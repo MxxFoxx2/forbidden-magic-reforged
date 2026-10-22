@@ -186,3 +186,31 @@ brainy_zombie/mind, pig/beast), размер таблицы не меньше 40
 
 Не покрыто: реальный импринт через `LivingDropsEvent` при убийстве, переключение модели
 `has_component` в клиенте, ветки `wrath_cage = false` и `wrath_crazy = true`, Клетка Гнева (M7b).
+
+## Слайс M7b: Клетка Гнева
+
+Замерено 2026-10-22 на `dev`, перед коммитом документации.
+
+| Гейт | Результат |
+|---|---|
+| build | `BUILD SUCCESSFUL in 25s`, без ошибок компиляции |
+| тесты, `no_lust = false` | `All 46 required tests passed :)`, `no_lust gate: disabled=false, luxuria=luxuria` |
+| тесты, `no_lust = true` | `All 46 required tests passed :)`, `no_lust gate: disabled=false, luxuria=luxuria` |
+| генератор | `lang/en_us.json: 85 keys`, `lang/ru_ru.json: 85 keys`, wrath cage model/blockstate |
+| provenance | не проверялся (нет изменений хоста) |
+| хост | `host matches sha + 3 patch commit(s)` (без изменений) |
+| артефакт | не измерялся |
+
+Новые тесты два — `wrath_cage_block_and_entity` (43) и `wrath_cage_crystal_and_spawn_rules` (44)
+в Task 1; `wrath_cage_research_and_recipes` (45) в Task 2. Тест 43 проверяет создание блока и
+block entity, привязку кристалла, замену привязки и дроп при разрушении. Тест 44 проверяет
+логику `shouldSpawn` для разных комбинаций красного камня, топлива и эссенции. Тест 45 проверяет
+существование исследования `WRATHCAGE` (warp 3, 5 страниц), инфузионного рецепта `WRATHCAGE`
+(WRATH 32) и тигельного рецепта `MOBCRYSTAL` (MIND 10).
+
+Добавлен клиентский рендерер `WrathCageRenderer` с современным API extract/submit: создаёт
+временную сущность из `mobId`, извлекает `EntityRenderState` через `EntityRenderDispatcher.extractEntity`,
+рендерит с вращением внутри клетки. Регистрация через `FmClientEvents` на клиентской шине событий.
+
+Не покрыто: визуальная проверка рендерера в реальной игре, вилка дьяболаста (отложена),
+переключение режимов эссенции вилкой, `wrathCrazy`-специфика за пределами разрешённых id.

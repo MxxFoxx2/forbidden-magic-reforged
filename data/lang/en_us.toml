@@ -38,6 +38,7 @@ VOIDTOUCHED = "Enchantment: Voidtouched"
 TAINTTREE = "Tainted Tree"
 BLACKFLOWER = "Umbral Rose"
 ARCANECAKE = "Thaumic Cake"
+WRATHCAGE = "Wrath Cage"
 
 [tc.research_text]
 NETHERSHARDS = "Aim to misbehave."
@@ -50,6 +51,7 @@ VOIDTOUCHED = "Colour Out of Space"
 TAINTTREE = "The root of flux bears gross fruit"
 BLACKFLOWER = "Save the squid!"
 ARCANECAKE = "Let them eat cake."
+WRATHCAGE = "Neverending battle"
 
 [forbiddenmagic.research_page.NETHERSHARDS]
 1 = "Strange energies swirl through the Nether. On occasion, they have been known to solidify into crystal shards when certain sympathetic events occur."
@@ -112,6 +114,11 @@ umbral_rose = "Umbral Rose"
 umbral_rose_bush = "Umbral Rose Bush"
 arcane_cake = "Thaumic Cake"
 wrath_cage = "Wrath Cage"
+
+[forbiddenmagic.research_page.WRATHCAGE]
+1 = "Sometimes, it is not enough to kill something only once. You have reconstructed the monster spawners found in ancient ruins, but made yours answer to redstone instead of requiring a nearby player. The Wrath Cage reacts to a redstone signal: powered it stops, unpowered it continues its cycle. It also works much faster than the ancient analogues."
+2 = "However, you could not recreate the original method of infinite creature spawning. For each creature the cage requires some essentia, which must be piped in. The device accepts different types of essentia depending on the imprinted creature. Ira can also serve as fuel. The cage also accepts Desidia, but it adds a substantial delay to the next cycle."
+3 = "Right-click the cage with an imprinted crystal to attune it. If it was already attuned, the previous imprint is returned directly to your hand. Breaking the cage also releases its imprint crystal. To imprint a crystal, kill a compatible mob with a blank crystal in your inventory."
 
 [forbiddenmagic.research_page.TAINTTREE]
 1 = "The sick, twisted runoff of magical experiments can take on a strange life of its own. Most plants are unable to survive in Tainted Lands, but you've found a way to grow one that can. By steeping a sapling in taint, you create a tree that can thrive in Tainted Lands.<BR><BR>Its wood can also be turned into planks which are resistant to fibrous taint, allowing you to build structures safe from spreading taint.<BR><BR>The tree also seems to bear fruit, but eating them is not recommended..."

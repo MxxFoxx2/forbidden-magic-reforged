@@ -80,7 +80,7 @@ import thaumcraft.research.ResearchManager;
 public final class FmGameTests {
     public static final DeferredRegister<Consumer<GameTestHelper>> FUNCTIONS =
         DeferredRegister.create(Registries.TEST_FUNCTION, ForbiddenMagic.MODID);
-    private static final String[] TESTS = {"mod_loads_and_host_is_present", "aspect_registry_keeps_builtin_order_and_combines", "addon_aspect_survives_client_sync", "sin_aspects_registered_with_own_textures", "sin_aspect_tags_merge_with_existing", "entity_aspect_tags_merge_with_existing", "every_tag_target_resolved", "shards_are_registered_with_seven_ids", "no_lust_removes_luxuria_items", "mob_killed_by_player_drops_wrath_shard", "boss_drops_pride_shards", "unattended_death_drops_sloth_shard", "forbidden_category_and_shard_entries_resolve", "skull_axe_infusion_recipe_matches_original", "every_ported_recipe_resolves_its_inputs", "chain_from_netherrack_to_wrath_shard", "enchantments_resolve_with_expected_shape", "emerald_fragment_is_registered", "consuming_destroys_garbage", "corrupting_yields_sin_shards", "greedy_drops_match_kills", "educational_multiplies_experience", "wrath_adds_damage", "enchantment_research_present", "enchantment_recipes_cover_five", "tinkerer_integration_is_optional", "morph_tools_are_registered", "morph_phase_rotates_sets", "impact_covers_a_three_by_three_plane", "voidtouched_repairs_and_warps", "morph_enchantments_and_exclusivity", "cluster_replaces_drops_with_clusters", "morph_research_entries_present", "morph_recipes_match_the_original", "taint_material_blocks_are_registered", "taint_blocks_carry_tool_tags", "materials_have_crafting_recipes", "blocks_drop_themselves", "taint_sapling_grows_a_tree", "umbral_plants_are_registered", "plant_research_and_recipes", "arcane_cake_feeds_and_keeps_slices", "mob_crystal_and_spawn_table", "wrath_cage_block_and_entity", "wrath_cage_crystal_and_spawn_rules"};
+    private static final String[] TESTS = {"mod_loads_and_host_is_present", "aspect_registry_keeps_builtin_order_and_combines", "addon_aspect_survives_client_sync", "sin_aspects_registered_with_own_textures", "sin_aspect_tags_merge_with_existing", "entity_aspect_tags_merge_with_existing", "every_tag_target_resolved", "shards_are_registered_with_seven_ids", "no_lust_removes_luxuria_items", "mob_killed_by_player_drops_wrath_shard", "boss_drops_pride_shards", "unattended_death_drops_sloth_shard", "forbidden_category_and_shard_entries_resolve", "skull_axe_infusion_recipe_matches_original", "every_ported_recipe_resolves_its_inputs", "chain_from_netherrack_to_wrath_shard", "enchantments_resolve_with_expected_shape", "emerald_fragment_is_registered", "consuming_destroys_garbage", "corrupting_yields_sin_shards", "greedy_drops_match_kills", "educational_multiplies_experience", "wrath_adds_damage", "enchantment_research_present", "enchantment_recipes_cover_five", "tinkerer_integration_is_optional", "morph_tools_are_registered", "morph_phase_rotates_sets", "impact_covers_a_three_by_three_plane", "voidtouched_repairs_and_warps", "morph_enchantments_and_exclusivity", "cluster_replaces_drops_with_clusters", "morph_research_entries_present", "morph_recipes_match_the_original", "taint_material_blocks_are_registered", "taint_blocks_carry_tool_tags", "materials_have_crafting_recipes", "blocks_drop_themselves", "taint_sapling_grows_a_tree", "umbral_plants_are_registered", "plant_research_and_recipes", "arcane_cake_feeds_and_keeps_slices", "mob_crystal_and_spawn_table", "wrath_cage_block_and_entity", "wrath_cage_crystal_and_spawn_rules", "wrath_cage_research_and_recipes"};
 
     static {
         FUNCTIONS.register(TESTS[0], () -> FmGameTests::modLoadsAndHostIsPresent);
@@ -128,6 +128,7 @@ public final class FmGameTests {
         FUNCTIONS.register(TESTS[42], () -> FmGameTests::mobCrystalAndSpawnTable);
         FUNCTIONS.register(TESTS[43], () -> FmGameTests::wrathCageBlockAndEntity);
         FUNCTIONS.register(TESTS[44], () -> FmGameTests::wrathCageCrystalAndSpawnRules);
+        FUNCTIONS.register(TESTS[45], () -> FmGameTests::wrathCageResearchAndRecipes);
     }
 
     private FmGameTests() {
@@ -730,6 +731,20 @@ public final class FmGameTests {
         helper.assertTrue(WrathCageBlockEntity.shouldSpawn(false, true, 0, 5, 5), "enough essentia starts a fuel cycle");
         helper.assertFalse(WrathCageBlockEntity.shouldSpawn(false, false, 10, 5, 0), "an unattuned cage waits");
         helper.assertTrue(WrathCageBlockEntity.shouldSpawn(false, true, 0, 0, 0), "cost 0 needs no fuel");
+        helper.succeed();
+    }
+
+    private static void wrathCageResearchAndRecipes(GameTestHelper helper) {
+        ResearchItem cage = ResearchCategories.getResearch("WRATHCAGE");
+        helper.assertTrue(cage != null, "wrath cage research exists");
+        helper.assertValueEqual(cage.warp(), 3, "wrath cage warp is 3");
+        helper.assertValueEqual(cage.pages().size(), 5, "wrath cage has 5 pages");
+        InfusionRecipe cageRecipe = (InfusionRecipe) TcRecipes.get("WRATHCAGE");
+        helper.assertTrue(cageRecipe != null, "wrath cage infusion recipe exists");
+        helper.assertTrue(cageRecipe.aspects().getAmount(FmAspects.WRATH) >= 32, "wrath cage recipe needs WRATH 32");
+        thaumcraft.crafting.CrucibleRecipe crystalRecipe = (thaumcraft.crafting.CrucibleRecipe) TcRecipes.get("MOBCRYSTAL");
+        helper.assertTrue(crystalRecipe != null, "mob crystal crucible recipe exists");
+        helper.assertTrue(crystalRecipe.aspects().getAmount(Aspect.MIND) >= 10, "mob crystal recipe needs MIND 10");
         helper.succeed();
     }
 

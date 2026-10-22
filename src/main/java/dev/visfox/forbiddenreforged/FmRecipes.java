@@ -13,7 +13,8 @@ import thaumcraft.crafting.TcStack;
 
 public final class FmRecipes {
     public static final Set<String> OWN_KEYS = Set.of("SKULLAXE", "WRATH", "GREEDY", "CONSUMING", "EDUCATIONAL", "CORRUPTING",
-        "MORPHPICK", "MORPHSWORD", "MORPHSHOVEL", "MORPHAXE", "CLUSTER", "IMPACT", "VOIDTOUCHED", "TAINTTREE", "BLACKFLOWER", "ARCANECAKE");
+        "MORPHPICK", "MORPHSWORD", "MORPHSHOVEL", "MORPHAXE", "CLUSTER", "IMPACT", "VOIDTOUCHED", "TAINTTREE", "BLACKFLOWER", "ARCANECAKE",
+        "WRATHCAGE", "MOBCRYSTAL");
 
     private FmRecipes() {
     }
@@ -125,6 +126,29 @@ public final class FmRecipes {
             TcIngredient.item("minecraft:oak_sapling"), new AspectList().add(Aspect.TAINT, 10).add(Aspect.POISON, 4)));
         TcRecipes.register(new CrucibleRecipe("BLACKFLOWER", "BLACKFLOWER", TcStack.of("forbiddenmagic:umbral_rose_bush", 1),
             TcIngredient.item("minecraft:rose_bush"), new AspectList().add(Aspect.DARKNESS, 8).add(Aspect.LIFE, 5)));
+        TcRecipes.register(new InfusionRecipe(
+            "WRATHCAGE",
+            "WRATHCAGE",
+            TcStack.of("forbiddenmagic:wrath_cage", 1),
+            10,
+            new AspectList().add(FmAspects.WRATH, 32).add(Aspect.MAGIC, 32).add(Aspect.BEAST, 32).add(Aspect.MECHANISM, 16),
+            TcIngredient.item("thaumcraft:thaumium_block"),
+            List.of(
+                TcIngredient.item(FmItems.id("wrath").toString()),
+                TcIngredient.item(FmItems.id("wrath").toString()),
+                TcIngredient.item(FmItems.id("wrath").toString()),
+                TcIngredient.item(FmItems.id("wrath").toString()),
+                TcIngredient.item("minecraft:diamond"),
+                TcIngredient.item("minecraft:diamond"),
+                TcIngredient.item("minecraft:diamond"),
+                TcIngredient.item("minecraft:diamond"),
+                TcIngredient.item("thaumcraft:warded_jar"),
+                TcIngredient.item("thaumcraft:warded_jar"),
+                TcIngredient.item("thaumcraft:warded_jar")
+            )
+        ));
+        TcRecipes.register(new CrucibleRecipe("MOBCRYSTAL", "WRATHCAGE", TcStack.of("forbiddenmagic:mob_crystal", 1),
+            TcIngredient.item("minecraft:diamond"), new AspectList().add(Aspect.MIND, 10).add(Aspect.ENERGY, 10)));
     }
 
     private static void registerMorphTools() {

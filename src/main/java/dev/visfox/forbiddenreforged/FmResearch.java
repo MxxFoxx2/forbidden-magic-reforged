@@ -97,6 +97,19 @@ public final class FmResearch {
             .setAspectTriggers(FmAspects.GLUTTONY)
             .setConcealed()
             .registerResearchItem();
+        new ResearchItem("WRATHCAGE", "FORBIDDEN", new AspectList().add(FmAspects.WRATH, 5).add(Aspect.MECHANISM, 3).add(Aspect.BEAST, 2), -9, -9, 3, TcStack.of("forbiddenmagic:wrath_cage", 1))
+            .setPages(
+                ResearchPage.text("forbiddenmagic.research_page.WRATHCAGE.1"),
+                ResearchPage.infusion("WRATHCAGE"),
+                ResearchPage.text("forbiddenmagic.research_page.WRATHCAGE.2"),
+                ResearchPage.text("forbiddenmagic.research_page.WRATHCAGE.3"),
+                ResearchPage.crucible("MOBCRYSTAL")
+            )
+            .setParents("NETHERSHARDS")
+            .setParentsHidden("INFUSION", "THAUMIUM", "DISTILESSENTIA")
+            .setConcealed()
+            .setWarp(3)
+            .registerResearchItem();
         new ResearchItem("TAINTTREE", "FORBIDDEN", new AspectList().add(Aspect.TREE, 4).add(Aspect.TAINT, 6).add(Aspect.POISON, 2).add(Aspect.PLANT, 3), -11, 3, 3, TcStack.of("forbiddenmagic:taint_sapling", 1))
             .setPages(ResearchPage.text("forbiddenmagic.research_page.TAINTTREE.1"), ResearchPage.crucible("TAINTTREE"))
             .setParents("THAUMIUM", "INFUSION", "ETHEREALBLOOM")

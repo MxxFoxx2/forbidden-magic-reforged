@@ -36,6 +36,9 @@
   "forbiddenmagic.research_page.TAINTTREE.1": "The sick, twisted runoff of magical experiments can take on a strange life of its own. Most plants are unable to survive in Tainted Lands, but you've found a way to grow one that can. By steeping a sapling in taint, you create a tree that can thrive in Tainted Lands.<BR><BR>Its wood can also be turned into planks which are resistant to fibrous taint, allowing you to build structures safe from spreading taint.<BR><BR>The tree also seems to bear fruit, but eating them is not recommended...",
   "forbiddenmagic.research_page.VOIDTOUCHED.1": "Voidmetal's ability to flow back into place after being damaged is fascinating. You sure wish your Chameleon Tools had the same properties...<BR><BR>The Voidtouched enchant gives a Chameleon Tool the same regenerating quality as Void Tools.<BR><BR>Chameleon Tools affected by the enchantment appear to be made of living scaled flesh which morphs back into shape when hurt. Just looking at it is disturbing for your sanity.",
   "forbiddenmagic.research_page.WRATH.1": "Ugh. You need more excessively violent weapons to kill things with. Enchanting is a good start, but there's only so much Sharpness you can squeeze into a typical sword before it starts to liquefy and sprout daisies instead. Your weapons just aren't killing things hard enough.<BR><BR>To amend this, you've created a special enchantment to force even more violence and death into a weapon. The Wrath enchantment increases the offensive power of a weapon, but is still compatible with Sharpness, Bane of Arthropods, and Smite.",
+  "forbiddenmagic.research_page.WRATHCAGE.1": "Sometimes, it is not enough to kill something only once. You have reconstructed the monster spawners found in ancient ruins, but made yours answer to redstone instead of requiring a nearby player. The Wrath Cage reacts to a redstone signal: powered it stops, unpowered it continues its cycle. It also works much faster than the ancient analogues.",
+  "forbiddenmagic.research_page.WRATHCAGE.2": "However, you could not recreate the original method of infinite creature spawning. For each creature the cage requires some essentia, which must be piped in. The device accepts different types of essentia depending on the imprinted creature. Ira can also serve as fuel. The cage also accepts Desidia, but it adds a substantial delay to the next cycle.",
+  "forbiddenmagic.research_page.WRATHCAGE.3": "Right-click the cage with an imprinted crystal to attune it. If it was already attuned, the previous imprint is returned directly to your hand. Breaking the cage also releases its imprint crystal. To imprint a crystal, kill a compatible mob with a blank crystal in your inventory.",
   "item.forbiddenmagic.emerald_fragment": "Emerald Fragment",
   "item.forbiddenmagic.envy_shard": "Envy Shard",
   "item.forbiddenmagic.gluttony_shard": "Gluttony Shard",
@@ -69,6 +72,7 @@
   "tc.research_name.SKULLAXE": "Axe of the Skulltaker",
   "tc.research_name.TAINTTREE": "Tainted Tree",
   "tc.research_name.VOIDTOUCHED": "Enchantment: Voidtouched",
+  "tc.research_name.WRATHCAGE": "Wrath Cage",
   "tc.research_text.ARCANECAKE": "Let them eat cake.",
   "tc.research_text.BLACKFLOWER": "Save the squid!",
   "tc.research_text.CLUSTER": "Chameleon of the Core",
@@ -78,5 +82,6 @@
   "tc.research_text.NETHERSHARDS": "Aim to misbehave.",
   "tc.research_text.SKULLAXE": "Off with their heads!",
   "tc.research_text.TAINTTREE": "The root of flux bears gross fruit",
-  "tc.research_text.VOIDTOUCHED": "Colour Out of Space"
+  "tc.research_text.VOIDTOUCHED": "Colour Out of Space",
+  "tc.research_text.WRATHCAGE": "Neverending battle"
 }
