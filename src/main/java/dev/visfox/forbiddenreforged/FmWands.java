@@ -13,6 +13,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import thaumcraft.aspect.Aspect;
@@ -87,7 +88,7 @@ public final class FmWands {
             SoundEvents.FLINTANDSTEEL_USE, SoundSource.BLOCKS, 1.0F,
             level.getRandom().nextFloat() * 0.4F + 0.8F
         );
-        player.swing(InteractionHand.MAIN_HAND);
+        player.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, true);
         return true;
     }
 
