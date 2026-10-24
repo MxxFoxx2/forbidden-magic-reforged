@@ -158,7 +158,7 @@ public final class FmEnchantmentEffects {
         if (!(attacker instanceof ServerPlayer player) || attacker instanceof FakePlayer || !event.isRecentlyHit()) {
             return;
         }
-        if (FmEnchantments.enabled() && FmConfig.greedyEnchantmentEnabled()) {
+        if (FmEnchantments.enabled()) {
             greedyDrops(event, player);
         }
         ItemStack weapon = player.getMainHandItem();
