@@ -67,7 +67,8 @@ public final class RecipeGameTests {
         "wand_rod_recipes_registered",
         "taintstone_research_and_arcane_recipe",
         "ore_dictionary_entries_became_tags",
-        "emerald_transmutation_matches_original"
+        "emerald_transmutation_matches_original",
+        "ring_nutrition_recipe_matches_original"
     };
 
     static {
@@ -81,6 +82,7 @@ public final class RecipeGameTests {
         FUNCTIONS.register(TESTS[7], () -> RecipeGameTests::taintstoneResearchAndArcaneRecipe);
         FUNCTIONS.register(TESTS[8], () -> RecipeGameTests::oreDictionaryEntriesBecameTags);
         FUNCTIONS.register(TESTS[9], () -> RecipeGameTests::emeraldTransmutationMatchesOriginal);
+        FUNCTIONS.register(TESTS[10], () -> RecipeGameTests::ringNutritionRecipeMatchesOriginal);
     }
 
     private RecipeGameTests() {}
@@ -272,6 +274,37 @@ public final class RecipeGameTests {
         helper.assertTrue(research != null, "transmutation research exists when enabled");
         helper.assertValueEqual(research.pages().size(), 2, "transmutation research has text and crucible pages");
         helper.assertTrue(research.isSecondary() && research.isConcealed(), "transmutation research retains secondary/concealed status");
+        helper.succeed();
+    }
+
+    private static void ringNutritionRecipeMatchesOriginal(GameTestHelper helper) {
+        ResearchItem research = ResearchCategories.getResearch("RINGFOOD");
+        helper.assertTrue(research != null, "ring nutrition research exists");
+        if (FmConfig.gluttonyMode() == 1) {
+            helper.assertTrue(TcRecipes.get("RINGFOOD") == null, "disabled gluttony removes the ring recipe");
+            helper.succeed();
+            return;
+        }
+
+        TcRecipe registered = TcRecipes.get("RINGFOOD");
+        helper.assertTrue(registered instanceof ShapedArcaneRecipe, "ring nutrition uses arcane crafting");
+        ShapedArcaneRecipe recipe = (ShapedArcaneRecipe) registered;
+        helper.assertValueEqual(recipe.width(), 3, "ring recipe width");
+        helper.assertValueEqual(recipe.height(), 3, "ring recipe height");
+        helper.assertValueEqual(recipe.aspects().getAmount(Aspect.ENTROPY), 10, "ring costs ten entropy");
+        helper.assertValueEqual(recipe.aspects().getAmount(Aspect.WATER), 20, "ring costs twenty water");
+        helper.assertValueEqual(recipe.aspects().getAmount(Aspect.EARTH), 20, "ring costs twenty earth");
+
+        String core = FmConfig.gluttonyMode() == 2 ? "forbiddenmagic:star_block" : "minecraft:diamond";
+        helper.assertTrue(recipe.grid().get(1).test(TcStack.of(core).create()), "ring core matches gluttony difficulty");
+        helper.assertTrue(recipe.grid().get(3).test(new ItemStack(FmItems.GLUTTONY_SHARD.get())), "left shard slot");
+        helper.assertTrue(recipe.grid().get(5).test(new ItemStack(FmItems.GLUTTONY_SHARD.get())), "right shard slot");
+        helper.assertTrue(recipe.grid().get(7).test(new ItemStack(FmItems.GLUTTONY_SHARD.get())), "bottom shard slot");
+        helper.assertTrue(recipe.grid().get(4).test(TcStack.of("thaumcraft:mundane_ring").create()), "blank ring is the base");
+        for (int slot : new int[]{0, 2, 6, 8}) {
+            helper.assertTrue(recipe.grid().get(slot).test(ItemStack.EMPTY), "slot " + slot + " is empty");
+        }
+        helper.assertValueEqual(research.pages().size(), 2, "research includes the original recipe page");
         helper.succeed();
     }
 
