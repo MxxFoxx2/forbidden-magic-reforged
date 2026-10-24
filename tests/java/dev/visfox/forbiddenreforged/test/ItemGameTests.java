@@ -27,6 +27,7 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.item.component.CookingFuel;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootParams;
@@ -51,6 +52,7 @@ import thaumcraft.research.ResearchItem;
 import thaumcraft.wand.WandRegistry;
 import thaumcraft.wand.WandRod;
 import thaumcraft.wand.Wands;
+import thaumcraft.wand.WandTriggers;
 
 @EventBusSubscriber(modid = ForbiddenMagic.MODID)
 public final class ItemGameTests {
@@ -363,10 +365,20 @@ public final class ItemGameTests {
         WandRod infernalRod = WandRegistry.findRod("infernal");
         helper.assertTrue(infernalRod != null, "infernal rod must be registered");
         ItemStack infernalWand = Wands.create(WandRegistry.CAP_IRON, infernalRod, false);
-        helper.assertFalse(FmToolEvents.cancelsInfernalDamage(infernalWand, true),
-            "infernal wand must not cancel incoming fire or wither damage");
+        helper.assertTrue(FmToolEvents.cancelsInfernalDamage(infernalWand, true),
+            "infernal wand cancels incoming fire or wither damage");
         helper.assertFalse(FmToolEvents.cancelsInfernalDamage(infernalWand, false),
-            "infernal wand must not cancel unrelated incoming damage");
+            "infernal wand does not cancel unrelated incoming damage");
+
+        WandRod taintedRod = WandRegistry.findRod("tainted");
+        ItemStack taintedWand = Wands.create(WandRegistry.CAP_THAUMIUM, taintedRod, false);
+        helper.assertTrue(FmToolEvents.isTaintedWand(taintedWand), "tainted wand is recognized for taint damage");
+        helper.assertFalse(FmToolEvents.isTaintedWand(infernalWand), "infernal wand is not treated as tainted");
+
+        helper.assertTrue(WandTriggers.hasTrigger(Blocks.OBSIDIAN.defaultBlockState()),
+            "hellfire trigger is registered for obsidian");
+        helper.assertTrue(WandTriggers.hasTrigger(Blocks.NETHERRACK.defaultBlockState()),
+            "hellfire trigger is registered for netherrack");
         helper.succeed();
     }
 
