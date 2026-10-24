@@ -1,0 +1,34 @@
+{
+  "wants": {
+    "id": "minecraft:emerald",
+    "count": {
+      "type": "minecraft:uniform",
+      "min": 8,
+      "max": 12
+    }
+  },
+  "additional_wants": {
+    "id": "minecraft:stick"
+  },
+  "gives": {
+    "id": "thaumcraft:wand",
+    "components": {
+      "thaumcraft:wand_parts": {
+        "cap": "iron",
+        "rod": "profane",
+        "sceptre": false
+      },
+      "thaumcraft:wand_vis": {
+        "aer": 5000,
+        "terra": 5000,
+        "ignis": 5000,
+        "aqua": 5000,
+        "ordo": 5000,
+        "perditio": 5000
+      }
+    }
+  },
+  "max_uses": 3,
+  "xp": 20,
+  "reputation_discount": 0
+}

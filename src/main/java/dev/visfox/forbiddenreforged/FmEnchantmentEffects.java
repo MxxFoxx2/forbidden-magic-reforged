@@ -247,17 +247,14 @@ public final class FmEnchantmentEffects {
         if (event.getEntity() instanceof Player wearer && !wearer.level().isClientSide()) {
             ItemStack held = wearer.getMainHandItem();
             if (Wands.isWand(held)) {
-                String rod = Wands.getRod(held).tag();
                 boolean fireOrWither = event.getSource().is(DamageTypeTags.IS_FIRE)
                     || event.getSource().is(DamageTypes.WITHER);
                 if (FmToolEvents.cancelsInfernalDamage(held, fireOrWither)) {
                     event.setCanceled(true);
                     return;
                 }
-                if (rod.equals("tainted") && event.getSource().is(ModDamageTypes.TAINT)) {
-                    List<Aspect> primals = Aspect.getPrimalAspects();
-                    for (int i = 0; i < 3; i++) {
-                        Aspect aspect = primals.get(wearer.getRandom().nextInt(primals.size()));
+                if (FmToolEvents.restoresTaintedVis(held, event.getSource().is(ModDamageTypes.TAINT))) {
+                    for (Aspect aspect : FmToolEvents.taintedVisRolls(wearer.getRandom())) {
                         Wands.addVis(held, aspect, 1, true);
                     }
                 }

@@ -43,6 +43,7 @@ import dev.visfox.forbiddenreforged.FmAspectTags;
 import dev.visfox.forbiddenreforged.FmConfig;
 import dev.visfox.forbiddenreforged.FmCreativeTab;
 import dev.visfox.forbiddenreforged.FmDrops;
+import dev.visfox.forbiddenreforged.FmBlocks;
 import dev.visfox.forbiddenreforged.FmItems;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.aspect.AspectList;
@@ -71,7 +72,8 @@ public final class AspectGameTests {
         "forbidden_category_and_shard_entries_resolve",
         "nether_shard_drop_rules_match_original_boundaries",
         "aspect_diagnostics_expose_stable_registry_table",
-        "forbiddenmagic_aspects_command_is_registered"
+        "forbiddenmagic_aspects_command_is_registered",
+        "addon_item_aspects_match_original_assignments"
     };
 
     static {
@@ -91,6 +93,7 @@ public final class AspectGameTests {
         FUNCTIONS.register(TESTS[13], () -> AspectGameTests::netherShardDropRulesMatchOriginalBoundaries);
         FUNCTIONS.register(TESTS[14], () -> AspectGameTests::aspectDiagnosticsExposeStableRegistryTable);
         FUNCTIONS.register(TESTS[15], () -> AspectGameTests::forbiddenmagicAspectsCommandIsRegistered);
+        FUNCTIONS.register(TESTS[16], () -> AspectGameTests::addonItemAspectsMatchOriginalAssignments);
     }
 
     private AspectGameTests() {}
@@ -233,6 +236,56 @@ public final class AspectGameTests {
         helper.assertTrue(FmDrops.rollWrath(2, 2), "chance 2 must drop at roll 2, the original uses nextInt(61) <= wrath");
         helper.assertFalse(FmDrops.rollWrath(2, 3), "chance 2 must not drop at roll 3");
         helper.assertValueEqual(FmDrops.wrathShardStack().getItem(), FmItems.DEADLY_SHARDS.get("wrath").get(), "wrath drop must be the wrath shard");
+        helper.succeed();
+    }
+
+    private static void addonItemAspectsMatchOriginalAssignments(GameTestHelper helper) {
+        AspectRegistry registry = AspectRegistry.active();
+
+        AspectList emerald = registry.getObjectTags(FmItems.EMERALD_FRAGMENT.get());
+        helper.assertTrue(emerald != null && emerald.getAmount(Aspect.CRYSTAL) == 1,
+            "emerald fragment keeps the original crystal aspect");
+        AspectList dye = registry.getObjectTags(FmItems.BLACK_DYE.get());
+        helper.assertTrue(dye != null && dye.getAmount(Aspect.DARKNESS) == 1,
+            "black dye keeps the original darkness aspect");
+
+        AspectList fruit = registry.getObjectTags(FmItems.TAINT_FRUIT.get());
+        helper.assertTrue(fruit != null && fruit.getAmount(Aspect.TAINT) == 2 && fruit.getAmount(Aspect.POISON) == 1,
+            "taint fruit keeps taint and poison");
+        AspectList coal = registry.getObjectTags(FmItems.TAINT_COAL.get());
+        helper.assertTrue(coal != null && coal.getAmount(Aspect.TAINT) == 2 && coal.getAmount(Aspect.ENTROPY) == 2,
+            "taint coal keeps taint and entropy");
+
+        AspectList leaves = registry.getObjectTags(FmBlocks.TAINT_LEAVES.get().asItem());
+        helper.assertTrue(leaves != null && leaves.getAmount(Aspect.TAINT) == 1 && leaves.getAmount(Aspect.PLANT) == 1,
+            "tainted leaves keep taint and plant");
+        AspectList log = registry.getObjectTags(FmBlocks.TAINT_LOG.get().asItem());
+        helper.assertTrue(log != null && log.getAmount(Aspect.TAINT) == 1 && log.getAmount(Aspect.TREE) == 3,
+            "tainted log keeps taint and tree");
+        AspectList planks = registry.getObjectTags(FmBlocks.TAINT_PLANKS.get().asItem());
+        helper.assertTrue(planks != null && planks.getAmount(Aspect.TREE) == 1,
+            "tainted planks keep tree");
+        AspectList brick = registry.getObjectTags(FmBlocks.TAINT_STONE_BRICK.get().asItem());
+        helper.assertTrue(brick != null && brick.getAmount(Aspect.EARTH) == 1,
+            "tainted stone bricks keep earth");
+
+        AspectList flower = registry.getObjectTags(FmBlocks.UMBRAL_ROSE.get().asItem());
+        helper.assertTrue(flower != null
+                && flower.getAmount(Aspect.PLANT) == 1
+                && flower.getAmount(Aspect.LIFE) == 1
+                && flower.getAmount(Aspect.SENSES) == 1
+                && flower.getAmount(Aspect.DARKNESS) == 1,
+            "umbral rose keeps the original black flower aspects");
+        if (!FmConfig.lustDisabled()) {
+            AspectList crop = registry.getObjectTags(FmItems.RIDING_CROP.get());
+            helper.assertTrue(crop != null
+                    && crop.getAmount(Aspect.TREE) == 2
+                    && crop.getAmount(Aspect.CLOTH) == 2
+                    && crop.getAmount(Aspect.BEAST) == 1
+                    && crop.getAmount(FmAspects.LUST) == 1
+                    && crop.getAmount(Aspect.WEAPON) == 1,
+                "riding crop keeps the original aspect list when lust is enabled");
+        }
         helper.succeed();
     }
 

@@ -23,13 +23,10 @@ public final class FmVillagers {
 
     private static DeferredHolder<VillagerProfession, VillagerProfession> profession(String name) {
         return PROFESSIONS.register(name, () -> {
-            String tradeSetName = name;
-            if (name.equals("heretic") && FmConfig.lustDisabled()) {
-                tradeSetName = "heretic_no_lust";
-            }
             Int2ObjectMap<ResourceKey<TradeSet>> tradeSets = new Int2ObjectOpenHashMap<>();
             for (int level = 1; level <= 5; level++) {
-                tradeSets.put(level, ResourceKey.create(Registries.TRADE_SET, ForbiddenMagic.id(tradeSetName + "/level_" + level)));
+                String suffix = FmConfig.lustDisabled() ? "/no_lust/level_" : "/level_";
+                tradeSets.put(level, ResourceKey.create(Registries.TRADE_SET, ForbiddenMagic.id(name + suffix + level)));
             }
             return new VillagerProfession(
                 Component.translatable("entity.forbiddenmagic.villager." + name),

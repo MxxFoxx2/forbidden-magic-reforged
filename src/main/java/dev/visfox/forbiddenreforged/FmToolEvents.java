@@ -1,5 +1,6 @@
 package dev.visfox.forbiddenreforged;
 
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.core.registries.Registries;
@@ -7,6 +8,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.state.BlockState;
@@ -16,14 +18,18 @@ import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
+import thaumcraft.aspect.Aspect;
 import thaumcraft.platform.Baubles;
+import thaumcraft.wand.Wands;
 import thaumcraft.registry.ModBlocks;
 import thaumcraft.taint.TaintBlock;
 import thaumcraft.taint.TaintFibresBlock;
-import thaumcraft.wand.Wands;
-import thaumcraft.wand.Wands;
 
 public final class FmToolEvents {
+    private static final Aspect[] TAINTED_PRIMALS = {
+        Aspect.ENTROPY, Aspect.ORDER, Aspect.FIRE, Aspect.WATER, Aspect.EARTH, Aspect.AIR
+    };
+
     private FmToolEvents() {
     }
 
@@ -106,7 +112,21 @@ public final class FmToolEvents {
     }
 
     public static boolean cancelsInfernalDamage(ItemStack held, boolean fireOrWither) {
-        return fireOrWither && Wands.isWand(held) && Wands.getRod(held).tag().equals("infernal");
+        return fireOrWither && held != null && !held.isEmpty() && Wands.isWand(held)
+            && "infernal".equals(Wands.getRod(held).tag());
+    }
+
+    public static boolean restoresTaintedVis(ItemStack held, boolean taintDamage) {
+        return taintDamage && held != null && !held.isEmpty() && Wands.isWand(held)
+            && "tainted".equals(Wands.getRod(held).tag());
+    }
+
+    public static List<Aspect> taintedVisRolls(RandomSource random) {
+        return List.of(
+            TAINTED_PRIMALS[random.nextInt(TAINTED_PRIMALS.length)],
+            TAINTED_PRIMALS[random.nextInt(TAINTED_PRIMALS.length)],
+            TAINTED_PRIMALS[random.nextInt(TAINTED_PRIMALS.length)]
+        );
     }
 
     private static void onTooltip(ItemTooltipEvent event) {

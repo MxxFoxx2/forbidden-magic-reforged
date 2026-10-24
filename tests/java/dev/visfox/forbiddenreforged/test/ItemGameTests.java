@@ -30,11 +30,13 @@ import net.minecraft.gametest.framework.TestData;
 import net.minecraft.gametest.framework.TestEnvironmentDefinition;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CookingFuel;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
@@ -62,6 +64,7 @@ import thaumcraft.research.ResearchPage;
 import thaumcraft.wand.WandRegistry;
 import thaumcraft.wand.WandRod;
 import thaumcraft.wand.Wands;
+import thaumcraft.wand.WandTriggers;
 
 @EventBusSubscriber(modid = ForbiddenMagic.MODID)
 public final class ItemGameTests {
@@ -92,7 +95,9 @@ public final class ItemGameTests {
         "research_prefix_respects_tag_research",
         "item_translation_keys_are_not_nested_under_research_pages",
         "research_translation_keys_are_complete",
-        "crystalwell_research_page_matches_difficulty"
+        "crystalwell_research_page_matches_difficulty",
+        "infernal_and_tainted_wand_damage_behaviors_match_original",
+        "hellfire_trigger_targets_netherrack_and_obsidian"
     };
 
     static {
@@ -120,6 +125,8 @@ public final class ItemGameTests {
         FUNCTIONS.register(TESTS[21], () -> ItemGameTests::itemTranslationKeysAreNotNestedUnderResearchPages);
         FUNCTIONS.register(TESTS[22], () -> ItemGameTests::researchTranslationKeysAreComplete);
         FUNCTIONS.register(TESTS[23], () -> ItemGameTests::crystalwellResearchPageMatchesDifficulty);
+        FUNCTIONS.register(TESTS[24], () -> ItemGameTests::infernalAndTaintedWandDamageBehaviorsMatchOriginal);
+        FUNCTIONS.register(TESTS[25], () -> ItemGameTests::hellfireTriggerTargetsNetherrackAndObsidian);
     }
 
     private ItemGameTests() {}
@@ -586,6 +593,45 @@ public final class ItemGameTests {
             : "forbiddenmagic.research_page.CRYSTALWELL.1";
         helper.assertValueEqual(textPages.size(), 1, "crystalwell exposes one behavior page");
         helper.assertValueEqual(textPages.get(0), expected, "crystalwell page follows research difficulty");
+        helper.succeed();
+    }
+
+    private static void infernalAndTaintedWandDamageBehaviorsMatchOriginal(GameTestHelper helper) {
+        WandRod tainted = WandRegistry.findRod("tainted");
+        WandRod infernal = WandRegistry.findRod("infernal");
+        helper.assertTrue(tainted != null && infernal != null, "both behavior-bearing rods must be registered");
+        ItemStack taintedWand = Wands.create(WandRegistry.CAP_THAUMIUM, tainted, false);
+        ItemStack infernalWand = Wands.create(WandRegistry.CAP_THAUMIUM, infernal, false);
+
+        helper.assertTrue(FmToolEvents.cancelsInfernalDamage(infernalWand, true),
+            "held Infernal Wand cancels fire or wither damage");
+        helper.assertFalse(FmToolEvents.cancelsInfernalDamage(infernalWand, false),
+            "Infernal Wand does not cancel unrelated damage");
+        helper.assertFalse(FmToolEvents.cancelsInfernalDamage(taintedWand, true),
+            "Tainted Wand does not gain Infernal immunity");
+
+        helper.assertTrue(FmToolEvents.restoresTaintedVis(taintedWand, true),
+            "held Tainted Wand reacts to the taint damage type");
+        helper.assertFalse(FmToolEvents.restoresTaintedVis(taintedWand, false),
+            "Tainted Wand does not react to non-taint damage");
+        helper.assertFalse(FmToolEvents.restoresTaintedVis(infernalWand, true),
+            "Infernal Wand does not use the Tainted Wand reaction");
+
+        List<Aspect> restored = FmToolEvents.taintedVisRolls(RandomSource.create(42L));
+        helper.assertValueEqual(restored.size(), 3, "taint damage makes three independent primal-aspect rolls");
+        for (Aspect aspect : restored) {
+            helper.assertTrue(aspect.isPrimal(), "every restored aspect must be primal");
+        }
+        helper.succeed();
+    }
+
+    private static void hellfireTriggerTargetsNetherrackAndObsidian(GameTestHelper helper) {
+        helper.assertTrue(WandTriggers.hasTrigger(Blocks.NETHERRACK.defaultBlockState()),
+            "Hellfire trigger must be registered for netherrack");
+        helper.assertTrue(WandTriggers.hasTrigger(Blocks.OBSIDIAN.defaultBlockState()),
+            "Hellfire trigger must be registered for obsidian");
+        helper.assertTrue(ResearchCategories.getResearch("HELLFIRE") != null,
+            "the trigger's HELLFIRE research gate must exist");
         helper.succeed();
     }
 
