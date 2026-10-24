@@ -75,6 +75,23 @@ public final class FmAspectTags {
             String gluttony = FmItems.GLUTTONY_SHARD.getId().toString();
             DECLARED.add(gluttony);
             register(gluttony, tags().add(FmAspects.NETHER, 1).add(FmAspects.GLUTTONY, 2).add(Aspect.CRYSTAL, 1));
+
+            assign("forbiddenmagic:emerald_fragment", tags().add(Aspect.CRYSTAL, 1));
+            assign("forbiddenmagic:black_dye", tags().add(Aspect.DARKNESS, 1));
+            assign("forbiddenmagic:umbral_rose", tags()
+                .add(Aspect.PLANT, 1).add(Aspect.LIFE, 1).add(Aspect.SENSES, 1).add(Aspect.DARKNESS, 1));
+            if (!FmConfig.lustDisabled()) {
+                assign("forbiddenmagic:riding_crop", tags()
+                    .add(Aspect.TREE, 2).add(Aspect.CLOTH, 2).add(Aspect.BEAST, 1)
+                    .add(FmAspects.LUST, 1).add(Aspect.WEAPON, 1));
+            }
+            assign("forbiddenmagic:taint_fruit", tags().add(Aspect.TAINT, 2).add(Aspect.POISON, 1));
+            assign("forbiddenmagic:taint_coal", tags().add(Aspect.TAINT, 2).add(Aspect.ENTROPY, 2));
+            assign("forbiddenmagic:taint_leaves", tags().add(Aspect.TAINT, 1).add(Aspect.PLANT, 1));
+            assign("forbiddenmagic:taint_log", tags().add(Aspect.TAINT, 1).add(Aspect.TREE, 3));
+            assign("forbiddenmagic:taint_planks", tags().add(Aspect.TREE, 1));
+            assign("forbiddenmagic:taint_stone_brick", tags().add(Aspect.EARTH, 1));
+
             addEntity("thaumcraft:brainy_zombie", tags().add(FmAspects.WRATH, 3));
             addEntity("thaumcraft:giant_brainy_zombie", tags().add(FmAspects.WRATH, 4));
             addEntity("thaumcraft:firebat", tags().add(FmAspects.WRATH, 1).add(FmAspects.NETHER, 2));
@@ -101,6 +118,11 @@ public final class FmAspectTags {
                 merged.add(aspect, additions.getAmount(aspect));
             }
             register(target, merged);
+        }
+
+        private void assign(String target, AspectList aspects) {
+            DECLARED.add(target);
+            register(target, aspects);
         }
 
         private void addShard(String vice, AspectList aspects) {
