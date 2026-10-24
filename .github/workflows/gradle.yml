@@ -74,8 +74,8 @@ jobs:
               raise SystemExit(f"Expected startup config was not generated: {config}")
 
           original = config.read_text(encoding="utf-8")
-          pattern = re.compile(r"(?m)^([ \\t]*no_lust[ \\t]*=[ \\t]*)false([ \\t]*(?:#.*)?[ \\t]*$)")
-          updated, count = pattern.subn(r"\\1true\\2", original)
+          pattern = re.compile(r"(?m)^([ \t]*no_lust[ \t]*=[ \t]*)false([ \t]*(?:#.*)?[ \t]*$)")
+          updated, count = pattern.subn(r"\1true\2", original)
           if count != 1:
               raise SystemExit(f"Expected exactly one no_lust = false setting, found {count}")
 
