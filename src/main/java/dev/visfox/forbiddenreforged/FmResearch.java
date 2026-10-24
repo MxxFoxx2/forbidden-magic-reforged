@@ -144,11 +144,13 @@ public final class FmResearch {
                 .setConcealed()
                 .setWarp(3)
                 .registerResearchItem();
-            new ResearchItem("GREEDY", "FORBIDDEN", new AspectList().add(Aspect.MAGIC, 2).add(Aspect.WEAPON, 1).add(Aspect.GREED, 3), -6, -5, 2, ForbiddenMagic.id("textures/misc/greedy.png"))
-                .setPages(ResearchPage.text("forbiddenmagic.research_page.GREEDY.1"), ResearchPage.infusionEnchantment("GREEDY"))
-                .setParents("NETHERSHARDS", "INFUSIONENCHANTMENT")
-                .setConcealed()
-                .registerResearchItem();
+            if (FmConfig.greedyEnch()) {
+                new ResearchItem("GREEDY", "FORBIDDEN", new AspectList().add(Aspect.MAGIC, 2).add(Aspect.WEAPON, 1).add(Aspect.GREED, 3), -6, -5, 2, ForbiddenMagic.id("textures/misc/greedy.png"))
+                    .setPages(ResearchPage.text("forbiddenmagic.research_page.GREEDY.1"), ResearchPage.infusionEnchantment("GREEDY"))
+                    .setParents("NETHERSHARDS", "INFUSIONENCHANTMENT")
+                    .setConcealed()
+                    .registerResearchItem();
+            }
             new ResearchItem("CORRUPTING", "FORBIDDEN", new AspectList().add(FmAspects.NETHER, 5).add(Aspect.CRYSTAL, 2).add(Aspect.EXCHANGE, 1), -6, -4, 1, ForbiddenMagic.id("textures/misc/corrupting.png"))
                 .setPages(ResearchPage.text("forbiddenmagic.research_page.CORRUPTING.1"), ResearchPage.infusionEnchantment("CORRUPTING"))
                 .setParents("NETHERSHARDS", "INFUSIONENCHANTMENT")
