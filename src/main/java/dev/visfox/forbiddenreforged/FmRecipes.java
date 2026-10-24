@@ -18,7 +18,7 @@ public final class FmRecipes {
     public static final Set<String> OWN_KEYS = Set.of("SKULLAXE", "FORK", "WRATH", "GREEDY", "CONSUMING", "EDUCATIONAL", "CORRUPTING",
         "MORPHPICK", "MORPHSWORD", "MORPHSHOVEL", "MORPHAXE", "CLUSTER", "IMPACT", "VOIDTOUCHED", "TAINTTREE", "BLACKFLOWER", "ARCANECAKE",
         "WRATHCAGE", "MOBCRYSTAL", "ROD_TAINTED", "ROD_INFERNAL", "TAINTSHOVEL", "TAINTPICK", "CRYSTALWELL", "PRIMEWELL", "TRANSEMERALD", "FOCUSBLINK", "RINGFOOD",
-        "TaintStone", "TaintBrick");
+        "TaintStone", "TaintBrick", "BlackInk");
 
     private FmRecipes() {
     }
@@ -155,6 +155,8 @@ public final class FmRecipes {
             TcIngredient.item("minecraft:oak_sapling"), new AspectList().add(Aspect.TAINT, 10).add(Aspect.POISON, 4)));
         TcRecipes.register(new CrucibleRecipe("BLACKFLOWER", "BLACKFLOWER", TcStack.of("forbiddenmagic:umbral_rose_bush", 1),
             TcIngredient.item("minecraft:rose_bush"), new AspectList().add(Aspect.DARKNESS, 8).add(Aspect.LIFE, 5)));
+        TcRecipes.register(new CraftingRecipeRef("BlackInk", "BLACKFLOWER",
+            ForbiddenMagic.id("ink_from_rose"), TcStack.of("forbiddenmagic:black_dye", 2)));
         TcRecipes.register(new ShapedArcaneRecipe("TaintStone", "TAINTSTONE",
             TcStack.of("forbiddenmagic:taint_stone_smooth", 9),
             new AspectList().add(Aspect.ENTROPY, 2).add(Aspect.ORDER, 1),
