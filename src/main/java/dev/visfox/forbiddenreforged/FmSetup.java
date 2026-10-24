@@ -15,6 +15,7 @@ public final class FmSetup {
         event.enqueueWork(() -> {
             AddonAspects.init();
             FmWands.register();
+            FmWandTriggers.register();
             FmRecipes.register();
             FmResearch.register();
             FmTinkerer.register();
