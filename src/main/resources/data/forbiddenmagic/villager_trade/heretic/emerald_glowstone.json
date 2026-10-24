@@ -4,7 +4,11 @@
   },
   "gives": {
     "id": "minecraft:glowstone_dust",
-    "count": 10
+    "count": {
+      "type": "minecraft:uniform",
+      "min": 8,
+      "max": 16
+    }
   },
   "max_uses": 10,
   "xp": 5,
