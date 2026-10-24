@@ -101,8 +101,8 @@ public final class FmItems {
         TAINT_PICKAXE = ITEMS.registerItem("taint_pickaxe", Item::new,
             properties -> Registration.pickaxe(properties.rarity(Rarity.UNCOMMON), TcMaterials.ELEMENTAL_TOOL, 1.0F, -2.8F)
                 .repairable(ModItems.THAUMIUM_INGOT.get()));
-        CRYSTALWELL = ITEMS.registerSimpleItem("crystalwell", properties -> properties.stacksTo(1));
-        PRIMEWELL = ITEMS.registerSimpleItem("primewell", properties -> properties.stacksTo(1).durability(100));
+        CRYSTALWELL = ITEMS.registerItem("crystalwell", CrystalwellItem::new, properties -> properties.stacksTo(1));
+        PRIMEWELL = ITEMS.registerItem("primewell", PrimewellItem::new, properties -> properties.stacksTo(1).rarity(Rarity.EPIC));
         BLINK_FOCUS = ITEMS.registerItem("blink_focus", BlinkFocusItem::new,
             properties -> FocusItem.properties(properties));
     }

@@ -62,15 +62,17 @@ public final class FmRecipes {
                     TcIngredient.item(FmItems.id("wrath").toString()),
                     TcIngredient.item(FmItems.id("wrath").toString())
                 )));
-            TcRecipes.register(new InfusionEnchantmentRecipe("GREEDY", "GREEDY", ForbiddenMagic.id("greedy"), 4,
-                new AspectList().add(FmAspects.NETHER, 16).add(Aspect.WEAPON, 8).add(Aspect.GREED, 16),
-                List.of(
-                    TcIngredient.item("minecraft:golden_sword"),
-                    TcIngredient.item("minecraft:diamond"),
-                    TcIngredient.item(FmItems.id("greed").toString()),
-                    TcIngredient.item(FmItems.id("greed").toString()),
-                    TcIngredient.item("thaumcraft:salis_mundus")
-                )));
+            if (FmConfig.greedyEnchantmentEnabled()) {
+                TcRecipes.register(new InfusionEnchantmentRecipe("GREEDY", "GREEDY", ForbiddenMagic.id("greedy"), 4,
+                    new AspectList().add(FmAspects.NETHER, 16).add(Aspect.WEAPON, 8).add(Aspect.GREED, 16),
+                    List.of(
+                        TcIngredient.item("minecraft:golden_sword"),
+                        TcIngredient.item("minecraft:diamond"),
+                        TcIngredient.item(FmItems.id("greed").toString()),
+                        TcIngredient.item(FmItems.id("greed").toString()),
+                        TcIngredient.item("thaumcraft:salis_mundus")
+                    )));
+            }
             TcRecipes.register(new InfusionEnchantmentRecipe("CONSUMING", "CONSUMING", ForbiddenMagic.id("consuming"), 3,
                 new AspectList().add(Aspect.VOID, 8).add(Aspect.TOOL, 8).add(Aspect.HUNGER, 8),
                 List.of(
@@ -249,15 +251,29 @@ public final class FmRecipes {
                 TcIngredient.item("thaumcraft:greatwood_log")
             )
         ));
-        TcRecipes.register(new ShapelessArcaneRecipe("CRYSTALWELL", "CRYSTALWELL",
-            TcStack.of(FmItems.CRYSTALWELL.getId().toString(), 1),
-            new AspectList().add(Aspect.WATER, 1).add(Aspect.ORDER, 1),
-            List.of(
-                TcIngredient.item("thaumcraft:inkwell"),
-                TcIngredient.tag("c:dyes/black"),
-                TcIngredient.item("thaumcraft:shard"),
-                TcIngredient.item("thaumcraft:shard")
-            )));
+        if (thaumcraft.Config.researchDifficulty() == -1) {
+            TcRecipes.register(new ShapelessArcaneRecipe("CRYSTALWELL", "CRYSTALWELL",
+                TcStack.of(FmItems.CRYSTALWELL.getId().toString(), 1),
+                new AspectList().add(Aspect.WATER, 1).add(Aspect.ORDER, 1),
+                List.of(
+                    TcIngredient.item("thaumcraft:scribing_tools"),
+                    TcIngredient.tag("c:dyes/black"),
+                    TcIngredient.tag("thaumcraft:shards"),
+                    TcIngredient.tag("thaumcraft:shards")
+                )));
+        } else {
+            TcRecipes.register(new ShapelessArcaneRecipe("CRYSTALWELL", "CRYSTALWELL",
+                TcStack.of(FmItems.CRYSTALWELL.getId().toString(), 1),
+                new AspectList().add(Aspect.WATER, 1).add(Aspect.ORDER, 1),
+                List.of(
+                    TcIngredient.item("thaumcraft:scribing_tools"),
+                    TcIngredient.tag("c:dyes/black"),
+                    TcIngredient.item("thaumcraft:mixed_crystal_cluster"),
+                    TcIngredient.item("thaumcraft:balanced_shard"),
+                    TcIngredient.item("thaumcraft:balanced_shard"),
+                    TcIngredient.item("thaumcraft:balanced_shard")
+                )));
+        }
         TcRecipes.register(new ShapelessArcaneRecipe("PRIMEWELL", "PRIMEWELL",
             TcStack.of(FmItems.PRIMEWELL.getId().toString(), 1),
             new AspectList().add(Aspect.WATER, 50).add(Aspect.EARTH, 50).add(Aspect.FIRE, 50).add(Aspect.AIR, 50).add(Aspect.ORDER, 50).add(Aspect.ENTROPY, 50),
@@ -267,18 +283,23 @@ public final class FmRecipes {
                 TcIngredient.item("minecraft:glass_bottle")
             )));
         if (FmConfig.gluttonyMode() != 1) {
-            TcRecipes.register(new InfusionRecipe(
+            String ringFoodTopIngredient = FmConfig.gluttonyMode() == 2
+                ? "forbiddenmagic:star_block"
+                : "minecraft:diamond";
+            TcRecipes.register(new ShapedArcaneRecipe(
                 "RINGFOOD",
                 "RINGFOOD",
                 TcStack.of(FmItems.RING_NUTRITION.getId().toString(), 1),
-                2,
-                new AspectList().add(FmAspects.GLUTTONY, 16).add(Aspect.HUNGER, 12).add(Aspect.LIFE, 8),
-                TcIngredient.item("minecraft:gold_ingot"),
+                new AspectList().add(Aspect.ENTROPY, 10).add(Aspect.WATER, 20).add(Aspect.EARTH, 20),
+                3, 3,
                 List.of(
-                    TcIngredient.item(FmItems.id("gluttony").toString()),
-                    TcIngredient.item("minecraft:bread"),
-                    TcIngredient.item(FmItems.id("gluttony").toString()),
-                    TcIngredient.item("minecraft:cookie")
+                    TcIngredient.EMPTY, TcIngredient.item(ringFoodTopIngredient), TcIngredient.EMPTY,
+                    TcIngredient.item(FmItems.GLUTTONY_SHARD.getId().toString()),
+                    TcIngredient.item("thaumcraft:mundane_ring"),
+                    TcIngredient.item(FmItems.GLUTTONY_SHARD.getId().toString()),
+                    TcIngredient.EMPTY,
+                    TcIngredient.item(FmItems.GLUTTONY_SHARD.getId().toString()),
+                    TcIngredient.EMPTY
                 )
             ));
         }

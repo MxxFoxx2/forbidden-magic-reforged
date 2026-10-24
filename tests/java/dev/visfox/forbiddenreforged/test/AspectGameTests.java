@@ -270,50 +270,50 @@ public final class AspectGameTests {
     }
 
     private static void forbiddenmagicAspectsCommandIsRegistered(GameTestHelper helper) {
-        var root = helper.getLevel().getServer().getCommands().getDispatcher().getRoot();
-        helper.assertTrue(root.getChild("forbiddenmagic") != null, "forbiddenmagic command must be registered");
-        helper.assertTrue(root.getChild("forbiddenmagic").getChild("aspects") != null, "forbiddenmagic aspects command must be registered");
-        var source = helper.getLevel().getServer().createCommandSourceStack();
-        helper.assertTrue(root.getChild("forbiddenmagic").getRequirement().test(source.withPermission(PermissionSet.ALL_PERMISSIONS)), "game masters must be allowed");
-        helper.assertFalse(root.getChild("forbiddenmagic").getRequirement().test(source.withPermission(PermissionSet.NO_PERMISSIONS)), "ordinary players must be denied");
-        helper.succeed();
-    }
+            var root = helper.getLevel().getServer().getCommands().getDispatcher().getRoot();
+            helper.assertTrue(root.getChild("forbiddenmagic") != null, "forbiddenmagic command must be registered");
+            helper.assertTrue(root.getChild("forbiddenmagic").getChild("aspects") != null, "forbiddenmagic aspects command must be registered");
+            var source = helper.getLevel().getServer().createCommandSourceStack();
+            helper.assertTrue(root.getChild("forbiddenmagic").getRequirement().test(source.withPermission(PermissionSet.ALL_PERMISSIONS)), "game masters must be allowed");
+            helper.assertFalse(root.getChild("forbiddenmagic").getRequirement().test(source.withPermission(PermissionSet.NO_PERMISSIONS)), "ordinary players must be denied");
+            helper.succeed();
+        }
 
     private static void aspectDiagnosticsExposeStableRegistryTable(GameTestHelper helper) {
-        List<String> registryLines = FmAspectDiagnostics.registryLines();
-        helper.assertValueEqual(registryLines.size(), Aspect.count(), "diagnostics must contain every registered aspect");
-        for (int index = 0; index < Aspect.values().length; index++) {
-            Aspect aspect = Aspect.values()[index];
-            helper.assertTrue(registryLines.get(index).contains("ordinal=" + index + " "), "registry ordinals must be strict and ordered: " + aspect.getTag());
-        }
-        helper.assertValueEqual(registryLines.get(0), "ordinal=0 tag=aer name=Aer kind=builtin components=-", "first registry row must be exact");
-        helper.assertTrue(registryLines.stream().anyMatch(line -> line.contains("ordinal=47 ") && line.contains("tag=vinculum ") && line.contains("name=Vinculum ") && line.contains("kind=builtin")), "ordinal 47 vinculum must be present");
-        for (Aspect aspect : Aspect.values()) {
-            if (aspect.ordinal() < Aspect.builtinCount()) {
-                helper.assertTrue(registryLines.stream().anyMatch(line -> line.contains("ordinal=" + aspect.ordinal() + " ") && line.contains("tag=" + aspect.getTag() + " ") && line.contains("kind=builtin")), "builtin aspect must be classified: " + aspect.getTag());
+            List<String> registryLines = FmAspectDiagnostics.registryLines();
+            helper.assertValueEqual(registryLines.size(), Aspect.count(), "diagnostics must contain every registered aspect");
+            for (int index = 0; index < Aspect.values().length; index++) {
+                Aspect aspect = Aspect.values()[index];
+                helper.assertTrue(registryLines.get(index).contains("ordinal=" + index + " "), "registry ordinals must be strict and ordered: " + aspect.getTag());
             }
+            helper.assertValueEqual(registryLines.get(0), "ordinal=0 tag=aer name=Aer kind=builtin components=-", "first registry row must be exact");
+            helper.assertTrue(registryLines.stream().anyMatch(line -> line.contains("ordinal=47 ") && line.contains("tag=vinculum ") && line.contains("name=Vinculum ") && line.contains("kind=builtin")), "ordinal 47 vinculum must be present");
+            for (Aspect aspect : Aspect.values()) {
+                if (aspect.ordinal() < Aspect.builtinCount()) {
+                    helper.assertTrue(registryLines.stream().anyMatch(line -> line.contains("ordinal=" + aspect.ordinal() + " ") && line.contains("tag=" + aspect.getTag() + " ") && line.contains("kind=builtin")), "builtin aspect must be classified: " + aspect.getTag());
+                }
+            }
+    
+            List<String> addonLines = FmAspectDiagnostics.addonLines();
+            int expected = FmConfig.lustDisabled() ? 6 : 7;
+            helper.assertValueEqual(addonLines.size(), expected, "diagnostics must list every registered Forbidden Magic aspect");
+            helper.assertValueEqual(
+                registryLines.stream().filter(line -> line.contains("kind=addon")).toList(),
+                addonLines,
+                "Forbidden Magic rows must match the add-on section of the canonical registry"
+            );
+            int expectedOrdinal = Aspect.builtinCount();
+            for (String line : addonLines) {
+                helper.assertTrue(line.contains("ordinal=" + expectedOrdinal + " "), "add-on ordinals must be consecutive: " + line);
+                helper.assertTrue(line.contains("kind=addon"), "add-on aspect must be classified: " + line);
+                helper.assertTrue(line.contains("tag="), "add-on aspect must include its tag: " + line);
+                helper.assertTrue(line.contains("components="), "add-on aspect must include its components: " + line);
+                expectedOrdinal++;
+            }
+            helper.assertValueEqual(expectedOrdinal, Aspect.builtinCount() + expected, "all add-on ordinals must be present");
+            helper.assertTrue(addonLines.stream().anyMatch(line -> line.contains("tag=infernus ") && line.contains("name=Infernus ") && line.contains("components=ignis,praecantatio")), "infernus row must include exact name and component tags");
+            helper.succeed();
         }
-
-        List<String> addonLines = FmAspectDiagnostics.addonLines();
-        int expected = FmConfig.lustDisabled() ? 6 : 7;
-        helper.assertValueEqual(addonLines.size(), expected, "diagnostics must list every registered Forbidden Magic aspect");
-        helper.assertValueEqual(
-            registryLines.stream().filter(line -> line.contains("kind=addon")).toList(),
-            addonLines,
-            "Forbidden Magic rows must match the add-on section of the canonical registry"
-        );
-        int expectedOrdinal = Aspect.builtinCount();
-        for (String line : addonLines) {
-            helper.assertTrue(line.contains("ordinal=" + expectedOrdinal + " "), "add-on ordinals must be consecutive: " + line);
-            helper.assertTrue(line.contains("kind=addon"), "add-on aspect must be classified: " + line);
-            helper.assertTrue(line.contains("tag="), "add-on aspect must include its tag: " + line);
-            helper.assertTrue(line.contains("components="), "add-on aspect must include its components: " + line);
-            expectedOrdinal++;
-        }
-        helper.assertValueEqual(expectedOrdinal, Aspect.builtinCount() + expected, "all add-on ordinals must be present");
-        helper.assertTrue(addonLines.stream().anyMatch(line -> line.contains("tag=infernus ") && line.contains("name=Infernus ") && line.contains("components=ignis,praecantatio")), "infernus row must include exact name and component tags");
-        helper.succeed();
-    }
 
     private static void forbiddenCategoryAndShardEntriesResolve(GameTestHelper helper) {
         ResearchItem shards = ResearchCategories.getResearch("NETHERSHARDS");

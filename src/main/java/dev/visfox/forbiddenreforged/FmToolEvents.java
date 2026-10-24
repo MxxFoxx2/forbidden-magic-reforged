@@ -21,6 +21,7 @@ import thaumcraft.registry.ModBlocks;
 import thaumcraft.taint.TaintBlock;
 import thaumcraft.taint.TaintFibresBlock;
 import thaumcraft.wand.Wands;
+import thaumcraft.wand.Wands;
 
 public final class FmToolEvents {
     private FmToolEvents() {
@@ -105,7 +106,7 @@ public final class FmToolEvents {
     }
 
     public static boolean cancelsInfernalDamage(ItemStack held, boolean fireOrWither) {
-        return false;
+        return fireOrWither && Wands.isWand(held) && Wands.getRod(held).tag().equals("infernal");
     }
 
     private static void onTooltip(ItemTooltipEvent event) {
