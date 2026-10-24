@@ -26,6 +26,22 @@ morph_sword = "Chameleon Sword"
 morph_shovel = "Chameleon Shovel"
 morph_axe = "Chameleon Axe"
 
+taint_coal = "Hexcoal"
+riding_crop = "Riding Crop"
+black_dye = "Black Dye"
+taint_fruit = "Tainted Fruit"
+ring_nutrition = "Ring of Nutrition"
+tainted_rod = "Tainted Wand Rod"
+infernal_rod = "Infernal Wand Rod"
+witchwood_rod = "Witchwood Wand Rod"
+profane_rod = "Profane Wand Rod"
+witchwood_staff_rod = "Witchwood Staff Rod"
+taint_shovel = "Taint Shovel"
+taint_pickaxe = "Taint Pickaxe"
+crystalwell = "Crystal Inkwell"
+primewell = "Primordial Inkwell"
+blink_focus = "Blink Focus"
+
 [item.forbiddenmagic.mob_crystal]
 empty = "Blank Imprinting Crystal"
 filled = "%s Imprinted Crystal"
@@ -157,23 +173,6 @@ wrath_cage = "Wrath Cage"
 
 [forbiddenmagic.research_page.ARCANECAKE]
 1 = "If there's one thing you love, it's cake. You would eat its delicious goodness all day if you could, but it always runs out in the end.<BR><BR>To remedy this, you have devised a recipe to infuse a cake with longevity-enhancing magic.  The Thaumic Cake lasts significantly longer than a mundane one and will slowly repair itself as long as there's at least a sliver left.  The enchantments are unstable, however, and the cake cannot be moved again through conventional means once placed down."
-
-[item.forbiddenmagic]
-taint_coal = "Hexcoal"
-riding_crop = "Riding Crop"
-black_dye = "Black Dye"
-taint_fruit = "Tainted Fruit"
-ring_nutrition = "Ring of Nutrition"
-tainted_rod = "Tainted Wand Rod"
-infernal_rod = "Infernal Wand Rod"
-witchwood_rod = "Witchwood Wand Rod"
-profane_rod = "Profane Wand Rod"
-witchwood_staff_rod = "Witchwood Staff Rod"
-taint_shovel = "Taint Shovel"
-taint_pickaxe = "Taint Pickaxe"
-crystalwell = "Crystal Inkwell"
-primewell = "Primordial Inkwell"
-blink_focus = "Blink Focus"
 
 [item.Wand]
 tainted.rod = "Tainted Core"
