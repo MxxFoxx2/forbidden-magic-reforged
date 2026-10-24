@@ -156,6 +156,6 @@ Expected: the host matches the pinned SHA plus the current patch count.
 
 Stage only the files changed by this plan and commit with an English message such as `fix: restore original localization fidelity`.
 
-- [ ] **Step 5: Request visual verification**
+- [x] **Step 5: Request visual verification**
 
 Launch `runClient` and ask the user to inspect the research browser, the `FORBIDDEN` category title, all 31 research titles/subtitles, restored pages, and Blink Focus upgrade tooltips.
