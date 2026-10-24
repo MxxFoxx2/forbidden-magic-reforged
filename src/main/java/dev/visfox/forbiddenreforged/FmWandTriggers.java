@@ -35,7 +35,7 @@ public final class FmWandTriggers {
         }
 
         BlockPos firePos = pos.above();
-        if (!level.isEmptyBlock(firePos) || !player.mayUseItemAt(firePos, Direction.UP, wand)
+        if (!level.isEmptyBlock(firePos) || !player.mayUseItemAt(pos, Direction.UP, wand)
             || !wandItem.consumeVis(wand, player, Aspect.FIRE, 2, false)) {
             return false;
         }
