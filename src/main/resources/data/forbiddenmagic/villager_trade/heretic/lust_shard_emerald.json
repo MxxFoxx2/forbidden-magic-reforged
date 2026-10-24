@@ -1,0 +1,16 @@
+{
+  "wants": {
+    "id": "forbiddenmagic:lust_shard",
+    "count": {
+      "type": "minecraft:uniform",
+      "min": 2,
+      "max": 5
+    }
+  },
+  "gives": {
+    "id": "minecraft:emerald"
+  },
+  "max_uses": 12,
+  "xp": 5,
+  "reputation_discount": 0.05
+}
