@@ -111,7 +111,7 @@ Replace rewritten page summaries with exact original English and Russian text, c
 
 - [x] **Step 3: Register applicable original pages**
 
-Register `FORK.wc` after `FORK.1`, `TAINTSHOVEL.2` after `TAINTSHOVEL.1`, and `CRYSTALWELL.1b` after `CRYSTALWELL.1`. Do not register `ROD_infernal.2`.
+Register `FORK.wc` after `FORK.1` and `TAINTSHOVEL.2` after `TAINTSHOVEL.1`. Select exactly one Crystalwell behavior page as the original does: `CRYSTALWELL.1b` in easy research difficulty and `CRYSTALWELL.1` otherwise. Do not register `ROD_infernal.2`.
 
 - [x] **Step 4: Document unavoidable differences**
 

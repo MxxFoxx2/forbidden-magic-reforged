@@ -55,8 +55,10 @@ import thaumcraft.aspect.Aspect;
 import thaumcraft.aspect.AspectList;
 import thaumcraft.crafting.InfusionRecipe;
 import thaumcraft.crafting.TcRecipes;
+import thaumcraft.Config;
 import thaumcraft.research.ResearchCategories;
 import thaumcraft.research.ResearchItem;
+import thaumcraft.research.ResearchPage;
 import thaumcraft.wand.WandRegistry;
 import thaumcraft.wand.WandRod;
 import thaumcraft.wand.Wands;
@@ -89,7 +91,8 @@ public final class ItemGameTests {
         "scribe_wells_keep_original_recipes_and_research",
         "research_prefix_respects_tag_research",
         "item_translation_keys_are_not_nested_under_research_pages",
-        "research_translation_keys_are_complete"
+        "research_translation_keys_are_complete",
+        "crystalwell_research_page_matches_difficulty"
     };
 
     static {
@@ -116,6 +119,7 @@ public final class ItemGameTests {
         FUNCTIONS.register(TESTS[20], () -> ItemGameTests::researchPrefixRespectsTagResearch);
         FUNCTIONS.register(TESTS[21], () -> ItemGameTests::itemTranslationKeysAreNotNestedUnderResearchPages);
         FUNCTIONS.register(TESTS[22], () -> ItemGameTests::researchTranslationKeysAreComplete);
+        FUNCTIONS.register(TESTS[23], () -> ItemGameTests::crystalwellResearchPageMatchesDifficulty);
     }
 
     private ItemGameTests() {}
@@ -526,15 +530,12 @@ public final class ItemGameTests {
     private static void researchTranslationKeysAreComplete(GameTestHelper helper) {
         JsonObject english = readJson(helper, "/assets/forbiddenmagic/lang/en_us.json");
         JsonObject russian = readJson(helper, "/assets/forbiddenmagic/lang/ru_ru.json");
-        List<String> researchIds = List.of(
-            "NETHERSHARDS", "HELLFIRE", "SKULLAXE", "FORK", "MORPHTOOLS",
-            "CLUSTER", "IMPACT", "VOIDTOUCHED", "ARCANECAKE", "WRATHCAGE",
-            "TAINTTREE", "TAINTSTONE", "BLACKFLOWER", "WRATH", "GREEDY",
-            "CORRUPTING", "CONSUMING", "EDUCATIONAL", "RIDINGCROP", "RINGFOOD",
-            "ROD_tainted", "ROD_infernal", "ROD_witchwood", "ROD_profane",
-            "ROD_witchwood_staff", "TRANSEMERALD", "CRYSTALWELL", "PRIMEWELL",
-            "TAINTSHOVEL", "TAINTPICK", "FOCUSBLINK"
-        );
+        List<String> researchIds = ResearchCategories.allResearch().stream()
+            .filter(item -> item.category().equals("FORBIDDEN"))
+            .map(ResearchItem::key)
+            .sorted()
+            .toList();
+        helper.assertTrue(!researchIds.isEmpty(), "Forbidden research is registered");
         List<String> required = List.of(
             "tc.research_category.FORBIDDEN",
             "focus.upgrade.hellfire.name",
@@ -543,6 +544,7 @@ public final class ItemGameTests {
             "focus.upgrade.pandemonium.text",
             "forbiddenmagic.research_page.FORK.wc",
             "forbiddenmagic.research_page.TAINTSHOVEL.2",
+            "forbiddenmagic.research_page.CRYSTALWELL.1",
             "forbiddenmagic.research_page.CRYSTALWELL.1b"
         );
         for (JsonObject translations : List.of(english, russian)) {
@@ -554,10 +556,36 @@ public final class ItemGameTests {
                     "missing research name " + researchId);
                 helper.assertTrue(translations.has("tc.research_text." + researchId),
                     "missing research text " + researchId);
+                helper.assertTrue(translations.has("forbiddenmagic.research_text." + researchId),
+                    "missing tagged research text " + researchId);
             }
         }
+        helper.assertValueEqual(
+            english.get("forbiddenmagic.research_page.ROD_tainted.1").getAsString(),
+            "Tainted Lands are places of great and terrible power for those Thaumaturges who know how to tap into them.<BR><BR>The Tainted Wand Core can store up to 150 vis of each type and slowly replenishes itself up to 10% in every aspect as long as it is being held inside of a Tainted Land.  While the wand is held in your hand, it can also feed off of taint coursing through your veins, randomly restoring vis every time you take damage from flux taint.",
+            "tainted wand page matches the original");
+        helper.assertValueEqual(
+            russian.get("forbiddenmagic.research_page.ROD_tainted.1").getAsString(),
+            "Заражённые земли - это место великой и ужасной энергии для тех тауматургов, которые знают как её использовать.<BR><BR>Заражённый стержень может хранить до 150 Вис каждого типа и медленно пополнять каждый аспект до 10%, пока жезл находятся на заражённой земле.  Когда Вы держите жезл в руке, он также может питаться от заражения, бегущего по Вашим венам, случайно восстанавливая Вис, во время получении урона от порчи.",
+            "tainted wand page matches the original Russian");
         helper.assertTrue(english.keySet().equals(russian.keySet()),
             "English and Russian translation key sets must match");
+        helper.succeed();
+    }
+
+    private static void crystalwellResearchPageMatchesDifficulty(GameTestHelper helper) {
+        ResearchItem item = ResearchCategories.getResearch("CRYSTALWELL");
+        helper.assertTrue(item != null, "crystalwell research is registered");
+        List<String> textPages = item.pages().stream()
+            .filter(ResearchPage.Text.class::isInstance)
+            .map(ResearchPage.Text.class::cast)
+            .map(ResearchPage.Text::text)
+            .toList();
+        String expected = Config.researchDifficulty() == -1
+            ? "forbiddenmagic.research_page.CRYSTALWELL.1b"
+            : "forbiddenmagic.research_page.CRYSTALWELL.1";
+        helper.assertValueEqual(textPages.size(), 1, "crystalwell exposes one behavior page");
+        helper.assertValueEqual(textPages.get(0), expected, "crystalwell page follows research difficulty");
         helper.succeed();
     }
 

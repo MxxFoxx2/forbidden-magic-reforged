@@ -1,5 +1,6 @@
 package dev.visfox.forbiddenreforged;
 
+import thaumcraft.Config;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.aspect.AspectList;
 import thaumcraft.crafting.TcStack;
@@ -215,8 +216,9 @@ public final class FmResearch {
         }
         new FmResearchItem("CRYSTALWELL", "FORBIDDEN", new AspectList().add(Aspect.MIND, 3).add(Aspect.CRYSTAL, 2).add(Aspect.MAGIC, 1), -2, -8, 1, TcStack.of(FmItems.CRYSTALWELL.getId().toString(), 1))
             .setPages(
-                ResearchPage.text("forbiddenmagic.research_page.CRYSTALWELL.1"),
-                ResearchPage.text("forbiddenmagic.research_page.CRYSTALWELL.1b"),
+                ResearchPage.text(Config.researchDifficulty() == -1
+                    ? "forbiddenmagic.research_page.CRYSTALWELL.1b"
+                    : "forbiddenmagic.research_page.CRYSTALWELL.1"),
                 ResearchPage.arcane("CRYSTALWELL")
             )
             .setParents("RESEARCH")
