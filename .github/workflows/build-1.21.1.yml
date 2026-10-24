@@ -25,6 +25,7 @@ jobs:
           repository: notlikethiss/thaumcraft-4-reforged
           ref: 17dd73087e52bf918cd7f580abd2114e44f88544
           path: thaumcraft-4-reforged
+          fetch-depth: 0
 
       - name: Set up Java 21
         uses: actions/setup-java@v4
@@ -42,9 +43,17 @@ jobs:
           chmod +x gradlew
           python3 tools/prepare_host.py --rebuild
 
+      - name: Verify prepared host
+        working-directory: forbidden-magic-reforged
+        run: python3 tools/prepare_host.py --verify
+
       - name: Build addon
         working-directory: forbidden-magic-reforged
         run: ./gradlew --no-daemon build
+
+      - name: Verify addon artifact provenance
+        working-directory: forbidden-magic-reforged
+        run: python3 tools/check_provenance.py
 
       - name: Run GameTests
         working-directory: forbidden-magic-reforged
