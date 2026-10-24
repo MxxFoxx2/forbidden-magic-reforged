@@ -18,6 +18,7 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
@@ -42,6 +43,7 @@ public final class FmToolEvents {
         NeoForge.EVENT_BUS.addListener(FmToolEvents::onBlockDrops);
         NeoForge.EVENT_BUS.addListener(FmToolEvents::onFoodFinished);
         NeoForge.EVENT_BUS.addListener(FmToolEvents::onIncomingDamage);
+        NeoForge.EVENT_BUS.addListener(FmToolEvents::onLivingDamagePre);
         NeoForge.EVENT_BUS.addListener(FmToolEvents::onTooltip);
     }
 
@@ -145,10 +147,17 @@ public final class FmToolEvents {
             event.setCanceled(true);
             return;
         }
-        if (!player.level().isClientSide() && restoresTaintedVis(held, source.is(ModDamageTypes.TAINT))) {
-            for (Aspect aspect : taintedVisRolls(player.getRandom())) {
-                Wands.addVis(held, aspect, 1, true);
-            }
+    }
+
+    private static void onLivingDamagePre(LivingDamageEvent.Pre event) {
+        if (!(event.getEntity() instanceof Player player) || player.level().isClientSide()) {
+            return;
+        }
+        if (!restoresTaintedVis(player.getMainHandItem(), event.getSource().is(ModDamageTypes.TAINT))) {
+            return;
+        }
+        for (Aspect aspect : taintedVisRolls(player.getRandom())) {
+            Wands.addVis(player.getMainHandItem(), aspect, 1, true);
         }
     }
 
