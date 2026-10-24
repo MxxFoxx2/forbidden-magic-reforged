@@ -25,7 +25,8 @@ public final class FmVillagers {
         return PROFESSIONS.register(name, () -> {
             Int2ObjectMap<ResourceKey<TradeSet>> tradeSets = new Int2ObjectOpenHashMap<>();
             for (int level = 1; level <= 5; level++) {
-                tradeSets.put(level, ResourceKey.create(Registries.TRADE_SET, ForbiddenMagic.id(name + "/level_" + level)));
+                String suffix = FmConfig.lustDisabled() ? "/no_lust/level_" : "/level_";
+                tradeSets.put(level, ResourceKey.create(Registries.TRADE_SET, ForbiddenMagic.id(name + suffix + level)));
             }
             return new VillagerProfession(
                 Component.translatable("entity.forbiddenmagic.villager." + name),
