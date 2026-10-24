@@ -60,8 +60,29 @@ jobs:
           chmod +x gradlew
           ./gradlew build --no-daemon
 
-      - name: Run GameTests
+      - name: Run GameTests with Luxuria enabled
         run: ./gradlew runGameTestServer --no-daemon
+
+      - name: Run GameTests with Luxuria disabled
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          config = Path("run/config/forbiddenmagic-startup.toml")
+          if not config.is_file():
+              raise SystemExit(f"Expected startup config was not generated: {config}")
+
+          original = config.read_text(encoding="utf-8")
+          pattern = re.compile(r"(?m)^([ \t]*no_lust[ \t]*=[ \t]*)false([ \t]*(?:#.*)?[ \t]*$)")
+          updated, count = pattern.subn(r"\1true\2", original)
+          if count != 1:
+              raise SystemExit(f"Expected exactly one no_lust = false setting, found {count}")
+
+          config.write_text(updated, encoding="utf-8")
+          print(f"Set no_lust=true in {config}")
+          PY
+          ./gradlew runGameTestServer --no-daemon
 
       - name: Upload mod jar
         uses: actions/upload-artifact@v4
