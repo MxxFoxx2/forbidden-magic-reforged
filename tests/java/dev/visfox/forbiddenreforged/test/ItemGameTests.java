@@ -23,11 +23,13 @@ import net.minecraft.gametest.framework.TestData;
 import net.minecraft.gametest.framework.TestEnvironmentDefinition;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CookingFuel;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
@@ -51,6 +53,7 @@ import thaumcraft.research.ResearchItem;
 import thaumcraft.wand.WandRegistry;
 import thaumcraft.wand.WandRod;
 import thaumcraft.wand.Wands;
+import thaumcraft.wand.WandTriggers;
 
 @EventBusSubscriber(modid = ForbiddenMagic.MODID)
 public final class ItemGameTests {
@@ -74,7 +77,9 @@ public final class ItemGameTests {
         "morph_phase_tints_match_original",
         "tool_and_skull_axe_chance_rules_preserve_original_boundaries",
         "silverfish_emerald_drop_thresholds_match_original",
-        "wand_tooltip_kinds_preserve_original_hints"
+        "wand_tooltip_kinds_preserve_original_hints",
+        "infernal_and_tainted_wand_damage_behaviors_match_original",
+        "hellfire_trigger_targets_netherrack_and_obsidian"
     };
 
     static {
@@ -95,6 +100,8 @@ public final class ItemGameTests {
         FUNCTIONS.register(TESTS[14], () -> ItemGameTests::toolAndSkullAxeChanceRulesPreserveOriginalBoundaries);
         FUNCTIONS.register(TESTS[15], () -> ItemGameTests::silverfishEmeraldDropThresholdsMatchOriginal);
         FUNCTIONS.register(TESTS[16], () -> ItemGameTests::wandTooltipKindsPreserveOriginalHints);
+        FUNCTIONS.register(TESTS[17], () -> ItemGameTests::infernalAndTaintedWandDamageBehaviorsMatchOriginal);
+        FUNCTIONS.register(TESTS[18], () -> ItemGameTests::hellfireTriggerTargetsNetherrackAndObsidian);
     }
 
     private ItemGameTests() {}
@@ -396,6 +403,45 @@ public final class ItemGameTests {
             "ordinary rods do not receive special wand tooltips");
         helper.assertValueEqual(FmToolEvents.wandTooltipKind(new ItemStack(Items.STICK)), "",
             "non-wand items do not receive wand-specific tooltips");
+        helper.succeed();
+    }
+
+    private static void infernalAndTaintedWandDamageBehaviorsMatchOriginal(GameTestHelper helper) {
+        WandRod tainted = WandRegistry.findRod("tainted");
+        WandRod infernal = WandRegistry.findRod("infernal");
+        helper.assertTrue(tainted != null && infernal != null, "both behavior-bearing rods must be registered");
+        ItemStack taintedWand = Wands.create(WandRegistry.CAP_THAUMIUM, tainted, false);
+        ItemStack infernalWand = Wands.create(WandRegistry.CAP_THAUMIUM, infernal, false);
+
+        helper.assertTrue(FmToolEvents.cancelsInfernalDamage(infernalWand, true),
+            "held Infernal Wand cancels fire or wither damage");
+        helper.assertFalse(FmToolEvents.cancelsInfernalDamage(infernalWand, false),
+            "Infernal Wand does not cancel unrelated damage");
+        helper.assertFalse(FmToolEvents.cancelsInfernalDamage(taintedWand, true),
+            "Tainted Wand does not gain Infernal immunity");
+
+        helper.assertTrue(FmToolEvents.restoresTaintedVis(taintedWand, true),
+            "held Tainted Wand reacts to the taint damage type");
+        helper.assertFalse(FmToolEvents.restoresTaintedVis(taintedWand, false),
+            "Tainted Wand does not react to non-taint damage");
+        helper.assertFalse(FmToolEvents.restoresTaintedVis(infernalWand, true),
+            "Infernal Wand does not use the Tainted Wand reaction");
+
+        List<Aspect> restored = FmToolEvents.taintedVisRolls(RandomSource.create(42L));
+        helper.assertValueEqual(restored.size(), 3, "taint damage makes three independent primal-aspect rolls");
+        for (Aspect aspect : restored) {
+            helper.assertTrue(aspect.isPrimal(), "every restored aspect must be primal");
+        }
+        helper.succeed();
+    }
+
+    private static void hellfireTriggerTargetsNetherrackAndObsidian(GameTestHelper helper) {
+        helper.assertTrue(WandTriggers.hasTrigger(Blocks.NETHERRACK.defaultBlockState()),
+            "Hellfire trigger must be registered for netherrack");
+        helper.assertTrue(WandTriggers.hasTrigger(Blocks.OBSIDIAN.defaultBlockState()),
+            "Hellfire trigger must be registered for obsidian");
+        helper.assertTrue(ResearchCategories.getResearch("HELLFIRE") != null,
+            "the trigger's HELLFIRE research gate must exist");
         helper.succeed();
     }
 
