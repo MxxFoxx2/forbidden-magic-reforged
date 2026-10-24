@@ -11,6 +11,7 @@ public final class FmConfig {
     public static ModConfigSpec.IntValue gluttony;
     public static ModConfigSpec.BooleanValue enchanting;
     public static ModConfigSpec.BooleanValue greedyEnch;
+    public static ModConfigSpec.BooleanValue tagResearch;
     public static ModConfigSpec.BooleanValue wrathCage;
     public static ModConfigSpec.IntValue wrathCost;
     public static ModConfigSpec.IntValue wrathEff;
@@ -24,6 +25,7 @@ public final class FmConfig {
         gluttony = BUILDER.comment("0 = Enabled, 1 = Disabled, 2 = Hardcore").defineInRange("general.gluttony", 0, 0, 2);
         enchanting = BUILDER.comment("Enable Forbidden Magic enchantments.").define("general.enchanting", true);
         greedyEnch = BUILDER.comment("Enable the Capitalist (Greedy) enchantment, recipe and effects.").define("general.greedy_ench", true);
+        tagResearch = BUILDER.comment("Show the [FM] prefix in Forbidden Magic research text.").define("general.tag_research", true);
         wrathCage = BUILDER.comment("Enable the Wrath Cage.").define("general.wrath_cage", true);
         wrathCost = BUILDER.comment("Essentia cost per spawn round.").defineInRange("general.wrath_cost", 5, 0, 64);
         wrathEff = BUILDER.comment("Spawns granted per essentia cost.").defineInRange("general.wrath_eff", 4, 1, 64);
@@ -55,6 +57,10 @@ public final class FmConfig {
 
     public static boolean greedyEnch() {
         return SPEC.isLoaded() ? greedyEnch.get() : greedyEnch.getDefault();
+    }
+
+    public static boolean tagResearch() {
+        return SPEC.isLoaded() ? tagResearch.get() : tagResearch.getDefault();
     }
 
     public static boolean wrathCage() {
