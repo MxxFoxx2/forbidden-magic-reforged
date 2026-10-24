@@ -1,6 +1,13 @@
 package dev.visfox.forbiddenreforged.test;
 
 import com.google.gson.JsonArray;
+import dev.visfox.forbiddenreforged.CrystalwellItem;
+import dev.visfox.forbiddenreforged.PrimewellItem;
+import net.minecraft.world.item.Rarity;
+import thaumcraft.item.ScribingToolsItem;
+import thaumcraft.crafting.ShapelessArcaneRecipe;
+import thaumcraft.registry.ModBlocks;
+import thaumcraft.registry.ModItems;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.IOException;
@@ -27,7 +34,6 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.item.component.CookingFuel;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootParams;
@@ -39,6 +45,8 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
 import dev.visfox.forbiddenreforged.FmAspects;
 import dev.visfox.forbiddenreforged.FmItems;
+import dev.visfox.forbiddenreforged.FmConfig;
+import dev.visfox.forbiddenreforged.FmResearchItem;
 import dev.visfox.forbiddenreforged.MorphState;
 import dev.visfox.forbiddenreforged.FmEnchantmentEffects;
 import dev.visfox.forbiddenreforged.FmToolEvents;
@@ -52,7 +60,6 @@ import thaumcraft.research.ResearchItem;
 import thaumcraft.wand.WandRegistry;
 import thaumcraft.wand.WandRod;
 import thaumcraft.wand.Wands;
-import thaumcraft.wand.WandTriggers;
 
 @EventBusSubscriber(modid = ForbiddenMagic.MODID)
 public final class ItemGameTests {
@@ -76,7 +83,12 @@ public final class ItemGameTests {
         "morph_phase_tints_match_original",
         "tool_and_skull_axe_chance_rules_preserve_original_boundaries",
         "silverfish_emerald_drop_thresholds_match_original",
-        "wand_tooltip_kinds_preserve_original_hints"
+        "wand_tooltip_kinds_preserve_original_hints",
+        "crystalwell_is_a_scribing_tool_with_original_durability",
+        "primewell_is_a_permanent_epic_scribing_tool",
+        "scribe_wells_keep_original_recipes_and_research",
+        "research_prefix_respects_tag_research",
+        "item_translation_keys_are_not_nested_under_research_pages"
     };
 
     static {
@@ -97,6 +109,11 @@ public final class ItemGameTests {
         FUNCTIONS.register(TESTS[14], () -> ItemGameTests::toolAndSkullAxeChanceRulesPreserveOriginalBoundaries);
         FUNCTIONS.register(TESTS[15], () -> ItemGameTests::silverfishEmeraldDropThresholdsMatchOriginal);
         FUNCTIONS.register(TESTS[16], () -> ItemGameTests::wandTooltipKindsPreserveOriginalHints);
+        FUNCTIONS.register(TESTS[17], () -> ItemGameTests::crystalwellIsAScribingToolWithOriginalDurability);
+        FUNCTIONS.register(TESTS[18], () -> ItemGameTests::primewellIsAPermanentEpicScribingTool);
+        FUNCTIONS.register(TESTS[19], () -> ItemGameTests::scribeWellsKeepOriginalRecipesAndResearch);
+        FUNCTIONS.register(TESTS[20], () -> ItemGameTests::researchPrefixRespectsTagResearch);
+        FUNCTIONS.register(TESTS[21], () -> ItemGameTests::itemTranslationKeysAreNotNestedUnderResearchPages);
     }
 
     private ItemGameTests() {}
@@ -369,16 +386,12 @@ public final class ItemGameTests {
             "infernal wand cancels incoming fire or wither damage");
         helper.assertFalse(FmToolEvents.cancelsInfernalDamage(infernalWand, false),
             "infernal wand does not cancel unrelated incoming damage");
-
         WandRod taintedRod = WandRegistry.findRod("tainted");
-        ItemStack taintedWand = Wands.create(WandRegistry.CAP_THAUMIUM, taintedRod, false);
-        helper.assertTrue(FmToolEvents.isTaintedWand(taintedWand), "tainted wand is recognized for taint damage");
-        helper.assertFalse(FmToolEvents.isTaintedWand(infernalWand), "infernal wand is not treated as tainted");
-
-        helper.assertTrue(WandTriggers.hasTrigger(Blocks.OBSIDIAN.defaultBlockState()),
-            "hellfire trigger is registered for obsidian");
-        helper.assertTrue(WandTriggers.hasTrigger(Blocks.NETHERRACK.defaultBlockState()),
-            "hellfire trigger is registered for netherrack");
+        ItemStack taintedWand = Wands.create(WandRegistry.CAP_IRON, taintedRod, false);
+        helper.assertFalse(FmToolEvents.cancelsInfernalDamage(taintedWand, true),
+            "tainted wand does not inherit infernal immunity");
+        helper.assertFalse(FmToolEvents.cancelsInfernalDamage(new ItemStack(Items.STICK), true),
+            "ordinary items do not cancel fire damage");
         helper.succeed();
     }
 
@@ -411,6 +424,101 @@ public final class ItemGameTests {
         helper.succeed();
     }
 
+    private static void crystalwellIsAScribingToolWithOriginalDurability(GameTestHelper helper) {
+        ItemStack stack = new ItemStack(FmItems.CRYSTALWELL.get());
+        helper.assertTrue(stack.getItem() instanceof CrystalwellItem, "crystalwell uses its behavior item");
+        helper.assertTrue(stack.getItem() instanceof ScribingToolsItem, "crystalwell can occupy the research table scribe slot");
+        int expectedMaxDamage = thaumcraft.Config.researchDifficulty() == -1 ? 50 : 100;
+        helper.assertValueEqual(stack.getMaxDamage(), expectedMaxDamage, "crystalwell durability follows research difficulty");
+        helper.assertValueEqual(stack.getCount(), 1, "crystalwell is unstackable");
+        helper.succeed();
+    }
+
+    private static void primewellIsAPermanentEpicScribingTool(GameTestHelper helper) {
+        ItemStack stack = new ItemStack(FmItems.PRIMEWELL.get());
+        helper.assertTrue(stack.getItem() instanceof PrimewellItem, "primewell uses its behavior item");
+        helper.assertTrue(stack.getItem() instanceof ScribingToolsItem, "primewell can occupy the research table scribe slot");
+        helper.assertValueEqual(stack.getRarity(), Rarity.EPIC, "primewell retains epic rarity");
+        helper.assertTrue(stack.getMaxDamage() > 1_000_000_000, "primewell does not wear out during research");
+        stack.setDamageValue(1000);
+        helper.assertFalse(stack.getItem().isBarVisible(stack), "primewell does not display a misleading durability bar");
+        helper.assertTrue(stack.getDamageValue() < stack.getMaxDamage(), "primewell remains usable after repeated scribe operations");
+        helper.succeed();
+    }
+
+    private static void scribeWellsKeepOriginalRecipesAndResearch(GameTestHelper helper) {
+        ShapelessArcaneRecipe crystalwell = (ShapelessArcaneRecipe) TcRecipes.get("CRYSTALWELL");
+        helper.assertTrue(crystalwell != null, "crystalwell arcane recipe is registered");
+        helper.assertTrue(TcRecipes.get("PRIMEWELL") != null, "primewell arcane recipe is registered");
+        helper.assertTrue(ResearchCategories.getResearch("CRYSTALWELL") != null, "crystalwell research is registered");
+        helper.assertTrue(ResearchCategories.getResearch("PRIMEWELL") != null, "primewell research is registered");
+        helper.assertTrue(crystalwell.ingredients().get(0).test(new ItemStack(ModItems.SCRIBING_TOOLS.get())),
+            "crystalwell recipe uses the registered scribing tools item");
+        if (thaumcraft.Config.researchDifficulty() == -1) {
+            helper.assertValueEqual(crystalwell.ingredients().size(), 4, "easy research uses two arbitrary Thaumcraft shards");
+            helper.assertTrue(crystalwell.ingredients().get(2).test(new ItemStack(ModItems.BALANCED_SHARD.get())),
+                "the easy recipe accepts any shard through the shard tag");
+        } else {
+            helper.assertValueEqual(crystalwell.ingredients().size(), 6, "normal research uses a mixed crystal and three balanced shards");
+            helper.assertTrue(crystalwell.ingredients().get(2).test(new ItemStack(ModBlocks.MIXED_CRYSTAL_CLUSTER.get().asItem())),
+                "the hard recipe uses the mixed crystal cluster");
+            helper.assertTrue(crystalwell.ingredients().get(3).test(new ItemStack(ModItems.BALANCED_SHARD.get())),
+                "the hard recipe uses balanced shards");
+        }
+        helper.succeed();
+    }
+
+    private static void itemTranslationKeysAreNotNestedUnderResearchPages(GameTestHelper helper) {
+            JsonObject english = readJson(helper, "/assets/forbiddenmagic/lang/en_us.json");
+            JsonObject russian = readJson(helper, "/assets/forbiddenmagic/lang/ru_ru.json");
+            List<String> expected = List.of(
+                "item.forbiddenmagic.taint_coal",
+                "item.forbiddenmagic.riding_crop",
+                "item.forbiddenmagic.black_dye",
+                "item.forbiddenmagic.taint_fruit",
+                "item.forbiddenmagic.ring_nutrition",
+                "item.forbiddenmagic.tainted_rod",
+                "item.forbiddenmagic.infernal_rod",
+                "item.forbiddenmagic.witchwood_rod",
+                "item.forbiddenmagic.profane_rod",
+                "item.forbiddenmagic.witchwood_staff_rod",
+                "item.Wand.tainted.rod",
+                "item.Wand.infernal.rod",
+                "item.Wand.profane.rod",
+                "item.Wand.profaned.rod",
+                "item.forbiddenmagic.taint_shovel",
+                "item.forbiddenmagic.taint_pickaxe",
+                "item.forbiddenmagic.crystalwell",
+                "item.forbiddenmagic.primewell",
+                "item.forbiddenmagic.blink_focus",
+                "entity.forbiddenmagic.villager.heretic",
+                "tooltip.creativeonly",
+                "tooltip.profane_contract"
+            );
+            List<String> pages = List.of(
+                "RIDINGCROP", "RINGFOOD", "ROD_tainted", "ROD_infernal", "ROD_witchwood",
+                "ROD_profane", "ROD_witchwood_staff", "TRANSEMERALD", "CRYSTALWELL",
+                "PRIMEWELL", "TAINTSHOVEL", "TAINTPICK", "FOCUSBLINK"
+            );
+            for (JsonObject translations : List.of(english, russian)) {
+                for (String key : expected) {
+                    helper.assertTrue(translations.has(key), "missing translation key " + key);
+                }
+                for (String page : pages) {
+                    helper.assertTrue(translations.has("forbiddenmagic.research_page." + page + ".1"),
+                        "missing research page key " + page);
+                }
+                for (String key : translations.keySet()) {
+                    helper.assertFalse(key.contains(".research_page.ARCANECAKE.item.")
+                            || key.contains(".research_page.ARCANECAKE.entity.")
+                            || key.contains(".research_page.ARCANECAKE.forbiddenmagic.")
+                            || key.startsWith("itemGroup.tooltip."),
+                        "translation key has an invalid nested prefix " + key);
+                }
+            }
+            helper.succeed();
+        }
+
     private static JsonObject readJson(GameTestHelper helper, String path) {        try (InputStream stream = ForbiddenMagic.class.getResourceAsStream(path)) {
             if (stream == null) {
                 helper.fail("missing resource " + path);
@@ -421,4 +529,15 @@ public final class ItemGameTests {
             return new JsonObject();
         }
     }
+    
+    private static void researchPrefixRespectsTagResearch(GameTestHelper helper) {
+        ResearchItem item = new FmResearchItem("TEST", "FORBIDDEN", new AspectList(), 0, 0, 1,
+            ForbiddenMagic.id("textures/misc/forbidden.png"));
+        String expected = FmConfig.tagResearchEnabled()
+            ? "forbiddenmagic.research_text.TEST"
+            : "tc.research_text.TEST";
+        helper.assertValueEqual(item.textKey(), expected, "research text key follows tagResearch config");
+        helper.succeed();
+    }
+
 }

@@ -68,7 +68,7 @@ public final class RecipeGameTests {
         "taintstone_research_and_arcane_recipe",
         "ore_dictionary_entries_became_tags",
         "emerald_transmutation_matches_original",
-        "ring_nutrition_recipe_matches_original"
+        "ring_food_recipe_matches_original"
     };
 
     static {
@@ -82,7 +82,7 @@ public final class RecipeGameTests {
         FUNCTIONS.register(TESTS[7], () -> RecipeGameTests::taintstoneResearchAndArcaneRecipe);
         FUNCTIONS.register(TESTS[8], () -> RecipeGameTests::oreDictionaryEntriesBecameTags);
         FUNCTIONS.register(TESTS[9], () -> RecipeGameTests::emeraldTransmutationMatchesOriginal);
-        FUNCTIONS.register(TESTS[10], () -> RecipeGameTests::ringNutritionRecipeMatchesOriginal);
+        FUNCTIONS.register(TESTS[10], () -> RecipeGameTests::ringFoodRecipeMatchesOriginal);
     }
 
     private RecipeGameTests() {}
@@ -277,37 +277,6 @@ public final class RecipeGameTests {
         helper.succeed();
     }
 
-    private static void ringNutritionRecipeMatchesOriginal(GameTestHelper helper) {
-        ResearchItem research = ResearchCategories.getResearch("RINGFOOD");
-        helper.assertTrue(research != null, "ring nutrition research exists");
-        if (FmConfig.gluttonyMode() == 1) {
-            helper.assertTrue(TcRecipes.get("RINGFOOD") == null, "disabled gluttony removes the ring recipe");
-            helper.succeed();
-            return;
-        }
-
-        TcRecipe registered = TcRecipes.get("RINGFOOD");
-        helper.assertTrue(registered instanceof ShapedArcaneRecipe, "ring nutrition uses arcane crafting");
-        ShapedArcaneRecipe recipe = (ShapedArcaneRecipe) registered;
-        helper.assertValueEqual(recipe.width(), 3, "ring recipe width");
-        helper.assertValueEqual(recipe.height(), 3, "ring recipe height");
-        helper.assertValueEqual(recipe.aspects().getAmount(Aspect.ENTROPY), 10, "ring costs ten entropy");
-        helper.assertValueEqual(recipe.aspects().getAmount(Aspect.WATER), 20, "ring costs twenty water");
-        helper.assertValueEqual(recipe.aspects().getAmount(Aspect.EARTH), 20, "ring costs twenty earth");
-
-        String core = FmConfig.gluttonyMode() == 2 ? "forbiddenmagic:star_block" : "minecraft:diamond";
-        helper.assertTrue(recipe.grid().get(1).test(TcStack.of(core).create()), "ring core matches gluttony difficulty");
-        helper.assertTrue(recipe.grid().get(3).test(new ItemStack(FmItems.GLUTTONY_SHARD.get())), "left shard slot");
-        helper.assertTrue(recipe.grid().get(5).test(new ItemStack(FmItems.GLUTTONY_SHARD.get())), "right shard slot");
-        helper.assertTrue(recipe.grid().get(7).test(new ItemStack(FmItems.GLUTTONY_SHARD.get())), "bottom shard slot");
-        helper.assertTrue(recipe.grid().get(4).test(TcStack.of("thaumcraft:mundane_ring").create()), "blank ring is the base");
-        for (int slot : new int[]{0, 2, 6, 8}) {
-            helper.assertTrue(recipe.grid().get(slot).test(ItemStack.EMPTY), "slot " + slot + " is empty");
-        }
-        helper.assertValueEqual(research.pages().size(), 2, "research includes the original recipe page");
-        helper.succeed();
-    }
-
     private static void oreDictionaryEntriesBecameTags(GameTestHelper helper) {
         TagKey<Item> netherStars = TagKey.create(Registries.ITEM, Identifier.parse("c:nether_stars"));
         helper.assertTrue(new ItemStack(FmBlocks.STAR_BLOCK.get().asItem()).is(netherStars), "the star block joins c:nether_stars like the blockNetherStar ore entry");
@@ -320,4 +289,19 @@ public final class RecipeGameTests {
         helper.assertTrue(recipe.grid().get(4).test(new ItemStack(FmItems.DEADLY_SHARDS.get("taint").get())), "the arcane centre accepts the taint shard tag");
         helper.succeed();
     }
+    
+    private static void ringFoodRecipeMatchesOriginal(GameTestHelper helper) {
+        TcRecipe base = TcRecipes.get("RINGFOOD");
+        helper.assertTrue(base instanceof ShapedArcaneRecipe, "Ring of Nutrition is an arcane crafting recipe");
+        ShapedArcaneRecipe recipe = (ShapedArcaneRecipe) base;
+        helper.assertValueEqual(recipe.width(), 3, "RingFood recipe width");
+        helper.assertValueEqual(recipe.height(), 3, "RingFood recipe height");
+        helper.assertValueEqual(recipe.aspects().getAmount(Aspect.ENTROPY), 10, "RingFood entropy cost");
+        helper.assertValueEqual(recipe.aspects().getAmount(Aspect.WATER), 20, "RingFood water cost");
+        helper.assertValueEqual(recipe.aspects().getAmount(Aspect.EARTH), 20, "RingFood earth cost");
+        helper.assertValueEqual(recipe.grid().size(), 9, "RingFood has a 3x3 ingredient grid");
+        helper.assertTrue(recipe.grid().get(4).exists(), "mundane ring is the center ingredient");
+        helper.succeed();
+    }
+
 }

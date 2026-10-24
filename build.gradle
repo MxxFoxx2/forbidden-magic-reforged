@@ -12,12 +12,20 @@ base {
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(Integer.parseInt(java_version))
 
+sourceSets {
+    client {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+
 neoForge {
     version = project.neo_version
 
     runs {
         client {
             client()
+            sourceSet = sourceSets.client
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
         gameTestServer {
@@ -48,16 +56,26 @@ repositories {
             includeGroup "com.github.glitchfiend"
         }
     }
+    maven {
+        name = "BlameJared"
+        url = "https://maven.blamejared.com/"
+        content {
+            includeGroup "mezz.jei"
+            includeGroup "net.mezzdev.config"
+        }
+    }
 }
 
 configurations {
     runtimeClasspath.extendsFrom localRuntime
+    clientRuntimeClasspath.extendsFrom runtimeClasspath
 }
 
 dependencies {
     implementation "com.github.glitchfiend:TerraBlender-neoforge:${terrablender_version}"
     compileOnly "thaumcraft:thaumcraft:${thaumcraft_version}"
     localRuntime "thaumcraft:thaumcraft:${thaumcraft_version}"
+    clientRuntimeOnly "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
 }
 
 tasks.named('jar', Jar) {

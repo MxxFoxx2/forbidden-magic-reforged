@@ -143,7 +143,7 @@ public final class FmResearch {
                 .setConcealed()
                 .setWarp(3)
                 .registerResearchItem();
-            if (FmConfig.greedyEnch()) {
+            if (FmConfig.greedyEnchantmentEnabled()) {
                 new FmResearchItem("GREEDY", "FORBIDDEN", new AspectList().add(Aspect.MAGIC, 2).add(Aspect.WEAPON, 1).add(Aspect.GREED, 3), -6, -5, 2, ForbiddenMagic.id("textures/misc/greedy.png"))
                     .setPages(ResearchPage.text("forbiddenmagic.research_page.GREEDY.1"), ResearchPage.infusionEnchantment("GREEDY"))
                     .setParents("NETHERSHARDS", "INFUSIONENCHANTMENT")
@@ -175,10 +175,7 @@ public final class FmResearch {
             .setAutoUnlock()
             .registerResearchItem();
         new FmResearchItem("RINGFOOD", "FORBIDDEN", new AspectList().add(FmAspects.GLUTTONY, 4).add(Aspect.HUNGER, 3).add(Aspect.LIFE, 2), -11, -6, 2, TcStack.of(FmItems.RING_NUTRITION.getId().toString(), 1))
-            .setPages(
-                ResearchPage.text("forbiddenmagic.research_page.RINGFOOD.1"),
-                ResearchPage.arcane("RINGFOOD")
-            )
+            .setPages(ResearchPage.text("forbiddenmagic.research_page.RINGFOOD.1"), ResearchPage.arcane("RINGFOOD"))
             .setParents("NETHERSHARDS")
             .registerResearchItem();
         new FmResearchItem("ROD_tainted", "FORBIDDEN", new AspectList().add(Aspect.TAINT, 4).add(Aspect.MAGIC, 2), -10, -4, 1, TcStack.of(FmItems.TAINTED_ROD.getId().toString(), 1))

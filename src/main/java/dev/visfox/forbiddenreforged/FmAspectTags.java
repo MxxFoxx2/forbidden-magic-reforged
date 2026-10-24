@@ -72,6 +72,23 @@ public final class FmAspectTags {
             }
             addShard("sloth", tags().add(FmAspects.NETHER, 1).add(FmAspects.SLOTH, 2).add(Aspect.CRYSTAL, 1));
             addShard("greed", tags().add(FmAspects.NETHER, 1).add(Aspect.GREED, 2).add(Aspect.CRYSTAL, 1));
+
+            register("forbiddenmagic:emerald_fragment", tags().add(Aspect.CRYSTAL, 1));
+            register("forbiddenmagic:black_dye", tags().add(Aspect.DARKNESS, 1));
+            AspectList blackFlower = tags().add(Aspect.PLANT, 1).add(Aspect.LIFE, 1).add(Aspect.SENSES, 1).add(Aspect.DARKNESS, 1);
+            register("forbiddenmagic:umbral_rose", blackFlower);
+            register("forbiddenmagic:umbral_rose_bush", blackFlower);
+            if (!FmConfig.lustDisabled()) {
+                register("forbiddenmagic:riding_crop", tags().add(Aspect.TREE, 2).add(Aspect.CLOTH, 2)
+                    .add(Aspect.BEAST, 1).add(FmAspects.LUST, 1).add(Aspect.WEAPON, 1));
+            }
+            register("forbiddenmagic:taint_fruit", tags().add(Aspect.TAINT, 2).add(Aspect.POISON, 1));
+            register("forbiddenmagic:taint_coal", tags().add(Aspect.TAINT, 2).add(Aspect.ENTROPY, 2));
+            register("forbiddenmagic:taint_leaves", tags().add(Aspect.TAINT, 1).add(Aspect.PLANT, 1));
+            register("forbiddenmagic:taint_log", tags().add(Aspect.TAINT, 1).add(Aspect.TREE, 3));
+            register("forbiddenmagic:taint_planks", tags().add(Aspect.TREE, 1));
+            register("forbiddenmagic:taint_stone_brick", tags().add(Aspect.EARTH, 1));
+
             String gluttony = FmItems.GLUTTONY_SHARD.getId().toString();
             DECLARED.add(gluttony);
             register(gluttony, tags().add(FmAspects.NETHER, 1).add(FmAspects.GLUTTONY, 2).add(Aspect.CRYSTAL, 1));

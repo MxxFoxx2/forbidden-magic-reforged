@@ -16,7 +16,7 @@ public final class FmResearchItem extends ResearchItem {
 
     @Override
     public String textKey() {
-        return FmConfig.tagResearch()
+        return FmConfig.tagResearchEnabled()
             ? "forbiddenmagic.research_text." + key()
             : super.textKey();
     }
