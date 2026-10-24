@@ -1,5 +1,6 @@
 package dev.visfox.forbiddenreforged;
 
+import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.core.registries.Registries;
