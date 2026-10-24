@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
@@ -17,6 +18,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -29,6 +31,9 @@ import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import net.neoforged.neoforge.event.entity.living.LivingExperienceDropEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
+import thaumcraft.aspect.Aspect;
+import thaumcraft.damage.ModDamageTypes;
+import thaumcraft.wand.Wands;
 
 public final class FmEnchantmentEffects {
     private static final Set<Item> GARBAGE = Set.of(Items.DIRT, Items.SAND, Items.GRAVEL, Items.COBBLESTONE, Items.NETHERRACK);
@@ -202,6 +207,9 @@ public final class FmEnchantmentEffects {
     }
 
     private static void greedyDrops(LivingDropsEvent event, ServerPlayer player) {
+        if (!FmConfig.greedyEnchantmentEnabled()) {
+            return;
+        }
         ItemStack weapon = player.getMainHandItem();
         if (FmEnchantments.level(player.level().registryAccess(), weapon, FmEnchantments.GREEDY) <= 0) {
             return;
@@ -236,6 +244,25 @@ public final class FmEnchantmentEffects {
     }
 
     private static void onIncomingDamage(LivingIncomingDamageEvent event) {
+        if (event.getEntity() instanceof Player wearer && !wearer.level().isClientSide()) {
+            ItemStack held = wearer.getMainHandItem();
+            if (Wands.isWand(held)) {
+                String rod = Wands.getRod(held).tag();
+                boolean fireOrWither = event.getSource().is(DamageTypeTags.IS_FIRE)
+                    || event.getSource().is(DamageTypes.WITHER);
+                if (FmToolEvents.cancelsInfernalDamage(held, fireOrWither)) {
+                    event.setCanceled(true);
+                    return;
+                }
+                if (rod.equals("tainted") && event.getSource().is(ModDamageTypes.TAINT)) {
+                    List<Aspect> primals = Aspect.getPrimalAspects();
+                    for (int i = 0; i < 3; i++) {
+                        Aspect aspect = primals.get(wearer.getRandom().nextInt(primals.size()));
+                        Wands.addVis(held, aspect, 1, true);
+                    }
+                }
+            }
+        }
         if (!FmEnchantments.enabled()) {
             return;
         }

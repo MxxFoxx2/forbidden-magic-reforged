@@ -67,7 +67,8 @@ public final class RecipeGameTests {
         "wand_rod_recipes_registered",
         "taintstone_research_and_arcane_recipe",
         "ore_dictionary_entries_became_tags",
-        "emerald_transmutation_matches_original"
+        "emerald_transmutation_matches_original",
+        "ring_food_recipe_matches_original"
     };
 
     static {
@@ -81,6 +82,7 @@ public final class RecipeGameTests {
         FUNCTIONS.register(TESTS[7], () -> RecipeGameTests::taintstoneResearchAndArcaneRecipe);
         FUNCTIONS.register(TESTS[8], () -> RecipeGameTests::oreDictionaryEntriesBecameTags);
         FUNCTIONS.register(TESTS[9], () -> RecipeGameTests::emeraldTransmutationMatchesOriginal);
+        FUNCTIONS.register(TESTS[10], () -> RecipeGameTests::ringFoodRecipeMatchesOriginal);
     }
 
     private RecipeGameTests() {}
@@ -287,4 +289,19 @@ public final class RecipeGameTests {
         helper.assertTrue(recipe.grid().get(4).test(new ItemStack(FmItems.DEADLY_SHARDS.get("taint").get())), "the arcane centre accepts the taint shard tag");
         helper.succeed();
     }
+    
+    private static void ringFoodRecipeMatchesOriginal(GameTestHelper helper) {
+        TcRecipe base = TcRecipes.get("RINGFOOD");
+        helper.assertTrue(base instanceof ShapedArcaneRecipe, "Ring of Nutrition is an arcane crafting recipe");
+        ShapedArcaneRecipe recipe = (ShapedArcaneRecipe) base;
+        helper.assertValueEqual(recipe.width(), 3, "RingFood recipe width");
+        helper.assertValueEqual(recipe.height(), 3, "RingFood recipe height");
+        helper.assertValueEqual(recipe.aspects().getAmount(Aspect.ENTROPY), 10, "RingFood entropy cost");
+        helper.assertValueEqual(recipe.aspects().getAmount(Aspect.WATER), 20, "RingFood water cost");
+        helper.assertValueEqual(recipe.aspects().getAmount(Aspect.EARTH), 20, "RingFood earth cost");
+        helper.assertValueEqual(recipe.grid().size(), 9, "RingFood has a 3x3 ingredient grid");
+        helper.assertTrue(recipe.grid().get(4).exists(), "mundane ring is the center ingredient");
+        helper.succeed();
+    }
+
 }

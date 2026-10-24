@@ -20,6 +20,7 @@ import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.PermissionSet;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.tags.TagKey;
@@ -36,6 +37,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
+import dev.visfox.forbiddenreforged.FmAspectDiagnostics;
 import dev.visfox.forbiddenreforged.FmAspects;
 import dev.visfox.forbiddenreforged.FmAspectTags;
 import dev.visfox.forbiddenreforged.FmConfig;
@@ -67,7 +69,9 @@ public final class AspectGameTests {
         "boss_drops_pride_shards",
         "unattended_death_drops_sloth_shard",
         "forbidden_category_and_shard_entries_resolve",
-        "nether_shard_drop_rules_match_original_boundaries"
+        "nether_shard_drop_rules_match_original_boundaries",
+        "aspect_diagnostics_expose_stable_registry_table",
+        "forbiddenmagic_aspects_command_is_registered"
     };
 
     static {
@@ -85,6 +89,8 @@ public final class AspectGameTests {
         FUNCTIONS.register(TESTS[11], () -> AspectGameTests::unattendedDeathDropsSlothShard);
         FUNCTIONS.register(TESTS[12], () -> AspectGameTests::forbiddenCategoryAndShardEntriesResolve);
         FUNCTIONS.register(TESTS[13], () -> AspectGameTests::netherShardDropRulesMatchOriginalBoundaries);
+        FUNCTIONS.register(TESTS[14], () -> AspectGameTests::aspectDiagnosticsExposeStableRegistryTable);
+        FUNCTIONS.register(TESTS[15], () -> AspectGameTests::forbiddenmagicAspectsCommandIsRegistered);
     }
 
     private AspectGameTests() {}
@@ -262,6 +268,52 @@ public final class AspectGameTests {
         helper.assertValueEqual(FmDrops.slothCount(2), 3, "maximum sloth drop is three");
         helper.succeed();
     }
+
+    private static void forbiddenmagicAspectsCommandIsRegistered(GameTestHelper helper) {
+            var root = helper.getLevel().getServer().getCommands().getDispatcher().getRoot();
+            helper.assertTrue(root.getChild("forbiddenmagic") != null, "forbiddenmagic command must be registered");
+            helper.assertTrue(root.getChild("forbiddenmagic").getChild("aspects") != null, "forbiddenmagic aspects command must be registered");
+            var source = helper.getLevel().getServer().createCommandSourceStack();
+            helper.assertTrue(root.getChild("forbiddenmagic").getRequirement().test(source.withPermission(PermissionSet.ALL_PERMISSIONS)), "game masters must be allowed");
+            helper.assertFalse(root.getChild("forbiddenmagic").getRequirement().test(source.withPermission(PermissionSet.NO_PERMISSIONS)), "ordinary players must be denied");
+            helper.succeed();
+        }
+
+    private static void aspectDiagnosticsExposeStableRegistryTable(GameTestHelper helper) {
+            List<String> registryLines = FmAspectDiagnostics.registryLines();
+            helper.assertValueEqual(registryLines.size(), Aspect.count(), "diagnostics must contain every registered aspect");
+            for (int index = 0; index < Aspect.values().length; index++) {
+                Aspect aspect = Aspect.values()[index];
+                helper.assertTrue(registryLines.get(index).contains("ordinal=" + index + " "), "registry ordinals must be strict and ordered: " + aspect.getTag());
+            }
+            helper.assertValueEqual(registryLines.get(0), "ordinal=0 tag=aer name=Aer kind=builtin components=-", "first registry row must be exact");
+            helper.assertTrue(registryLines.stream().anyMatch(line -> line.contains("ordinal=47 ") && line.contains("tag=vinculum ") && line.contains("name=Vinculum ") && line.contains("kind=builtin")), "ordinal 47 vinculum must be present");
+            for (Aspect aspect : Aspect.values()) {
+                if (aspect.ordinal() < Aspect.builtinCount()) {
+                    helper.assertTrue(registryLines.stream().anyMatch(line -> line.contains("ordinal=" + aspect.ordinal() + " ") && line.contains("tag=" + aspect.getTag() + " ") && line.contains("kind=builtin")), "builtin aspect must be classified: " + aspect.getTag());
+                }
+            }
+    
+            List<String> addonLines = FmAspectDiagnostics.addonLines();
+            int expected = FmConfig.lustDisabled() ? 6 : 7;
+            helper.assertValueEqual(addonLines.size(), expected, "diagnostics must list every registered Forbidden Magic aspect");
+            helper.assertValueEqual(
+                registryLines.stream().filter(line -> line.contains("kind=addon")).toList(),
+                addonLines,
+                "Forbidden Magic rows must match the add-on section of the canonical registry"
+            );
+            int expectedOrdinal = Aspect.builtinCount();
+            for (String line : addonLines) {
+                helper.assertTrue(line.contains("ordinal=" + expectedOrdinal + " "), "add-on ordinals must be consecutive: " + line);
+                helper.assertTrue(line.contains("kind=addon"), "add-on aspect must be classified: " + line);
+                helper.assertTrue(line.contains("tag="), "add-on aspect must include its tag: " + line);
+                helper.assertTrue(line.contains("components="), "add-on aspect must include its components: " + line);
+                expectedOrdinal++;
+            }
+            helper.assertValueEqual(expectedOrdinal, Aspect.builtinCount() + expected, "all add-on ordinals must be present");
+            helper.assertTrue(addonLines.stream().anyMatch(line -> line.contains("tag=infernus ") && line.contains("name=Infernus ") && line.contains("components=ignis,praecantatio")), "infernus row must include exact name and component tags");
+            helper.succeed();
+        }
 
     private static void forbiddenCategoryAndShardEntriesResolve(GameTestHelper helper) {
         ResearchItem shards = ResearchCategories.getResearch("NETHERSHARDS");

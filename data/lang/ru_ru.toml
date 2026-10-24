@@ -57,6 +57,59 @@ TAINTSTONE = "Скверна не отступает"
 BLACKFLOWER = "Спасите кальмаров!"
 ARCANECAKE = "Пусть едят торт."
 WRATHCAGE = "Бесконечная битва"
+FORK = "Тайный инструмент инженера"
+WRATH = "Когда каждая проблема — гвоздь, всё, что Вам нужно, — это большой молот."
+GREEDY = "Нерегулируемое зачарование"
+CORRUPTING = "Плохое влияние на осколки"
+CONSUMING = "Мусороудаление"
+EDUCATIONAL = "Вы будете УЧИТЬ!"
+RIDINGCROP = "Мотивированная боль"
+RINGFOOD = "Сырные шарики защищают от цинги, да?"
+ROD_tainted = "Изогнутое хранилище Вис"
+ROD_infernal = "Дьявольское хранилище Вис"
+ROD_witchwood = "Преобразователь маны"
+ROD_profane = "Подпишите договор"
+ROD_witchwood_staff = "Посох чародея"
+TRANSEMERALD = "Трансформация ценностей в изумруд"
+CRYSTALWELL = "Тайный исследовательский грант"
+PRIMEWELL = "Право похвастаться"
+TAINTSHOVEL = "Как горячий нож сквозь плотное масло"
+TAINTPICK = "Обсидиановый уничтожитель"
+FOCUSBLINK = "Лучше, чем глупая жемчужина Эндера"
+
+
+[forbiddenmagic.research_text]
+NETHERSHARDS = "[FM] Цель: плохо себя вести."
+HELLFIRE = "[FM] Никогда не попадай в затруднительное положение"
+SKULLAXE = "[FM] Отрубить им головы!"
+FORK = "[FM] Тайный инструмент инженера"
+MORPHTOOLS = "[FM] Для них есть зачарования..."
+CLUSTER = "[FM] Хамелеон ядра"
+IMPACT = "[FM] Когда-нибудь эта стена упадёт."
+VOIDTOUCHED = "[FM] Цвет из Космоса"
+TAINTTREE = "[FM] Корень флюкса приносит мерзкие плоды"
+TAINTSTONE = "[FM] Скверна не отступает"
+BLACKFLOWER = "[FM] Спасите спрута!"
+ARCANECAKE = "[FM] Пусть едят торт."
+WRATHCAGE = "[FM] Бесконечная битва"
+WRATH = "[FM] Когда каждая проблема — гвоздь, всё, что Вам нужно, — это большой молот."
+GREEDY = "[FM] Нерегулируемое зачарование"
+CORRUPTING = "[FM] Плохое влияние на осколки"
+CONSUMING = "[FM] Мусороудаление"
+EDUCATIONAL = "[FM] Вы будете УЧИТЬ!"
+RIDINGCROP = "[FM] Мотивированная боль"
+RINGFOOD = "[FM] Сырные шарики защищают от цинги, да?"
+ROD_tainted = "[FM] Изогнутое хранилище Вис"
+ROD_infernal = "[FM] Дьявольское хранилище Вис"
+ROD_witchwood = "[FM] Преобразователь маны"
+ROD_profane = "[FM] Подпишите договор"
+ROD_witchwood_staff = "[FM] Посох чародея"
+TRANSEMERALD = "[FM] Трансформация ценностей в изумруд"
+CRYSTALWELL = "[FM] Тайный исследовательский грант"
+PRIMEWELL = "[FM] Право похвастаться"
+TAINTSHOVEL = "[FM] Как горячий нож сквозь плотное масло"
+TAINTPICK = "[FM] Обсидиановый уничтожитель"
+FOCUSBLINK = "[FM] Лучше, чем глупая жемчужина Эндера"
 
 [forbiddenmagic.research_page.NETHERSHARDS]
 1 = "Странная энергия циркулирует по Нижнему миру. Как известно, иногда они затвердевают в хрустальные осколки во время наступления определённых симпатических событий."
@@ -140,42 +193,80 @@ wrath_cage = "Клетка гнева"
 [forbiddenmagic.research_page.ARCANECAKE]
 1 = "Если существует вещь, которую Вы любите, то это - торт. Вы бы ели его вкусную доброту весь день, если бы Вы могли, но она всегда заканчивается.<BR><BR>Чтобы исправить это, Вы написали рецепт, который наполняет торт магией долголетия.  Таумический торт заканчивается намного медленнее, чем земной, и он будет медленно себя восстанавливать, пока есть хотя бы кусочек.  Однако его чары нестабильны, как только Вы его поставили, торт нельзя будет перемещать обычными способами."
 
-item.forbiddenmagic.taint_coal = "Гексуголь"
-item.forbiddenmagic.riding_crop = "Верховая плеть"
-item.forbiddenmagic.black_dye = "Чёрная краска"
-item.forbiddenmagic.taint_fruit = "Скверный плод"
-item.forbiddenmagic.ring_nutrition = "Кольцо питания"
-item.forbiddenmagic.tainted_rod = "Скверный стержень"
-item.forbiddenmagic.infernal_rod = "Адский стержень"
-item.forbiddenmagic.witchwood_rod = "Ведьмин стержень"
-item.forbiddenmagic.profane_rod = "Нечестивый стержень"
-item.forbiddenmagic.witchwood_staff_rod = "Ведьмин посох"
-item.Wand.tainted.rod = "Скверная основа"
-item.Wand.infernal.rod = "Адская основа"
-item.Wand.profane.rod = "Нечестивая основа"
-item.Wand.profaned.rod = "Осквернённая основа"
-forbiddenmagic.research_page.RIDINGCROP.1 = "Простая плеть для погонии ездовых животных."
-forbiddenmagic.research_page.RINGFOOD.1 = "Кольцо, поддерживающее носителя, снижая потребность в пище."
-forbiddenmagic.research_page.ROD_tainted.1 = "Стержень, пропитанный сутью скверны."
-forbiddenmagic.research_page.ROD_infernal.1 = "Стержень, выкованный в пламени Незера."
-forbiddenmagic.research_page.ROD_witchwood.1 = "Стержень из ведьминого дерева."
-forbiddenmagic.research_page.ROD_profane.1 = "Нечестивый стержень тёмной силы."
-forbiddenmagic.research_page.ROD_witchwood_staff.1 = "Посох из ведьминого дерева."
-forbiddenmagic.research_page.TRANSEMERALD.1 = "Трансмутация золота в осколки изумруда."
-item.forbiddenmagic.taint_shovel = "Заразная лопата"
-item.forbiddenmagic.taint_pickaxe = "Заразная кирка"
-item.forbiddenmagic.crystalwell = "Кристальная чернильница"
-item.forbiddenmagic.primewell = "Первичная чернильница"
-forbiddenmagic.research_page.CRYSTALWELL.1 = "Чернильница, наполненная силой кристаллов, никогда не иссякает."
-forbiddenmagic.research_page.PRIMEWELL.1 = "Чернильница, наполненная первозданной силой."
-forbiddenmagic.research_page.TAINTSHOVEL.1 = "Лопата, наполненная скверной, способна копать огромные области."
-forbiddenmagic.research_page.TAINTPICK.1 = "Кирка, наполненная скверной и энтропией."
-item.forbiddenmagic.blink_focus = "Фокус телепортации"
-forbiddenmagic.research_page.FOCUSBLINK.1 = "Фокус, позволяющий мгновенно телепортироваться в указанную точку. Можно улучшить Адским огнём для урона ближайшим существам или Пандемонием для телепортации мобов к вам."
-entity.forbiddenmagic.villager.heretic = "Еретик"
+[item.forbiddenmagic]
+taint_coal = "Гексуголь"
+riding_crop = "Верховая плеть"
+black_dye = "Чёрная краска"
+taint_fruit = "Скверный плод"
+ring_nutrition = "Кольцо питания"
+tainted_rod = "Скверный стержень"
+infernal_rod = "Адский стержень"
+witchwood_rod = "Ведьмин стержень"
+profane_rod = "Нечестивый стержень"
+witchwood_staff_rod = "Ведьмин посох"
+taint_shovel = "Заразная лопата"
+taint_pickaxe = "Заразная кирка"
+crystalwell = "Кристальная чернильница"
+primewell = "Первичная чернильница"
+blink_focus = "Фокус телепортации"
+
+[item.Wand.tainted]
+rod = "Скверная основа"
+
+[item.Wand.infernal]
+rod = "Адская основа"
+
+[item.Wand.profane]
+rod = "Нечестивая основа"
+
+[item.Wand.profaned]
+rod = "Осквернённая основа"
+
+[forbiddenmagic.research_page.RIDINGCROP]
+1 = "Простая плеть для погонии ездовых животных."
+
+[forbiddenmagic.research_page.RINGFOOD]
+1 = "Кольцо, поддерживающее носителя, снижая потребность в пище."
+
+[forbiddenmagic.research_page.ROD_tainted]
+1 = "Стержень, пропитанный сутью скверны."
+
+[forbiddenmagic.research_page.ROD_infernal]
+1 = "Стержень, выкованный в пламени Незера."
+
+[forbiddenmagic.research_page.ROD_witchwood]
+1 = "Стержень из ведьминого дерева."
+
+[forbiddenmagic.research_page.ROD_profane]
+1 = "Нечестивый стержень тёмной силы."
+
+[forbiddenmagic.research_page.ROD_witchwood_staff]
+1 = "Посох из ведьминого дерева."
+
+[forbiddenmagic.research_page.TRANSEMERALD]
+1 = "Трансмутация золота в осколки изумруда."
+
+[forbiddenmagic.research_page.CRYSTALWELL]
+1 = "Чернильница, наполненная силой кристаллов, никогда не иссякает."
+
+[forbiddenmagic.research_page.PRIMEWELL]
+1 = "Чернильница, наполненная первозданной силой."
+
+[forbiddenmagic.research_page.TAINTSHOVEL]
+1 = "Лопата, наполненная скверной, способна копать огромные области."
+
+[forbiddenmagic.research_page.TAINTPICK]
+1 = "Кирка, наполненная скверной и энтропией."
+
+[forbiddenmagic.research_page.FOCUSBLINK]
+1 = "Фокус, позволяющий мгновенно телепортироваться в указанную точку. Можно улучшить Адским огнём для урона ближайшим существам или Пандемонием для телепортации мобов к вам."
+
+[entity.forbiddenmagic.villager]
+heretic = "Еретик"
 
 [itemGroup]
 forbiddenmagic = "Запретная магия"
 
-tooltip.creativeonly = "Только для творческого режима"
-tooltip.profane_contract = "Контракт: %s"
+[tooltip]
+creativeonly = "Только для творческого режима"
+profane_contract = "Контракт: %s"

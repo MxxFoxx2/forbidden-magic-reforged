@@ -1,32 +1,21 @@
 package dev.visfox.forbiddenreforged;
 
 import java.util.List;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.research.Warp;
 import thaumcraft.research.WarpType;
-import thaumcraft.research.ResearchManager;
 import thaumcraft.taint.TaintBiomes;
 import thaumcraft.wand.RodUpdate;
 import thaumcraft.wand.WandKeys;
 import thaumcraft.wand.WandParts;
 import thaumcraft.wand.WandRegistry;
-import thaumcraft.wand.WandItem;
-import thaumcraft.wand.WandTriggers;
 import thaumcraft.wand.Wands;
 
 public final class FmWands {
@@ -55,41 +44,6 @@ public final class FmWands {
         WandRegistry.registerRod("neutronium", 9002, Identifier.withDefaultNamespace("bedrock"), 1000,
             new CreativeWandUpdate(), true, true, false,
             ForbiddenMagic.id("textures/model/wand_rod_neutronium.png"));
-        WandTriggers.register(
-            state -> state.is(Blocks.OBSIDIAN) || state.is(Blocks.NETHERRACK),
-            FmWands::hellfire
-        );
-    }
-
-    private static boolean hellfire(Level level, ItemStack wand, Player player, BlockPos pos, Direction side) {
-        if (side != Direction.UP
-            || !Wands.isWand(wand)
-            || Wands.getFocus(wand) != null
-            || !ResearchManager.isComplete(player, "HELLFIRE")
-            || !player.mayUseItemAt(pos, side, new ItemStack(Items.FIRE_CHARGE))) {
-            return false;
-        }
-
-        BlockPos firePos = pos.above();
-        if (!level.isEmptyBlock(firePos)) {
-            return false;
-        }
-        if (level.isClientSide()) {
-            return true;
-        }
-        if (!(wand.getItem() instanceof WandItem wandItem)
-            || !wandItem.consumeVis(wand, player, Aspect.FIRE, 2, false)) {
-            return false;
-        }
-
-        level.setBlock(firePos, Blocks.FIRE.defaultBlockState(), 3);
-        level.playSound(
-            null, firePos.getX() + 0.5D, firePos.getY() + 0.5D, firePos.getZ() + 0.5D,
-            SoundEvents.FLINTANDSTEEL_USE, SoundSource.BLOCKS, 1.0F,
-            level.getRandom().nextFloat() * 0.4F + 0.8F
-        );
-        player.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, true);
-        return true;
     }
 
     private static final class CreativeWandUpdate implements RodUpdate {
