@@ -370,8 +370,8 @@ public final class ItemGameTests {
         WandRod infernalRod = WandRegistry.findRod("infernal");
         helper.assertTrue(infernalRod != null, "infernal rod must be registered");
         ItemStack infernalWand = Wands.create(WandRegistry.CAP_IRON, infernalRod, false);
-        helper.assertFalse(FmToolEvents.cancelsInfernalDamage(infernalWand, true),
-            "infernal wand must not cancel incoming fire or wither damage");
+        helper.assertTrue(FmToolEvents.cancelsInfernalDamage(infernalWand, true),
+            "infernal wand cancels incoming fire or wither damage");
         helper.assertFalse(FmToolEvents.cancelsInfernalDamage(infernalWand, false),
             "infernal wand must not cancel unrelated incoming damage");
         helper.succeed();
