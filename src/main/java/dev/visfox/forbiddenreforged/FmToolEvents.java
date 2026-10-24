@@ -7,12 +7,15 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.damagesource.DamageTypeTags;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
@@ -30,6 +33,7 @@ public final class FmToolEvents {
         NeoForge.EVENT_BUS.addListener(FmToolEvents::onBreakSpeed);
         NeoForge.EVENT_BUS.addListener(FmToolEvents::onBlockDrops);
         NeoForge.EVENT_BUS.addListener(FmToolEvents::onFoodFinished);
+        NeoForge.EVENT_BUS.addListener(FmToolEvents::onIncomingDamage);
         NeoForge.EVENT_BUS.addListener(FmToolEvents::onTooltip);
     }
 
@@ -105,7 +109,19 @@ public final class FmToolEvents {
     }
 
     public static boolean cancelsInfernalDamage(ItemStack held, boolean fireOrWither) {
-        return false;
+        return fireOrWither && held != null && !held.isEmpty() && Wands.isWand(held)
+            && "infernal".equals(Wands.getRod(held).tag());
+    }
+
+    private static void onIncomingDamage(LivingIncomingDamageEvent event) {
+        if (!(event.getEntity() instanceof Player player)) {
+            return;
+        }
+        var source = event.getSource();
+        boolean fireOrWither = source.is(DamageTypeTags.IS_FIRE) || source.is(DamageTypes.WITHER);
+        if (cancelsInfernalDamage(player.getMainHandItem(), fireOrWither)) {
+            event.setCanceled(true);
+        }
     }
 
     private static void onTooltip(ItemTooltipEvent event) {
