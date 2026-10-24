@@ -3,8 +3,6 @@ package dev.visfox.forbiddenreforged;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.tags.DamageTypeTags;
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -15,12 +13,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
-import thaumcraft.aspect.Aspect;
-import thaumcraft.damage.ModDamageTypes;
 import thaumcraft.platform.Baubles;
 import thaumcraft.wand.Wands;
 import thaumcraft.registry.ModBlocks;
@@ -35,7 +30,6 @@ public final class FmToolEvents {
         NeoForge.EVENT_BUS.addListener(FmToolEvents::onBreakSpeed);
         NeoForge.EVENT_BUS.addListener(FmToolEvents::onBlockDrops);
         NeoForge.EVENT_BUS.addListener(FmToolEvents::onFoodFinished);
-        NeoForge.EVENT_BUS.addListener(FmToolEvents::onIncomingDamage);
         NeoForge.EVENT_BUS.addListener(FmToolEvents::onTooltip);
     }
 
@@ -112,35 +106,6 @@ public final class FmToolEvents {
 
     public static boolean cancelsInfernalDamage(ItemStack held, boolean fireOrWither) {
         return fireOrWither && Wands.isWand(held) && Wands.getRod(held).tag().equals("infernal");
-    }
-
-    public static boolean isTaintedWand(ItemStack held) {
-        return Wands.isWand(held) && Wands.getRod(held).tag().equals("tainted");
-    }
-
-    private static void onIncomingDamage(LivingIncomingDamageEvent event) {
-        if (!(event.getEntity() instanceof Player player) || player.level().isClientSide()) {
-            return;
-        }
-
-        ItemStack held = player.getMainHandItem();
-        if (!Wands.isWand(held)) {
-            return;
-        }
-
-        var source = event.getSource();
-        boolean fireOrWither = source.is(DamageTypeTags.IS_FIRE) || source.is(DamageTypes.WITHER);
-        if (cancelsInfernalDamage(held, fireOrWither)) {
-            event.setCanceled(true);
-            return;
-        }
-
-        if (source.is(ModDamageTypes.TAINT) && isTaintedWand(held)) {
-            var primals = Aspect.getPrimalAspects();
-            for (int i = 0; i < 3; i++) {
-                Wands.addVis(held, primals.get(player.getRandom().nextInt(primals.size())), 1, true);
-            }
-        }
     }
 
     private static void onTooltip(ItemTooltipEvent event) {
