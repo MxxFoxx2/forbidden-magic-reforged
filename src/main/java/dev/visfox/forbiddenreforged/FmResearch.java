@@ -62,6 +62,7 @@ public final class FmResearch {
         new ResearchItem("FORK", "FORBIDDEN", new AspectList().add(Aspect.FIRE, 3).add(Aspect.MECHANISM, 1).add(Aspect.TOOL, 1), -6, -7, 0, TcStack.of(FmItems.DIABOLIST_FORK.getId().toString(), 1))
             .setPages(
                 ResearchPage.text("forbiddenmagic.research_page.FORK.1"),
+                ResearchPage.text("forbiddenmagic.research_page.FORK.wc"),
                 ResearchPage.infusion("FORK")
             )
             .setSecondary()
@@ -212,7 +213,11 @@ public final class FmResearch {
                 .registerResearchItem();
         }
         new ResearchItem("CRYSTALWELL", "FORBIDDEN", new AspectList().add(Aspect.MIND, 3).add(Aspect.CRYSTAL, 2).add(Aspect.MAGIC, 1), -2, -8, 1, TcStack.of(FmItems.CRYSTALWELL.getId().toString(), 1))
-            .setPages(ResearchPage.text("forbiddenmagic.research_page.CRYSTALWELL.1"), ResearchPage.arcane("CRYSTALWELL"))
+            .setPages(
+                ResearchPage.text("forbiddenmagic.research_page.CRYSTALWELL.1"),
+                ResearchPage.text("forbiddenmagic.research_page.CRYSTALWELL.1b"),
+                ResearchPage.arcane("CRYSTALWELL")
+            )
             .setParents("RESEARCH")
             .registerResearchItem();
         new ResearchItem("PRIMEWELL", "FORBIDDEN", new AspectList().add(Aspect.MIND, 3).add(Aspect.ELDRITCH, 6).add(Aspect.CRAFT, 1), 2, -8, 1, TcStack.of(FmItems.PRIMEWELL.getId().toString(), 1))
@@ -221,7 +226,11 @@ public final class FmResearch {
             .setConcealed()
             .registerResearchItem();
         new ResearchItem("TAINTSHOVEL", "FORBIDDEN", new AspectList().add(Aspect.TOOL, 2).add(Aspect.TAINT, 4).add(Aspect.HEAL, 3), -10, 2, 2, TcStack.of(FmItems.TAINT_SHOVEL.getId().toString(), 1))
-            .setPages(ResearchPage.text("forbiddenmagic.research_page.TAINTSHOVEL.1"), ResearchPage.infusion("TAINTSHOVEL"))
+            .setPages(
+                ResearchPage.text("forbiddenmagic.research_page.TAINTSHOVEL.1"),
+                ResearchPage.text("forbiddenmagic.research_page.TAINTSHOVEL.2"),
+                ResearchPage.infusion("TAINTSHOVEL")
+            )
             .setParents("THAUMIUM", "INFUSION")
             .setConcealed()
             .registerResearchItem();

@@ -19,7 +19,7 @@ greed_shard = "Greed Shard"
 gluttony_shard = "Gluttony Shard"
 skull_axe = "Axe of the Skulltaker"
 diabolist_fork = "Diabolist Fork"
-diabolist_fork_spork = "Diabolist Spork"
+diabolist_fork_spork = "Spork of Doom"
 emerald_fragment = "Emerald Fragment"
 morph_pickaxe = "Chameleon Pickaxe"
 morph_sword = "Chameleon Sword"
@@ -30,60 +30,115 @@ riding_crop = "Riding Crop"
 black_dye = "Black Dye"
 taint_fruit = "Tainted Fruit"
 ring_nutrition = "Ring of Nutrition"
-tainted_rod = "Tainted Wand Rod"
-infernal_rod = "Infernal Wand Rod"
-witchwood_rod = "Witchwood Wand Rod"
-profane_rod = "Profane Wand Rod"
-witchwood_staff_rod = "Witchwood Staff Rod"
-taint_shovel = "Taint Shovel"
-taint_pickaxe = "Taint Pickaxe"
-crystalwell = "Crystal Inkwell"
-primewell = "Primordial Inkwell"
-blink_focus = "Blink Focus"
+tainted_rod = "Tainted Rod"
+infernal_rod = "Infernal Rod"
+witchwood_rod = "Witchwood Rod"
+profane_rod = "Profane Rod"
+witchwood_staff_rod = "Witchwood Staff Core"
+taint_shovel = "Shovel of the Purifier"
+taint_pickaxe = "Pickaxe of Distortion"
+crystalwell = "Crystal Scribing Tools"
+primewell = "Primal Scribing Tools"
+blink_focus = "Wand Focus: Blink"
 
 [item.Wand.tainted]
-rod = "Tainted Core"
+rod = "Tainted"
 
 [item.Wand.infernal]
-rod = "Infernal Core"
+rod = "Infernal"
 
 [item.Wand.profane]
-rod = "Profane Core"
+rod = "Profane"
 
 [item.Wand.profaned]
-rod = "Profaned Core"
+rod = "Profane"
+
+[item.Wand.orichalcum]
+cap = "Orichalcum Studded"
+
+[item.Wand.neutronium]
+rod = "Cosmic Neutronium"
 
 [item.forbiddenmagic.mob_crystal]
 empty = "Blank Imprinting Crystal"
 filled = "%s Imprinted Crystal"
 
+[tc.research_category]
+FORBIDDEN = "Apocrypha"
+
 [tc.research_name]
 NETHERSHARDS = "Nether Shards"
 HELLFIRE = "Lord of Hellfire"
 SKULLAXE = "Axe of the Skulltaker"
+FORK = "Diabolist Fork"
 MORPHTOOLS = "Chameleon Tools"
 CLUSTER = "Enchantment: Fiery Core"
 IMPACT = "Enchantment: Impact"
 VOIDTOUCHED = "Enchantment: Voidtouched"
+ARCANECAKE = "Thaumic Cake"
+WRATHCAGE = "Wrath Cage"
 TAINTTREE = "Tainted Tree"
 TAINTSTONE = "Tainted Stone"
 BLACKFLOWER = "Umbral Rose"
-ARCANECAKE = "Thaumic Cake"
-WRATHCAGE = "Wrath Cage"
+WRATH = "Enchantment: Wrath"
+GREEDY = "Enchantment: Capitalist"
+CORRUPTING = "Enchantment: Corrupting"
+CONSUMING = "Enchantment: Consuming"
+EDUCATIONAL = "Enchantment: Educational"
+RIDINGCROP = "Riding Crop"
+RINGFOOD = "Ring of Nutrition"
+ROD_tainted = "Tainted Wand Core"
+ROD_infernal = "Infernal Wand Core"
+ROD_witchwood = "Witchwood Wand Core"
+ROD_profane = "Profane Wand"
+ROD_witchwood_staff = "Witchwood Staff Core"
+TRANSEMERALD = "Emerald Transmutation"
+CRYSTALWELL = "Crystal Scribing Tools"
+PRIMEWELL = "Primal Scribing Tools"
+TAINTSHOVEL = "Shovel of the Purifier"
+TAINTPICK = "Pickaxe of Distortion"
+FOCUSBLINK = "Wand Focus: Blink"
 
 [tc.research_text]
 NETHERSHARDS = "Aim to misbehave."
 HELLFIRE = "Never get stranded again"
 SKULLAXE = "Off with their heads!"
+FORK = "Arcane tinkering tool"
 MORPHTOOLS = "There's an enchantment for that..."
 CLUSTER = "Chameleon of the Core"
 IMPACT = "Someday that wall is gonna fall."
 VOIDTOUCHED = "Colour Out of Space"
+ARCANECAKE = "Let them eat cake."
+WRATHCAGE = "Neverending battle"
 TAINTTREE = "The root of flux bears gross fruit"
 TAINTSTONE = "The Taint rocks on"
 BLACKFLOWER = "Save the squid!"
-ARCANECAKE = "Let them eat cake."
-WRATHCAGE = "Neverending battle"
+WRATH = "When every problem is a nail, all you want is a bigger hammer."
+GREEDY = "Unregulated enchanting"
+CORRUPTING = "A bad influence on shards"
+CONSUMING = "Garbage Disposal"
+EDUCATIONAL = "You will LEARN!"
+RIDINGCROP = "Motivating Pain"
+RINGFOOD = "Cheese puffs prevent scurvy, right?"
+ROD_tainted = "Squiggly vis storage"
+ROD_infernal = "Devilish vis storage"
+ROD_witchwood = "Mana converter"
+ROD_profane = "Sign on the dotted line"
+ROD_witchwood_staff = "Staff of the Arcanist"
+TRANSEMERALD = "Transformation of valuables into emerald"
+CRYSTALWELL = "Arcane Research Grant"
+PRIMEWELL = "Bragging Rights"
+TAINTSHOVEL = "Like a hot knife through really gross butter"
+TAINTPICK = "Obsidian Buster"
+FOCUSBLINK = "Better than a stupid Ender Pearl"
+
+[focus.upgrade.hellfire]
+name = "Hellfire"
+text = "This upgrade unleashes a burst of fire upon teleporting to a location."
+
+[focus.upgrade.pandemonium]
+name = "Pandemonium"
+text = "This upgrade teleports all surrounding enemies to your previous location upon teleporting to a location."
 
 [forbiddenmagic.research_page.NETHERSHARDS]
 1 = "Strange energies swirl through the Nether. On occasion, they have been known to solidify into crystal shards when certain sympathetic events occur."
@@ -98,7 +153,8 @@ WRATHCAGE = "Neverending battle"
 1 = "Some monsters just really boil your blood. Skeletons! Always clacking around and using you for target practice. Or those Creepers! They just creep around blowing things up like they own the place! You wish you could just chop all their smug heads off and place them on pikes.<BR><BR>Fortunately, you've discovered an item that will let you do just that.  The Axe of the Skulltaker has a chance to remove the heads of monsters it slays. It might even work on other humans! Unfortunately, the infusion leaves the axe far too bloodthirsty to effectively cleave through boring plant matter."
 
 [forbiddenmagic.research_page.FORK]
-1 = "A curious tinkering tool, this fork hums with infernal energy. When wielded against the creatures of the world, it can capture their essence into Blank Imprinting Crystals carried in your inventory. The fork also serves as a key for configuring the Wrath Cage, cycling through its fuel modes when right-clicked upon it."
+1 = "You've created a tool to help you tinker with various infernal contraptions. The quartz prongs on the Diabolist Fork allow it to attune itself to arcane energies.<BR><BR>Along with being used to tune devices, the fork also makes for a functional weapon.<BR><BR>More information should appear in the following pages as you uncover more research."
+wc = "If the Diabolist Fork is used to slay a compatible creature with a Blank Imprinting Crystal in your inventory, it will imprint on the crystal.  The Imprinted Crystal can then be used to attune a Wrath Cage to that monster.<BR><BR>The fork can also be used to adjust which essentia type a Wrath Cage is using for fuel. Simply right click on the Wrath Cage with the Diabolist Fork to cycle between the three different fuel types."
 
 [enchantment.forbiddenmagic]
 wrath = "Wrath"
@@ -151,9 +207,9 @@ arcane_cake = "Thaumic Cake"
 wrath_cage = "Wrath Cage"
 
 [forbiddenmagic.research_page.WRATHCAGE]
-1 = "Sometimes, it is not enough to kill something only once. You have reconstructed the monster spawners found in ancient ruins, but made yours answer to redstone instead of requiring a nearby player. The Wrath Cage reacts to a redstone signal: powered it stops, unpowered it continues its cycle. It also works much faster than the ancient analogues."
-2 = "However, you could not recreate the original method of infinite creature spawning. For each creature the cage requires some essentia, which must be piped in. The device accepts different types of essentia depending on the imprinted creature. Ira can also serve as fuel. The cage also accepts Desidia, but it adds a substantial delay to the next cycle."
-3 = "Right-click the cage with an imprinted crystal to attune it. If it was already attuned, the previous imprint is returned directly to your hand. Breaking the cage also releases its imprint crystal. To imprint a crystal, kill a compatible mob with a blank crystal in your inventory."
+1 = "Sometimes, it's not enough to just kill something. Sure, slaying a single monster may be rather cathartic, but imagine just mowing down a crowd of the obnoxious little jerks.<BR><BR>To that end, you've discovered a way to recreate the monster spawners found in the ancient ruins. Unlike the original monster spawners, the Wrath Cage responds to redstone controls instead of the presence of human beings and can run much faster than the ancient devices."
+2 = "However, you haven't been able to duplicate the original method of infinite creation. For every creature spawned, the Wrath Cage requires a bit of essentia piped into its internal reserves. The device will accept different types of essentia depending on the creature it is attuned to. Alternatively, piping Ira into the cage can serve as a fuel. The cage can also accept Desidia for some reason.<BR><BR>Right-clicking the Wrath Cage with a Diabolist Fork will cycle the cage between the different fuel types, changing which essentia it applies suction to."
+3 = "To attune a wrath cage to a specific creature, right click on it with an imprinted crystal.  Slaying a compatible creature with a Diabolist Fork while carrying a blank imprinting crystal will attune the crystal to that monster."
 
 [forbiddenmagic.research_page.TAINTTREE]
 1 = "The sick, twisted runoff of magical experiments can take on a strange life of its own. Most plants are unable to survive in Tainted Lands, but you've found a way to grow one that can. By steeping a sapling in taint, you create a tree that can thrive in Tainted Lands.<BR><BR>Its wood can also be turned into planks which are resistant to fibrous taint, allowing you to build structures safe from spreading taint.<BR><BR>The tree also seems to bear fruit, but eating them is not recommended..."
@@ -162,49 +218,51 @@ wrath_cage = "Wrath Cage"
 1 = "Tainted Lands aren't very safe places to be. Fibrous Taint hungrily spreads and crawls over most surfaces, eventually enveloping them and making them unsafe to walk on. The fibers don't appear to be harmful to tainted creatures or materials, however.<BR><BR>By mixing taint in with regular stone, you've created a magical material which is structurally stable, but resistant to the spread of fibrous taint. Tainted Stone can be used to build surfaces in Tainted Lands which are safe to walk on.<BR><BR>Not that building in a Tainted Land is advised..."
 
 [forbiddenmagic.research_page.BLACKFLOWER]
-1 = "There's no sight more pathetic than a soggy Thaumaturge.  For all your great and miraculous powers, you still have to go jump in the nearest lake and hunt for squids every time you want to refill your inkwell.<BR><BR>You're done squid hunting.  By infusing a rose with tenebrae and victus, you create a flower that spreads like a weed and whose petals can be crushed for ink."
+1 = "By infusing a rose with Tenebrae and Victus, you create a dark flower that spreads on its own onto nearby dirt blocks."
 
 [forbiddenmagic.research_page.ARCANECAKE]
 1 = "If there's one thing you love, it's cake. You would eat its delicious goodness all day if you could, but it always runs out in the end.<BR><BR>To remedy this, you have devised a recipe to infuse a cake with longevity-enhancing magic.  The Thaumic Cake lasts significantly longer than a mundane one and will slowly repair itself as long as there's at least a sliver left.  The enchantments are unstable, however, and the cake cannot be moved again through conventional means once placed down."
 
 [forbiddenmagic.research_page.RIDINGCROP]
-1 = "A simple crop for urging mounts forward."
+1 = "A riding crop is, as its name suggests, a tool used to motivate mounts to move faster.  Right clicking with it in your hand while riding a horse or other mount will give the mount a quick lash of pain and cause it to move faster for a little while.<BR><BR>You could hit other creatures with the crop too, but what would possess you to do something like that?"
 
 [forbiddenmagic.research_page.RINGFOOD]
-1 = "A ring that sustains the wearer, reducing the need for food."
+1 = "People keep scolding you. They insist that you can't just eat cookies all day or that \"nutrition doesn't work like that.\" Well, you've had it with these naysayers.<BR><BR>The Ring of Nutrition provides a boost to the food and saturation values of most foods you eat while wearing the ring on your finger.<BR><BR>(Side effects may include nausea, headaches, cramping, vertigo, diabetes, and sudden interest in homeopathy.)"
 
 [forbiddenmagic.research_page.ROD_tainted]
-1 = "A rod infused with the essence of taint."
+1 = "Tainted Lands are places of great and terrible power for those Thaumaturges who know how to tap into them.<BR><BR>The Tainted Wand Core can store up to 150 vis of each type and slowly replenishes itself up to 10% in every aspect as long as it is being held inside of a Tainted Land."
 
 [forbiddenmagic.research_page.ROD_infernal]
-1 = "A rod forged in the fires of the Nether."
+1 = "A great and powerful thaumaturge like you deserves a powerful and imposing wand befitting your station. Some hippy silverwood wand just won't cut it. You need a wand that will serve as your scepter of authority.<BR><BR>You've discovered a way to create a wand infused with the power of the Nether.  The Infernal Wand Core can hold up to 150 vis and will slowly replenish its supply of Ignis up to 20%.  While within the Nether, the wand will also replenish its other aspects to 10%."
 
 [forbiddenmagic.research_page.ROD_witchwood]
 1 = "A rod crafted from witchwood."
 
 [forbiddenmagic.research_page.ROD_profane]
-1 = "A profane rod of dark power."
+1 = "Strange villagers have been known to procure these wooden wands carved with blasphemous symbols. Profane Wands draw from a mediocre pool of vis, but they seem to be able to refill themselves very quickly from an unseen source.<BR><BR>The runes on the wand sometimes shift and bleed and the wand itself occasionally whispers of demonic contracts and vile deeds.<BR><BR>Prolonged use is not recommended."
 
 [forbiddenmagic.research_page.ROD_witchwood_staff]
 1 = "A staff rod of witchwood."
 
 [forbiddenmagic.research_page.TRANSEMERALD]
-1 = "Transmute gold into emerald fragments."
+1 = "You have discovered a way to multiply emeralds by steeping emerald fragments in lucrum harvested from other substances."
 
 [forbiddenmagic.research_page.CRYSTALWELL]
-1 = "A crystal-infused inkwell that never runs dry."
+1 = "Combining elemental shards with your inkwell results in some interesting effects. The Crystal Scribing Tools seem to absorb knowledge as you use them to write. Once the well is empty of ink, you can absorb this knowledge for a small burst of research points by holding the tools in your hand and right clicking. Unfortunately, this burns the tool out and turns it back into a mundane Scribing Tool again."
+1b = "Research can get boring and tedious sometimes. There's only so many hours you can spend taking apart bits of cobblestone in the sad hope of finding esoteric insights before you start considering a change in careers.<BR><BR>Thankfully, you've devised a way to expedite the process. The Crystal Scribing Tools contain a small pool of esoteric knowledge which will slowly be transferred into your mind as you carry them around.<BR><BR>Your chakras are going to be SO aligned!"
 
 [forbiddenmagic.research_page.PRIMEWELL]
-1 = "An inkwell infused with primordial power."
+1 = "You've learned things humans weren't meant to know, seen things humans weren't meant to see, and been places humans weren't meant to go.<BR><BR>What these experiences have taught you is how to refill your inkwell.<BR><BR>By utilizing the strange properties of the Primordial Pearl, you can create a set of scribing tools that will never run out of ink. At the cold, dark end of time when the light of a million stars have died out, the Primal Scribing Tools will still be ready to scribble onwards."
 
 [forbiddenmagic.research_page.TAINTSHOVEL]
-1 = "A shovel infused with taint, capable of mining vast areas."
+1 = "Sometimes, the easiest way to remove patches of taint is to just physically remove them.<BR><BR>By reinforcing a thaumium shovel with Silverwood and Order Shards, you have created a tool capable of combating Taint.  The Shovel of the Purifier can dig through pulpy tainted lands as effectively as it can through normal earth.<BR><BR>If held in your hand and right-clicked, the shovel will purify all flux goo and gas from a small radius at the cost of durability. You no longer have to clean up infusion mishaps with a piece of cobblestone!"
+2 = "When digging through taint with the shovel, there's a chance that the twisted energies released will crystallize into Taint Shards.  Unlike other tainted materials, the crystalline pattern keeps these shards stable enough to carry around."
 
 [forbiddenmagic.research_page.TAINTPICK]
-1 = "A pickaxe infused with taint and entropy."
+1 = "The Pickaxe of Distortion mines hard materials faster. Its effectiveness increases with the hardness of the material, while softer materials are mined more slowly."
 
 [forbiddenmagic.research_page.FOCUSBLINK]
-1 = "A focus that allows instant teleportation to a targeted location. Can be upgraded with Hellfire to damage nearby entities or Pandemonium to teleport mobs to you."
+1 = "Ugh.<BR><BR>The only thing that sucks more than getting up is having to walk places. So much woooooork. What's the point of being a big fancy magician if you still have to use your feet like everyone else?<BR><BR>The Blink focus eases the hardships of having to put one foot in front of the other. Just point your wand at a distant location and wave it to teleport yourself there.<BR><BR>Now all you need is a Shower focus and you'll be all set..."
 
 [entity.forbiddenmagic.villager]
 heretic = "Heretic"

@@ -75,7 +75,8 @@ public final class ItemGameTests {
         "tool_and_skull_axe_chance_rules_preserve_original_boundaries",
         "silverfish_emerald_drop_thresholds_match_original",
         "wand_tooltip_kinds_preserve_original_hints",
-        "item_translation_keys_are_not_nested_under_research_pages"
+        "item_translation_keys_are_not_nested_under_research_pages",
+        "research_translation_keys_are_complete"
     };
 
     static {
@@ -97,6 +98,7 @@ public final class ItemGameTests {
         FUNCTIONS.register(TESTS[15], () -> ItemGameTests::silverfishEmeraldDropThresholdsMatchOriginal);
         FUNCTIONS.register(TESTS[16], () -> ItemGameTests::wandTooltipKindsPreserveOriginalHints);
         FUNCTIONS.register(TESTS[17], () -> ItemGameTests::itemTranslationKeysAreNotNestedUnderResearchPages);
+        FUNCTIONS.register(TESTS[18], () -> ItemGameTests::researchTranslationKeysAreComplete);
     }
 
     private ItemGameTests() {}
@@ -419,6 +421,8 @@ public final class ItemGameTests {
             "item.Wand.infernal.rod",
             "item.Wand.profane.rod",
             "item.Wand.profaned.rod",
+            "item.Wand.orichalcum.cap",
+            "item.Wand.neutronium.rod",
             "item.forbiddenmagic.taint_shovel",
             "item.forbiddenmagic.taint_pickaxe",
             "item.forbiddenmagic.crystalwell",
@@ -449,6 +453,44 @@ public final class ItemGameTests {
                     "translation key has an invalid nested prefix " + key);
             }
         }
+        helper.succeed();
+    }
+
+    private static void researchTranslationKeysAreComplete(GameTestHelper helper) {
+        JsonObject english = readJson(helper, "/assets/forbiddenmagic/lang/en_us.json");
+        JsonObject russian = readJson(helper, "/assets/forbiddenmagic/lang/ru_ru.json");
+        List<String> researchIds = List.of(
+            "NETHERSHARDS", "HELLFIRE", "SKULLAXE", "FORK", "MORPHTOOLS",
+            "CLUSTER", "IMPACT", "VOIDTOUCHED", "ARCANECAKE", "WRATHCAGE",
+            "TAINTTREE", "TAINTSTONE", "BLACKFLOWER", "WRATH", "GREEDY",
+            "CORRUPTING", "CONSUMING", "EDUCATIONAL", "RIDINGCROP", "RINGFOOD",
+            "ROD_tainted", "ROD_infernal", "ROD_witchwood", "ROD_profane",
+            "ROD_witchwood_staff", "TRANSEMERALD", "CRYSTALWELL", "PRIMEWELL",
+            "TAINTSHOVEL", "TAINTPICK", "FOCUSBLINK"
+        );
+        List<String> required = List.of(
+            "tc.research_category.FORBIDDEN",
+            "focus.upgrade.hellfire.name",
+            "focus.upgrade.hellfire.text",
+            "focus.upgrade.pandemonium.name",
+            "focus.upgrade.pandemonium.text",
+            "forbiddenmagic.research_page.FORK.wc",
+            "forbiddenmagic.research_page.TAINTSHOVEL.2",
+            "forbiddenmagic.research_page.CRYSTALWELL.1b"
+        );
+        for (JsonObject translations : List.of(english, russian)) {
+            for (String key : required) {
+                helper.assertTrue(translations.has(key), "missing translation key " + key);
+            }
+            for (String researchId : researchIds) {
+                helper.assertTrue(translations.has("tc.research_name." + researchId),
+                    "missing research name " + researchId);
+                helper.assertTrue(translations.has("tc.research_text." + researchId),
+                    "missing research text " + researchId);
+            }
+        }
+        helper.assertTrue(english.keySet().equals(russian.keySet()),
+            "English and Russian translation key sets must match");
         helper.succeed();
     }
 
