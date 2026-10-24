@@ -176,7 +176,10 @@ public final class FmResearch {
             .setAutoUnlock()
             .registerResearchItem();
         new ResearchItem("RINGFOOD", "FORBIDDEN", new AspectList().add(FmAspects.GLUTTONY, 4).add(Aspect.HUNGER, 3).add(Aspect.LIFE, 2), -11, -6, 2, TcStack.of(FmItems.RING_NUTRITION.getId().toString(), 1))
-            .setPages(ResearchPage.text("forbiddenmagic.research_page.RINGFOOD.1"))
+            .setPages(
+                ResearchPage.text("forbiddenmagic.research_page.RINGFOOD.1"),
+                ResearchPage.arcane("RINGFOOD")
+            )
             .setParents("NETHERSHARDS")
             .registerResearchItem();
         new ResearchItem("ROD_tainted", "FORBIDDEN", new AspectList().add(Aspect.TAINT, 4).add(Aspect.MAGIC, 2), -10, -4, 1, TcStack.of(FmItems.TAINTED_ROD.getId().toString(), 1))
