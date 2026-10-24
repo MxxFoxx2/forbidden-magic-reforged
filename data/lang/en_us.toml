@@ -251,7 +251,7 @@ wrath_cage = "Wrath Cage"
 1 = "Tainted Lands aren't very safe places to be. Fibrous Taint hungrily spreads and crawls over most surfaces, eventually enveloping them and making them unsafe to walk on. The fibers don't appear to be harmful to tainted creatures or materials, however.<BR><BR>By mixing taint in with regular stone, you've created a magical material which is structurally stable, but resistant to the spread of fibrous taint. Tainted Stone can be used to build surfaces in Tainted Lands which are safe to walk on.<BR><BR>Not that building in a Tainted Land is advised..."
 
 [forbiddenmagic.research_page.BLACKFLOWER]
-1 = "By infusing a rose with Tenebrae and Victus, you create a dark flower that spreads on its own onto nearby dirt blocks."
+1 = "There's no sight more pathetic than a soggy Thaumaturge.  For all your great and miraculous powers, you still have to go jump in the nearest lake and hunt for squids every time you want to refill your inkwell.<BR><BR>You're done squid hunting.  By infusing a rose with tenebrae and victus, you create a flower that spreads like a weed and whose petals can be crushed for ink."
 
 [forbiddenmagic.research_page.ARCANECAKE]
 1 = "If there's one thing you love, it's cake. You would eat its delicious goodness all day if you could, but it always runs out in the end.<BR><BR>To remedy this, you have devised a recipe to infuse a cake with longevity-enhancing magic.  The Thaumic Cake lasts significantly longer than a mundane one and will slowly repair itself as long as there's at least a sliver left.  The enchantments are unstable, however, and the cake cannot be moved again through conventional means once placed down."
@@ -267,15 +267,16 @@ wrath_cage = "Wrath Cage"
 
 [forbiddenmagic.research_page.ROD_infernal]
 1 = "A great and powerful thaumaturge like you deserves a powerful and imposing wand befitting your station. Some hippy silverwood wand just won't cut it. You need a wand that will serve as your scepter of authority.<BR><BR>You've discovered a way to create a wand infused with the power of the Nether.  The Infernal Wand Core can hold up to 150 vis and will slowly replenish its supply of Ignis up to 20%.  While within the Nether, the wand will also replenish its other aspects to 10%."
+2 = "The wand also imbues you with some protection from the Nether's hazards, extinguishing you if you are on fire or protecting you from the effects of Withering as long as it is in your inventory.  While the wand is held in your hand, it will completely protect you from all fire damage."
 
 [forbiddenmagic.research_page.ROD_witchwood]
-1 = "A rod crafted from witchwood."
+1 = "By creating a wand core out of Witchwood, you've discovered a way to convert mana into Vis.  The Witchwood Wand Core holds up to 100 vis and will gradually charge itself at the cost of 140 mana per point of vis.<BR><BR>Further research may reveal ways to lower this price."
 
 [forbiddenmagic.research_page.ROD_profane]
 1 = "Strange villagers have been known to procure these wooden wands carved with blasphemous symbols. Profane Wands draw from a mediocre pool of vis, but they seem to be able to refill themselves very quickly from an unseen source.<BR><BR>The runes on the wand sometimes shift and bleed and the wand itself occasionally whispers of demonic contracts and vile deeds.<BR><BR>Prolonged use is not recommended."
 
 [forbiddenmagic.research_page.ROD_witchwood_staff]
-1 = "A staff rod of witchwood."
+1 = "The Witchwood Wand eats far too much magical power and charges far too slowly to stand up in sustained combat. It's time for something a little more efficient at channeling arcane power.<BR><BR>Unlike most staves, the Witchwood Staff can only hold 50 vis. Its true strength lies in how quickly it recharges itself.  The staff regains vis at over twice the rate of the Witchwood Wand. Furthermore, the staff uses considerably less magical power than the Witchwood Wand, only needing 100 mana per point of vis, if used without the appropriate cap."
 
 [forbiddenmagic.research_page.TRANSEMERALD]
 1 = "You have discovered a way to multiply emeralds by steeping emerald fragments in lucrum harvested from other substances."
@@ -292,7 +293,7 @@ wrath_cage = "Wrath Cage"
 2 = "When digging through taint with the shovel, there's a chance that the twisted energies released will crystallize into Taint Shards.  Unlike other tainted materials, the crystalline pattern keeps these shards stable enough to carry around."
 
 [forbiddenmagic.research_page.TAINTPICK]
-1 = "The Pickaxe of Distortion mines hard materials faster. Its effectiveness increases with the hardness of the material, while softer materials are mined more slowly."
+1 = "By infusing a thaumium pickaxe with taint, you create a tool capable of cutting through difficult materials.<BR><BR>The Pickaxe of Distortion infects hard materials with taint, weakening them. The harder the material, the more effective the pickaxe is at removing it. Unfortunately, the effects of the taint have an inverse effect when mining softer materials, rendering the pickaxe less effective than just pawing at the block with your bare hands."
 
 [forbiddenmagic.research_page.FOCUSBLINK]
 1 = "Ugh.<BR><BR>The only thing that sucks more than getting up is having to walk places. So much woooooork. What's the point of being a big fancy magician if you still have to use your feet like everyone else?<BR><BR>The Blink focus eases the hardships of having to put one foot in front of the other. Just point your wand at a distant location and wave it to teleport yourself there.<BR><BR>Now all you need is a Shower focus and you'll be all set..."
