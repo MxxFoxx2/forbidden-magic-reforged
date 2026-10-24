@@ -247,7 +247,6 @@ public final class FmEnchantmentEffects {
         if (event.getEntity() instanceof Player wearer && !wearer.level().isClientSide()) {
             ItemStack held = wearer.getMainHandItem();
             if (Wands.isWand(held)) {
-                String rod = Wands.getRod(held).tag();
                 boolean fireOrWither = event.getSource().is(DamageTypeTags.IS_FIRE)
                     || event.getSource().is(DamageTypes.WITHER);
                 if (FmToolEvents.cancelsInfernalDamage(held, fireOrWither)) {
