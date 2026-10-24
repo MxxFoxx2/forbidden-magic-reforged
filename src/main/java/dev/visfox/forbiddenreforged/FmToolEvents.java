@@ -9,6 +9,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.damagesource.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.state.BlockState;
@@ -19,6 +20,8 @@ import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
+import thaumcraft.aspect.Aspect;
+import thaumcraft.damage.ModDamageTypes;
 import thaumcraft.platform.Baubles;
 import thaumcraft.registry.ModBlocks;
 import thaumcraft.taint.TaintBlock;
@@ -26,6 +29,10 @@ import thaumcraft.taint.TaintFibresBlock;
 import thaumcraft.wand.Wands;
 
 public final class FmToolEvents {
+    private static final Aspect[] TAINTED_PRIMALS = {
+        Aspect.ENTROPY, Aspect.ORDER, Aspect.FIRE, Aspect.WATER, Aspect.EARTH, Aspect.AIR
+    };
+
     private FmToolEvents() {
     }
 
@@ -113,14 +120,34 @@ public final class FmToolEvents {
             && "infernal".equals(Wands.getRod(held).tag());
     }
 
+    public static boolean restoresTaintedVis(ItemStack held, boolean taintDamage) {
+        return taintDamage && held != null && !held.isEmpty() && Wands.isWand(held)
+            && "tainted".equals(Wands.getRod(held).tag());
+    }
+
+    public static List<Aspect> taintedVisRolls(RandomSource random) {
+        return List.of(
+            TAINTED_PRIMALS[random.nextInt(TAINTED_PRIMALS.length)],
+            TAINTED_PRIMALS[random.nextInt(TAINTED_PRIMALS.length)],
+            TAINTED_PRIMALS[random.nextInt(TAINTED_PRIMALS.length)]
+        );
+    }
+
     private static void onIncomingDamage(LivingIncomingDamageEvent event) {
         if (!(event.getEntity() instanceof Player player)) {
             return;
         }
         var source = event.getSource();
+        ItemStack held = player.getMainHandItem();
         boolean fireOrWither = source.is(DamageTypeTags.IS_FIRE) || source.is(DamageTypes.WITHER);
-        if (cancelsInfernalDamage(player.getMainHandItem(), fireOrWither)) {
+        if (cancelsInfernalDamage(held, fireOrWither)) {
             event.setCanceled(true);
+            return;
+        }
+        if (!player.level().isClientSide() && restoresTaintedVis(held, source.is(ModDamageTypes.TAINT))) {
+            for (Aspect aspect : taintedVisRolls(player.getRandom())) {
+                Wands.addVis(held, aspect, 1, true);
+            }
         }
     }
 
