@@ -135,7 +135,7 @@ public final class FmResearch {
             .setConcealed()
             .registerResearchItem();
         new FmResearchItem("BLACKFLOWER", "FORBIDDEN", new AspectList().add(Aspect.PLANT, 3).add(Aspect.SENSES, 2).add(Aspect.DARKNESS, 4), -2, -6, 1, TcStack.of("forbiddenmagic:umbral_rose", 1))
-            .setPages(ResearchPage.text("forbiddenmagic.research_page.BLACKFLOWER.1"), ResearchPage.crucible("BLACKFLOWER"))
+            .setPages(ResearchPage.text("forbiddenmagic.research_page.BLACKFLOWER.1"), ResearchPage.crucible("BLACKFLOWER"), ResearchPage.crafting("BlackInk"))
             .setAspectTriggers(Aspect.SENSES)
             .registerResearchItem();
         if (FmConfig.enchantmentsEnabled()) {
@@ -186,7 +186,10 @@ public final class FmResearch {
             .setHidden()
             .registerResearchItem();
         new FmResearchItem("ROD_infernal", "FORBIDDEN", new AspectList().add(FmAspects.NETHER, 4).add(Aspect.FIRE, 3).add(Aspect.TOOL, 1), -11, -4, 3, TcStack.of(FmItems.INFERNAL_ROD.getId().toString(), 1))
-            .setPages(ResearchPage.text("forbiddenmagic.research_page.ROD_infernal.1"))
+            .setPages(
+                ResearchPage.text("forbiddenmagic.research_page.ROD_infernal.1"),
+                ResearchPage.text("forbiddenmagic.research_page.ROD_infernal.2")
+            )
             .setParents("ROD_silverwood", "INFUSION", "NETHERSHARDS")
             .setConcealed()
             .registerResearchItem();
