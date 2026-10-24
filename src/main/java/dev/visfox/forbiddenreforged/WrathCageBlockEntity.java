@@ -170,7 +170,8 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
         AABB nearby = new AABB(pos.getX() - 4, pos.getY() - 1, pos.getZ() - 4, pos.getX() + 5, pos.getY() + 2, pos.getZ() + 5);
         int cost = FmConfig.wrathCost();
         for (int attempt = 0; attempt < SPAWN_COUNT && (fuel > 0 || cost <= 0); attempt++) {
-            Entity entity = type.create(null, level, MobSpawnType.SPAWNER);
+            // Minecraft 1.21.1 exposes the spawn-aware overload with level, consumer, position and flags.
+            Entity entity = type.create(level, null, pos, MobSpawnType.SPAWNER, false, false);
             if (entity == null) {
                 break;
             }
