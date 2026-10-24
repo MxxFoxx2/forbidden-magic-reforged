@@ -550,6 +550,7 @@ public final class ItemGameTests {
             "focus.upgrade.pandemonium.name",
             "focus.upgrade.pandemonium.text",
             "forbiddenmagic.research_page.FORK.wc",
+            "forbiddenmagic.research_page.ROD_infernal.2",
             "forbiddenmagic.research_page.TAINTSHOVEL.2",
             "forbiddenmagic.research_page.CRYSTALWELL.1",
             "forbiddenmagic.research_page.CRYSTALWELL.1b"
@@ -567,6 +568,16 @@ public final class ItemGameTests {
                     "missing tagged research text " + researchId);
             }
         }
+        ResearchItem infernal = ResearchCategories.getResearch("ROD_infernal");
+        helper.assertTrue(infernal != null, "infernal wand research is registered");
+        List<String> infernalTextPages = infernal.pages().stream()
+            .filter(ResearchPage.Text.class::isInstance)
+            .map(ResearchPage.Text.class::cast)
+            .map(ResearchPage.Text::text)
+            .toList();
+        helper.assertTrue(infernalTextPages.contains("forbiddenmagic.research_page.ROD_infernal.2"),
+            "infernal wand includes the original protection and extinguishing page");
+
         helper.assertValueEqual(
             english.get("forbiddenmagic.research_page.ROD_tainted.1").getAsString(),
             "Tainted Lands are places of great and terrible power for those Thaumaturges who know how to tap into them.<BR><BR>The Tainted Wand Core can store up to 150 vis of each type and slowly replenishes itself up to 10% in every aspect as long as it is being held inside of a Tainted Land.  While the wand is held in your hand, it can also feed off of taint coursing through your veins, randomly restoring vis every time you take damage from flux taint.",
