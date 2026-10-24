@@ -203,13 +203,25 @@ public final class RecipeGameTests {
         helper.assertValueEqual(tree.pages().size(), 2, "taint tree has text and crucible pages");
         ResearchItem flower = ResearchCategories.getResearch("BLACKFLOWER");
         helper.assertTrue(flower != null, "black flower research must exist");
-        helper.assertValueEqual(flower.pages().size(), 2, "black flower has text and crucible pages");
+        helper.assertValueEqual(flower.pages().size(), 3, "black flower has text, crucible, and ink crafting pages");
         CrucibleRecipe taintTree = (CrucibleRecipe) TcRecipes.get("TAINTTREE");
         helper.assertTrue(taintTree != null, "taint tree recipe exists");
         helper.assertValueEqual(taintTree.aspects().getAmount(Aspect.TAINT), 10, "taint tree needs ten taint");
         CrucibleRecipe blackFlower = (CrucibleRecipe) TcRecipes.get("BLACKFLOWER");
         helper.assertTrue(blackFlower != null, "black flower recipe exists");
         helper.assertValueEqual(blackFlower.aspects().getAmount(Aspect.DARKNESS), 8, "black flower needs eight darkness");
+
+        TcRecipe inkRef = TcRecipes.get("BlackInk");
+        helper.assertTrue(inkRef instanceof CraftingRecipeRef, "black flower ink recipe is exposed in research");
+        CraftingRecipeRef ink = (CraftingRecipeRef) inkRef;
+        helper.assertValueEqual(ink.recipe(), ForbiddenMagic.id("ink_from_rose"), "ink research page points to the rose crafting recipe");
+        ItemStack inkResult = ink.result().create();
+        helper.assertTrue(inkResult.is(FmItems.BLACK_DYE.get()), "rose petals yield the legacy black dye resource");
+        helper.assertValueEqual(inkResult.getCount(), 2, "black ink recipe yields two dye items");
+        var inkRecipeKey = ResourceKey.create(Registries.RECIPE, ForbiddenMagic.id("ink_from_rose"));
+        helper.assertTrue(helper.getLevel().getServer().getRecipeManager().byKey(inkRecipeKey).isPresent(),
+            "the linked black ink crafting recipe loads");
+
         helper.succeed();
     }
 
