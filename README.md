@@ -7,6 +7,7 @@
 - Основной таргет — Minecraft 26.3 / Java 25. Порт на 1.21.1 отложен до завершения основного таргета.
 - Паритет не объявлен завершённым. Текущие пробелы и ограничения записаны в [roadmap](docs/roadmap.md), проверенные отличия — в [fidelity ledger](docs/fidelity.md).
 - Первая экспериментальная beta опубликована: [0.1.0-beta.1](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/0.1.0-beta.1). Полный паритет ещё не объявлен.
+- Новые релизы публикуются из Git-тегов после сборки и обоих наборов GameTests; тесты также запускаются для pull request в `main`. Инструкция: [процесс выпуска](docs/releasing.md).
 - [Thaumcraft 4: Reforged #37](https://github.com/notlikethiss/thaumcraft-4-reforged/pull/37) открыт, но ещё не слит; публичный API пока отсутствует в опубликованном upstream-хосте. Beta требует закреплённый и локально пропатченный хост.
 
 ## Установка
