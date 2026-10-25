@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "forbiddenmagic:item/chameleonaxe",
+    "layer1": "forbiddenmagic:item/eyeaxe"
+  }
+}

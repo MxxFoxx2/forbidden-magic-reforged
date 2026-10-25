@@ -1,7 +1,9 @@
 {
   "type": "minecraft:smelting",
   "category": "misc",
-  "ingredient": "forbiddenmagic:taint_log",
+  "ingredient": {
+    "item": "forbiddenmagic:taint_log"
+  },
   "result": {
     "id": "forbiddenmagic:taint_coal"
   },

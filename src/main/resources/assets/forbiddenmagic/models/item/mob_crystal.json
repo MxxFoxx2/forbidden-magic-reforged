@@ -1,6 +1,11 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "forbiddenmagic:item/mobcrystal"
-  }
+  "parent": "forbiddenmagic:item/mob_crystal_empty",
+  "overrides": [
+    {
+      "predicate": {
+        "forbiddenmagic:filled": 1
+      },
+      "model": "forbiddenmagic:item/mob_crystal_filled"
+    }
+  ]
 }

@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "forbiddenmagic:umbral_rose",
+    "forbiddenmagic:umbral_rose_bush",
+    "forbiddenmagic:taint_leaves",
+    "forbiddenmagic:taint_sapling"
+  ]
+}

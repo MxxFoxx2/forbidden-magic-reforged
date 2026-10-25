@@ -41,6 +41,9 @@ crystalwell = "Crystal Scribing Tools"
 primewell = "Primal Scribing Tools"
 blink_focus = "Wand Focus: Blink"
 
+alchemical_cap = "Alchemical Wand Cap"
+equivalent_rod = "Equivalent Wand Rod"
+sub_collar = "Collar of Pain"
 [item.Wand.tainted]
 rod = "Tainted"
 
@@ -99,6 +102,7 @@ TAINTSHOVEL = "Shovel of the Purifier"
 TAINTPICK = "Pickaxe of Distortion"
 FOCUSBLINK = "Wand Focus: Blink"
 
+SUBCOLLAR = "Collar of Pain"
 [tc.research_text]
 NETHERSHARDS = "Aim to misbehave."
 HELLFIRE = "Never get stranded again"
@@ -132,6 +136,7 @@ TAINTSHOVEL = "Like a hot knife through really gross butter"
 TAINTPICK = "Obsidian Buster"
 FOCUSBLINK = "Better than a stupid Ender Pearl"
 
+SUBCOLLAR = "Pain and Magic"
 [focus.upgrade.hellfire]
 name = "Hellfire"
 text = "This upgrade unleashes a burst of fire upon teleporting to a location."
@@ -173,6 +178,7 @@ TAINTSHOVEL = "[FM] Like a hot knife through really gross butter"
 TAINTPICK = "[FM] Obsidian Buster"
 FOCUSBLINK = "[FM] Better than a stupid Ender Pearl"
 
+SUBCOLLAR = "[FM] Pain and Magic"
 [forbiddenmagic.research_page.NETHERSHARDS]
 1 = "Strange energies swirl through the Nether. On occasion, they have been known to solidify into crystal shards when certain sympathetic events occur."
 2 = "These crystals are imbued with different vices and have many uses for more unscrupulous Thaumaturges.<BR>There are seven documented types of nether shard, each attuned to a different \"deadly sin.\"<BR><BR><IMG>forbiddenmagic:textures/misc/research.png:0:0:111:16:1</IMG><BR>"
@@ -307,3 +313,25 @@ forbiddenmagic = "Forbidden Magic"
 [tooltip]
 creativeonly = "Creative Only"
 profane_contract = "Contract: %s"
+[item.Wand.alchemical]
+cap = "Alchemical"
+
+[item.Wand.equivalent]
+rod = "Equivalent"
+
+[forbiddenmagic.research_page.SUBCOLLAR]
+1 = "Sometimes, people just want to get hurt. Especially if there's a benefit...<BR><BR>The Collar of Pain has all the capabilities of an Amulet of Vis Storage with the added bonus that it will generate vis whenever you take damage. The more you get hurt, the more vis it generates."
+
+[tooltip.collar]
+owner = "Owner:"
+
+[message.collar]
+alreadywearing = "%s is already wearing something around their neck!"
+placescollar = "%s places a collar around your neck."
+youplacecollar = "You place the collar around %s's neck."
+
+[entity.minecraft.villager]
+heretic = "Heretic"
+
+[entity.minecraft.villager.forbiddenmagic]
+heretic = "Heretic"

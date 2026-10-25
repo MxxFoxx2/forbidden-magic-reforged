@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.fml.ModList;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.aspect.AspectList;
@@ -27,18 +28,19 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.neoforged.neoforge.event.furnace.FurnaceFuelBurnTimeEvent;
 
-@GameTestHolder(ForbiddenMagic.MODID)
+@GameTestHolder
+@PrefixGameTestTemplate(false)
 public final class FmGameTests {
     private FmGameTests() {
     }
 
-    @GameTest(template = "empty", templateNamespace = "minecraft")
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void modLoadsAndHostIsPresent(GameTestHelper helper) {
         helper.assertTrue(ModList.get().isLoaded("thaumcraft"), "thaumcraft must be loaded");
         helper.succeed();
     }
 
-    @GameTest(template = "empty", templateNamespace = "minecraft")
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void taintCoalHasFuelValue(GameTestHelper helper) {
         FurnaceFuelBurnTimeEvent event = new FurnaceFuelBurnTimeEvent(
             new ItemStack(FmItems.TAINT_COAL.get()), 0, RecipeType.SMELTING
@@ -49,7 +51,7 @@ public final class FmGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "empty", templateNamespace = "minecraft")
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void itemRegistryContainsPortedBaseItems(GameTestHelper helper) {
         helper.assertTrue(BuiltInRegistries.ITEM.get(ForbiddenMagic.id("taint_fruit")) != net.minecraft.world.item.Items.AIR,
             "taint fruit must be registered");
@@ -61,7 +63,7 @@ public final class FmGameTests {
     }
 
 
-    @GameTest(template = "empty", templateNamespace = "minecraft")
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void taintAndUmbralBlocksAreRegistered(GameTestHelper helper) {
         helper.assertTrue(BuiltInRegistries.BLOCK.get(ForbiddenMagic.id("taint_log")) != Blocks.AIR,
             "taint log must be registered");
@@ -74,7 +76,7 @@ public final class FmGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "empty", templateNamespace = "minecraft")
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void mobCrystalAttunesAndSwapsCageTarget(GameTestHelper helper) {
         var cage = new WrathCageBlockEntity(new net.minecraft.core.BlockPos(0, 0, 0),
             dev.visfox.forbiddenreforged.FmBlocks.WRATH_CAGE.get().defaultBlockState());
@@ -91,7 +93,7 @@ public final class FmGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "empty", templateNamespace = "minecraft")
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void forbiddenWandRodsAreRegistered(GameTestHelper helper) {
         helper.assertTrue(WandRegistry.findRod("tainted") != null, "tainted rod must be registered");
         helper.assertTrue(WandRegistry.findRod("infernal") != null, "infernal rod must be registered");
@@ -106,7 +108,7 @@ public final class FmGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "empty", templateNamespace = "minecraft")
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void forbiddenMagicResearchIsRegistered(GameTestHelper helper) {
         helper.assertTrue(ResearchCategories.get("FORBIDDEN") != null, "Forbidden research category must exist");
         helper.assertTrue(ResearchCategories.getResearch("NETHERSHARDS") != null, "Nether shards entry must exist");
@@ -119,16 +121,16 @@ public final class FmGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "empty", templateNamespace = "minecraft")
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void forbiddenMagicThaumcraftRecipesAreRegistered(GameTestHelper helper) {
-        helper.assertTrue(TcRecipes.get("FM_TAINTTREE") != null, "taint sapling crucible recipe must exist");
-        helper.assertTrue(TcRecipes.get("FM_BLACKFLOWER") != null, "umbral rose crucible recipe must exist");
-        helper.assertTrue(TcRecipes.get("FM_TAINTSTONE") != null, "tainted stone arcane recipe must exist");
-        helper.assertTrue(TcRecipes.get("FM_ARCANECAKE") != null, "Thaumic Cake infusion recipe must exist");
-        helper.assertTrue(TcRecipes.get("FM_ROD_TAINTED") != null, "tainted rod infusion recipe must exist");
-        helper.assertTrue(TcRecipes.get("FM_ROD_INFERNAL") != null, "infernal rod infusion recipe must exist");
-        helper.assertTrue(TcRecipes.get("FM_WRATHCAGE") != null, "Wrath Cage infusion recipe must exist");
-        helper.assertTrue(TcRecipes.get("FM_MOBCRYSTAL") != null, "Mob Crystal crucible recipe must exist");
+        helper.assertTrue(TcRecipes.get("TAINTTREE") != null, "taint sapling crucible recipe must exist");
+        helper.assertTrue(TcRecipes.get("BLACKFLOWER") != null, "umbral rose crucible recipe must exist");
+        helper.assertTrue(TcRecipes.get("TaintStone") != null, "tainted stone arcane recipe must exist");
+        helper.assertTrue(TcRecipes.get("ARCANECAKE") != null, "Thaumic Cake infusion recipe must exist");
+        helper.assertTrue(TcRecipes.get("ROD_TAINTED") != null, "tainted rod infusion recipe must exist");
+        helper.assertTrue(TcRecipes.get("ROD_INFERNAL") != null, "infernal rod infusion recipe must exist");
+        helper.assertTrue(TcRecipes.get("WRATHCAGE") != null, "Wrath Cage infusion recipe must exist");
+        helper.assertTrue(TcRecipes.get("MOBCRYSTAL") != null, "Mob Crystal crucible recipe must exist");
         helper.assertTrue(TcIngredient.item("thaumcraft:tainted_goo").exists(), "tainted goo central ingredient must exist");
         helper.assertTrue(TcIngredient.item("thaumcraft:salis_mundus").exists(), "Salis Mundus must exist");
         helper.assertTrue(TcIngredient.item("forbiddenmagic:tainted_rod").exists(), "tainted rod result must exist");
@@ -136,7 +138,7 @@ public final class FmGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "empty", templateNamespace = "minecraft")
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void itemAspectTagsExist(GameTestHelper helper) {
         AspectList fruit = AspectRegistry.active().getObjectTags(FmItems.TAINT_FRUIT.get());
         AspectList shard = AspectRegistry.active().getObjectTags(FmItems.DEADLY_SHARDS.get("wrath").get());
@@ -151,7 +153,7 @@ public final class FmGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "empty", templateNamespace = "minecraft")
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void aspectRegistryKeepsBuiltinOrderAndCombines(GameTestHelper helper) {
         Aspect[] all = Aspect.values();
         helper.assertValueEqual(Aspect.builtinCount(), 48, "exactly 48 builtin aspects");
@@ -163,7 +165,7 @@ public final class FmGameTests {
         helper.succeed();
     }
 
-    @GameTest(template = "empty", templateNamespace = "minecraft")
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void addonAspectsSurviveSerialization(GameTestHelper helper) {
         Aspect nether = FmAspects.NETHER;
         helper.assertTrue(nether != null && nether.ordinal() >= Aspect.builtinCount(), "infernus must be an add-on aspect");

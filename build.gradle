@@ -44,6 +44,7 @@ neoForge {
         }
         gameTestServer {
             type = "gameTestServer"
+            // These tests use vanilla's empty structure template, so permit both the addon namespace and minecraft.
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
         data {
@@ -68,6 +69,11 @@ neoForge {
 repositories {
     // The locally patched Thaumcraft artifact is prepared by the host-build workflow.
     maven { url = uri("maven") }
+
+    maven {
+        name = "Curios"
+        url = uri("https://maven.theillusivec4.top/")
+    }
 
     maven {
         name = "Minecraft Forge"
@@ -97,6 +103,8 @@ dependencies {
 
     compileOnly "thaumcraft:thaumcraft:${thaumcraft_version}"
     localRuntime "thaumcraft:thaumcraft:${thaumcraft_version}"
+    // Thaumcraft 1.21.1 has a mandatory Curios runtime dependency; include it in GameTest runs.
+    localRuntime "top.theillusivec4.curios:curios-neoforge:${curios_version}"
 
     compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
     compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"

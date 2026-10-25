@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "forbiddenmagic:taint_stone_smooth",
+    "forbiddenmagic:taint_stone_brick",
+    "forbiddenmagic:star_block"
+  ]
+}

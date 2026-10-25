@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "forbiddenmagic:taint_log",
+    "forbiddenmagic:taint_planks"
+  ]
+}
