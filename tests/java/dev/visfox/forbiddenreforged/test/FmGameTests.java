@@ -116,8 +116,6 @@ public final class FmGameTests {
     }
 
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
-    public static void forbiddenMagicResearchIsRegistered(GameTestHelper helper) {
-    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void witchwoodManaCostsPreserveOriginalRates(GameTestHelper helper) {
         helper.assertValueEqual(FmWands.witchwoodRechargeInterval(false), 100,
             "Witchwood wand recharges on the original 100-tick interval");
@@ -147,6 +145,8 @@ public final class FmGameTests {
     }
 
 
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void forbiddenMagicResearchIsRegistered(GameTestHelper helper) {
         helper.assertTrue(ResearchCategories.get("FORBIDDEN") != null, "Forbidden research category must exist");
         helper.assertTrue(ResearchCategories.getResearch("NETHERSHARDS") != null, "Nether shards entry must exist");
         helper.assertTrue(ResearchCategories.getResearch("TAINTTREE") != null, "taint tree research must exist");
