@@ -8,7 +8,7 @@ This file tracks the 1.21.1 backport-specific checks separately from the 26.3 fi
 - WRATHCAGE depends on FORK; TAINTSHOVEL and ROD_tainted use the restored research aspects and prerequisite paths; ROD_profane uses the round research icon.
 - Ring of Nutrition only triggers from Baubles ring slots 1 and 2. The amulet and belt slots do not activate its food bonus.
 - Blink Focus Hellfire and Pandemonium upgrades point at their original icon textures, included in the resource pack.
-- Witchwood wand and staff cores use an optional reflection-based Ars Magica 2 mana adapter. The wand recharges every 100 ticks at 140 mana per vis point; the staff recharges every 40 ticks at 100 mana per vis point. Vinteum caps reduce those costs to 80 and 50. If Ars Magica 2 or its API is absent, the adapter safely does nothing and does not prevent startup.
+- Witchwood wand and staff cores use an optional reflection-based mana adapter. It supports both the legacy Ars Magica 2 mod ID (`arsmagica2`) and the current Ars Magica: Legacy API (`arsmagicalegacy`) without a compile-time dependency. The wand recharges every 100 ticks at 140 mana per vis point; the staff recharges every 40 ticks at 100 mana per vis point. The converter also recognizes the legacy Vinteum-cap cost override (80/50 mana per point) when a cap with that tag is available. If neither supported mod is present, or its API cannot be accessed, the adapter safely does nothing and does not prevent startup.
 
 ## Automated coverage
 
