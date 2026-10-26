@@ -230,7 +230,6 @@ public final class FmWands {
             else setter.invoke(receiver, (float)amount);
         }
     }
-    }
     private static final class ManaWandUpdate extends ManaConversionUpdate {
         private ManaWandUpdate() { super(false); }
     }
