@@ -1,6 +1,7 @@
 package dev.visfox.forbiddenreforged;
 
 import java.lang.reflect.Method;
+import net.minecraft.world.entity.LivingEntity;
 import java.util.List;
 import net.neoforged.fml.ModList;
 import net.minecraft.core.particles.ParticleTypes;
@@ -165,27 +166,23 @@ public final class FmWands {
 
         @Override
         public void onUpdate(ItemStack stack, Player player) {
-            if (player.tickCount % witchwoodRechargeInterval(staff) != 0
-                || !ModList.get().isLoaded("arsmagica2")) return;
+            if (player.tickCount % witchwoodRechargeInterval(staff) != 0 || !isArsMagicaLoaded()) return;
             try {
-                Object properties = arsMagicaProperties(player);
-                if (properties == null) return;
-                Class<?> api = Class.forName("am2.api.IExtendedProperties");
-                Method getMana = api.getMethod("getCurrentMana");
-                Method setMana = api.getMethod("setCurrentMana", float.class);
-                float current = ((Number)getMana.invoke(properties)).floatValue();
-                if (current <= 0.0F) return;
-                float remaining = current;
+                ManaAccess access = manaAccess(player);
+                if (access == null) return;
+                double current = access.getMana();
+                if (current <= 0.0D) return;
+                double remaining = current;
                 String cap = Wands.getCap(stack).tag();
                 for (Aspect aspect : Aspect.getPrimalAspects()) {
                     if (Wands.getMaxVis(stack) <= Wands.getVis(stack, aspect)) continue;
-                    float cost = witchwoodManaCost(staff, cap);
-                    if (remaining > cost) {
+                    double cost = witchwoodManaCost(staff, cap);
+                    if (remaining >= cost) {
                         remaining -= cost;
                         Wands.addVis(stack, aspect, 1, true);
                     }
                 }
-                if (remaining < current) setMana.invoke(properties, remaining);
+                if (remaining < current) access.setMana(remaining);
             } catch (ReflectiveOperationException | LinkageError | RuntimeException error) {
                 if (!warnedAboutApi) {
                     warnedAboutApi = true;
@@ -194,15 +191,45 @@ public final class FmWands {
             }
         }
 
-        private static Object arsMagicaProperties(Player player) throws ReflectiveOperationException {
-            Class<?> apiType = Class.forName("am2.api.ArsMagicaApi");
-            Object instance = apiType.getField("instance").get(null);
-            for (Method method : apiType.getMethods()) {
-                if (method.getName().equals("getExtendedProperties") && method.getParameterCount() == 1
-                    && method.getParameterTypes()[0].isInstance(player)) return method.invoke(instance, player);
+        private static ManaAccess manaAccess(Player player) throws ReflectiveOperationException {
+            if (ModList.get().isLoaded("arsmagicalegacy")) {
+                Class<?> apiType = Class.forName("at.minecraftschurli.mods.arsmagicalegacy.api.ArsMagicaApi");
+                Object helper = apiType.getMethod("manaHelper").invoke(null);
+                Class<?> helperType = Class.forName("at.minecraftschurli.mods.arsmagicalegacy.api.magic.ManaHelper");
+                Method getMana = helperType.getMethod("getMana", LivingEntity.class);
+                Method setMana = helperType.getMethod("setMana", LivingEntity.class, double.class);
+                return new ManaAccess(helper, getMana, setMana, player, true);
+            }
+            if (ModList.get().isLoaded("arsmagica2")) {
+                Class<?> apiType = Class.forName("am2.api.ArsMagicaApi");
+                Object instance = apiType.getField("instance").get(null);
+                Object properties = null;
+                for (Method method : apiType.getMethods()) {
+                    if (method.getName().equals("getExtendedProperties") && method.getParameterCount() == 1
+                        && method.getParameterTypes()[0].isInstance(player)) {
+                        properties = method.invoke(instance, player);
+                        break;
+                    }
+                }
+                if (properties == null) return null;
+                Class<?> propertiesType = Class.forName("am2.api.IExtendedProperties");
+                return new ManaAccess(properties, propertiesType.getMethod("getCurrentMana"),
+                    propertiesType.getMethod("setCurrentMana", float.class), player, false);
             }
             return null;
         }
+    }
+
+    private record ManaAccess(Object receiver, Method getter, Method setter, Player player, boolean modernApi) {
+        private double getMana() throws ReflectiveOperationException {
+            Object value = modernApi ? getter.invoke(receiver, player) : getter.invoke(receiver);
+            return ((Number)value).doubleValue();
+        }
+        private void setMana(double amount) throws ReflectiveOperationException {
+            if (modernApi) setter.invoke(receiver, player, amount);
+            else setter.invoke(receiver, (float)amount);
+        }
+    }
     }
     private static final class ManaWandUpdate extends ManaConversionUpdate {
         private ManaWandUpdate() { super(false); }
@@ -210,6 +237,14 @@ public final class FmWands {
     private static final class ManaStaffUpdate extends ManaConversionUpdate {
         private ManaStaffUpdate() { super(true); }
     }
+    public static boolean supportsArsMagicaModId(String modId) {
+        return "arsmagicalegacy".equals(modId) || "arsmagica2".equals(modId);
+    }
+
+    public static boolean isArsMagicaLoaded() {
+        return (ModList.get().isLoaded("arsmagicalegacy") || ModList.get().isLoaded("arsmagica2"));
+    }
+
     public static int witchwoodRechargeInterval(boolean staff) { return staff ? 40 : 100; }
     public static float witchwoodManaCost(boolean staff, String capTag) {
         if (staff) return "vinteum".equals(capTag) ? 50.0F : 100.0F;

@@ -208,7 +208,7 @@ public final class FmResearch {
                 .setHidden()
                 .registerResearchItem();
         }
-        if (ModList.get().isLoaded("arsmagica2")) {
+        if (FmWands.isArsMagicaLoaded()) {
             new FmResearchItem("ROD_witchwood", "FORBIDDEN", new AspectList().add(Aspect.TREE, 3).add(Aspect.MAGIC, 2), -3, 1, 3, TcStack.of(FmItems.WITCHWOOD_ROD.getId().toString(), 1))
                 .setPages(ResearchPage.text("forbiddenmagic.research_page.ROD_witchwood.1"))
                 .setParents("NETHERSHARDS")
@@ -223,7 +223,7 @@ public final class FmResearch {
             .setStub()
             .setRound()
             .registerResearchItem();
-        if (ModList.get().isLoaded("arsmagica2")) {
+        if (FmWands.isArsMagicaLoaded()) {
             new FmResearchItem("ROD_witchwood_staff", "FORBIDDEN", new AspectList().add(Aspect.TREE, 4).add(Aspect.MAGIC, 3), -3, -1, 2, TcStack.of(FmItems.WITCHWOOD_STAFF_ROD.getId().toString(), 1))
                 .setPages(ResearchPage.text("forbiddenmagic.research_page.ROD_witchwood_staff.1"))
                 .setParents("ROD_witchwood")

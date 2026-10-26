@@ -129,6 +129,12 @@ public final class FmGameTests {
             "Vinteum reduces wand recharge cost");
         helper.assertTrue(Math.abs(FmWands.witchwoodManaCost(true, "vinteum") - 50.0F) < 0.01F,
             "Vinteum reduces staff recharge cost");
+        helper.assertTrue(FmWands.supportsArsMagicaModId("arsmagicalegacy"),
+            "modern Ars Magica: Legacy mod id is recognized");
+        helper.assertTrue(FmWands.supportsArsMagicaModId("arsmagica2"),
+            "legacy Ars Magica 2 mod id remains supported");
+        helper.assertTrue(!FmWands.supportsArsMagicaModId("unrelatedmod"),
+            "unrelated mods do not activate Witchwood mana integration");
         helper.succeed();
     }
 
