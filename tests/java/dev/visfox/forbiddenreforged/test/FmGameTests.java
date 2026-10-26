@@ -4,6 +4,8 @@ import dev.visfox.forbiddenreforged.ForbiddenMagic;
 import dev.visfox.forbiddenreforged.FmAspects;
 import dev.visfox.forbiddenreforged.FmConfig;
 import dev.visfox.forbiddenreforged.FmItems;
+import dev.visfox.forbiddenreforged.FmToolEvents;
+import dev.visfox.forbiddenreforged.FmWands;
 import dev.visfox.forbiddenreforged.FmComponents;
 import dev.visfox.forbiddenreforged.MobCrystalItem;
 import dev.visfox.forbiddenreforged.WrathCageBlock;
@@ -95,6 +97,11 @@ public final class FmGameTests {
 
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void forbiddenWandRodsAreRegistered(GameTestHelper helper) {
+        helper.assertTrue(WandRegistry.findRod("witchwood").onUpdate() != null,
+            "Witchwood wand core must have its mana recharge update");
+        helper.assertTrue(WandRegistry.findRod("witchwood_staff").onUpdate() != null,
+            "Witchwood staff core must have its faster mana recharge update");
+
         helper.assertTrue(WandRegistry.findRod("tainted") != null, "tainted rod must be registered");
         helper.assertTrue(WandRegistry.findRod("infernal") != null, "infernal rod must be registered");
         helper.assertTrue(WandRegistry.findRod("profane") != null, "profane rod must be registered");
@@ -110,6 +117,36 @@ public final class FmGameTests {
 
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void forbiddenMagicResearchIsRegistered(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void witchwoodManaCostsPreserveOriginalRates(GameTestHelper helper) {
+        helper.assertValueEqual(FmWands.witchwoodRechargeInterval(false), 100,
+            "Witchwood wand recharges on the original 100-tick interval");
+        helper.assertValueEqual(FmWands.witchwoodRechargeInterval(true), 40,
+            "Witchwood staff recharges faster on the original 40-tick interval");
+        helper.assertTrue(Math.abs(FmWands.witchwoodManaCost(false, "iron") - 140.0F) < 0.01F,
+            "ordinary wand cap costs 140 mana per vis point");
+        helper.assertTrue(Math.abs(FmWands.witchwoodManaCost(true, "iron") - 100.0F) < 0.01F,
+            "ordinary staff cap costs 100 mana per vis point");
+        helper.assertTrue(Math.abs(FmWands.witchwoodManaCost(false, "vinteum") - 80.0F) < 0.01F,
+            "Vinteum reduces wand recharge cost");
+        helper.assertTrue(Math.abs(FmWands.witchwoodManaCost(true, "vinteum") - 50.0F) < 0.01F,
+            "Vinteum reduces staff recharge cost");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void nutritionRingOnlyCountsRingSlotStacks(GameTestHelper helper) {
+        ItemStack ring = new ItemStack(FmItems.RING_NUTRITION.get());
+        helper.assertTrue(FmToolEvents.hasNutritionRingInRingSlots(ring, ItemStack.EMPTY),
+            "nutrition ring in first ring slot grants its food bonus");
+        helper.assertTrue(FmToolEvents.hasNutritionRingInRingSlots(ItemStack.EMPTY, ring),
+            "nutrition ring in second ring slot grants its food bonus");
+        helper.assertTrue(!FmToolEvents.hasNutritionRingInRingSlots(ItemStack.EMPTY, ItemStack.EMPTY),
+            "empty ring slots grant no food bonus");
+        helper.succeed();
+    }
+
+
         helper.assertTrue(ResearchCategories.get("FORBIDDEN") != null, "Forbidden research category must exist");
         helper.assertTrue(ResearchCategories.getResearch("NETHERSHARDS") != null, "Nether shards entry must exist");
         helper.assertTrue(ResearchCategories.getResearch("TAINTTREE") != null, "taint tree research must exist");

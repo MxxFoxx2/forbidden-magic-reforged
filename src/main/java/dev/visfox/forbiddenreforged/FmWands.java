@@ -1,6 +1,8 @@
 package dev.visfox.forbiddenreforged;
 
+import java.lang.reflect.Method;
 import java.util.List;
+import net.neoforged.fml.ModList;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -33,10 +35,10 @@ public final class FmWands {
             new ProfaneWandUpdate(), false, false, false,
             ForbiddenMagic.id("textures/model/wand_rod_profane.png"));
         WandRegistry.registerRod("witchwood", 100, ForbiddenMagic.id("witchwood_rod"), 12,
-            null, false, false, false,
+            new ManaWandUpdate(), false, false, false,
             ForbiddenMagic.id("textures/model/wand_rod_witchwood.png"));
         WandRegistry.registerRod("witchwood", 50, ForbiddenMagic.id("witchwood_staff_rod"), 24,
-            null, false, true, false,
+            new ManaStaffUpdate(), false, true, false,
             ForbiddenMagic.id("textures/model/wand_rod_witchwood_staff.png"));
         WandRegistry.registerRod("profaned", 50, ResourceLocation.withDefaultNamespace("bedrock"), 1000,
             null, false, false, false,
@@ -154,4 +156,64 @@ public final class FmWands {
             return 25000;
         }
     }
+
+    /** Optional Ars Magica mana bridge for Witchwood wand and staff cores. */
+    private abstract static class ManaConversionUpdate implements RodUpdate {
+        private static boolean warnedAboutApi;
+        private final boolean staff;
+        private ManaConversionUpdate(boolean staff) { this.staff = staff; }
+
+        @Override
+        public void onUpdate(ItemStack stack, Player player) {
+            if (player.tickCount % witchwoodRechargeInterval(staff) != 0
+                || !ModList.get().isLoaded("arsmagica2")) return;
+            try {
+                Object properties = arsMagicaProperties(player);
+                if (properties == null) return;
+                Class<?> api = Class.forName("am2.api.IExtendedProperties");
+                Method getMana = api.getMethod("getCurrentMana");
+                Method setMana = api.getMethod("setCurrentMana", float.class);
+                float current = ((Number)getMana.invoke(properties)).floatValue();
+                if (current <= 0.0F) return;
+                float remaining = current;
+                String cap = Wands.getCap(stack).tag();
+                for (Aspect aspect : Aspect.getPrimalAspects()) {
+                    if (Wands.getMaxVis(stack) <= Wands.getVis(stack, aspect)) continue;
+                    float cost = witchwoodManaCost(staff, cap);
+                    if (remaining > cost) {
+                        remaining -= cost;
+                        Wands.addVis(stack, aspect, 1, true);
+                    }
+                }
+                if (remaining < current) setMana.invoke(properties, remaining);
+            } catch (ReflectiveOperationException | LinkageError | RuntimeException error) {
+                if (!warnedAboutApi) {
+                    warnedAboutApi = true;
+                    ForbiddenMagic.LOGGER.warn("Witchwood recharge disabled: Ars Magica mana API unavailable", error);
+                }
+            }
+        }
+
+        private static Object arsMagicaProperties(Player player) throws ReflectiveOperationException {
+            Class<?> apiType = Class.forName("am2.api.ArsMagicaApi");
+            Object instance = apiType.getField("instance").get(null);
+            for (Method method : apiType.getMethods()) {
+                if (method.getName().equals("getExtendedProperties") && method.getParameterCount() == 1
+                    && method.getParameterTypes()[0].isInstance(player)) return method.invoke(instance, player);
+            }
+            return null;
+        }
+    }
+    private static final class ManaWandUpdate extends ManaConversionUpdate {
+        private ManaWandUpdate() { super(false); }
+    }
+    private static final class ManaStaffUpdate extends ManaConversionUpdate {
+        private ManaStaffUpdate() { super(true); }
+    }
+    public static int witchwoodRechargeInterval(boolean staff) { return staff ? 40 : 100; }
+    public static float witchwoodManaCost(boolean staff, String capTag) {
+        if (staff) return "vinteum".equals(capTag) ? 50.0F : 100.0F;
+        return "vinteum".equals(capTag) ? 80.0F : 140.0F;
+    }
+
 }
