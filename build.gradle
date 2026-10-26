@@ -67,9 +67,6 @@ neoForge {
 }
 
 repositories {
-    // The locally patched Thaumcraft artifact is prepared by the host-build workflow.
-    maven { url = uri("maven") }
-
     maven {
         name = "Curios"
         url = uri("https://maven.theillusivec4.top/")
@@ -96,6 +93,15 @@ repositories {
 configurations {
     runtimeClasspath.extendsFrom localRuntime
     clientRuntimeClasspath.extendsFrom runtimeClasspath
+}
+
+if (file('host').isDirectory()) {
+    def hostProperties = new java.util.Properties()
+    file('host/gradle.properties').withInputStream { hostProperties.load(it) }
+    def hostVersion = hostProperties.getProperty('mod_version')
+    if (hostVersion != thaumcraft_version) {
+        throw new GradleException("host/ is version ${hostVersion} but thaumcraft_version is ${thaumcraft_version}; run tools/prepare_host.py")
+    }
 }
 
 dependencies {

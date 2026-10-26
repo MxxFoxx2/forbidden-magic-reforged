@@ -207,7 +207,7 @@ public final class FmGameTests {
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void aspectRegistryKeepsBuiltinOrderAndCombines(GameTestHelper helper) {
         Aspect[] all = Aspect.values();
-        helper.assertValueEqual(Aspect.builtinCount(), 48, "exactly 48 builtin aspects");
+        helper.assertValueEqual(FmAspects.BUILTIN_ASPECT_COUNT, 48, "exactly 48 builtin aspects");
         helper.assertTrue(all.length >= 48, "builtins must remain registered");
         helper.assertValueEqual(all[0], Aspect.AIR, "first builtin must stay index 0");
         helper.assertValueEqual(all[47], Aspect.TRAP, "last builtin must stay index 47");
@@ -219,7 +219,7 @@ public final class FmGameTests {
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void addonAspectsSurviveSerialization(GameTestHelper helper) {
         Aspect nether = FmAspects.NETHER;
-        helper.assertTrue(nether != null && nether.ordinal() >= Aspect.builtinCount(), "infernus must be an add-on aspect");
+        helper.assertTrue(nether != null && nether.ordinal() >= FmAspects.BUILTIN_ASPECT_COUNT, "infernus must be an add-on aspect");
         helper.assertValueEqual(Aspect.getAspect("infernus"), nether, "by-tag lookup must find infernus");
         helper.assertTrue(FmAspects.PRIDE != null && FmAspects.GLUTTONY != null && FmAspects.ENVY != null
             && FmAspects.SLOTH != null && FmAspects.WRATH != null, "all enabled sin aspects must be registered");

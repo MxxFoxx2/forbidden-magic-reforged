@@ -91,9 +91,9 @@ def main() -> int:
     apply_patches()
     if arguments.rebuild:
         if os.name == "nt":
-            run("cmd", "//c", "gradlew.bat", "publish", cwd=HOST)
+            run("cmd", "//c", "gradlew.bat", "build", cwd=HOST)
         else:
-            run("./gradlew", "publish", cwd=HOST)
+            run("./gradlew", "build", cwd=HOST)
     return 0
 
 

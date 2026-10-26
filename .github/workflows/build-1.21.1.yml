@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: notlikethiss/thaumcraft-4-reforged
-          ref: 17dd73087e52bf918cd7f580abd2114e44f88544
+          ref: 2beb6871123328968bbdba3ae4872d09d3ab1510
           path: thaumcraft-4-reforged
           fetch-depth: 0
 
@@ -37,17 +37,21 @@ jobs:
             forbidden-magic-reforged/gradle/wrapper/gradle-wrapper.properties
             thaumcraft-4-reforged/gradle/wrapper/gradle-wrapper.properties
 
-      - name: Prepare and publish patched host
+      - name: Prepare pinned host and apply local patches
         working-directory: forbidden-magic-reforged
-        run: |
-          chmod +x gradlew
-          python3 tools/prepare_host.py --rebuild
+        run: python3 tools/prepare_host.py
 
       - name: Verify prepared host
         working-directory: forbidden-magic-reforged
         run: python3 tools/prepare_host.py --verify
 
-      - name: Build addon
+      - name: Build host
+        working-directory: forbidden-magic-reforged/host
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon build
+
+      - name: Build addon with composite host
         working-directory: forbidden-magic-reforged
         run: ./gradlew --no-daemon build
 

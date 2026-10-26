@@ -4,7 +4,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import thaumcraft.aspect.AddonAspects;
-import thaumcraft.aspect.Aspect;
 import thaumcraft.research.Warp;
 
 @EventBusSubscriber(modid = ForbiddenMagic.MODID)
@@ -39,9 +38,9 @@ public final class FmSetup {
             }
             ForbiddenMagic.LOGGER.info(
                 "Aspect registry summary: total={} builtin={} registeredAddon={} fmAddon={} expectedFmAddon={} luxuria={}",
-                Aspect.count(),
-                Aspect.builtinCount(),
-                Aspect.count() - Aspect.builtinCount(),
+                FmAspects.count(),
+                FmAspects.BUILTIN_ASPECT_COUNT,
+                FmAspects.count() - FmAspects.BUILTIN_ASPECT_COUNT,
                 fmAddonCount,
                 expectedAddonCount,
                 luxuriaStatus

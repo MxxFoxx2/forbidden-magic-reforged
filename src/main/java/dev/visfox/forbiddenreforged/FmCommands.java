@@ -7,7 +7,6 @@ import net.minecraft.network.chat.Component;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
-import thaumcraft.aspect.Aspect;
 
 @EventBusSubscriber(modid = ForbiddenMagic.MODID)
 public final class FmCommands {
@@ -30,9 +29,9 @@ public final class FmCommands {
         CommandSourceStack source = context.getSource();
         int fmAddonCount = FmAspectDiagnostics.addonLines().size();
         source.sendSuccess(
-            () -> Component.literal("Aspect registry: total=" + Aspect.count()
-                + " builtin=" + Aspect.builtinCount()
-                + " registeredAddon=" + (Aspect.count() - Aspect.builtinCount())
+            () -> Component.literal("Aspect registry: total=" + FmAspects.count()
+                + " builtin=" + FmAspects.BUILTIN_ASPECT_COUNT
+                + " registeredAddon=" + (FmAspects.count() - FmAspects.BUILTIN_ASPECT_COUNT)
                 + " fmAddon=" + fmAddonCount),
             false
         );
