@@ -129,6 +129,14 @@ public final class FmGameTests {
             "Vinteum reduces wand recharge cost");
         helper.assertTrue(Math.abs(FmWands.witchwoodManaCost(true, "vinteum") - 50.0F) < 0.01F,
             "Vinteum reduces staff recharge cost");
+        helper.assertTrue(Math.abs(FmWands.witchwoodManaCost(false, "iron", 20) - 28.0F) < 0.01F,
+            "partially depleted wand aspect only charges for missing vis units");
+        helper.assertTrue(Math.abs(FmWands.witchwoodManaCost(true, "vinteum", 20) - 10.0F) < 0.01F,
+            "partial staff recharge applies the cap modifier to missing vis units");
+        helper.assertTrue(Math.abs(FmWands.witchwoodManaCost(false, "iron", 150) - 140.0F) < 0.01F,
+            "one update never recharges more than one vis point per aspect");
+        helper.assertTrue(FmWands.witchwoodManaCost(false, "iron", 0) == 0.0F,
+            "a full aspect costs no mana to recharge");
         helper.assertTrue(FmWands.supportsArsMagicaModId("arsmagicalegacy"),
             "modern Ars Magica: Legacy mod id is recognized");
         helper.assertTrue(FmWands.supportsArsMagicaModId("arsmagica2"),

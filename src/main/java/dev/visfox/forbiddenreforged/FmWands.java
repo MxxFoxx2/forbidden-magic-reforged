@@ -177,9 +177,10 @@ public final class FmWands {
                 String cap = Wands.getCap(stack).tag();
                 List<Aspect> toRecharge = new ArrayList<>();
                 for (Aspect aspect : Aspect.getPrimalAspects()) {
-                    if (Wands.getMaxVis(stack) <= Wands.getVis(stack, aspect)) continue;
-                    double cost = witchwoodManaCost(staff, cap);
-                    if (remaining >= cost) {
+                    int deficit = Wands.getMaxVis(stack) - Wands.getVis(stack, aspect);
+                    if (deficit <= 0) continue;
+                    double cost = witchwoodManaCost(staff, cap, deficit);
+                    if (remaining > cost) {
                         remaining -= cost;
                         toRecharge.add(aspect);
                     }
@@ -256,9 +257,19 @@ public final class FmWands {
     }
 
     public static int witchwoodRechargeInterval(boolean staff) { return staff ? 40 : 100; }
+    /** Cost for a full vis point, before partial-deficit scaling. */
     public static float witchwoodManaCost(boolean staff, String capTag) {
         if (staff) return "vinteum".equals(capTag) ? 50.0F : 100.0F;
         return "vinteum".equals(capTag) ? 80.0F : 140.0F;
+    }
+
+    /**
+     * Costs scale with stored vis units, where 100 internal units equal one vis
+     * point. A nearly full aspect therefore costs less to top up than an empty one.
+     */
+    public static float witchwoodManaCost(boolean staff, String capTag, int deficit) {
+        if (deficit <= 0) return 0.0F;
+        return witchwoodManaCost(staff, capTag) * Math.min(deficit, 100) / 100.0F;
     }
 
 }
