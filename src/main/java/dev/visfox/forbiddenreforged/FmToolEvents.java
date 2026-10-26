@@ -145,6 +145,11 @@ public final class FmToolEvents {
         event.getDrops().add(drop);
     }
 
+    public static boolean hasNutritionRingInRingSlot(Player player) {
+        return Baubles.get(player, 1).is(FmItems.RING_NUTRITION.get())
+            || Baubles.get(player, 2).is(FmItems.RING_NUTRITION.get());
+    }
+
     public static boolean cancelsInfernalDamage(ItemStack held, boolean fireOrWither) {
         return fireOrWither && held != null && !held.isEmpty() && Wands.isWand(held)
             && "infernal".equals(Wands.getRod(held).tag());
@@ -177,7 +182,7 @@ public final class FmToolEvents {
     private static void onFoodFinished(LivingEntityUseItemEvent.Finish event) {
         if (!(event.getEntity() instanceof Player player) || player.level().isClientSide()
             || event.getItem().get(net.minecraft.core.component.DataComponents.FOOD) == null
-            || !Baubles.isEquipped(player, FmItems.RING_NUTRITION.get())) {
+            || !hasNutritionRingInRingSlot(player)) {
             return;
         }
         player.getFoodData().eat(2, 2.0F);

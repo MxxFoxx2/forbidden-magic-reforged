@@ -43,7 +43,7 @@ public final class FmRecipes {
             "FORK",
             TcStack.of(FmItems.DIABOLIST_FORK.getId().toString(), 1),
             1,
-            new AspectList().add(Aspect.FIRE, 8).add(Aspect.MECHANISM, 8).add(Aspect.ENERGY, 8),
+            new AspectList().add(FmAspects.NETHER, 8).add(Aspect.MECHANISM, 8).add(Aspect.ENERGY, 8),
             TcIngredient.item("thaumcraft:thaumium_sword"),
             List.of(
                 TcIngredient.item("minecraft:quartz"),

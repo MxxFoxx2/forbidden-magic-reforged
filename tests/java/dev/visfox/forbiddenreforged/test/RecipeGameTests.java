@@ -340,6 +340,27 @@ public final class RecipeGameTests {
         assertResearchLayout(helper, "VOIDTOUCHED", -8, -1, 3);
         assertResearchLayout(helper, "WRATH", -6, -3, 3);
         assertResearchLayout(helper, "WRATHCAGE", -6, -9, 3);
+
+        ResearchItem taintedRod = ResearchCategories.getResearch("ROD_tainted");
+        helper.assertTrue(taintedRod.isConcealed(), "tainted rod research is concealed");
+        helper.assertFalse(taintedRod.isHidden(), "tainted rod research is not hidden");
+        helper.assertValueEqual(taintedRod.tags().getAmount(Aspect.MAGIC), 4, "tainted rod MAGIC cost");
+        helper.assertValueEqual(taintedRod.tags().getAmount(Aspect.TAINT), 5, "tainted rod TAINT cost");
+        helper.assertValueEqual(taintedRod.tags().getAmount(Aspect.TOOL), 2, "tainted rod TOOL cost");
+        helper.assertValueEqual(taintedRod.parents(), List.of("ROD_silverwood", "TAINTSHOVEL", "INFUSION"), "tainted rod parents");
+
+        ResearchItem taintShovel = ResearchCategories.getResearch("TAINTSHOVEL");
+        helper.assertValueEqual(taintShovel.tags().getAmount(Aspect.CRYSTAL), 3, "taint shovel CRYSTAL cost");
+        helper.assertValueEqual(taintShovel.tags().getAmount(Aspect.TAINT), 2, "taint shovel TAINT cost");
+        helper.assertValueEqual(taintShovel.tags().getAmount(Aspect.TOOL), 1, "taint shovel TOOL cost");
+        helper.assertValueEqual(taintShovel.parents(), List.of("THAUMIUM", "INFUSION", "ETHEREALBLOOM"), "taint shovel parents");
+
+        ResearchItem wrathCage = ResearchCategories.getResearch("WRATHCAGE");
+        helper.assertValueEqual(wrathCage.parents(), List.of("FORK"), "Wrath Cage depends on Diabolist Fork");
+        ResearchItem profaneRod = ResearchCategories.getResearch("ROD_profane");
+        helper.assertTrue(profaneRod.isRound(), "Profane Rod research has a round icon");
+        helper.assertTrue(profaneRod.isHidden(), "Profane Rod research remains hidden");
+        helper.assertTrue(profaneRod.isStub(), "Profane Rod research remains a stub");
         helper.succeed();
     }
 

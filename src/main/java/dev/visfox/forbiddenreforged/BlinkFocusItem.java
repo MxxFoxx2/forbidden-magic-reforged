@@ -28,8 +28,8 @@ public class BlinkFocusItem extends FocusItem {
     private static final AspectList COST_HELLFIRE = new AspectList().add(Aspect.ENTROPY, 300).add(Aspect.FIRE, 100);
     private static final AspectList COST_PANDEMONIUM = new AspectList().add(Aspect.ENTROPY, 300).add(Aspect.ORDER, 100);
 
-    public static final FocusUpgradeType HELLFIRE = new FocusUpgradeType(100, "hellfire", new AspectList().add(FmAspects.NETHER, 1));
-    public static final FocusUpgradeType PANDEMONIUM = new FocusUpgradeType(101, "pandemonium", new AspectList().add(Aspect.DARKNESS, 1));
+    public static final FocusUpgradeType HELLFIRE = new FocusUpgradeType(100, "hellfire", ForbiddenMagic.id("textures/misc/hellfire.png"), new AspectList().add(FmAspects.NETHER, 1));
+    public static final FocusUpgradeType PANDEMONIUM = new FocusUpgradeType(101, "pandemonium", ForbiddenMagic.id("textures/misc/pandemonium.png"), new AspectList().add(Aspect.DARKNESS, 1));
 
     public BlinkFocusItem(Properties properties) {
         super(properties);

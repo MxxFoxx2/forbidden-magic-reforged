@@ -125,7 +125,9 @@ public final class ItemGameTests {
         "heretic_trades_match_original_listing",
         "witchwood_requires_ars_magica",
         "wrath_shard_formula_matches_original",
-        "alchemical_cap_and_equivalent_rod_match_original"
+        "alchemical_cap_and_equivalent_rod_match_original",
+        "ring_of_nutrition_only_works_in_ring_slots",
+        "blink_focus_upgrades_use_original_icon_assets"
     };
 
     static {
@@ -161,6 +163,8 @@ public final class ItemGameTests {
         FUNCTIONS.register(TESTS[29], () -> ItemGameTests::witchwoodRequiresArsMagica);
         FUNCTIONS.register(TESTS[30], () -> ItemGameTests::wrathShardFormulaMatchesOriginal);
         FUNCTIONS.register(TESTS[31], () -> ItemGameTests::alchemicalCapAndEquivalentRodMatchOriginal);
+        FUNCTIONS.register(TESTS[32], () -> ItemGameTests::ringOfNutritionOnlyWorksInRingSlots);
+        FUNCTIONS.register(TESTS[33], () -> ItemGameTests::blinkFocusUpgradesUseOriginalIconAssets);
     }
 
     private ItemGameTests() {}
@@ -196,11 +200,16 @@ public final class ItemGameTests {
         helper.assertTrue(fork.isSecondary(), "FORK is secondary");
         helper.assertTrue(fork.isConcealed(), "FORK is concealed");
         helper.assertValueEqual(fork.warp(), 0, "FORK has no warp");
+        helper.assertValueEqual(fork.tags().getAmount(FmAspects.NETHER), 3, "FORK research NETHER cost");
+        helper.assertValueEqual(fork.tags().getAmount(Aspect.MECHANISM), 1, "FORK research MECHANISM cost");
+        helper.assertValueEqual(fork.tags().getAmount(Aspect.TOOL), 1, "FORK research TOOL cost");
+        helper.assertValueEqual(fork.tags().getAmount(Aspect.FIRE), 0, "FORK research has no FIRE cost");
         helper.assertValueEqual(fork.parents(), List.of("INFUSION", "NETHERSHARDS", "THAUMIUM"), "FORK parents");
         InfusionRecipe recipe = (InfusionRecipe) TcRecipes.get("FORK");
         helper.assertTrue(recipe != null, "FORK infusion recipe exists");
         helper.assertValueEqual(recipe.instability(), 1, "FORK instability");
-        helper.assertValueEqual(recipe.aspects().getAmount(Aspect.FIRE), 8, "FORK fire cost");
+        helper.assertValueEqual(recipe.aspects().getAmount(FmAspects.NETHER), 8, "FORK NETHER cost");
+        helper.assertValueEqual(recipe.aspects().getAmount(Aspect.FIRE), 0, "FORK has no FIRE cost");
         helper.assertValueEqual(recipe.aspects().getAmount(Aspect.MECHANISM), 8, "FORK mechanism cost");
         helper.assertValueEqual(recipe.aspects().getAmount(Aspect.ENERGY), 8, "FORK energy cost");
         helper.assertValueEqual(recipe.components().size(), 4, "FORK has 4 components");
@@ -333,6 +342,38 @@ public final class ItemGameTests {
         JsonObject despair = readJson(helper, "/assets/forbiddenmagic/models/item/lust_shard_despair.json");
         helper.assertValueEqual(despair.getAsJsonObject("textures").get("layer0").getAsString(), "forbiddenmagic:item/despair_shard", "despair model uses the despair texture");
         helper.assertTrue(ForbiddenMagic.class.getResourceAsStream("/assets/forbiddenmagic/textures/item/despair_shard.png") != null, "despair texture ships with the mod");
+        helper.succeed();
+    }
+
+    private static void ringOfNutritionOnlyWorksInRingSlots(GameTestHelper helper) {
+        ServerPlayer player = mockConnectedPlayer(helper);
+        for (int slot = 0; slot < Baubles.slotCount(); slot++) {
+            Baubles.set(player, slot, ItemStack.EMPTY);
+        }
+        ItemStack ring = new ItemStack(FmItems.RING_NUTRITION.get());
+        Baubles.set(player, 0, ring.copy());
+        helper.assertFalse(FmToolEvents.hasNutritionRingInRingSlot(player), "amulet slot does not activate Ring of Nutrition");
+        Baubles.set(player, 0, ItemStack.EMPTY);
+        Baubles.set(player, 1, ring.copy());
+        helper.assertTrue(FmToolEvents.hasNutritionRingInRingSlot(player), "first ring slot activates Ring of Nutrition");
+        Baubles.set(player, 1, ItemStack.EMPTY);
+        Baubles.set(player, 2, ring.copy());
+        helper.assertTrue(FmToolEvents.hasNutritionRingInRingSlot(player), "second ring slot activates Ring of Nutrition");
+        Baubles.set(player, 2, ItemStack.EMPTY);
+        Baubles.set(player, 3, ring.copy());
+        helper.assertFalse(FmToolEvents.hasNutritionRingInRingSlot(player), "belt slot does not activate Ring of Nutrition");
+        helper.succeed();
+    }
+
+    private static void blinkFocusUpgradesUseOriginalIconAssets(GameTestHelper helper) {
+        helper.assertValueEqual(dev.visfox.forbiddenreforged.BlinkFocusItem.HELLFIRE.icon(),
+            ForbiddenMagic.id("textures/misc/hellfire.png"), "Hellfire uses the bundled original icon");
+        helper.assertValueEqual(dev.visfox.forbiddenreforged.BlinkFocusItem.PANDEMONIUM.icon(),
+            ForbiddenMagic.id("textures/misc/pandemonium.png"), "Pandemonium uses the bundled original icon");
+        helper.assertTrue(ForbiddenMagic.class.getResourceAsStream("/assets/forbiddenmagic/textures/misc/hellfire.png") != null,
+            "Hellfire icon asset is bundled");
+        helper.assertTrue(ForbiddenMagic.class.getResourceAsStream("/assets/forbiddenmagic/textures/misc/pandemonium.png") != null,
+            "Pandemonium icon asset is bundled");
         helper.succeed();
     }
 
