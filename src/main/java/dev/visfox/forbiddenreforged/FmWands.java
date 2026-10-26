@@ -1,6 +1,7 @@
 package dev.visfox.forbiddenreforged;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import net.minecraft.world.entity.LivingEntity;
 import java.util.List;
 import net.neoforged.fml.ModList;
@@ -174,15 +175,22 @@ public final class FmWands {
                 if (current <= 0.0D) return;
                 double remaining = current;
                 String cap = Wands.getCap(stack).tag();
+                List<Aspect> toRecharge = new ArrayList<>();
                 for (Aspect aspect : Aspect.getPrimalAspects()) {
                     if (Wands.getMaxVis(stack) <= Wands.getVis(stack, aspect)) continue;
                     double cost = witchwoodManaCost(staff, cap);
                     if (remaining >= cost) {
                         remaining -= cost;
+                        toRecharge.add(aspect);
+                    }
+                }
+                // Debit mana first, then add vis. If the optional API rejects the
+                // debit, the wand must not receive free vis.
+                if (!toRecharge.isEmpty() && access.setMana(remaining)) {
+                    for (Aspect aspect : toRecharge) {
                         Wands.addVis(stack, aspect, 1, true);
                     }
                 }
-                if (remaining < current) access.setMana(remaining);
             } catch (ReflectiveOperationException | LinkageError | RuntimeException error) {
                 if (!warnedAboutApi) {
                     warnedAboutApi = true;
@@ -225,9 +233,12 @@ public final class FmWands {
             Object value = modernApi ? getter.invoke(receiver, player) : getter.invoke(receiver);
             return ((Number)value).doubleValue();
         }
-        private void setMana(double amount) throws ReflectiveOperationException {
-            if (modernApi) setter.invoke(receiver, player, amount);
-            else setter.invoke(receiver, (float)amount);
+        private boolean setMana(double amount) throws ReflectiveOperationException {
+            if (modernApi) {
+                return Boolean.TRUE.equals(setter.invoke(receiver, player, amount));
+            }
+            setter.invoke(receiver, (float)amount);
+            return true;
         }
     }
     private static final class ManaWandUpdate extends ManaConversionUpdate {
