@@ -254,7 +254,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          CHANNEL_TAG="$CHANNEL"
+          # Channel tags live under release/ so they never collide with the
+          # 1.21.1 branch name (a bare "1.21.1" tag made every release look
+          # like a fresh push to the branch in GitHub's UI).
+          CHANNEL_TAG="release/$CHANNEL"
           TITLE="$RELEASE_VERSION (NeoForge $CHANNEL)"
 
           git -C "$REPO_DIR" config user.email "ci@github-actions.local"
@@ -413,7 +416,7 @@ jobs:
 
           # This is a rolling release, not a build archive: remove only assets managed
           # by this workflow before uploading the current, predictable filenames.
-          RELEASE_ID="$(gh api "repos/$REPO/releases/tags/$CHANNEL_TAG" --jq .id)"
+          RELEASE_ID="$(gh api "repos/$REPO/releases/tags/${CHANNEL_TAG//\//%2F}" --jq .id)"
           while read -r ASSET_ID ASSET_NAME; do
             [[ -n "$ASSET_ID" && -n "$ASSET_NAME" ]] || continue
             if [[ "$ASSET_NAME" == forbidden-magic-* ]]; then

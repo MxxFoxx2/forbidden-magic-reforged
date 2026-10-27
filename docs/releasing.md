@@ -21,7 +21,7 @@ Manual `workflow_dispatch` runs ignore this filter, which is how a workflow chan
 
 ## Rolling channels
 
-There is one rolling GitHub release per Minecraft channel, tagged `26.3` and `1.21.1`. Each successful build **recreates** its release with the current jar, so the release date and the asset always match the newest build. The tag is preserved across the recreation. Only the `26.3` release is created with the GitHub "Latest" mark — the primary channel — so the two channels do not steal the badge from each other on every build.
+There is one rolling GitHub release per Minecraft channel, tagged `release/26.3` and `release/1.21.1` (the `release/` prefix keeps the tags from colliding with the `1.21.1` branch name). Each successful build **recreates** its release with the current jar, so the release date and the asset always match the newest build. The tag is preserved across the recreation. Only the `release/26.3` release is created with the GitHub "Latest" mark — the primary channel — so the two channels do not steal the badge from each other on every build.
 
 For rollback, every 26.3 build also pushes an `archive/releases/26.3/<source sha>` tag. A manual `workflow_dispatch` run accepts such a tag and rebuilds it; the workflow refuses to overwrite an existing numbered release.
 
