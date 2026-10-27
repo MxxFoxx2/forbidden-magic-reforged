@@ -77,7 +77,7 @@ jobs:
 
           build_version="$GITHUB_RUN_NUMBER.$GITHUB_RUN_ATTEMPT"
           release_version="1.0.$GITHUB_RUN_NUMBER"
-          mod_version="0.574-$channel-port.$release_version"
+          mod_version="$release_version"
           python3 - "$repo_dir/gradle.properties" "$mod_version" <<'PY'
           import re
           import sys
@@ -199,7 +199,7 @@ jobs:
         run: |
           set -euo pipefail
           repo_abs="$(cd "$REPO_DIR" && pwd)"
-          built="$repo_abs/build/libs/forbidden-magic-0.574-$CHANNEL-port.$RELEASE_VERSION.jar"
+          built="$repo_abs/build/libs/forbidden-magic-$RELEASE_VERSION.jar"
           test -s "$built"
           asset_name="forbidden-magic-$RELEASE_VERSION-$CHANNEL.jar"
           asset="$repo_abs/build/libs/$asset_name"
