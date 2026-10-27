@@ -243,11 +243,9 @@ jobs:
         run: |
           set -euo pipefail
           repo_abs="$(cd "$REPO_DIR" && pwd)"
-          built="$repo_abs/build/libs/forbidden-magic-$RELEASE_VERSION.jar"
-          test -s "$built"
           asset_name="forbidden-magic-$RELEASE_VERSION-$CHANNEL.jar"
           asset="$repo_abs/build/libs/$asset_name"
-          mv "$built" "$asset"
+          test -s "$asset"
           echo "jar_path=$asset" >> "$GITHUB_OUTPUT"
 
       - name: Archive tested source and publish rolling release
