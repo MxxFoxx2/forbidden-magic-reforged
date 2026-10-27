@@ -8,7 +8,7 @@
 
 Требуются: Minecraft 26.3, NeoForge 26.3.0.57-beta или новее и [Thaumcraft 4: Reforged](https://github.com/notlikethiss/thaumcraft-4-reforged) 1.1.2+. Скачайте JAR из [Releases](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases) и поместите в `mods/` вместе с хост-модом.
 
-Основной канал — релиз `26.3`; для Minecraft 1.21.1 есть отдельный релиз.
+Основной канал — релиз `26.3`; отдельные релизы есть для Minecraft 26.1.2 и 1.21.1. Каждый канал — rolling-релиз под тегом `release/<версия>`: свежий билд всегда доступен по одному и тому же тегу.
 
 ## Использование
 
