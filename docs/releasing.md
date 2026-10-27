@@ -13,6 +13,12 @@ Releases are built and published by the **Release** workflow that runs on every 
 
 Versions therefore always increase without a manual step; the committed `gradle.properties` keeps its own development value, because the workflow only overrides it inside the build. The chosen version is also stored in the release notes as a `release-version` marker so the next build can continue from it.
 
+## When a release is published
+
+A push publishes a release only if it changes something the mod ships or documents: sources, resources, tests, build files, `host.sha`, patches, release settings, docs or the README. Pushes that touch only `.github/` are ignored by the release workflow, so CI tweaks do not create a new version; the regular CI workflow still builds and tests them.
+
+Manual `workflow_dispatch` runs ignore this filter, which is how a workflow change itself can be published on purpose.
+
 ## Rolling channels
 
 There is one rolling GitHub release per Minecraft channel, tagged `26.3` and `1.21.1`. Each successful build **recreates** its release with the current jar, so the release date and the asset always match the newest build. The tag is preserved across the recreation.
