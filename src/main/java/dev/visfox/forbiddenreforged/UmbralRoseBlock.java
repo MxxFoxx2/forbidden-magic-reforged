@@ -1,5 +1,6 @@
 package dev.visfox.forbiddenreforged;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
@@ -13,8 +14,15 @@ import net.minecraft.world.level.BlockGetter;
 public class UmbralRoseBlock extends VegetationBlock {
     private static final VoxelShape SHAPE = box(5.0, 0.0, 5.0, 11.0, 10.0, 11.0);
 
+    public static final MapCodec<UmbralRoseBlock> CODEC = simpleCodec(UmbralRoseBlock::new);
+
     public UmbralRoseBlock(Properties properties) {
         super(properties);
+    }
+
+    @Override
+    protected MapCodec<UmbralRoseBlock> codec() {
+        return CODEC;
     }
 
     @Override

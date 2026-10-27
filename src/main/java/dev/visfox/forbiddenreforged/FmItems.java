@@ -10,11 +10,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.ToolMaterial;
-import net.minecraft.world.item.component.CookingFuel;
-import net.minecraft.world.level.storage.loot.providers.number.floats.ContextFloatProviders;
-import net.minecraft.world.level.storage.loot.providers.number.floats.ResolvableFloat;
-import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProvider;
-import net.minecraft.world.level.storage.loot.providers.number.ints.ResolvableInt;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -26,8 +21,6 @@ import thaumcraft.wand.focus.FocusItem;
 
 public final class FmItems {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(ForbiddenMagic.MODID);
-    private static final ResourceKey<ContextIntProvider> TAINT_COAL_BURN =
-        ResourceKey.create(Registries.CONTEXT_INT_PROVIDER, ForbiddenMagic.id("taint_coal_burn"));
     public static final Map<String, DeferredItem<Item>> DEADLY_SHARDS = new LinkedHashMap<>();
     public static final DeferredItem<Item> GLUTTONY_SHARD;
     public static final DeferredItem<Item> SKULL_AXE;
@@ -81,13 +74,7 @@ public final class FmItems {
         DIABOLIST_FORK = ITEMS.registerItem("diabolist_fork", DiabolistForkItem::new,
             properties -> Registration.sword(properties.rarity(Rarity.UNCOMMON), TcMaterials.THAUMIUM_TOOL, 3.0F, -2.4F)
                 .repairable(net.minecraft.world.item.Items.QUARTZ));
-        TAINT_COAL = ITEMS.registerSimpleItem("taint_coal", properties -> properties.component(
-            DataComponents.COOKING_FUEL,
-            new CookingFuel(
-                ResolvableInt.fromKey(TAINT_COAL_BURN),
-                ResolvableFloat.fromKey(ContextFloatProviders.COOKING_DEFAULT_SPEED_MULTIPLIER)
-            )
-        ));
+        TAINT_COAL = ITEMS.registerItem("taint_coal", TaintCoalItem::new);
         RIDING_CROP = ITEMS.registerItem("riding_crop", RidingCropItem::new,
             properties -> properties.sword(ToolMaterial.WOOD, 3.0F, -2.4F)
                 .repairable(TagKey.create(Registries.ITEM, ForbiddenMagic.id("riding_crop_repair"))));

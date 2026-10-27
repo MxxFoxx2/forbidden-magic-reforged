@@ -69,9 +69,9 @@ public class WrathCageRenderer implements BlockEntityRenderer<WrathCageBlockEnti
         }
         poseStack.pushPose();
         poseStack.translate(0.5, 0.4, 0.5);
-        poseStack.rotateDegrees(Axis.YP, state.spin);
+        poseStack.mulPose(Axis.YP.rotationDegrees(state.spin));
         poseStack.translate(0.0, -0.2, 0.0);
-        poseStack.rotateDegrees(Axis.XP, -30.0F);
+        poseStack.mulPose(Axis.XP.rotationDegrees(-30.0F));
         poseStack.scale(state.scale, state.scale, state.scale);
         dispatcher.submit(state.mob, camera, 0.0, 0.0, 0.0, poseStack, collector);
         poseStack.popPose();

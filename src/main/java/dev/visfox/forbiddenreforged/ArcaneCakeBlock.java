@@ -17,13 +17,21 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import com.mojang.serialization.MapCodec;
+
 public class ArcaneCakeBlock extends VegetationBlock {
+    public static final MapCodec<ArcaneCakeBlock> CODEC = simpleCodec(ArcaneCakeBlock::new);
     public static final int SLICES = 12;
     public static final IntegerProperty SLICE = IntegerProperty.create("slice", 0, SLICES - 1);
 
     public ArcaneCakeBlock(Properties properties) {
         super(properties);
         registerDefaultState(stateDefinition.any().setValue(SLICE, 0));
+    }
+
+    @Override
+    protected MapCodec<ArcaneCakeBlock> codec() {
+        return CODEC;
     }
 
     @Override

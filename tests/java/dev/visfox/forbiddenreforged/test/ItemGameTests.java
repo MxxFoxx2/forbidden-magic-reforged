@@ -19,12 +19,12 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Consumer;
+import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.NbtOps;
@@ -44,19 +44,17 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.equine.Horse;
 import net.minecraft.world.entity.animal.pig.Pig;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.CookingFuel;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.world.level.storage.loot.LootParams;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.block.entity.FuelValues;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -226,25 +224,20 @@ public final class ItemGameTests {
         ItemStack stack = new ItemStack(FmItems.TAINT_COAL.get());
         helper.assertFalse(stack.isEmpty(), "taint coal must exist");
         helper.assertValueEqual(BuiltInRegistries.ITEM.getKey(stack.getItem()), Identifier.parse("forbiddenmagic:taint_coal"), "taint coal id");
-        helper.assertTrue(stack.has(DataComponents.COOKING_FUEL), "taint coal is a fuel");
+        helper.assertTrue(stack.getBurnTime(RecipeType.SMELTING, helper.getLevel().fuelValues()) > 0, "taint coal is a fuel");
         helper.succeed();
     }
 
     private static void taintCoalBurnTimeVariesWithinOriginalRange(GameTestHelper helper) {
         ItemStack stack = new ItemStack(FmItems.TAINT_COAL.get());
-        CookingFuel fuel = stack.get(DataComponents.COOKING_FUEL);
-        helper.assertTrue(fuel != null, "taint coal carries a cooking fuel component");
-        LootContext context = new LootContext.Builder(
-            new LootParams.Builder(helper.getLevel()).create(LootContextParamSets.EMPTY)
-        ).create(Optional.empty());
+        FuelValues fuelValues = helper.getLevel().fuelValues();
         Set<Integer> drawn = new HashSet<>();
         for (int i = 0; i < 40; i++) {
-            int burn = fuel.burnTime().get(context, 0);
+            int burn = stack.getBurnTime(RecipeType.SMELTING, fuelValues);
             helper.assertTrue(burn >= 1 && burn <= 2400, "burn time " + burn + " must stay within 1..2400");
             drawn.add(burn);
         }
         helper.assertTrue(drawn.size() > 1, "burn time must be drawn per use, not a constant");
-        helper.assertTrue(ItemStack.CODEC.encodeStart(NbtOps.INSTANCE, stack).result().isPresent(), "taint coal must serialize its fuel component");
         helper.succeed();
     }
 
@@ -455,7 +448,7 @@ public final class ItemGameTests {
             .findFirst().orElse(ItemStack.EMPTY);
         helper.assertFalse(neutroniumWand.isEmpty(), "creative neutronium wand can be located");
         helper.assertFalse(staffWand.isEmpty(), "creative neutronium staff can be located");
-        var creativePlayer = helper.makeMockServerPlayer(net.minecraft.world.level.GameType.CREATIVE);
+        var creativePlayer = mockPlayer(helper, GameType.CREATIVE);
         Wands.getRod(neutroniumWand).onUpdate().onUpdate(neutroniumWand, creativePlayer);
         Wands.getRod(staffWand).onUpdate().onUpdate(staffWand, creativePlayer);
         for (Aspect aspect : Aspect.getPrimalAspects()) {
@@ -818,12 +811,12 @@ public final class ItemGameTests {
         ItemStack crop = new ItemStack(FmItems.RIDING_CROP.get());
         ServerPlayer attacker = mockConnectedPlayer(helper);
 
-        Horse horse = helper.spawn(EntityTypes.HORSE, new BlockPos(2, 4, 2));
+        Horse horse = helper.spawn(EntityType.HORSE, new BlockPos(2, 4, 2));
         crop.getItem().hurtEnemy(crop, horse, attacker);
         MobEffectInstance horseSpeed = horse.getEffect(MobEffects.SPEED);
         helper.assertTrue(horseSpeed != null && horseSpeed.getDuration() == 200 && horseSpeed.getAmplifier() == 5, "a horse gets speed 200 at amplifier 5");
 
-        Pig pig = helper.spawn(EntityTypes.PIG, new BlockPos(4, 4, 4));
+        Pig pig = helper.spawn(EntityType.PIG, new BlockPos(4, 4, 4));
         crop.getItem().hurtEnemy(crop, pig, attacker);
         MobEffectInstance pigSpeed = pig.getEffect(MobEffects.SPEED);
         helper.assertTrue(pigSpeed != null && pigSpeed.getDuration() == 200 && pigSpeed.getAmplifier() == 5, "a pig gets speed 200 at amplifier 5");
@@ -842,7 +835,7 @@ public final class ItemGameTests {
         helper.assertValueEqual(crop.getRarity(), Rarity.COMMON, "the crop keeps the original common rarity");
         helper.assertValueEqual(crop.getItem().getDestroySpeed(crop, Blocks.STONE.defaultBlockState()), 1.0F, "the crop always digs at speed 1");
 
-        Horse mount = helper.spawn(EntityTypes.HORSE, new BlockPos(6, 4, 6));
+        Horse mount = helper.spawn(EntityType.HORSE, new BlockPos(6, 4, 6));
         float health = mount.getHealth();
         attacker.startRiding(mount);
         crop.getItem().use(helper.getLevel(), attacker, InteractionHand.MAIN_HAND);
@@ -903,8 +896,8 @@ public final class ItemGameTests {
         helper.assertValueEqual(FmDrops.heldWrathDamage(new ItemStack(FmItems.SKULL_AXE.get())), 7, "the skull axe counts as elemental sword damage");
         helper.assertValueEqual(FmDrops.heldWrathDamage(new ItemStack(FmItems.MORPH_SWORD.get())), 7, "the morph sword counts as elemental sword damage");
         helper.assertValueEqual(FmDrops.heldWrathDamage(new ItemStack(FmItems.RIDING_CROP.get())), 4, "the riding crop counts as wooden sword damage");
-        helper.assertTrue(FmDrops.wrathEligible(helper.spawn(EntityTypes.ZOMBIE, new BlockPos(2, 4, 2))), "hostile mobs are eligible");
-        helper.assertFalse(FmDrops.wrathEligible(helper.spawn(EntityTypes.PIG, new BlockPos(4, 4, 4))), "passive animals are not eligible");
+        helper.assertTrue(FmDrops.wrathEligible(helper.spawn(EntityType.ZOMBIE, new BlockPos(2, 4, 2))), "hostile mobs are eligible");
+        helper.assertFalse(FmDrops.wrathEligible(helper.spawn(EntityType.PIG, new BlockPos(4, 4, 4))), "passive animals are not eligible");
         helper.succeed();
     }
 
@@ -936,7 +929,19 @@ public final class ItemGameTests {
         helper.succeed();
     }
 
-    private static ServerPlayer mockConnectedPlayer(GameTestHelper helper) {        ServerPlayer player = (ServerPlayer) helper.makeMockServerPlayer(GameType.SURVIVAL);
+    private static ServerPlayer mockPlayer(GameTestHelper helper, GameType type) {
+        CommonListenerCookie cookie = CommonListenerCookie.createInitial(new GameProfile(UUID.randomUUID(), "test-mock-player"), false);
+        ServerPlayer player = new ServerPlayer(helper.getLevel().getServer(), helper.getLevel(), cookie.gameProfile(), cookie.clientInformation()) {
+            @Override
+            public GameType gameMode() {
+                return type;
+            }
+        };
+        return player;
+    }
+
+    private static ServerPlayer mockConnectedPlayer(GameTestHelper helper) {
+        ServerPlayer player = mockPlayer(helper, GameType.SURVIVAL);
         CommonListenerCookie cookie = CommonListenerCookie.createInitial(player.getGameProfile(), false);
         Connection connection = new Connection(PacketFlow.SERVERBOUND);
         new EmbeddedChannel(connection);

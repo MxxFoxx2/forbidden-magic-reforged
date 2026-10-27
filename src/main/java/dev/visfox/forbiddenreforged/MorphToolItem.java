@@ -50,7 +50,7 @@ public class MorphToolItem extends Item implements WarpingGear {
             stack.hurtAndBreak(5, player, EquipmentSlot.MAINHAND);
             level.playSound(null, player.blockPosition(), ModSounds.WANDFAIL.get(), SoundSource.PLAYERS, 0.2F, 0.2F + player.getRandom().nextFloat() * 0.2F);
         }
-        player.swing(hand, net.minecraft.world.item.component.SwingAnimation.DEFAULT, true);
+        player.swing(hand, true);
         return InteractionResult.SUCCESS;
     }
 
