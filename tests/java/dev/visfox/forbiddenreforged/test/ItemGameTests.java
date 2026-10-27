@@ -5,12 +5,14 @@ import dev.visfox.forbiddenreforged.CrystalwellItem;
 import dev.visfox.forbiddenreforged.PrimewellItem;
 import net.minecraft.world.item.Rarity;
 import thaumcraft.item.ScribingToolsItem;
+import thaumcraft.crafting.TcStack;
 import thaumcraft.crafting.ShapelessArcaneRecipe;
 import thaumcraft.registry.ModBlocks;
 import thaumcraft.registry.ModItems;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.netty.channel.embedded.EmbeddedChannel;
+import java.util.ArrayList;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -127,7 +129,8 @@ public final class ItemGameTests {
         "wrath_shard_formula_matches_original",
         "alchemical_cap_and_equivalent_rod_match_original",
         "ring_of_nutrition_only_works_in_ring_slots",
-        "blink_focus_upgrades_use_original_icon_assets"
+        "blink_focus_upgrades_use_original_icon_assets",
+        "research_icons_resolve_to_real_content"
     };
 
     static {
@@ -165,6 +168,7 @@ public final class ItemGameTests {
         FUNCTIONS.register(TESTS[31], () -> ItemGameTests::alchemicalCapAndEquivalentRodMatchOriginal);
         FUNCTIONS.register(TESTS[32], () -> ItemGameTests::ringOfNutritionOnlyWorksInRingSlots);
         FUNCTIONS.register(TESTS[33], () -> ItemGameTests::blinkFocusUpgradesUseOriginalIconAssets);
+        FUNCTIONS.register(TESTS[34], () -> ItemGameTests::researchIconsResolveToRealContent);
     }
 
     private ItemGameTests() {}
@@ -910,6 +914,25 @@ public final class ItemGameTests {
         helper.assertValueEqual(BuiltInRegistries.ITEM.getOptional(ForbiddenMagic.id("witchwood_staff_rod")).isPresent(), am2, "the witchwood staff rod exists only with Ars Magica 2");
         helper.assertValueEqual(ResearchCategories.getResearch("ROD_witchwood") != null, am2, "the witchwood research exists only with Ars Magica 2");
         helper.assertValueEqual(ResearchCategories.getResearch("ROD_witchwood_staff") != null, am2, "the witchwood staff research exists only with Ars Magica 2");
+        helper.succeed();
+    }
+
+
+    private static void researchIconsResolveToRealContent(GameTestHelper helper) {
+        List<String> broken = new ArrayList<>();
+        for (ResearchItem item : ResearchCategories.allResearch()) {
+            if (!"FORBIDDEN".equals(item.category())) {
+                continue;
+            }
+            if (item.iconTexture() != null) {
+                continue;
+            }
+            TcStack icon = item.iconItem();
+            if (icon == null || !icon.exists()) {
+                broken.add(item.key() + " -> " + (icon == null ? "no icon" : icon.item().toString()));
+            }
+        }
+        helper.assertTrue(broken.isEmpty(), "research icons must resolve to a real item or texture: " + broken);
         helper.succeed();
     }
 
