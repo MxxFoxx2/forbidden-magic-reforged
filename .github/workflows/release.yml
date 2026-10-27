@@ -261,6 +261,14 @@ jobs:
               git -C "$REPO_DIR" tag -a "$ARCHIVE_TAG" "$SOURCE_SHA" -m "Rollback point for Minecraft $CHANNEL ($SOURCE_SHA)"
               git -C "$REPO_DIR" push origin "refs/tags/$ARCHIVE_TAG"
             fi
+            # Keep only the newest rollback points; older ones are dropped so the
+            # tag list stays readable. Rollback needs the last few builds at most.
+            git -C "$REPO_DIR" fetch --tags --force origin >/dev/null 2>&1 || true
+            while read -r stale_tag; do
+              [[ -n "$stale_tag" ]] || continue
+              git -C "$REPO_DIR" push origin ":refs/tags/$stale_tag" >/dev/null 2>&1 || true
+              echo "Pruned old rollback tag: $stale_tag"
+            done < <(git -C "$REPO_DIR" for-each-ref --sort=taggerdate --format='%(refname:short)' "refs/tags/archive/releases/$CHANNEL" | head -n -10)
             TAG_TARGET="$SOURCE_SHA"
           else
             # GitHub's built-in GITHUB_TOKEN cannot create a release tag directly on a
