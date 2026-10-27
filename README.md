@@ -22,11 +22,10 @@
 
 ## Сборка
 
-Нужны Git, Python 3 и JDK 25. Хост не включён в репозиторий из-за лицензии All Rights Reserved — клонируйте его рядом с этой копией, затем `tools/prepare_host.py` создаст `host/` по `host.sha` и применит патчи:
+Нужны Git, Python 3.11+ и JDK 25. Хост не включён в репозиторий из-за лицензии All Rights Reserved — `tools/prepare_host.py` клонирует его сам (в sibling-папку `../thaumcraft-4-reforged`, если её ещё нет), создаст `host/` по `host.sha` и применит патчи:
 
 ```sh
 git clone https://github.com/MxxFoxx2/forbidden-magic-reforged.git
-git clone https://github.com/notlikethiss/thaumcraft-4-reforged.git
 cd forbidden-magic-reforged
 python3 tools/prepare_host.py
 (cd host && ./gradlew build --no-daemon)
@@ -34,7 +33,7 @@ python3 tools/prepare_host.py
 ./gradlew runGameTestServer --no-daemon
 ```
 
-На Windows используйте `python` и `gradlew.bat`. Composite build подключает `host/` автоматически; отдельный `publish` не требуется. Не редактируйте `host/` вручную — скрипт пересоздаёт его заново.
+На Windows используйте `python` и `gradlew.bat`. Composite build подключает `host/` автоматически; отдельный `publish` не требуется. Не редактируйте `host/` вручную — скрипт пересоздаёт его заново. Правки хоста живут в `patches/`: после изменений в `host/` их пересобирает `python3 tools/prepare_host.py --export`.
 
 ## Credits
 
