@@ -443,4 +443,22 @@ public final class FmGameTests {
             helper.fail("could not read the taint log blockstate: " + e);
         }
     }
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void researchIconsResolveToRealContent(GameTestHelper helper) {
+        List<String> broken = new java.util.ArrayList<>();
+        for (ResearchItem item : ResearchCategories.allResearch()) {
+            if (!"FORBIDDEN".equals(item.category())) {
+                continue;
+            }
+            if (item.iconTexture() != null) {
+                continue;
+            }
+            var icon = item.iconItem();
+            if (icon == null || !icon.exists()) {
+                broken.add(item.key() + " -> " + (icon == null ? "no icon" : icon.item().toString()));
+            }
+        }
+        helper.assertTrue(broken.isEmpty(), "research icons must resolve to a real item or texture: " + broken);
+        helper.succeed();
+    }
 }

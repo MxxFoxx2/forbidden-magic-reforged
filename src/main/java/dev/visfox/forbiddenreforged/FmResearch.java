@@ -35,7 +35,7 @@ public final class FmResearch {
             -8,
             -8,
             1,
-            TcStack.of("minecraft:fire", 1)
+            TcStack.of("minecraft:flint_and_steel", 1)
         )
             .setPages(ResearchPage.text("forbiddenmagic.research_page.HELLFIRE.1"))
             .setRound()
