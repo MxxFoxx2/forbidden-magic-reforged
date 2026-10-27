@@ -5,9 +5,10 @@ on:
   push:
     branches: [main, "1.21.1"]
     # A release only matters when the mod itself changes: sources, resources,
-    # tests, data, tools, patches, gradle inputs or release settings. Pushes that
-    # touch only docs, README, licenses or CI files keep the published release
-    # as it is and skip the build entirely. New build inputs must be added here.
+    # tests, data, tools, patches, gradle inputs, release settings, docs or the
+    # README. Pushes that touch only licenses or CI files keep the published
+    # release as it is and skip the build entirely. New build inputs must be
+    # added here.
     paths:
       - "src/**"
       - "tests/**"

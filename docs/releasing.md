@@ -15,7 +15,7 @@ Versions therefore always increase without a manual step; the committed `gradle.
 
 ## When a release is published
 
-A push publishes a release only if it changes files that build into the mod or drive the release: `src/`, `tests/`, `data/`, `tools/`, `patches/`, the Gradle inputs (`build.gradle`, `settings.gradle`, `gradle.properties`, `gradle/`, `gradlew`, `gradlew.bat`), `host.sha` or `release-version.txt`. Pushes that touch only docs, the README, licenses, `.github/` or other repository service files are ignored, so documentation and CI tweaks do not create a new version; the regular CI workflow still builds and tests them. The allowlist lives in the workflow's `paths` filter — a new build input must be added there or its pushes will not release.
+A push publishes a release only if it changes files that build into the mod, drive the release, or document it: `src/`, `tests/`, `data/`, `tools/`, `patches/`, `docs/`, `README.md`, the Gradle inputs (`build.gradle`, `settings.gradle`, `gradle.properties`, `gradle/`, `gradlew`, `gradlew.bat`), `host.sha` or `release-version.txt`. Pushes that touch only `.github/`, licenses or other repository service files are ignored, so CI tweaks do not create a new version; the regular CI workflow still builds and tests them. The allowlist lives in the workflow's `paths` filter — a new build input must be added there or its pushes will not release.
 
 Manual `workflow_dispatch` runs ignore this filter, which is how a workflow change itself can be published on purpose.
 
