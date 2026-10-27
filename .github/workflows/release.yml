@@ -3,7 +3,7 @@ name: Publish version-specific rolling releases
 
 on:
   push:
-    branches: [main, "1.21.1"]
+    branches: [main, "1.21.1", "mc/26.1.2"]
     # A release only matters when the mod itself changes: sources, resources,
     # tests, data, tools, patches, gradle inputs or release settings. Pushes that
     # touch only docs, README, licenses or CI files keep the published release
@@ -51,8 +51,8 @@ jobs:
           ref: ${{ github.event_name == 'workflow_dispatch' && inputs.source_ref != '' && inputs.source_ref || github.sha }}
           fetch-depth: 0
 
-      - name: Checkout Minecraft 1.21.1 source
-        if: github.ref == 'refs/heads/1.21.1'
+      - name: Checkout port branch source
+        if: github.ref != 'refs/heads/main'
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event_name == 'workflow_dispatch' && inputs.source_ref != '' && inputs.source_ref || github.sha }}
@@ -67,26 +67,37 @@ jobs:
           REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-          if [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
-            channel="26.3"
-            repo_dir="."
-            expected_mc="26.3"
-            java_version="25"
-            host_sha=""
-          elif [[ "$GITHUB_REF" == "refs/heads/1.21.1" ]]; then
-            channel="1.21.1"
-            repo_dir="port/forbidden-magic-reforged"
-            expected_mc="1.21.1"
-            java_version="21"
+          case "$GITHUB_REF" in
+            refs/heads/main)
+              channel="26.3"
+              repo_dir="."
+              expected_mc="26.3"
+              java_version="25"
+              ;;
+            refs/heads/1.21.1)
+              channel="1.21.1"
+              repo_dir="port/forbidden-magic-reforged"
+              expected_mc="1.21.1"
+              java_version="21"
+              ;;
+            refs/heads/mc/26.1.2)
+              channel="26.1.2"
+              repo_dir="port/forbidden-magic-reforged"
+              expected_mc="26.1.2"
+              java_version="25"
+              ;;
+            *)
+              echo "Run this workflow from main (26.3), 1.21.1 or mc/26.1.2 only." >&2
+              exit 1
+              ;;
+          esac
+          if [[ "$repo_dir" != "." ]]; then
             host_sha="$(tr -d '[:space:]' < "$repo_dir/host.sha")"
             if [[ ! "$host_sha" =~ ^[0-9a-f]{40}$ ]]; then
               echo "Invalid host.sha: $host_sha" >&2
               exit 1
             fi
             echo "host_sha=$host_sha" >> "$GITHUB_OUTPUT"
-          else
-            echo "Run this workflow from main (26.3) or 1.21.1 only." >&2
-            exit 1
           fi
 
           source_sha="$(git -C "$repo_dir" rev-parse HEAD)"
@@ -99,8 +110,8 @@ jobs:
           build_version="$GITHUB_RUN_NUMBER.$GITHUB_RUN_ATTEMPT"
           base_version="$(tr -d '[:space:]' < "$repo_dir/release-version.txt")"
           previous_version=""
-          if gh release view "$channel" --repo "$REPO" >/dev/null 2>&1; then
-            previous_version="$(gh release view "$channel" --repo "$REPO" --json name,body               | python3 -c 'import json,re,sys; d=json.load(sys.stdin); m=re.search(r"<!-- release-version: ([0-9]+\.[0-9]+\.[0-9]+) -->", d.get("body") or ""); print(m.group(1) if m else (re.match(r"([0-9]+\.[0-9]+\.[0-9]+)", d.get("name") or "") or [None,""])[1])')"
+          if gh release view "release/$channel" --repo "$REPO" >/dev/null 2>&1; then
+            previous_version="$(gh release view "release/$channel" --repo "$REPO" --json name,body               | python3 -c 'import json,re,sys; d=json.load(sys.stdin); m=re.search(r"<!-- release-version: ([0-9]+\.[0-9]+\.[0-9]+) -->", d.get("body") or ""); print(m.group(1) if m else (re.match(r"([0-9]+\.[0-9]+\.[0-9]+)", d.get("name") or "") or [None,""])[1])')"
           fi
           release_version="$(python3 - "$base_version" "$previous_version" <<'PY'
           import sys
@@ -123,7 +134,7 @@ jobs:
           print(".".join(str(part) for part in chosen))
           PY
           )"
-          mod_version="$release_version"
+          mod_version="$release_version-$channel"
           python3 - "$repo_dir/gradle.properties" "$mod_version" <<'PY'
           import re
           import sys
@@ -170,8 +181,8 @@ jobs:
         if: steps.meta.outputs.channel == '26.3'
         run: git clone https://github.com/notlikethiss/thaumcraft-4-reforged.git ../thaumcraft-4-reforged
 
-      - name: Checkout pinned Thaumcraft host for Minecraft 1.21.1
-        if: steps.meta.outputs.channel == '1.21.1'
+      - name: Checkout pinned Thaumcraft host for port branches
+        if: steps.meta.outputs.channel != '26.3'
         uses: actions/checkout@v4
         with:
           repository: notlikethiss/thaumcraft-4-reforged
@@ -188,8 +199,8 @@ jobs:
           git config --global user.name "GitHub Actions"
           python3 tools/prepare_host.py
 
-      - name: Verify prepared host for Minecraft 1.21.1
-        if: steps.meta.outputs.channel == '1.21.1'
+      - name: Verify prepared host for port branches
+        if: steps.meta.outputs.channel != '26.3'
         working-directory: ${{ steps.meta.outputs.repo_dir }}
         run: python3 tools/prepare_host.py --verify
 
@@ -212,8 +223,8 @@ jobs:
         working-directory: ${{ steps.meta.outputs.repo_dir }}
         run: ./gradlew --no-daemon runGameTestServer
 
-      - name: Run GameTests with Luxuria disabled (26.3)
-        if: steps.meta.outputs.channel == '26.3'
+      - name: Run GameTests with Luxuria disabled (26.x)
+        if: steps.meta.outputs.channel != '1.21.1'
         working-directory: ${{ steps.meta.outputs.repo_dir }}
         shell: bash
         run: |
@@ -367,6 +378,13 @@ jobs:
                   "Minecraft 26.3 / NeoForge 26.3 build; Java 25.",
                   "Includes the core content: seven sin aspects, shards, taint content, morph tools, Mob Crystal and Wrath Cage, wand items, Blink Focus, enchantments, recipes, and research.",
                   "Builds the host and add-on, checks artifact provenance, and runs GameTests with no_lust=false and no_lust=true.",
+                  f"Known parity gaps and client-visual checks are tracked in the [fidelity ledger](https://github.com/{repo}/blob/{source_sha}/docs/fidelity.md).",
+              ]
+          elif channel == "26.1.2":
+              bullets = [
+                  "Minecraft 26.1.2 / NeoForge 26.1.2 build; Java 25.",
+                  "Includes the core content: seven sin aspects, shards, taint content, morph tools, Mob Crystal and Wrath Cage, wand items, Blink Focus, enchantments, recipes, and research.",
+                  "Builds the pinned Thaumcraft host and add-on, verifies host preparation and artifact provenance, and runs GameTests with no_lust=false and no_lust=true.",
                   f"Known parity gaps and client-visual checks are tracked in the [fidelity ledger](https://github.com/{repo}/blob/{source_sha}/docs/fidelity.md).",
               ]
           else:
