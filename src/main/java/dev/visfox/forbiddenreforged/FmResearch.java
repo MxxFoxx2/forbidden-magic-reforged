@@ -183,7 +183,10 @@ public final class FmResearch {
             .setParents("NETHERSHARDS")
             .registerResearchItem();
         new FmResearchItem("ROD_tainted", "FORBIDDEN", new AspectList().add(Aspect.MAGIC, 4).add(Aspect.TAINT, 5).add(Aspect.TOOL, 2), -8, 3, 3, TcStack.of(FmItems.TAINTED_ROD.getId().toString(), 1))
-            .setPages(ResearchPage.text("forbiddenmagic.research_page.ROD_tainted.1"))
+            .setPages(
+                ResearchPage.text("forbiddenmagic.research_page.ROD_tainted.1"),
+                ResearchPage.infusion("ROD_TAINTED")
+            )
             .setParents("ROD_silverwood", "TAINTSHOVEL", "INFUSION")
             .setConcealed()
             .setWarp(2)
@@ -255,8 +258,8 @@ public final class FmResearch {
         new FmResearchItem("TAINTSHOVEL", "FORBIDDEN", new AspectList().add(Aspect.CRYSTAL, 3).add(Aspect.TAINT, 2).add(Aspect.TOOL, 1), -8, 1, 2, TcStack.of(FmItems.TAINT_SHOVEL.getId().toString(), 1))
             .setPages(
                 ResearchPage.text("forbiddenmagic.research_page.TAINTSHOVEL.1"),
-                ResearchPage.text("forbiddenmagic.research_page.TAINTSHOVEL.2"),
-                ResearchPage.infusion("TAINTSHOVEL")
+                ResearchPage.infusion("TAINTSHOVEL"),
+                ResearchPage.text("forbiddenmagic.research_page.TAINTSHOVEL.2")
             )
             .setParents("THAUMIUM", "INFUSION", "ETHEREALBLOOM")
             .setConcealed()

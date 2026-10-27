@@ -57,7 +57,7 @@ public final class ArcaneCakeBlock extends Block {
         eat(level, pos, state, player);
     }
 
-    private static void eat(Level level, BlockPos pos, BlockState state, Player player) {
+    public static void eat(Level level, BlockPos pos, BlockState state, Player player) {
         if (!player.canEat(false)) {
             return;
         }

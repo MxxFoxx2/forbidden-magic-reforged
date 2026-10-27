@@ -17,6 +17,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 
 @EventBusSubscriber(modid = ForbiddenMagic.MODID, value = Dist.CLIENT)
@@ -32,11 +33,16 @@ public final class FmClientEvents {
     @SubscribeEvent
     public static void registerItemColors(RegisterColorHandlersEvent.Item event) {
         event.register((stack, tintIndex) -> {
-            if (tintIndex != 0) {
+            if (tintIndex != 1) {
                 return -1;
             }
             return stack.getOrDefault(FmComponents.MORPH_STATE.get(), MorphState.EMPTY).tintColor() & 0xFFFFFF;
         }, FmItems.MORPH_PICKAXE.get(), FmItems.MORPH_SWORD.get(), FmItems.MORPH_SHOVEL.get(), FmItems.MORPH_AXE.get());
+    }
+
+    @SubscribeEvent
+    public static void registerGeometryLoaders(ModelEvent.RegisterGeometryLoaders event) {
+        event.register(TaintLogFaceModel.Loader.ID, TaintLogFaceModel.Loader.INSTANCE);
     }
 
     @SubscribeEvent

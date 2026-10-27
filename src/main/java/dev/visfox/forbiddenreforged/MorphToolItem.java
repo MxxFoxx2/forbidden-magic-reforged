@@ -29,6 +29,11 @@ public class MorphToolItem extends Item implements WarpingGear {
     }
 
     @Override
+    public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
+        return repair.is(FmItems.DEADLY_SHARDS.get("envy").get()) || super.isValidRepairItem(toRepair, repair);
+    }
+
+    @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         if (!player.isShiftKeyDown()) {
             return InteractionResultHolder.pass(player.getItemInHand(hand));

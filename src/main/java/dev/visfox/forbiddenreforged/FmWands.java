@@ -36,12 +36,14 @@ public final class FmWands {
         WandRegistry.registerRod("profane", 50, ForbiddenMagic.id("profane_rod"), 12,
             new ProfaneWandUpdate(), false, false, false,
             ForbiddenMagic.id("textures/model/wand_rod_profane.png"));
-        WandRegistry.registerRod("witchwood", 100, ForbiddenMagic.id("witchwood_rod"), 12,
-            new ManaWandUpdate(), false, false, false,
-            ForbiddenMagic.id("textures/model/wand_rod_witchwood.png"));
-        WandRegistry.registerRod("witchwood", 50, ForbiddenMagic.id("witchwood_staff_rod"), 24,
-            new ManaStaffUpdate(), false, true, false,
-            ForbiddenMagic.id("textures/model/wand_rod_witchwood_staff.png"));
+        if (isArsMagicaLoaded()) {
+            WandRegistry.registerRod("witchwood", 100, ForbiddenMagic.id("witchwood_rod"), 12,
+                new ManaWandUpdate(), false, false, false,
+                ForbiddenMagic.id("textures/model/wand_rod_witchwood.png"));
+            WandRegistry.registerRod("witchwood", 50, ForbiddenMagic.id("witchwood_staff_rod"), 24,
+                new ManaStaffUpdate(), false, true, false,
+                ForbiddenMagic.id("textures/model/wand_rod_witchwood_staff.png"));
+        }
         WandRegistry.registerRod("profaned", 50, ResourceLocation.withDefaultNamespace("bedrock"), 1000,
             null, false, false, false,
             ForbiddenMagic.id("textures/model/wand_rod_profaned.png"));

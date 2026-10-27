@@ -1,0 +1,173 @@
+From 775fd4742214ce53ddbcbfdd91abaadfaab67cbe Mon Sep 17 00:00:00 2001
+From: Forbidden Magic Port Build <port-build@example.invalid>
+Date: Tue, 27 Oct 2026 23:12:57 +0000
+Subject: [PATCH] feat: support block aspect scan targets
+
+Co-Authored-By: Mxx Foxx <MxxFoxx2@yandex.ru>
+---
+ .../thaumcraft/aspect/AspectRegistrar.java    |  7 ++++++
+ .../thaumcraft/aspect/AspectRegistry.java     | 23 ++++++++++++++++++-
+ .../java/thaumcraft/aspect/AspectSync.java    |  2 +-
+ .../client/ClientPayloadHandlers.java         |  2 +-
+ .../thaumcraft/network/AspectTagsPayload.java |  9 +++++++-
+ .../java/thaumcraft/research/ScanManager.java |  5 ++++
+ 6 files changed, 44 insertions(+), 4 deletions(-)
+
+diff --git a/src/main/java/thaumcraft/aspect/AspectRegistrar.java b/src/main/java/thaumcraft/aspect/AspectRegistrar.java
+index 2261d87..dc22bac 100644
+--- a/src/main/java/thaumcraft/aspect/AspectRegistrar.java
++++ b/src/main/java/thaumcraft/aspect/AspectRegistrar.java
+@@ -56,6 +56,13 @@ public abstract class AspectRegistrar {
+         }
+     }
+ 
++    protected void block(String target, AspectList aspects) {
++        BuiltInRegistries.BLOCK.getOptional(ResourceLocation.parse(target)).ifPresentOrElse(
++            block -> registry.registerBlock(block, aspects.copy()),
++            () -> Thaumcraft.LOGGER.debug("Aspect block target {} is not registered", target)
++        );
++    }
++
+     protected void entity(String target, AspectList aspects, Object... nbt) {
+         BuiltInRegistries.ENTITY_TYPE.getOptional(ResourceLocation.parse(target)).ifPresentOrElse(
+             type -> registry.registerEntity(type, aspects.copy(), nbt),
+diff --git a/src/main/java/thaumcraft/aspect/AspectRegistry.java b/src/main/java/thaumcraft/aspect/AspectRegistry.java
+index c41e5e0..0edc7a8 100644
+--- a/src/main/java/thaumcraft/aspect/AspectRegistry.java
++++ b/src/main/java/thaumcraft/aspect/AspectRegistry.java
+@@ -14,6 +14,7 @@ import net.minecraft.world.entity.Entity;
+ import net.minecraft.world.entity.EntityType;
+ import net.minecraft.world.item.Item;
+ import net.minecraft.world.item.ItemStack;
++import net.minecraft.world.level.block.Block;
+ import net.minecraft.world.item.Items;
+ import net.minecraft.world.item.crafting.AbstractCookingRecipe;
+ import net.minecraft.world.item.crafting.Ingredient;
+@@ -30,6 +31,7 @@ public final class AspectRegistry {
+     private static volatile AspectRegistry active = new AspectRegistry();
+ 
+     private final Map<Item, AspectList> tags = new HashMap<>();
++    private final Map<Block, AspectList> blockTags = new HashMap<>();
+     private final Map<EntityType<?>, List<EntityAspects>> entities = new HashMap<>();
+     private final Map<Item, List<CraftingSource>> craftingByOutput = new HashMap<>();
+     private final Map<Item, List<CraftingSource>> processingByOutput = new HashMap<>();
+@@ -54,9 +56,10 @@ public final class AspectRegistry {
+         active = registry;
+     }
+ 
+-    public static AspectRegistry fromSync(Map<Item, AspectList> tags, Map<EntityType<?>, List<EntityAspects>> entities) {
++    public static AspectRegistry fromSync(Map<Item, AspectList> tags, Map<Block, AspectList> blockTags, Map<EntityType<?>, List<EntityAspects>> entities) {
+         AspectRegistry registry = new AspectRegistry();
+         tags.forEach((item, aspects) -> registry.tags.put(item, aspects.copy()));
++        blockTags.forEach((block, aspects) -> registry.blockTags.put(block, aspects.copy()));
+         entities.forEach((type, list) -> registry.entities.put(type, new ArrayList<>(list)));
+         return registry;
+     }
+@@ -65,6 +68,14 @@ public final class AspectRegistry {
+         tags.put(item, aspects == null ? new AspectList() : aspects.copy());
+     }
+ 
++    public void registerBlock(Block block, @Nullable AspectList aspects) {
++        blockTags.put(block, aspects == null ? new AspectList() : aspects.copy());
++    }
++
++    public @Nullable AspectList getBlockTags(Block block) {
++        return cap(blockTags.get(block));
++    }
++
+     public boolean exists(Item item) {
+         return tags.containsKey(item);
+     }
+@@ -167,6 +178,16 @@ public final class AspectRegistry {
+         return result;
+     }
+ 
++    public Map<Block, AspectList> exportBlockTags() {
++        Map<Block, AspectList> result = new LinkedHashMap<>();
++        blockTags.forEach((block, aspects) -> {
++            if (!aspects.isEmpty()) {
++                result.put(block, aspects.copy());
++            }
++        });
++        return result;
++    }
++
+     public Map<EntityType<?>, List<EntityAspects>> exportEntities() {
+         Map<EntityType<?>, List<EntityAspects>> result = new LinkedHashMap<>();
+         entities.forEach((type, list) -> result.put(type, List.copyOf(list)));
+diff --git a/src/main/java/thaumcraft/aspect/AspectSync.java b/src/main/java/thaumcraft/aspect/AspectSync.java
+index 2ea28c1..71be5fa 100644
+--- a/src/main/java/thaumcraft/aspect/AspectSync.java
++++ b/src/main/java/thaumcraft/aspect/AspectSync.java
+@@ -34,7 +34,7 @@ public final class AspectSync {
+             rebuild(event.getPlayerList().getServer());
+         }
+         AspectRegistry registry = AspectRegistry.active();
+-        AspectTagsPayload payload = new AspectTagsPayload(registry.exportTags(), registry.exportEntities());
++        AspectTagsPayload payload = new AspectTagsPayload(registry.exportTags(), registry.exportBlockTags(), registry.exportEntities());
+         event.getRelevantPlayers().forEach(player -> ModNetwork.sendToPlayer(player, payload));
+     }
+ 
+diff --git a/src/main/java/thaumcraft/client/ClientPayloadHandlers.java b/src/main/java/thaumcraft/client/ClientPayloadHandlers.java
+index abe9426..d91fdfe 100644
+--- a/src/main/java/thaumcraft/client/ClientPayloadHandlers.java
++++ b/src/main/java/thaumcraft/client/ClientPayloadHandlers.java
+@@ -119,7 +119,7 @@ public final class ClientPayloadHandlers {
+     }
+ 
+     private static void aspectTags(AspectTagsPayload payload, Player player) {
+-        AspectRegistry.setActive(AspectRegistry.fromSync(payload.items(), payload.entities()));
++        AspectRegistry.setActive(AspectRegistry.fromSync(payload.items(), payload.blocks(), payload.entities()));
+     }
+ 
+     private static void nodeZap(NodeZapPayload payload, Player player) {
+diff --git a/src/main/java/thaumcraft/network/AspectTagsPayload.java b/src/main/java/thaumcraft/network/AspectTagsPayload.java
+index d4fff55..d218063 100644
+--- a/src/main/java/thaumcraft/network/AspectTagsPayload.java
++++ b/src/main/java/thaumcraft/network/AspectTagsPayload.java
+@@ -11,11 +11,12 @@ import net.minecraft.network.codec.StreamCodec;
+ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+ import net.minecraft.world.entity.EntityType;
+ import net.minecraft.world.item.Item;
++import net.minecraft.world.level.block.Block;
+ import thaumcraft.Thaumcraft;
+ import thaumcraft.aspect.AspectList;
+ import thaumcraft.aspect.EntityAspects;
+ 
+-public record AspectTagsPayload(Map<Item, AspectList> items, Map<EntityType<?>, List<EntityAspects>> entities) implements CustomPacketPayload {
++public record AspectTagsPayload(Map<Item, AspectList> items, Map<Block, AspectList> blocks, Map<EntityType<?>, List<EntityAspects>> entities) implements CustomPacketPayload {
+     public static final Type<AspectTagsPayload> TYPE = new Type<>(Thaumcraft.id("aspect_tags"));
+     public static final StreamCodec<RegistryFriendlyByteBuf, AspectTagsPayload> STREAM_CODEC = StreamCodec.composite(
+         ByteBufCodecs.<RegistryFriendlyByteBuf, Item, AspectList, Map<Item, AspectList>>map(
+@@ -24,6 +25,12 @@ public record AspectTagsPayload(Map<Item, AspectList> items, Map<EntityType<?>,
+             AspectList.STREAM_CODEC.cast()
+         ),
+         AspectTagsPayload::items,
++        ByteBufCodecs.<RegistryFriendlyByteBuf, Block, AspectList, Map<Block, AspectList>>map(
++            LinkedHashMap::new,
++            ByteBufCodecs.registry(Registries.BLOCK),
++            AspectList.STREAM_CODEC.cast()
++        ),
++        AspectTagsPayload::blocks,
+         ByteBufCodecs.<RegistryFriendlyByteBuf, EntityType<?>, List<EntityAspects>, Map<EntityType<?>, List<EntityAspects>>>map(
+             LinkedHashMap::new,
+             ByteBufCodecs.registry(Registries.ENTITY_TYPE),
+diff --git a/src/main/java/thaumcraft/research/ScanManager.java b/src/main/java/thaumcraft/research/ScanManager.java
+index be7cce0..e285e84 100644
+--- a/src/main/java/thaumcraft/research/ScanManager.java
++++ b/src/main/java/thaumcraft/research/ScanManager.java
+@@ -98,6 +98,11 @@ public final class ScanManager {
+         if (state.is(Blocks.LAVA)) {
+             return new Target(ScanKind.OBJECT, "minecraft:lava", new AspectList().add(Aspect.FIRE, 3).add(Aspect.EARTH, 1), ItemStack.EMPTY, null);
+         }
++        AspectList blockAspects = AspectRegistry.active().getBlockTags(state.getBlock());
++        if (blockAspects != null) {
++            String key = "block:" + BuiltInRegistries.BLOCK.getKey(state.getBlock());
++            return new Target(ScanKind.OBJECT, key, blockAspects, ItemStack.EMPTY, null);
++        }
+         ItemStack stack = state.getBlock().getCloneItemStack(level, pos, state);
+         if (stack.isEmpty()) {
+             return null;
+-- 
+2.34.1
+
