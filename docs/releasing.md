@@ -4,14 +4,14 @@ Releases are built and published by the **Release** workflow that runs on every 
 
 ## Version numbers
 
-Every build gets its own version, `1.0.<workflow run number>`, and that number is the add-on version:
+`release-version.txt` holds the base `MAJOR.MINOR.PATCH`. Each build takes the higher of that base and the version of the previous build on the same channel, and when the base is not higher it bumps the previous patch. So the patch increments on its own, while `1.1.0` or `2.0.0` is released by editing that one file and pushing. The number becomes the add-on version:
 
 - release title: `1.0.37 (NeoForge 26.3)`;
 - asset name: `forbidden-magic-1.0.37-26.3.jar`;
 - the JAR reports `1.0.37` in its own mod metadata, because the workflow writes it into `gradle.properties` before building;
 - the release notes open with `Version 1.0.37 for Minecraft 26.3` followed by the source commit.
 
-The run number is monotonic, so versions always increase and never need to be bumped by hand. The committed `gradle.properties` keeps its own development value; the workflow only overrides it inside the build.
+Versions therefore always increase without a manual step; the committed `gradle.properties` keeps its own development value, because the workflow only overrides it inside the build. The chosen version is also stored in the release notes as a `release-version` marker so the next build can continue from it.
 
 ## Rolling channels
 
