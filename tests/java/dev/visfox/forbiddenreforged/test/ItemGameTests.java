@@ -937,12 +937,6 @@ public final class ItemGameTests {
                 return type;
             }
         };
-        return player;
-    }
-
-    private static ServerPlayer mockConnectedPlayer(GameTestHelper helper) {
-        ServerPlayer player = mockPlayer(helper, GameType.SURVIVAL);
-        CommonListenerCookie cookie = CommonListenerCookie.createInitial(player.getGameProfile(), false);
         Connection connection = new Connection(PacketFlow.SERVERBOUND);
         new EmbeddedChannel(connection);
         new ServerGamePacketListenerImpl(helper.getLevel().getServer(), connection, player, cookie) {
@@ -951,7 +945,12 @@ public final class ItemGameTests {
             }
         };
         player.connection.markClientLoaded();
+        player.gameMode.changeGameModeForPlayer(type);
         return player;
+    }
+
+    private static ServerPlayer mockConnectedPlayer(GameTestHelper helper) {
+        return mockPlayer(helper, GameType.SURVIVAL);
     }
 
 }

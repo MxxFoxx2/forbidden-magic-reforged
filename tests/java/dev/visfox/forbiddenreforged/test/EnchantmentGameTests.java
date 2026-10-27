@@ -127,6 +127,7 @@ public final class EnchantmentGameTests {
             }
         };
         player.connection.markClientLoaded();
+        player.gameMode.changeGameModeForPlayer(GameType.SURVIVAL);
         return player;
     }
 

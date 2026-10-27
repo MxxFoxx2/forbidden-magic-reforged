@@ -127,6 +127,7 @@ public final class RecipeGameTests {
             }
         };
         player.connection.markClientLoaded();
+        player.gameMode.changeGameModeForPlayer(GameType.SURVIVAL);
         return player;
     }
 

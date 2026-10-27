@@ -120,6 +120,7 @@ public final class BlockGameTests {
             }
         };
         player.connection.markClientLoaded();
+        player.gameMode.changeGameModeForPlayer(GameType.SURVIVAL);
         return player;
     }
 
