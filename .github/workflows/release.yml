@@ -76,7 +76,8 @@ jobs:
           fi
 
           build_version="$GITHUB_RUN_NUMBER.$GITHUB_RUN_ATTEMPT"
-          mod_version="0.574-$channel-port.$build_version"
+          release_version="1.0.$GITHUB_RUN_NUMBER"
+          mod_version="$release_version"
           python3 - "$repo_dir/gradle.properties" "$mod_version" <<'PY'
           import re
           import sys
@@ -99,6 +100,7 @@ jobs:
             echo "java_version=$java_version"
             echo "source_sha=$source_sha"
             echo "build_version=$build_version"
+            echo "release_version=$release_version"
             echo "mod_version=$mod_version"
           } >> "$GITHUB_OUTPUT"
           echo "Publishing Minecraft $channel from $source_sha as mod version $mod_version"
@@ -192,14 +194,14 @@ jobs:
         env:
           REPO_DIR: ${{ steps.meta.outputs.repo_dir }}
           CHANNEL: ${{ steps.meta.outputs.channel }}
-          BUILD_VERSION: ${{ steps.meta.outputs.build_version }}
+          RELEASE_VERSION: ${{ steps.meta.outputs.release_version }}
           SOURCE_SHA: ${{ steps.meta.outputs.source_sha }}
         run: |
           set -euo pipefail
           repo_abs="$(cd "$REPO_DIR" && pwd)"
-          built="$repo_abs/build/libs/forbidden-magic-0.574-$CHANNEL-port.$BUILD_VERSION.jar"
+          built="$repo_abs/build/libs/forbidden-magic-$RELEASE_VERSION.jar"
           test -s "$built"
-          asset_name="forbidden-magic-$CHANNEL.jar"
+          asset_name="forbidden-magic-$RELEASE_VERSION-$CHANNEL.jar"
           asset="$repo_abs/build/libs/$asset_name"
           mv "$built" "$asset"
           echo "jar_path=$asset" >> "$GITHUB_OUTPUT"
@@ -211,6 +213,7 @@ jobs:
           CHANNEL: ${{ steps.meta.outputs.channel }}
           SOURCE_SHA: ${{ steps.meta.outputs.source_sha }}
           BUILD_VERSION: ${{ steps.meta.outputs.build_version }}
+          RELEASE_VERSION: ${{ steps.meta.outputs.release_version }}
           JAVA_VERSION: ${{ steps.meta.outputs.java_version }}
           MC_VERSION: ${{ steps.meta.outputs.expected_mc }}
           REPO_DIR: ${{ steps.meta.outputs.repo_dir }}
@@ -219,7 +222,7 @@ jobs:
         run: |
           set -euo pipefail
           CHANNEL_TAG="$CHANNEL"
-          TITLE="$CHANNEL"
+          TITLE="$RELEASE_VERSION (NeoForge $CHANNEL)"
 
           git -C "$REPO_DIR" config user.email "ci@github-actions.local"
           git -C "$REPO_DIR" config user.name "GitHub Actions"
@@ -268,6 +271,7 @@ jobs:
           channel = os.environ["CHANNEL"]
           source_sha = os.environ["SOURCE_SHA"]
           build_version = os.environ["BUILD_VERSION"]
+          release_version = os.environ["RELEASE_VERSION"]
           mc_version = os.environ["MC_VERSION"]
           java_version = os.environ["JAVA_VERSION"]
           repo_dir = os.environ["REPO_DIR"]
@@ -335,7 +339,7 @@ jobs:
           ).stdout.strip()
 
           lines = [
-              f"{mc_version}",
+              f"Version {release_version} for Minecraft {mc_version}",
               "",
               f"`{source_sha[:7]}`: {commit_subject}",
           ]
@@ -363,7 +367,7 @@ jobs:
           RELEASE_ID="$(gh api "repos/$REPO/releases/tags/$CHANNEL_TAG" --jq .id)"
           while read -r ASSET_ID ASSET_NAME; do
             [[ -n "$ASSET_ID" && -n "$ASSET_NAME" ]] || continue
-            if [[ "$ASSET_NAME" == "forbidden-magic-$CHANNEL"* ]]; then
+            if [[ "$ASSET_NAME" == forbidden-magic-* ]]; then
               gh api "repos/$REPO/releases/assets/$ASSET_ID" --method DELETE >/dev/null
               echo "Removed obsolete release asset: $ASSET_NAME"
             fi
