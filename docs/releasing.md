@@ -1,6 +1,6 @@
 # Publishing releases
 
-Releases are built and published by the **Release** workflow that runs on every push to a release channel branch: `main` for Minecraft 26.3 and `1.21.1` for Minecraft 1.21.1. It checks out the pushed commit, prepares the pinned Thaumcraft host, builds the add-on, verifies the JAR provenance, runs the required GameTests, and publishes only if every check succeeds.
+Releases are built and published by the **Release** workflow that runs on every push to a release channel branch: `main` for Minecraft 26.3, `mc/26.1.2` for Minecraft 26.1.2 and `1.21.1` for Minecraft 1.21.1. It checks out the pushed commit, prepares the pinned Thaumcraft host, builds the add-on, verifies the JAR provenance, runs the required GameTests, and publishes only if every check succeeds.
 
 ## Version numbers
 
@@ -8,7 +8,7 @@ Releases are built and published by the **Release** workflow that runs on every 
 
 - release title: `1.0.37 (NeoForge 26.3)`;
 - asset name: `forbidden-magic-1.0.37-26.3.jar`;
-- the JAR reports `1.0.37` in its own mod metadata, because the workflow writes it into `gradle.properties` before building;
+- the JAR reports `1.0.37-26.3` in its own mod metadata, because the workflow writes `<version>-<channel>` into `gradle.properties` before building;
 - the release notes open with `Version 1.0.37 for Minecraft 26.3` followed by the source commit.
 
 Versions therefore always increase without a manual step; the committed `gradle.properties` keeps its own development value, because the workflow only overrides it inside the build. The chosen version is also stored in the release notes as a `release-version` marker so the next build can continue from it.
@@ -21,7 +21,7 @@ Manual `workflow_dispatch` runs ignore this filter, which is how a workflow chan
 
 ## Rolling channels
 
-There is one rolling GitHub release per Minecraft channel, tagged `release/26.3` and `release/1.21.1` (the `release/` prefix keeps the tags from colliding with the `1.21.1` branch name). Each successful build **recreates** its release with the current jar, so the release date and the asset always match the newest build. The tag is preserved across the recreation. Only the `release/26.3` release is created with the GitHub "Latest" mark — the primary channel — so the two channels do not steal the badge from each other on every build.
+There is one rolling GitHub release per Minecraft channel, tagged `release/26.3`, `release/26.1.2` and `release/1.21.1` (the `release/` prefix keeps the tags from colliding with branch names like `1.21.1`). Each successful build **recreates** its release with the current jar, so the release date and the asset always match the newest build. The tag is preserved across the recreation. Only the `release/26.3` release is created with the GitHub "Latest" mark — the primary channel — so the two channels do not steal the badge from each other on every build.
 
 For rollback, every 26.3 build also pushes an `archive/releases/26.3/<source sha>` tag. A manual `workflow_dispatch` run accepts such a tag and rebuilds it; the workflow refuses to overwrite an existing numbered release.
 
