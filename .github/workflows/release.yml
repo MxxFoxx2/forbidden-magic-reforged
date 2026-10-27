@@ -11,6 +11,8 @@ on:
     paths:
       - "src/**"
       - "tests/**"
+      - "docs/**"
+      - "README.md"
       - "data/**"
       - "tools/**"
       - "patches/**"
