@@ -27,4 +27,4 @@ For rollback, every 26.3 build also pushes an `archive/releases/26.3/<source sha
 
 ## Older numbered releases
 
-Releases `0.1.0-beta.1`, `0.1.0` and `0.1.1` are historical: they were cut from tags before the channel scheme existed. They stay published, but new builds never create releases like that.
+Releases `0.1.0-beta.1`, `0.1.0` and `0.1.1` are historical: they were cut from tags before the channel scheme existed and were removed together with those tags. Their notes remain under `docs/releases/`; new builds never create releases like that.

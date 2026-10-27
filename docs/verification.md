@@ -2,13 +2,13 @@
 
 ## Последний успешный runtime CI
 
-- Проверенный коммит: [`a5f0c015`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/a5f0c01531b3c90f80f00957d4832a1a0ec504a9).
-- [Java CI with Gradle #40368491928](https://github.com/MxxFoxx2/forbidden-magic-reforged/actions/runs/40368491928) завершился успешно 26 октября 2026 года.
-- Хост закреплён на upstream `5ea7ba3cb4753f06cbf93c7bb83bab9afbd99755` (1.1.2); host patch подготовлен через `tools/prepare_host.py`, сборка использует Gradle composite build вместо локального Maven publish.
+- Проверенный коммит: [`5c5aa02`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/5c5aa020e31d7c222ce2198475658e997d295e6e).
+- [Java CI with Gradle #40566141998](https://github.com/MxxFoxx2/forbidden-magic-reforged/actions/runs/40566141998) завершился успешно 27 октября 2026 года.
+- Хост закреплён на upstream `604767636dc318a6d81f1abb8a8a2d3e5ec3298a` (1.1.2); host patch подготовлен через `tools/prepare_host.py`, сборка использует Gradle composite build вместо локального Maven publish.
 - Сборка хоста, сборка аддона и проверка provenance завершились успешно.
-- С `no_lust=false`: **94/94** required GameTests passed; `luxuria=luxuria`.
-- С `no_lust=true`: **94/94** required GameTests passed; `luxuria=null`.
-- Опубликованный релиз: [0.1.1](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/0.1.1). Сборка и тесты headless не заменяют ручные проверки клиента и реального геймплея.
+- С `no_lust=false`: **95/95** required GameTests passed; `luxuria=luxuria`.
+- С `no_lust=true`: **95/95** required GameTests passed; `luxuria=null`.
+- Опубликованный релиз: rolling [`26.3`](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/26.3). Сборка и тесты headless не заменяют ручные проверки клиента и реального геймплея.
 
 ## Проверки вне CI
 

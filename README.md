@@ -6,7 +6,7 @@
 
 - Целевая версия — Minecraft 26.3 / Java 25. Полный паритет с оригиналом пока не подтверждён.
 - Реализованные механики и отличия: [fidelity ledger](docs/fidelity.md). Оставшиеся задачи: [roadmap](docs/roadmap.md). Результаты проверок: [verification](docs/verification.md).
-- Последний релиз — [0.1.1](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/0.1.1). CI успешно прошёл сборку и 94/94 GameTests в обоих режимах `no_lust`; визуальные проверки клиента и полноценные игровые проверки ещё нужны.
+- Актуальная сборка — rolling-релиз [`26.3`](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/26.3). CI успешно прошёл сборку и 95/95 GameTests в обоих режимах `no_lust`; визуальные проверки клиента и полноценные игровые проверки ещё нужны.
 - Thaumcraft 4: Reforged 1.1.2+ содержит upstream API аспектов аддонов. Для регистрации портала Нижнего мира как отдельной цели сканирования блока нужен локальный [host patch](patches/0001-block-aspect-targets.patch).
 
 ## Установка
@@ -33,7 +33,7 @@ Pop-Location
 
 ## Использование
 
-В Thaumonomicon категория **FORBIDDEN** открывается после исследования «Сетевые осколки». Хамелеоновы инструменты переключают наборы зачарований по **Shift + ПКМ**.
+В Thaumonomicon категория **FORBIDDEN** открывается после исследования «Осколки Нижнего мира». Хамелеоновы инструменты переключают наборы зачарований по **Shift + ПКМ**.
 
 Настройки в `config/forbiddenmagic-startup.toml`:
 

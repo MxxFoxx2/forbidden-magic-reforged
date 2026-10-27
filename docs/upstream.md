@@ -11,7 +11,7 @@
 
 ## Версия хоста и CI
 
-- `host.sha` закрепляет `5ea7ba3cb4753f06cbf93c7bb83bab9afbd99755` (Thaumcraft 4: Reforged 1.1.2, Minecraft 26.3).
+- `host.sha` закрепляет `604767636dc318a6d81f1abb8a8a2d3e5ec3298a` (Thaumcraft 4: Reforged 1.1.2, Minecraft 26.3).
 - `tools/prepare_host.py` создаёт рабочую копию указанного коммита и применяет только файлы из `patches/`.
 - `settings.gradle` подменяет Maven-координаты хоста локальным composite-build-проектом. `build.gradle` сверяет `host/gradle.properties:mod_version` с `thaumcraft_version`.
 - CI подготавливает хост, собирает его и аддон, проверяет происхождение JAR и запускает два набора GameTests (`no_lust=false/true`). Maven publish не выполняется.
