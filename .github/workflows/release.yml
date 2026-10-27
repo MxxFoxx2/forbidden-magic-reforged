@@ -276,7 +276,7 @@ jobs:
               [[ -n "$stale_tag" ]] || continue
               git -C "$REPO_DIR" push origin ":refs/tags/$stale_tag" >/dev/null 2>&1 || true
               echo "Pruned old rollback tag: $stale_tag"
-            done < <(git -C "$REPO_DIR" for-each-ref --sort=taggerdate --format='%(refname:short)' "refs/tags/archive/releases/$CHANNEL" | head -n -10)
+            done < <(git -C "$REPO_DIR" for-each-ref --sort=taggerdate --format='%(refname:short)' "refs/tags/archive/releases/$CHANNEL" | head -n -5)
             TAG_TARGET="$SOURCE_SHA"
           else
             # GitHub's built-in GITHUB_TOKEN cannot create a release tag directly on a
