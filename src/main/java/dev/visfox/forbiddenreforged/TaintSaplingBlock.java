@@ -1,37 +1,32 @@
 package dev.visfox.forbiddenreforged;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.block.BonemealableBlock;
-import net.minecraft.world.level.block.BushBlock;
-import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SaplingBlock;
+import net.minecraft.world.level.block.grower.TreeGrower;
 import net.minecraft.world.level.block.state.BlockState;
 
-public final class TaintSaplingBlock extends BushBlock implements BonemealableBlock {
-    public static final MapCodec<TaintSaplingBlock> CODEC = simpleCodec(TaintSaplingBlock::new);
-    public TaintSaplingBlock(BlockBehaviour.Properties properties) {
-        super(properties);
+public class TaintSaplingBlock extends SaplingBlock {
+    public TaintSaplingBlock(Properties properties) {
+        super(TreeGrower.OAK, properties);
     }
 
     @Override
-    public MapCodec<? extends TaintSaplingBlock> codec() {
-        return CODEC;
-    }
-
-    @Override
-    protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-        if (random.nextInt(10) == 0 && level.getMaxLocalRawBrightness(pos.above()) >= 9) {
-            grow(level, pos, random);
+    public void advanceTree(ServerLevel level, BlockPos pos, BlockState state, RandomSource random) {
+        if (state.getValue(SaplingBlock.STAGE) == 0) {
+            level.setBlockAndUpdate(pos, state.setValue(SaplingBlock.STAGE, 1));
+            return;
         }
+        grow(level, pos, state, random);
     }
 
-    private void grow(ServerLevel level, BlockPos pos, RandomSource random) {
+    private void grow(ServerLevel level, BlockPos pos, BlockState state, RandomSource random) {
+        level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
         if (!TaintTree.grow(level, pos, random)) {
-            level.setBlockAndUpdate(pos, defaultBlockState());
+            level.setBlockAndUpdate(pos, state);
         }
     }
 
@@ -41,12 +36,7 @@ public final class TaintSaplingBlock extends BushBlock implements BonemealableBl
     }
 
     @Override
-    public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state) {
-        return true;
-    }
-
-    @Override
     public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
-        grow(level, pos, random);
+        grow(level, pos, state, random);
     }
 }

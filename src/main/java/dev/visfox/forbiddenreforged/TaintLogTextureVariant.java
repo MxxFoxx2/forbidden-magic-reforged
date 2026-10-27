@@ -25,4 +25,12 @@ public final class TaintLogTextureVariant {
         }
         return select(direction.get3DDataValue(), x, y, z);
     }
+
+    public static int selectSeeded(long seed, int side) {
+        Random random = new Random(seed ^ (side + 1L));
+        if (random.nextInt(100) < 75) {
+            return STANDARD;
+        }
+        return random.nextBoolean() ? GROSS : GROSS_2;
+    }
 }

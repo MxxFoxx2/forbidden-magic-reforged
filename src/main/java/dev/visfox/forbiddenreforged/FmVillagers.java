@@ -60,7 +60,10 @@ public final class FmVillagers {
         if (novice == null) {
             return;
         }
+        hereticNoviceTrades(novice);
+    }
 
+    public static void hereticNoviceTrades(List<VillagerTrades.ItemListing> novice) {
         novice.add(listing(random -> offer(
             Items.EMERALD, randomCount(random, 1, 2), null, 0,
             new ItemStack(FmItems.DEADLY_SHARDS.get("greed").get(), randomCount(random, 3, 4)), 7
