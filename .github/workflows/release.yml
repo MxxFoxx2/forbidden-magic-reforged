@@ -44,6 +44,9 @@ jobs:
       - name: Determine channel and validate source
         id: meta
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
           if [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
@@ -76,7 +79,32 @@ jobs:
           fi
 
           build_version="$GITHUB_RUN_NUMBER.$GITHUB_RUN_ATTEMPT"
-          release_version="1.0.$GITHUB_RUN_NUMBER"
+          base_version="$(tr -d '[:space:]' < "$repo_dir/release-version.txt")"
+          previous_version=""
+          if gh release view "$channel" --repo "$REPO" >/dev/null 2>&1; then
+            previous_version="$(gh release view "$channel" --repo "$REPO" --json name,body               | python3 -c 'import json,re,sys; d=json.load(sys.stdin); m=re.search(r"<!-- release-version: ([0-9]+\.[0-9]+\.[0-9]+) -->", d.get("body") or ""); print(m.group(1) if m else (re.match(r"([0-9]+\.[0-9]+\.[0-9]+)", d.get("name") or "") or [None,""])[1])')"
+          fi
+          release_version="$(python3 - "$base_version" "$previous_version" <<'PY'
+          import sys
+          base, previous = sys.argv[1], sys.argv[2]
+
+          def parse(value):
+              try:
+                  return tuple(int(part) for part in value.split("."))
+              except ValueError:
+                  return None
+
+          base_parts = parse(base) or (1, 0, 0)
+          previous_parts = parse(previous)
+          if previous_parts is None:
+              chosen = base_parts
+          elif base_parts > previous_parts:
+              chosen = base_parts
+          else:
+              chosen = (previous_parts[0], previous_parts[1], previous_parts[2] + 1)
+          print(".".join(str(part) for part in chosen))
+          PY
+          )"
           mod_version="$release_version"
           python3 - "$repo_dir/gradle.properties" "$mod_version" <<'PY'
           import re
@@ -346,6 +374,7 @@ jobs:
           if compare_url:
               lines += ["", f"[Changes since previous build]({compare_url})"]
           lines += ["", f"<!-- release-source-sha: {source_sha} -->"]
+          lines += [f"<!-- release-version: {release_version} -->"]
 
           with open(sys.argv[1], "w", encoding="utf-8", newline="\n") as output:
               output.write("\n".join(lines) + "\n")
