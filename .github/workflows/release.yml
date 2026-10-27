@@ -350,11 +350,13 @@ jobs:
           git -C "$REPO_DIR" tag -f -a "$CHANNEL_TAG" "$TAG_TARGET" -m "Latest tested Minecraft $CHANNEL build from source $SOURCE_SHA"
           git -C "$REPO_DIR" push --force origin "refs/tags/$CHANNEL_TAG"
 
+          # Recreate the rolling release instead of editing it: GitHub derives the
+          # "released ..." date from the release, not from the asset, so an edit would
+          # keep showing the first build date. The tag is kept for rollback history.
           if gh release view "$CHANNEL_TAG" --repo "$REPO" >/dev/null 2>&1; then
-            gh release edit "$CHANNEL_TAG" --repo "$REPO" --title "$TITLE" --notes-file "$NOTES_FILE"
-          else
-            gh release create "$CHANNEL_TAG" --repo "$REPO" --target "$TAG_TARGET" --title "$TITLE" --notes-file "$NOTES_FILE"
+            gh release delete "$CHANNEL_TAG" --repo "$REPO" --yes --cleanup-tag=false
           fi
+          gh release create "$CHANNEL_TAG" --repo "$REPO" --target "$TAG_TARGET" --title "$TITLE" --notes-file "$NOTES_FILE"
 
           # This is a rolling release, not a build archive: remove only assets managed
           # by this workflow before uploading the current, predictable filenames.
