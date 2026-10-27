@@ -4,10 +4,26 @@ name: Publish version-specific rolling releases
 on:
   push:
     branches: [main, "1.21.1"]
-    # A release only matters when the mod itself changes. Pushes that touch
-    # nothing but CI files keep the published jar as it is and skip the build.
-    paths-ignore:
-      - ".github/**"
+    # A release only matters when the mod itself changes: sources, resources,
+    # tests, data, tools, patches, gradle inputs or release settings. Pushes that
+    # touch only docs, README, licenses or CI files keep the published release
+    # as it is and skip the build entirely. New build inputs must be added here.
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "docs/**"
+      - "README.md"
+      - "data/**"
+      - "tools/**"
+      - "patches/**"
+      - "gradle/**"
+      - "build.gradle"
+      - "settings.gradle"
+      - "gradle.properties"
+      - "gradlew"
+      - "gradlew.bat"
+      - "host.sha"
+      - "release-version.txt"
   workflow_dispatch:
     inputs:
       source_ref:
@@ -401,7 +417,14 @@ jobs:
           if gh release view "$CHANNEL_TAG" --repo "$REPO" >/dev/null 2>&1; then
             gh release delete "$CHANNEL_TAG" --repo "$REPO" --yes --cleanup-tag=false
           fi
-          gh release create "$CHANNEL_TAG" --repo "$REPO" --target "$TAG_TARGET" --title "$TITLE" --notes-file "$NOTES_FILE"
+          # 26.3 is the primary channel and keeps the GitHub "Latest" mark; the
+          # secondary channel is created without it so the two rolling releases
+          # do not steal the badge from each other on every build.
+          LATEST_FLAG="--latest=false"
+          if [[ "$CHANNEL" == "26.3" ]]; then
+            LATEST_FLAG="--latest"
+          fi
+          gh release create "$CHANNEL_TAG" --repo "$REPO" --target "$TAG_TARGET" --title "$TITLE" --notes-file "$NOTES_FILE" $LATEST_FLAG
 
           # This is a rolling release, not a build archive: remove only assets managed
           # by this workflow before uploading the current, predictable filenames.

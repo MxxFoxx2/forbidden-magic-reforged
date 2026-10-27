@@ -15,16 +15,16 @@ Versions therefore always increase without a manual step; the committed `gradle.
 
 ## When a release is published
 
-A push publishes a release only if it changes something the mod ships or documents: sources, resources, tests, build files, `host.sha`, patches, release settings, docs or the README. Pushes that touch only `.github/` are ignored by the release workflow, so CI tweaks do not create a new version; the regular CI workflow still builds and tests them.
+A push publishes a release only if it changes files that build into the mod or drive the release: `src/`, `tests/`, `data/`, `tools/`, `patches/`, the Gradle inputs (`build.gradle`, `settings.gradle`, `gradle.properties`, `gradle/`, `gradlew`, `gradlew.bat`), `host.sha` or `release-version.txt`. Pushes that touch only docs, the README, licenses, `.github/` or other repository service files are ignored, so documentation and CI tweaks do not create a new version; the regular CI workflow still builds and tests them. The allowlist lives in the workflow's `paths` filter — a new build input must be added there or its pushes will not release.
 
 Manual `workflow_dispatch` runs ignore this filter, which is how a workflow change itself can be published on purpose.
 
 ## Rolling channels
 
-There is one rolling GitHub release per Minecraft channel, tagged `26.3` and `1.21.1`. Each successful build **recreates** its release with the current jar, so the release date and the asset always match the newest build. The tag is preserved across the recreation.
+There is one rolling GitHub release per Minecraft channel, tagged `26.3` and `1.21.1`. Each successful build **recreates** its release with the current jar, so the release date and the asset always match the newest build. The tag is preserved across the recreation. Only the `26.3` release is created with the GitHub "Latest" mark — the primary channel — so the two channels do not steal the badge from each other on every build.
 
 For rollback, every 26.3 build also pushes an `archive/releases/26.3/<source sha>` tag. A manual `workflow_dispatch` run accepts such a tag and rebuilds it; the workflow refuses to overwrite an existing numbered release.
 
 ## Older numbered releases
 
-Releases `0.1.0-beta.1`, `0.1.0` and `0.1.1` are historical: they were cut from tags before the channel scheme existed. They stay published, but new builds never create releases like that.
+Releases `0.1.0-beta.1`, `0.1.0` and `0.1.1` are historical: they were cut from tags before the channel scheme existed and were removed together with those tags. Their notes remain under `docs/releases/`; new builds never create releases like that.
