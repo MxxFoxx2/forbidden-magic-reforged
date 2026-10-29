@@ -34,6 +34,8 @@ public final class FmAspects {
                 SLOTH = api.register("desidia", 0x6E6E6E, new Aspect[]{Aspect.TRAP, Aspect.SOUL}, 771, texture("desidia"));
                 WRATH = api.register("ira", 0x870404, new Aspect[]{Aspect.WEAPON, Aspect.FIRE}, 771, texture("ira"));
             });
+            // Item classes build focus upgrades in static initializers, so the aspects must exist before FmItems loads.
+            AddonAspects.init();
         } catch (NoSuchMethodError | NoClassDefFoundError absent) {
             throw new IllegalStateException("Forbidden Magic requires Thaumcraft 4: Reforged 1.1.2 or newer with the add-on aspect API", absent);
         }

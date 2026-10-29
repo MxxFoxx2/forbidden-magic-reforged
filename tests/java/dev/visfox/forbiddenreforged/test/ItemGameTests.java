@@ -1,6 +1,7 @@
 package dev.visfox.forbiddenreforged.test;
 
 import com.google.gson.JsonArray;
+import dev.visfox.forbiddenreforged.BlinkFocusItem;
 import dev.visfox.forbiddenreforged.CrystalwellItem;
 import dev.visfox.forbiddenreforged.PrimewellItem;
 import net.minecraft.world.item.Rarity;
@@ -74,11 +75,13 @@ import dev.visfox.forbiddenreforged.MorphState;
 import dev.visfox.forbiddenreforged.FmEnchantmentEffects;
 import dev.visfox.forbiddenreforged.FmToolEvents;
 import dev.visfox.forbiddenreforged.RidingCropItem;
+import thaumcraft.arcane.FocalManipulatorBlockEntity;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.aspect.AspectList;
 import thaumcraft.crafting.InfusionRecipe;
 import thaumcraft.crafting.TcRecipes;
 import thaumcraft.Config;
+import thaumcraft.node.EnergizedNodeBlockEntity;
 import thaumcraft.research.ResearchCategories;
 import thaumcraft.research.ResearchItem;
 import thaumcraft.research.ResearchPage;
@@ -87,8 +90,12 @@ import thaumcraft.wand.VisStorage;
 import thaumcraft.wand.WandRegistry;
 import thaumcraft.wand.WandCap;
 import thaumcraft.wand.WandRod;
+import thaumcraft.vis.VisNet;
 import thaumcraft.wand.Wands;
 import thaumcraft.wand.WandTriggers;
+import thaumcraft.wand.focus.FocusItem;
+import thaumcraft.wand.focus.FocusKeys;
+import thaumcraft.wand.focus.FocusUpgradeType;
 
 @EventBusSubscriber(modid = ForbiddenMagic.MODID)
 public final class ItemGameTests {
@@ -130,7 +137,8 @@ public final class ItemGameTests {
         "alchemical_cap_and_equivalent_rod_match_original",
         "ring_of_nutrition_only_works_in_ring_slots",
         "blink_focus_upgrades_use_original_icon_assets",
-        "research_icons_resolve_to_real_content"
+        "research_icons_resolve_to_real_content",
+        "blink_focus_hellfire_applies_through_focal_manipulator"
     };
 
     static {
@@ -169,6 +177,7 @@ public final class ItemGameTests {
         FUNCTIONS.register(TESTS[32], () -> ItemGameTests::ringOfNutritionOnlyWorksInRingSlots);
         FUNCTIONS.register(TESTS[33], () -> ItemGameTests::blinkFocusUpgradesUseOriginalIconAssets);
         FUNCTIONS.register(TESTS[34], () -> ItemGameTests::researchIconsResolveToRealContent);
+        FUNCTIONS.register(TESTS[35], () -> ItemGameTests::blinkFocusHellfireAppliesThroughFocalManipulator);
     }
 
     private ItemGameTests() {}
@@ -933,6 +942,47 @@ public final class ItemGameTests {
             }
         }
         helper.assertTrue(broken.isEmpty(), "research icons must resolve to a real item or texture: " + broken);
+        helper.succeed();
+    }
+
+    private static void blinkFocusHellfireAppliesThroughFocalManipulator(GameTestHelper helper) {
+        BlockPos tablePos = new BlockPos(2, 2, 2);
+        BlockPos nodePos = new BlockPos(5, 2, 2);
+        helper.setBlock(tablePos, ModBlocks.FOCAL_MANIPULATOR.get());
+        helper.setBlock(nodePos, ModBlocks.ENERGIZED_AURA_NODE.get());
+        FocalManipulatorBlockEntity table = helper.getBlockEntity(tablePos, FocalManipulatorBlockEntity.class);
+        EnergizedNodeBlockEntity node = helper.getBlockEntity(nodePos, EnergizedNodeBlockEntity.class);
+
+        ItemStack focus = new ItemStack(FmItems.BLINK_FOCUS.get());
+        FocusKeys.UPGRADES.set(focus, List.of(FocusUpgradeType.FRUGAL.id()));
+        table.setItem(0, focus);
+
+        node.getAuraBase().add(Aspect.FIRE, 4_000_000).add(Aspect.VOID, 400_000).add(Aspect.ENERGY, 400_000);
+        node.setupNode();
+        EnergizedNodeBlockEntity.serverTick(helper.getLevel(), helper.absolutePos(nodePos), helper.getBlockState(nodePos), node);
+
+        helper.assertTrue(node.getCurrentVis().getAmount(Aspect.FIRE) > 0, "test node is not storing fire vis");
+        helper.assertTrue(VisNet.drainVis(helper.getLevel(), helper.absolutePos(tablePos), Aspect.FIRE, 1) > 0,
+            "the focal manipulator is not wired to the test node's vis network");
+        helper.assertTrue(node.getCurrentVis().getAmount(Aspect.FIRE) >= 800, "test node cannot supply the Hellfire cost");
+
+        ServerPlayer player = mockConnectedPlayer(helper);
+        player.experienceLevel = 100;
+
+        helper.assertTrue(table.startCraft(BlinkFocusItem.HELLFIRE.id(), player), "the manipulator refused the Hellfire upgrade");
+        helper.assertValueEqual(table.getSize(), 2000, "Hellfire rank 2 pending vis");
+        helper.assertValueEqual(table.getAspects().getAmount(Aspect.FIRE), 800, "Hellfire FIRE cost");
+        helper.assertValueEqual(table.getAspects().getAmount(Aspect.AIR), 400, "Hellfire AIR cost");
+        helper.assertValueEqual(table.getAspects().getAmount(Aspect.ENTROPY), 400, "Hellfire ENTROPY cost");
+        helper.assertValueEqual(table.getAspects().getAmount(Aspect.ORDER), 400, "Hellfire ORDER cost");
+
+        for (int tick = 0; tick < 400 && table.getSize() > 0; tick++) {
+            FocalManipulatorBlockEntity.serverTick(helper.getLevel(), helper.absolutePos(tablePos), helper.getBlockState(tablePos), table);
+        }
+
+        helper.assertValueEqual(table.getSize(), 0, "Hellfire craft never finished");
+        FocusItem focusItem = (FocusItem) focus.getItem();
+        helper.assertTrue(focusItem.isUpgradedWith(focus, BlinkFocusItem.HELLFIRE), "Hellfire was not stored on the focus");
         helper.succeed();
     }
 
