@@ -48,6 +48,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.animal.equine.Horse;
 import net.minecraft.world.entity.animal.pig.Pig;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -56,6 +57,9 @@ import net.minecraft.world.item.component.CookingFuel;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -138,7 +142,8 @@ public final class ItemGameTests {
         "ring_of_nutrition_only_works_in_ring_slots",
         "blink_focus_upgrades_use_original_icon_assets",
         "research_icons_resolve_to_real_content",
-        "blink_focus_hellfire_applies_through_focal_manipulator"
+        "blink_focus_hellfire_applies_through_focal_manipulator",
+        "blink_focus_reaches_beyond_wand_reach_and_lands_like_original"
     };
 
     static {
@@ -178,6 +183,7 @@ public final class ItemGameTests {
         FUNCTIONS.register(TESTS[33], () -> ItemGameTests::blinkFocusUpgradesUseOriginalIconAssets);
         FUNCTIONS.register(TESTS[34], () -> ItemGameTests::researchIconsResolveToRealContent);
         FUNCTIONS.register(TESTS[35], () -> ItemGameTests::blinkFocusHellfireAppliesThroughFocalManipulator);
+        FUNCTIONS.register(TESTS[36], () -> ItemGameTests::blinkFocusReachesBeyondWandReachAndLandsLikeOriginal);
     }
 
     private ItemGameTests() {}
@@ -983,6 +989,37 @@ public final class ItemGameTests {
         helper.assertValueEqual(table.getSize(), 0, "Hellfire craft never finished");
         FocusItem focusItem = (FocusItem) focus.getItem();
         helper.assertTrue(focusItem.isUpgradedWith(focus, BlinkFocusItem.HELLFIRE), "Hellfire was not stored on the focus");
+        helper.succeed();
+    }
+
+    private static void blinkFocusReachesBeyondWandReachAndLandsLikeOriginal(GameTestHelper helper) {
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        BlockPos base = helper.absolutePos(new BlockPos(2, 3, 2));
+        double px = base.getX() + 0.5;
+        double py = 40.0;
+        double pz = base.getZ() + 0.5;
+        player.setPos(px, py, pz);
+        player.setYRot(-90.0F);
+        player.setYHeadRot(-90.0F);
+        player.setXRot(0.0F);
+
+        BlockPos targetBlock = BlockPos.containing(px + 20.0, py + 1.0, pz);
+        helper.getLevel().setBlockAndUpdate(targetBlock, Blocks.STONE.defaultBlockState());
+        helper.assertTrue(player.pick(4.5, 1.0F, false).getType() != HitResult.Type.BLOCK,
+            "the test target must sit beyond the vanilla wand reach");
+
+        HitResult hit = BlinkFocusItem.target(player);
+        helper.assertTrue(hit instanceof BlockHitResult blockHit && blockHit.getType() == HitResult.Type.BLOCK,
+            "the blink focus must reach a block beyond the wand's own reach");
+        BlockHitResult blockHit = (BlockHitResult) hit;
+        helper.assertValueEqual(blockHit.getBlockPos(), targetBlock, "blink target block");
+
+        Vec3 landing = BlinkFocusItem.destination(blockHit);
+        helper.assertTrue(Math.abs(landing.x - (targetBlock.getX() - 0.5)) < 0.001, "blink lands half a block outside the west face");
+        helper.assertTrue(Math.abs(landing.z - pz) < 0.001, "blink keeps the hit depth on Z");
+        helper.assertTrue(Math.abs(landing.y - (py + 1.62)) < 0.01, "blink keeps the hit height on a side face");
+
+        helper.getLevel().removeBlock(targetBlock, false);
         helper.succeed();
     }
 
