@@ -199,6 +199,14 @@ def main():
         if isinstance(gate, dict) and gate.get("entry") not in entry_ids:
             errors += fail(f"{path.name}: unknown research gate {gate.get('entry')}")
 
+    for enchantment in ["wrath", "greedy", "consuming", "educational", "corrupting", "cluster", "impact", "voidtouched"]:
+        path = RES / "data/forbiddenmagic/enchantment" / (enchantment + ".json")
+        if not path.is_file():
+            errors += fail(f"missing enchantment {enchantment}")
+        key = "enchantment.forbiddenmagic." + enchantment
+        if key not in lang_en or key not in lang_ru:
+            errors += fail(f"missing {key}")
+
     for key in sorted(set(lang_en) | set(lang_ru)):
         if key not in lang_en or key not in lang_ru:
             errors += fail(f"lang key missing on one side: {key}")

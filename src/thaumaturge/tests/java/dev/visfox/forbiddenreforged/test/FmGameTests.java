@@ -6,6 +6,8 @@ import com.leclowndu93150.thaumaturge.api.research.IResearchEntry;
 import com.leclowndu93150.thaumaturge.api.taint.ITaintBlock;
 import dev.visfox.forbiddenreforged.FmAspects;
 import dev.visfox.forbiddenreforged.FmDrops;
+import dev.visfox.forbiddenreforged.FmEnchantmentEffects;
+import dev.visfox.forbiddenreforged.FmEnchantments;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
 import dev.visfox.forbiddenreforged.WrathCageBlockEntity;
 import java.util.List;
@@ -48,7 +50,9 @@ public final class FmGameTests {
         "taint_tools_are_registered",
         "drop_rules_match_original",
         "mob_crystal_and_wrath_cage_are_registered",
-        "cage_rules_match_original"
+        "cage_rules_match_original",
+        "enchantments_are_loaded",
+        "enchantment_rules_match_original"
     };
 
     static {
@@ -65,6 +69,8 @@ public final class FmGameTests {
         FUNCTIONS.register(TESTS[10], () -> FmGameTests::dropRulesMatchOriginal);
         FUNCTIONS.register(TESTS[11], () -> FmGameTests::mobCrystalAndWrathCageAreRegistered);
         FUNCTIONS.register(TESTS[12], () -> FmGameTests::cageRulesMatchOriginal);
+        FUNCTIONS.register(TESTS[13], () -> FmGameTests::enchantmentsAreLoaded);
+        FUNCTIONS.register(TESTS[14], () -> FmGameTests::enchantmentRulesMatchOriginal);
     }
 
     private FmGameTests() {
@@ -224,6 +230,29 @@ public final class FmGameTests {
             int slothDelay = WrathCageBlockEntity.nextDelay(random, true);
             helper.assertTrue(slothDelay >= 400 && slothDelay < 500, "slothful delay in range");
         }
+        helper.succeed();
+    }
+
+    private static void enchantmentsAreLoaded(GameTestHelper helper) {
+        var enchantments = helper.getLevel().registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
+        for (var key : List.of(FmEnchantments.WRATH, FmEnchantments.GREEDY, FmEnchantments.CONSUMING,
+            FmEnchantments.EDUCATIONAL, FmEnchantments.CORRUPTING, FmEnchantments.CLUSTER,
+            FmEnchantments.IMPACT, FmEnchantments.VOIDTOUCHED)) {
+            helper.assertTrue(enchantments.get(key).isPresent(), key.identifier() + " must be registered");
+        }
+        helper.succeed();
+    }
+
+    private static void enchantmentRulesMatchOriginal(GameTestHelper helper) {
+        helper.assertValueEqual(FmEnchantmentEffects.educationalExperience(10, 2), 70, "educational triples per level");
+        helper.assertValueEqual(FmEnchantmentEffects.wrathDamage(2), 2.5F, "wrath damage per level");
+        helper.assertValueEqual(FmEnchantmentEffects.clusterChance(1), 0.275F, "cluster chance per level");
+        helper.assertTrue(FmEnchantmentEffects.silverfishEmeraldRoll(true, 6, 2), "windswept boundary inside");
+        helper.assertFalse(FmEnchantmentEffects.silverfishEmeraldRoll(true, 7, 2), "windswept boundary outside");
+        helper.assertTrue(FmEnchantmentEffects.silverfishEmeraldRoll(false, 4, 1), "normal boundary inside");
+        helper.assertFalse(FmEnchantmentEffects.silverfishEmeraldRoll(false, 5, 1), "normal boundary outside");
+        helper.assertTrue(FmEnchantmentEffects.skullAxeRoll(5, 2, 3, 1), "skull axe boundary inside");
+        helper.assertFalse(FmEnchantmentEffects.skullAxeRoll(6, 2, 3, 1), "skull axe boundary outside");
         helper.succeed();
     }
 

@@ -1,0 +1,22 @@
+{
+  "anvil_cost": 4,
+  "description": {
+    "translate": "enchantment.forbiddenmagic.cluster"
+  },
+  "effects": {},
+  "exclusive_set": "#forbiddenmagic:exclusive_set/cluster",
+  "max_cost": {
+    "base": 51,
+    "per_level_above_first": 10
+  },
+  "max_level": 4,
+  "min_cost": {
+    "base": 1,
+    "per_level_above_first": 10
+  },
+  "slots": [
+    "mainhand"
+  ],
+  "supported_items": "#forbiddenmagic:enchantable/morph_pickaxe",
+  "weight": 1
+}
