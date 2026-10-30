@@ -1,0 +1,20 @@
+{
+  "type": "thaumaturge:crucible",
+  "catalyst": {
+    "tag": "c:nuggets/emerald"
+  },
+  "aspects": [
+    {
+      "aspect": "thaumaturge:vitreus",
+      "amount": 2
+    },
+    {
+      "aspect": "thaumaturge:desiderium",
+      "amount": 2
+    }
+  ],
+  "result": {
+    "id": "forbiddenmagic:emerald_fragment",
+    "count": 4
+  }
+}

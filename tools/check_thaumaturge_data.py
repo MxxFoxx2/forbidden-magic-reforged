@@ -171,6 +171,26 @@ def main():
         if key not in lang_en or key not in lang_ru:
             errors += fail(f"missing {key}")
 
+    recipe_dir = RES / "data/forbiddenmagic/recipe"
+    entry_ids = {"forbiddenmagic:" + path.stem for path in entry_dir.glob("*.json")}
+    for path in sorted(recipe_dir.glob("*.json")):
+        data = load(path)
+        result = data.get("result", {})
+        result_id = result.get("id") if isinstance(result, dict) else None
+        if result_id and result_id.startswith("forbiddenmagic:"):
+            item = result_id.split(":", 1)[1]
+            if not (RES / "assets/forbiddenmagic/items" / (item + ".json")).is_file():
+                errors += fail(f"{path.name}: unknown result {result_id}")
+        for aspect in data.get("aspects", []):
+            namespace, _, name = aspect.get("aspect", "").partition(":")
+            if namespace == "thaumaturge" and name not in known_aspects:
+                errors += fail(f"{path.name}: unknown recipe aspect {aspect.get('aspect')}")
+            if namespace == "forbiddenmagic" and name not in ASPECTS:
+                errors += fail(f"{path.name}: unknown recipe aspect {aspect.get('aspect')}")
+        gate = data.get("research")
+        if isinstance(gate, dict) and gate.get("entry") not in entry_ids:
+            errors += fail(f"{path.name}: unknown research gate {gate.get('entry')}")
+
     for key in sorted(set(lang_en) | set(lang_ru)):
         if key not in lang_en or key not in lang_ru:
             errors += fail(f"lang key missing on one side: {key}")

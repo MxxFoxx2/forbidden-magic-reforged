@@ -39,7 +39,8 @@ public final class FmGameTests {
         "tainted_blocks_are_registered",
         "tainted_blocks_use_taint_contract",
         "simple_items_are_registered",
-        "rose_and_cake_blocks_are_registered"
+        "rose_and_cake_blocks_are_registered",
+        "recipes_are_loaded"
     };
 
     static {
@@ -51,6 +52,7 @@ public final class FmGameTests {
         FUNCTIONS.register(TESTS[5], () -> FmGameTests::taintedBlocksUseTaintContract);
         FUNCTIONS.register(TESTS[6], () -> FmGameTests::simpleItemsAreRegistered);
         FUNCTIONS.register(TESTS[7], () -> FmGameTests::roseAndCakeBlocksAreRegistered);
+        FUNCTIONS.register(TESTS[8], () -> FmGameTests::recipesAreLoaded);
     }
 
     private FmGameTests() {
@@ -141,6 +143,15 @@ public final class FmGameTests {
         for (String id : List.of("umbral_rose", "umbral_rose_bush", "arcane_cake")) {
             helper.assertTrue(BuiltInRegistries.BLOCK.containsKey(ForbiddenMagic.id(id)), id + " block must be registered");
             helper.assertTrue(BuiltInRegistries.ITEM.containsKey(ForbiddenMagic.id(id)), id + " block item must be registered");
+        }
+        helper.succeed();
+    }
+
+    private static void recipesAreLoaded(GameTestHelper helper) {
+        for (String id : List.of("taint_planks", "taint_stone_brick", "star_block", "star_from_block", "taint_coal",
+            "ink_from_rose", "taint_sapling_crucible", "umbral_rose_crucible", "emerald_fragment_crucible")) {
+            helper.assertTrue(helper.getLevel().getServer().getRecipeManager()
+                .byKey(ResourceKey.create(Registries.RECIPE, ForbiddenMagic.id(id))).isPresent(), id + " recipe must load");
         }
         helper.succeed();
     }
