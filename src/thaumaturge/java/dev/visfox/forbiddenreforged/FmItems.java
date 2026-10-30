@@ -19,6 +19,8 @@ public final class FmItems {
     public static final DeferredItem<Item> TAINT_FRUIT;
     public static final DeferredItem<Item> BLACK_DYE;
     public static final DeferredItem<Item> DIABOLIST_FORK;
+    public static final DeferredItem<Item> TAINT_SHOVEL;
+    public static final DeferredItem<Item> TAINT_PICKAXE;
 
     static {
         for (String vice : List.of("wrath", "envy", "taint", "pride", "lust", "sloth", "greed")) {
@@ -33,6 +35,10 @@ public final class FmItems {
         DIABOLIST_FORK = ITEMS.registerItem("diabolist_fork", DiabolistForkItem::new,
             properties -> properties.sword(FmMaterials.THAUMIUM, 3.0F, -2.4F).rarity(Rarity.UNCOMMON)
                 .repairable(Items.QUARTZ));
+        TAINT_SHOVEL = ITEMS.registerItem("taint_shovel", TaintShovelItem::new,
+            properties -> properties.shovel(FmMaterials.ELEMENTAL, 1.0F, -3.0F).rarity(Rarity.UNCOMMON));
+        TAINT_PICKAXE = ITEMS.registerItem("taint_pickaxe", Item::new,
+            properties -> properties.pickaxe(FmMaterials.ELEMENTAL, 2.0F, -2.8F).rarity(Rarity.UNCOMMON));
     }
 
     private FmItems() {

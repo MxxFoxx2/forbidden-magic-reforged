@@ -17,6 +17,15 @@ public final class FmMaterials {
         TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "ingots/thaumium"))
     );
 
+    public static final ToolMaterial ELEMENTAL = new ToolMaterial(
+        BlockTags.INCORRECT_FOR_DIAMOND_TOOL,
+        1500,
+        9.0F,
+        3.0F,
+        18,
+        TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "ingots/thaumium"))
+    );
+
     private FmMaterials() {
     }
 }

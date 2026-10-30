@@ -10,7 +10,7 @@ HOST = ROOT.parent / "Thaumaturge"
 ASSETS = ROOT / "src" / "main" / "resources" / "assets"
 
 SHARDS = ["wrath", "envy", "taint", "pride", "lust", "sloth", "greed", "gluttony"]
-EXTRA_ITEMS = ["emerald_fragment", "taint_coal", "taint_fruit", "black_dye", "diabolist_fork"]
+EXTRA_ITEMS = ["emerald_fragment", "taint_coal", "taint_fruit", "black_dye", "diabolist_fork", "taint_shovel", "taint_pickaxe"]
 BLOCKS = ["taint_log", "taint_planks", "taint_stone_smooth", "taint_stone_brick", "star_block", "taint_leaves", "taint_sapling",
           "umbral_rose", "umbral_rose_bush", "arcane_cake"]
 NO_LOOT = {"arcane_cake"}
