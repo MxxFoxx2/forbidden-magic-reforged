@@ -1,0 +1,42 @@
+{
+  "type": "thaumaturge:infusion",
+  "catalyst": {
+    "item": "thaumaturge:thaumium_shovel"
+  },
+  "components": [
+    {
+      "item": "thaumaturge:crystal_ordo"
+    },
+    {
+      "item": "thaumaturge:crystal_ordo"
+    },
+    {
+      "item": "minecraft:diamond"
+    },
+    {
+      "item": "thaumaturge:log_silverwood"
+    }
+  ],
+  "aspects": [
+    {
+      "aspect": "thaumaturge:victus",
+      "amount": 8
+    },
+    {
+      "aspect": "thaumaturge:vitreus",
+      "amount": 24
+    },
+    {
+      "aspect": "thaumaturge:instrumentum",
+      "amount": 12
+    }
+  ],
+  "instability": 5,
+  "result": {
+    "id": "forbiddenmagic:taint_shovel",
+    "count": 1
+  },
+  "research": {
+    "entry": "forbiddenmagic:taint_shovel"
+  }
+}

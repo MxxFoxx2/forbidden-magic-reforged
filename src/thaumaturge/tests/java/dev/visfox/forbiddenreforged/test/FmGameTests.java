@@ -122,7 +122,7 @@ public final class FmGameTests {
             helper.getLevel().registryAccess().lookup(IResearchEntry.REGISTRY_KEY).orElse(null);
         helper.assertTrue(entries != null, "research entry registry must exist");
         for (String id : List.of("nether_shards", "tainted_tree", "tainted_stone", "blackflower", "arcane_cake",
-            "emerald_transmutation", "taint_shovel", "taint_pickaxe")) {
+            "emerald_transmutation", "taint_shovel", "taint_pickaxe", "wrath_cage")) {
             helper.assertTrue(entries.get(ResourceKey.create(IResearchEntry.REGISTRY_KEY, ForbiddenMagic.id(id))).isPresent(),
                 "forbiddenmagic:" + id + " entry must exist");
         }
@@ -164,7 +164,9 @@ public final class FmGameTests {
 
     private static void recipesAreLoaded(GameTestHelper helper) {
         for (String id : List.of("taint_planks", "taint_stone_brick", "star_block", "star_from_block", "taint_coal",
-            "ink_from_rose", "taint_sapling_crucible", "umbral_rose_crucible", "emerald_fragment_crucible")) {
+            "ink_from_rose", "taint_sapling_crucible", "umbral_rose_crucible", "emerald_fragment_crucible",
+            "arcane_cake_infusion", "wrath_cage_infusion", "mob_crystal_crucible", "taint_shovel_infusion",
+            "taint_pickaxe_infusion")) {
             helper.assertTrue(helper.getLevel().getServer().getRecipeManager()
                 .byKey(ResourceKey.create(Registries.RECIPE, ForbiddenMagic.id(id))).isPresent(), id + " recipe must load");
         }
