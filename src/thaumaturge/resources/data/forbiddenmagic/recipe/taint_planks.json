@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "#": "forbiddenmagic:taint_log"
+  },
+  "pattern": [
+    "#"
+  ],
+  "result": {
+    "id": "forbiddenmagic:taint_planks",
+    "count": 4
+  }
+}

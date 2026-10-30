@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "#": "forbiddenmagic:taint_stone_smooth"
+  },
+  "pattern": [
+    "##",
+    "##"
+  ],
+  "result": {
+    "id": "forbiddenmagic:taint_stone_brick",
+    "count": 4
+  }
+}

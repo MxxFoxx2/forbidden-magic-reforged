@@ -3,6 +3,7 @@ package dev.visfox.forbiddenreforged.test;
 import com.leclowndu93150.thaumaturge.api.aspect.IAspect;
 import com.leclowndu93150.thaumaturge.api.research.IResearchCategory;
 import com.leclowndu93150.thaumaturge.api.research.IResearchEntry;
+import com.leclowndu93150.thaumaturge.api.taint.ITaintBlock;
 import dev.visfox.forbiddenreforged.FmAspects;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
 import java.util.List;
@@ -17,6 +18,7 @@ import net.minecraft.gametest.framework.TestData;
 import net.minecraft.gametest.framework.TestEnvironmentDefinition;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Rotation;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
@@ -33,7 +35,9 @@ public final class FmGameTests {
         "thaumaturge_host_is_present",
         "sin_aspects_are_registered",
         "shards_are_registered",
-        "forbidden_research_entry_and_category_resolve"
+        "forbidden_research_entry_and_category_resolve",
+        "tainted_blocks_are_registered",
+        "tainted_blocks_use_taint_contract"
     };
 
     static {
@@ -41,6 +45,8 @@ public final class FmGameTests {
         FUNCTIONS.register(TESTS[1], () -> FmGameTests::sinAspectsAreRegistered);
         FUNCTIONS.register(TESTS[2], () -> FmGameTests::shardsAreRegistered);
         FUNCTIONS.register(TESTS[3], () -> FmGameTests::forbiddenResearchResolves);
+        FUNCTIONS.register(TESTS[4], () -> FmGameTests::taintedBlocksAreRegistered);
+        FUNCTIONS.register(TESTS[5], () -> FmGameTests::taintedBlocksUseTaintContract);
     }
 
     private FmGameTests() {
@@ -99,6 +105,24 @@ public final class FmGameTests {
         helper.assertTrue(entries != null, "research entry registry must exist");
         helper.assertTrue(entries.get(ResourceKey.create(IResearchEntry.REGISTRY_KEY, ForbiddenMagic.id("nether_shards"))).isPresent(),
             "forbiddenmagic:nether_shards entry must exist");
+        helper.succeed();
+    }
+
+    private static void taintedBlocksAreRegistered(GameTestHelper helper) {
+        for (String id : List.of("taint_log", "taint_planks", "taint_stone_smooth", "taint_stone_brick",
+            "star_block", "taint_leaves", "taint_sapling")) {
+            helper.assertTrue(BuiltInRegistries.BLOCK.containsKey(ForbiddenMagic.id(id)), id + " block must be registered");
+            helper.assertTrue(BuiltInRegistries.ITEM.containsKey(ForbiddenMagic.id(id)), id + " block item must be registered");
+        }
+        helper.succeed();
+    }
+
+    private static void taintedBlocksUseTaintContract(GameTestHelper helper) {
+        for (String id : List.of("taint_log", "taint_planks", "taint_stone_smooth", "taint_stone_brick",
+            "taint_leaves", "taint_sapling")) {
+            Block block = BuiltInRegistries.BLOCK.getValue(ForbiddenMagic.id(id));
+            helper.assertTrue(block instanceof ITaintBlock, id + " must implement ITaintBlock");
+        }
         helper.succeed();
     }
 

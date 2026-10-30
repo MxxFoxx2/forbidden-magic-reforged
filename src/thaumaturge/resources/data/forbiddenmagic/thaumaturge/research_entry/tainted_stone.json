@@ -1,0 +1,20 @@
+{
+  "category": "forbiddenmagic:forbidden",
+  "name": "research.forbiddenmagic.tainted_stone.title",
+  "parents": [
+    "forbiddenmagic:nether_shards"
+  ],
+  "column": 0,
+  "row": 1,
+  "meta": [
+    "round"
+  ],
+  "icons": [
+    "forbiddenmagic:taint_stone_smooth"
+  ],
+  "stages": [
+    {
+      "text": "research.forbiddenmagic.tainted_stone.stage_0"
+    }
+  ]
+}

@@ -8,6 +8,13 @@
   "item.forbiddenmagic.sloth_shard": "Sloth Shard",
   "item.forbiddenmagic.greed_shard": "Greed Shard",
   "item.forbiddenmagic.gluttony_shard": "Gluttony Shard",
+  "block.forbiddenmagic.taint_log": "Tainted Log",
+  "block.forbiddenmagic.taint_planks": "Tainted Planks",
+  "block.forbiddenmagic.taint_stone_smooth": "Tainted Stone",
+  "block.forbiddenmagic.taint_stone_brick": "Tainted Stone Bricks",
+  "block.forbiddenmagic.star_block": "Nether Star Block",
+  "block.forbiddenmagic.taint_leaves": "Tainted Leaves",
+  "block.forbiddenmagic.taint_sapling": "Tainted Sapling",
   "aspect.forbiddenmagic.luxuria": "Luxuria",
   "aspect.forbiddenmagic.luxuria.desc": "Lust, Desire, Excess",
   "aspect.forbiddenmagic.infernus": "Infernus",
@@ -24,5 +31,9 @@
   "aspect.forbiddenmagic.ira.desc": "Wrath, Anger, Rage",
   "research_category.forbiddenmagic.forbidden": "Forbidden",
   "research.forbiddenmagic.nether_shards.title": "Nether Shards",
-  "research.forbiddenmagic.nether_shards.stage_0": "Strange energies swirl through the Nether. On occasion, they have been known to solidify into crystal shards when certain sympathetic events occur."
+  "research.forbiddenmagic.nether_shards.stage_0": "Strange energies swirl through the Nether. On occasion, they have been known to solidify into crystal shards when certain sympathetic events occur.",
+  "research.forbiddenmagic.tainted_tree.title": "Tainted Tree",
+  "research.forbiddenmagic.tainted_tree.stage_0": "The sick, twisted runoff of magical experiments can take on a strange life of its own. Most plants are unable to survive in Tainted Lands, but you've found a way to grow one that can. By steeping a sapling in taint, you create a tree that can thrive in Tainted Lands. Its wood can also be turned into planks which are resistant to fibrous taint, allowing you to build structures safe from spreading taint. The tree also seems to bear fruit, but eating them is not recommended...",
+  "research.forbiddenmagic.tainted_stone.title": "Tainted Stone",
+  "research.forbiddenmagic.tainted_stone.stage_0": "Tainted Lands aren't very safe places to be. Fibrous Taint hungrily spreads and crawls over most surfaces, eventually enveloping them and making them unsafe to walk on. The fibers don't appear to be harmful to tainted creatures or materials, however. By mixing taint in with regular stone, you've created a magical material which is structurally stable, but resistant to the spread of fibrous taint. Tainted Stone can be used to build surfaces in Tainted Lands which are safe to walk on. Not that building in a Tainted Land is advised..."
 }

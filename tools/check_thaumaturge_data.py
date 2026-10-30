@@ -10,6 +10,7 @@ HOST = ROOT.parent / "Thaumaturge"
 ASSETS = ROOT / "src" / "main" / "resources" / "assets"
 
 SHARDS = ["wrath", "envy", "taint", "pride", "lust", "sloth", "greed", "gluttony"]
+BLOCKS = ["taint_log", "taint_planks", "taint_stone_smooth", "taint_stone_brick", "star_block", "taint_leaves", "taint_sapling"]
 ASPECTS = ["luxuria", "infernus", "superbia", "gula", "invidia", "desidia", "ira"]
 
 
@@ -32,7 +33,12 @@ def texture_exists(identifier):
     namespace, path = identifier.split(":", 1)
     if namespace != "forbiddenmagic":
         return True
-    candidates = [RES / "assets" / namespace / path, ASSETS / namespace / path]
+    candidates = [
+        RES / "assets" / namespace / path,
+        ASSETS / namespace / path,
+        RES / "assets" / namespace / "textures" / (path + ".png"),
+        ASSETS / namespace / "textures" / (path + ".png"),
+    ]
     return any(candidate.is_file() for candidate in candidates)
 
 
@@ -109,8 +115,9 @@ def main():
                     errors += fail(f"{path.name}: missing icon texture {icon}")
                 continue
             namespace, _, item = icon.partition(":")
-            if namespace == "forbiddenmagic" and item not in [shard + "_shard" for shard in SHARDS]:
-                errors += fail(f"{path.name}: unknown item icon {icon}")
+            if namespace == "forbiddenmagic":
+                if not (RES / "assets/forbiddenmagic/items" / (item + ".json")).is_file():
+                    errors += fail(f"{path.name}: unknown item icon {icon}")
 
     for shard in SHARDS:
         item = shard + "_shard"
@@ -124,6 +131,22 @@ def main():
         if not texture.is_file():
             errors += fail(f"missing item texture {item}")
         key = "item.forbiddenmagic." + item
+        if key not in lang_en or key not in lang_ru:
+            errors += fail(f"missing {key}")
+
+    for block in BLOCKS:
+        state = RES / "assets/forbiddenmagic/blockstates" / (block + ".json")
+        model = RES / "assets/forbiddenmagic/models/block" / (block + ".json")
+        definition = RES / "assets/forbiddenmagic/items" / (block + ".json")
+        loot = RES / "data/forbiddenmagic/loot_table/blocks" / (block + ".json")
+        for path in (state, model, definition, loot):
+            if not path.is_file():
+                errors += fail(f"missing block file {path.relative_to(RES)}")
+        if model.is_file():
+            for texture in load(model).get("textures", {}).values():
+                if not texture_exists(texture):
+                    errors += fail(f"{block}: missing texture {texture}")
+        key = "block.forbiddenmagic." + block
         if key not in lang_en or key not in lang_ru:
             errors += fail(f"missing {key}")
 

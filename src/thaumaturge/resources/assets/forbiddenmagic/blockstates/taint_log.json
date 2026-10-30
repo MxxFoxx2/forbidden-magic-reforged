@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=y": {
+      "model": "forbiddenmagic:block/taint_log"
+    },
+    "axis=z": {
+      "model": "forbiddenmagic:block/taint_log_horizontal",
+      "x": 90
+    },
+    "axis=x": {
+      "model": "forbiddenmagic:block/taint_log_horizontal",
+      "x": 90,
+      "y": 90
+    }
+  }
+}
