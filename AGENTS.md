@@ -3,10 +3,13 @@
 Порт Forbidden Magic 0.574 (Minecraft 1.7.10, SpitefulFox) на Thaumcraft 4: Reforged. Основной таргет — Minecraft 26.3; 1.21.1 — отдельный второй таргет после завершения и зелёного гейта 26.3.
 Логика, числа, рецепты, тексты и ассеты оригинала переносятся 1:1, где это допускает современный API.
 
+Ветка `port/thaumaturge` — отдельный порт на Thaumaturge 1.0.3 (Minecraft 26.1.2). Её сборка и отличия описаны в `docs/thaumaturge.md`; правила ниже относятся к каналам Thaumcraft 4: Reforged.
+
 ## Источники истины
 
 - Игровое поведение и данные оригинала: `../ForbiddenMagic`.
 - API хоста: `../thaumcraft-4-reforged`; используемый исходный коммит закреплён в `host.sha`.
+- API Thaumaturge для ветки `port/thaumaturge`: `../Thaumaturge` (All Rights Reserved), публичный пакет `com.leclowndu93150.thaumaturge.api`.
 - `docs/fidelity.md` — единственный ledger отличий и подтверждённых приближений.
 - `docs/roadmap.md` — только текущие незакрытые задачи и критерии завершения.
 - `docs/verification.md` — последний подтверждённый CI и проверки, которые ещё не автоматизированы.
@@ -21,6 +24,8 @@
 
 ## Хост и сборка
 
+- Ветка `port/thaumaturge` собирается против jar локального клона `../Thaumaturge` версии `1.0.3` (`compileOnly` и `localRuntime`, путь можно задать через `-Pthaumaturge_jar`). Jar хоста не коммитится и не входит в артефакт.
+- Код и данные этой ветки лежат в `src/thaumaturge/java`, `src/thaumaturge/tests/java` и `src/thaumaturge/resources`; `src/main/java` и `src/main/resources/data` относятся к каналу Thaumcraft 4: Reforged и в сборку порта не входят.
 - Хост закреплён в `host.sha`; `tools/prepare_host.py` заново создаёт локальную копию `host/` из пина и `patches/*.patch`. `host/` и локальный Maven не коммитятся.
 - Изменения хоста — только в `patches/*.patch`. Не редактируй `host/` вручную: подготовка его уничтожит. Перегенерируй патчи из коммитов `host/` через `tools/prepare_host.py --export`.
 - Хост имеет лицензию All Rights Reserved. Не включай его классы/ассеты в jar аддона и не распространяй собранный host jar.
