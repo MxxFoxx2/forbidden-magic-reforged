@@ -15,6 +15,8 @@ JAVA_HOME=<JDK 25> ./gradlew build
 
 `build.gradle` ищет `thaumaturge-*-1.0.3.jar` в `../Thaumaturge/build/libs` и `../../../Thaumaturge/build/libs`; путь можно задать явно через `-Pthaumaturge_jar=<path>`. Jar хоста подключается как `compileOnly` и `localRuntime`: его классы и ассеты не входят в jar аддона (лицензия All Rights Reserved).
 
+Порт развёрнут в worktree `.worktrees/port-thaumaturge`, откуда `../Thaumaturge` не виден, поэтому срабатывает второй путь — `Desktop/thaumcraft/Thaumaturge/build/libs`. Клон хоста собирается один раз и переиспользуется; `.gradle` и `build` в worktree начинаются с нуля.
+
 `lithostitched` и `curios` добавлены в `localRuntime`, потому что Thaumaturge требует их при запуске.
 
 ## Раскладка
