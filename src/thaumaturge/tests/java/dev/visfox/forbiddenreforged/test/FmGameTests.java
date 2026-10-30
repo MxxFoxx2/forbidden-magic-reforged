@@ -57,7 +57,8 @@ public final class FmGameTests {
         "enchantment_rules_match_original",
         "morph_tools_are_registered",
         "morph_state_cycles",
-        "item_aspects_match_original"
+        "item_aspects_match_original",
+        "cluster_mapping_matches_host"
     };
 
     static {
@@ -79,6 +80,7 @@ public final class FmGameTests {
         FUNCTIONS.register(TESTS[15], () -> FmGameTests::morphToolsAreRegistered);
         FUNCTIONS.register(TESTS[16], () -> FmGameTests::morphStateCycles);
         FUNCTIONS.register(TESTS[17], () -> FmGameTests::itemAspectsMatchOriginal);
+        FUNCTIONS.register(TESTS[18], () -> FmGameTests::clusterMappingMatchesHost);
     }
 
     private FmGameTests() {
@@ -302,6 +304,16 @@ public final class FmGameTests {
         helper.assertTrue(coal != null, "hexcoal must declare aspects");
         helper.assertValueEqual(coal.amountOf(aspects.getOrThrow(com.leclowndu93150.thaumaturge.api.aspect.TTAspects.VITIUM)), 2,
             "hexcoal carries vitium two");
+        helper.succeed();
+    }
+
+    private static void clusterMappingMatchesHost(GameTestHelper helper) {
+        var iron = FmEnchantmentEffects.clusterFor(net.minecraft.world.level.block.Blocks.IRON_ORE.defaultBlockState());
+        helper.assertTrue(iron != null, "iron ore must map to a cluster");
+        helper.assertValueEqual(BuiltInRegistries.ITEM.getKey(iron.getItem()),
+            Identifier.fromNamespaceAndPath("thaumaturge", "cluster_iron"), "iron ore maps to cluster_iron");
+        helper.assertTrue(FmEnchantmentEffects.clusterFor(net.minecraft.world.level.block.Blocks.DIRT.defaultBlockState()) == null,
+            "dirt has no cluster");
         helper.succeed();
     }
 

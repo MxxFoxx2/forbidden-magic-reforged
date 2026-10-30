@@ -8,6 +8,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
@@ -24,6 +25,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ResolvableProfile;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
@@ -108,12 +110,14 @@ public final class FmEnchantmentEffects {
         int cluster = FmEnchantments.level(player.level().registryAccess(), tool, FmEnchantments.CLUSTER);
         if (cluster > 0 && FmEnchantments.level(player.level().registryAccess(), tool, Enchantments.FORTUNE) == 0) {
             RandomSource random = event.getLevel().getRandom();
+            ItemStack replacement = clusterFor(event.getState());
             float chance = clusterChance(cluster);
-            for (ItemEntity drop : List.copyOf(event.getDrops())) {
-                if (random.nextFloat() < chance) {
-                    ItemStack stack = drop.getItem();
-                    event.getDrops().add(new ItemEntity(event.getLevel(),
-                        drop.getX(), drop.getY(), drop.getZ(), stack.copyWithCount(stack.getCount())));
+            if (replacement != null) {
+                for (ItemEntity drop : event.getDrops()) {
+                    if (random.nextFloat() < chance) {
+                        ItemStack stack = drop.getItem();
+                        drop.setItem(replacement.copyWithCount(stack.getCount()));
+                    }
                 }
             }
         }
@@ -127,6 +131,39 @@ public final class FmEnchantmentEffects {
                 }
             }
         }
+    }
+
+    public static ItemStack clusterFor(BlockState state) {
+        String ore = null;
+        if (state.is(BlockTags.IRON_ORES)) {
+            ore = "iron";
+        } else if (state.is(BlockTags.GOLD_ORES)) {
+            ore = "gold";
+        } else if (state.is(BlockTags.COPPER_ORES)) {
+            ore = "copper";
+        } else if (state.is(commonOre("quartz"))) {
+            ore = "quartz";
+        } else if (state.is(commonOre("tin"))) {
+            ore = "tin";
+        } else if (state.is(commonOre("silver"))) {
+            ore = "silver";
+        } else if (state.is(commonOre("lead"))) {
+            ore = "lead";
+        } else if (state.is(commonOre("cinnabar"))) {
+            ore = "cinnabar";
+        }
+        if (ore == null) {
+            return null;
+        }
+        Identifier id = Identifier.fromNamespaceAndPath("thaumaturge", "cluster_" + ore);
+        if (!BuiltInRegistries.ITEM.containsKey(id)) {
+            return null;
+        }
+        return new ItemStack(BuiltInRegistries.ITEM.getValue(id));
+    }
+
+    private static TagKey<Block> commonOre(String metal) {
+        return TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath("c", "ores/" + metal));
     }
 
     private static void onLivingDrops(LivingDropsEvent event) {
