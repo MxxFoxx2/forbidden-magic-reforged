@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "forbiddenmagic:umbral_rose"
+  ],
+  "result": {
+    "id": "forbiddenmagic:black_dye",
+    "count": 2
+  }
+}

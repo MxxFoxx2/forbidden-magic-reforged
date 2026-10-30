@@ -38,7 +38,8 @@ public final class FmGameTests {
         "forbidden_research_entry_and_category_resolve",
         "tainted_blocks_are_registered",
         "tainted_blocks_use_taint_contract",
-        "simple_items_are_registered"
+        "simple_items_are_registered",
+        "rose_and_cake_blocks_are_registered"
     };
 
     static {
@@ -49,6 +50,7 @@ public final class FmGameTests {
         FUNCTIONS.register(TESTS[4], () -> FmGameTests::taintedBlocksAreRegistered);
         FUNCTIONS.register(TESTS[5], () -> FmGameTests::taintedBlocksUseTaintContract);
         FUNCTIONS.register(TESTS[6], () -> FmGameTests::simpleItemsAreRegistered);
+        FUNCTIONS.register(TESTS[7], () -> FmGameTests::roseAndCakeBlocksAreRegistered);
     }
 
     private FmGameTests() {
@@ -131,6 +133,14 @@ public final class FmGameTests {
     private static void simpleItemsAreRegistered(GameTestHelper helper) {
         for (String id : List.of("emerald_fragment", "taint_coal", "taint_fruit", "black_dye", "diabolist_fork")) {
             helper.assertTrue(BuiltInRegistries.ITEM.containsKey(ForbiddenMagic.id(id)), id + " must be registered");
+        }
+        helper.succeed();
+    }
+
+    private static void roseAndCakeBlocksAreRegistered(GameTestHelper helper) {
+        for (String id : List.of("umbral_rose", "umbral_rose_bush", "arcane_cake")) {
+            helper.assertTrue(BuiltInRegistries.BLOCK.containsKey(ForbiddenMagic.id(id)), id + " block must be registered");
+            helper.assertTrue(BuiltInRegistries.ITEM.containsKey(ForbiddenMagic.id(id)), id + " block item must be registered");
         }
         helper.succeed();
     }

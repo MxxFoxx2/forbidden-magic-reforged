@@ -11,7 +11,13 @@ ASSETS = ROOT / "src" / "main" / "resources" / "assets"
 
 SHARDS = ["wrath", "envy", "taint", "pride", "lust", "sloth", "greed", "gluttony"]
 EXTRA_ITEMS = ["emerald_fragment", "taint_coal", "taint_fruit", "black_dye", "diabolist_fork"]
-BLOCKS = ["taint_log", "taint_planks", "taint_stone_smooth", "taint_stone_brick", "star_block", "taint_leaves", "taint_sapling"]
+BLOCKS = ["taint_log", "taint_planks", "taint_stone_smooth", "taint_stone_brick", "star_block", "taint_leaves", "taint_sapling",
+          "umbral_rose", "umbral_rose_bush", "arcane_cake"]
+NO_LOOT = {"arcane_cake"}
+MODEL_PARTS = {
+    "umbral_rose_bush": ["umbral_rose_bush_bottom", "umbral_rose_bush_top"],
+    "arcane_cake": ["arcane_cake_" + str(slice) for slice in range(12)],
+}
 ASPECTS = ["luxuria", "infernus", "superbia", "gula", "invidia", "desidia", "ira"]
 
 
@@ -148,16 +154,19 @@ def main():
 
     for block in BLOCKS:
         state = RES / "assets/forbiddenmagic/blockstates" / (block + ".json")
-        model = RES / "assets/forbiddenmagic/models/block" / (block + ".json")
+        models = [RES / "assets/forbiddenmagic/models/block" / (name + ".json") for name in MODEL_PARTS.get(block, [block])]
         definition = RES / "assets/forbiddenmagic/items" / (block + ".json")
-        loot = RES / "data/forbiddenmagic/loot_table/blocks" / (block + ".json")
-        for path in (state, model, definition, loot):
+        paths = [state, definition, *models]
+        if block not in NO_LOOT:
+            paths.append(RES / "data/forbiddenmagic/loot_table/blocks" / (block + ".json"))
+        for path in paths:
             if not path.is_file():
                 errors += fail(f"missing block file {path.relative_to(RES)}")
-        if model.is_file():
-            for texture in load(model).get("textures", {}).values():
-                if not texture_exists(texture):
-                    errors += fail(f"{block}: missing texture {texture}")
+        for model in models:
+            if model.is_file():
+                for texture in load(model).get("textures", {}).values():
+                    if not texture_exists(texture):
+                        errors += fail(f"{block}: missing texture {texture}")
         key = "block.forbiddenmagic." + block
         if key not in lang_en or key not in lang_ru:
             errors += fail(f"missing {key}")

@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "half=lower": {
+      "model": "forbiddenmagic:block/umbral_rose_bush_bottom"
+    },
+    "half=upper": {
+      "model": "forbiddenmagic:block/umbral_rose_bush_top"
+    }
+  }
+}

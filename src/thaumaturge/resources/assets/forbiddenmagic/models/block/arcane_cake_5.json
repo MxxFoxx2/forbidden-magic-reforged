@@ -1,0 +1,45 @@
+{
+  "elements": [
+    {
+      "faces": {
+        "down": {
+          "cullface": "down",
+          "texture": "#bottom"
+        },
+        "east": {
+          "texture": "#side"
+        },
+        "north": {
+          "texture": "#side"
+        },
+        "south": {
+          "texture": "#side"
+        },
+        "up": {
+          "texture": "#top"
+        },
+        "west": {
+          "texture": "#inner"
+        }
+      },
+      "from": [
+        8.0,
+        0,
+        1
+      ],
+      "to": [
+        15,
+        8,
+        15
+      ]
+    }
+  ],
+  "parent": "minecraft:block/block",
+  "textures": {
+    "bottom": "forbiddenmagic:block/cake_bottom",
+    "inner": "forbiddenmagic:block/cake_inner",
+    "particle": "forbiddenmagic:block/cake_side",
+    "side": "forbiddenmagic:block/cake_side",
+    "top": "forbiddenmagic:block/cake_top"
+  }
+}
