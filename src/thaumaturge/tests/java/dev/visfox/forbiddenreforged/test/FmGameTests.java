@@ -52,7 +52,9 @@ public final class FmGameTests {
         "mob_crystal_and_wrath_cage_are_registered",
         "cage_rules_match_original",
         "enchantments_are_loaded",
-        "enchantment_rules_match_original"
+        "enchantment_rules_match_original",
+        "morph_tools_are_registered",
+        "morph_state_cycles"
     };
 
     static {
@@ -71,6 +73,8 @@ public final class FmGameTests {
         FUNCTIONS.register(TESTS[12], () -> FmGameTests::cageRulesMatchOriginal);
         FUNCTIONS.register(TESTS[13], () -> FmGameTests::enchantmentsAreLoaded);
         FUNCTIONS.register(TESTS[14], () -> FmGameTests::enchantmentRulesMatchOriginal);
+        FUNCTIONS.register(TESTS[15], () -> FmGameTests::morphToolsAreRegistered);
+        FUNCTIONS.register(TESTS[16], () -> FmGameTests::morphStateCycles);
     }
 
     private FmGameTests() {
@@ -256,6 +260,27 @@ public final class FmGameTests {
         helper.assertFalse(FmEnchantmentEffects.silverfishEmeraldRoll(false, 5, 1), "normal boundary outside");
         helper.assertTrue(FmEnchantmentEffects.skullAxeRoll(5, 2, 3, 1), "skull axe boundary inside");
         helper.assertFalse(FmEnchantmentEffects.skullAxeRoll(6, 2, 3, 1), "skull axe boundary outside");
+        helper.succeed();
+    }
+
+    private static void morphToolsAreRegistered(GameTestHelper helper) {
+        for (String id : List.of("morph_pickaxe", "morph_sword", "morph_shovel", "morph_axe")) {
+            helper.assertTrue(BuiltInRegistries.ITEM.containsKey(ForbiddenMagic.id(id)), id + " must be registered");
+        }
+        helper.succeed();
+    }
+
+    private static void morphStateCycles(GameTestHelper helper) {
+        var state = dev.visfox.forbiddenreforged.MorphState.EMPTY;
+        helper.assertValueEqual(state.phase(), 0, "empty state starts at phase zero");
+        helper.assertValueEqual(state.advance().phase(), 1, "advance moves to phase one");
+        helper.assertValueEqual(state.advance().advance().phase(), 2, "two advances reach phase two");
+        helper.assertValueEqual(state.advance().advance().advance().phase(), 0, "third advance wraps to zero");
+        helper.assertValueEqual(state.tintColor(), 0xFF980000, "phase zero tint");
+        helper.assertValueEqual(state.advance().tintColor(), 0xFF0010CC, "phase one tint");
+        helper.assertValueEqual(state.advance().advance().tintColor(), 0xFFE5DA00, "phase two tint");
+        var stored = state.store(net.minecraft.world.item.enchantment.ItemEnchantments.EMPTY, "test");
+        helper.assertValueEqual(stored.currentName(), "test", "store keeps the name in the active slot");
         helper.succeed();
     }
 
