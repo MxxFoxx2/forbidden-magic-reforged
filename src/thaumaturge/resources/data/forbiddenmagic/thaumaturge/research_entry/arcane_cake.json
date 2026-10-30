@@ -1,0 +1,20 @@
+{
+  "category": "forbiddenmagic:forbidden",
+  "name": "research.forbiddenmagic.arcane_cake.title",
+  "parents": [
+    "forbiddenmagic:nether_shards"
+  ],
+  "column": 0,
+  "row": 2,
+  "meta": [
+    "round"
+  ],
+  "icons": [
+    "forbiddenmagic:arcane_cake"
+  ],
+  "stages": [
+    {
+      "text": "research.forbiddenmagic.arcane_cake.stage_0"
+    }
+  ]
+}

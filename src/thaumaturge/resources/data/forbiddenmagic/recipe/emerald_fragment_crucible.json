@@ -16,5 +16,8 @@
   "result": {
     "id": "forbiddenmagic:emerald_fragment",
     "count": 4
+  },
+  "research": {
+    "entry": "forbiddenmagic:emerald_transmutation"
   }
 }

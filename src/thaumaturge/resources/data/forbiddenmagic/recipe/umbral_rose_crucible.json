@@ -16,5 +16,8 @@
   "result": {
     "id": "forbiddenmagic:umbral_rose_bush",
     "count": 1
+  },
+  "research": {
+    "entry": "forbiddenmagic:blackflower"
   }
 }

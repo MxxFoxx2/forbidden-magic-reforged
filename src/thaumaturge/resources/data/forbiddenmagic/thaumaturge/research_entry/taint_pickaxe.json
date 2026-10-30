@@ -1,0 +1,20 @@
+{
+  "category": "forbiddenmagic:forbidden",
+  "name": "research.forbiddenmagic.taint_pickaxe.title",
+  "parents": [
+    "forbiddenmagic:tainted_stone"
+  ],
+  "column": 2,
+  "row": 1,
+  "meta": [
+    "round"
+  ],
+  "icons": [
+    "forbiddenmagic:taint_pickaxe"
+  ],
+  "stages": [
+    {
+      "text": "research.forbiddenmagic.taint_pickaxe.stage_0"
+    }
+  ]
+}

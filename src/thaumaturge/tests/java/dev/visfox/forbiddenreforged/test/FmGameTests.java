@@ -116,8 +116,11 @@ public final class FmGameTests {
         HolderLookup.RegistryLookup<IResearchEntry> entries =
             helper.getLevel().registryAccess().lookup(IResearchEntry.REGISTRY_KEY).orElse(null);
         helper.assertTrue(entries != null, "research entry registry must exist");
-        helper.assertTrue(entries.get(ResourceKey.create(IResearchEntry.REGISTRY_KEY, ForbiddenMagic.id("nether_shards"))).isPresent(),
-            "forbiddenmagic:nether_shards entry must exist");
+        for (String id : List.of("nether_shards", "tainted_tree", "tainted_stone", "blackflower", "arcane_cake",
+            "emerald_transmutation", "taint_shovel", "taint_pickaxe")) {
+            helper.assertTrue(entries.get(ResourceKey.create(IResearchEntry.REGISTRY_KEY, ForbiddenMagic.id(id))).isPresent(),
+                "forbiddenmagic:" + id + " entry must exist");
+        }
         helper.succeed();
     }
 
