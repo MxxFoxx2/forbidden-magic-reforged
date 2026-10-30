@@ -9,11 +9,3 @@ plugins {
 }
 
 rootProject.name = 'forbidden-magic-reforged'
-
-if (file('host').isDirectory()) {
-    includeBuild('host') {
-        dependencySubstitution {
-            substitute module('thaumcraft:thaumcraft') using project(':')
-        }
-    }
-}

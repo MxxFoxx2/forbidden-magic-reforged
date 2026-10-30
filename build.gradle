@@ -48,20 +48,20 @@ neoForge {
 }
 
 repositories {
-    maven { url = uri("maven") }
-    maven {
-        name = "Minecraft Forge"
-        url = "https://maven.minecraftforge.net/"
-        content {
-            includeGroup "com.github.glitchfiend"
-        }
-    }
+    maven { url = uri("https://api.modrinth.com/maven") }
     maven {
         name = "BlameJared"
         url = "https://maven.blamejared.com/"
         content {
             includeGroup "mezz.jei"
             includeGroup "net.mezzdev.config"
+        }
+    }
+    maven {
+        name = "IllusiveSoulworks"
+        url = "https://maven.theillusivec4.top/"
+        content {
+            includeGroup "top.theillusivec4.curios"
         }
     }
 }
@@ -71,19 +71,37 @@ configurations {
     clientRuntimeClasspath.extendsFrom runtimeClasspath
 }
 
-if (file('host').isDirectory()) {
-    def hostProperties = new java.util.Properties()
-    file('host/gradle.properties').withInputStream { hostProperties.load(it) }
-    def hostVersion = hostProperties.getProperty('mod_version')
-    if (hostVersion != thaumcraft_version) {
-        throw new GradleException("host/ is version ${hostVersion} but thaumcraft_version is ${thaumcraft_version}; run tools/prepare_host.py")
+def thaumaturgeJar = null
+def explicitJar = providers.gradleProperty('thaumaturge_jar')
+if (explicitJar.isPresent()) {
+    thaumaturgeJar = file(explicitJar.get())
+} else {
+    ['../Thaumaturge', '../../../Thaumaturge'].each { base ->
+        if (thaumaturgeJar != null) {
+            return
+        }
+        def libs = file("${base}/build/libs")
+        if (!libs.isDirectory()) {
+            return
+        }
+        def candidate = libs.listFiles()?.findAll {
+            it.name.startsWith('thaumaturge-') && it.name.endsWith("-${thaumaturge_version}.jar") &&
+                !it.name.contains('sources') && !it.name.contains('javadoc')
+        }?.sort { it.name }?.last()
+        if (candidate != null) {
+            thaumaturgeJar = candidate
+        }
     }
+}
+if (thaumaturgeJar == null || !thaumaturgeJar.isFile()) {
+    throw new GradleException("Thaumaturge ${thaumaturge_version} jar not found. Build ../Thaumaturge or pass -Pthaumaturge_jar=<path>.")
 }
 
 dependencies {
-    implementation "com.github.glitchfiend:TerraBlender-neoforge:${terrablender_version}"
-    compileOnly "thaumcraft:thaumcraft:${thaumcraft_version}"
-    localRuntime "thaumcraft:thaumcraft:${thaumcraft_version}"
+    compileOnly files(thaumaturgeJar)
+    localRuntime files(thaumaturgeJar)
+    localRuntime "maven.modrinth:lithostitched:${lithostitched_version}"
+    localRuntime "top.theillusivec4.curios:curios-neoforge:${curios_version}+${minecraft_version}"
     clientRuntimeOnly "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
 }
 
@@ -91,15 +109,15 @@ tasks.named('jar', Jar) {
     archiveFileName = "forbidden-magic-${mod_version}.jar"
 }
 
-sourceSets.main.resources { srcDir('src/generated/resources') }
-sourceSets.main.java { srcDir('tests/java') }
+sourceSets.main.java.srcDirs = ['src/thaumaturge/java', 'src/thaumaturge/tests/java']
+sourceSets.main.resources.srcDirs = ['src/thaumaturge/resources', 'src/main/resources/assets']
 
 def generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
     var replaceProperties = [
         minecraft_version: minecraft_version, minecraft_version_range: minecraft_version_range,
         neo_version: neo_version, mod_id: mod_id, mod_name: mod_name, mod_version: mod_version,
         mod_authors: mod_authors, mod_credits: mod_credits, mod_description: mod_description,
-        thaumcraft_version: thaumcraft_version
+        thaumaturge_version: thaumaturge_version
     ]
     inputs.properties replaceProperties
     expand replaceProperties

@@ -1,0 +1,10 @@
+{
+  "tag": "luxuria",
+  "color": 16761294,
+  "components": [
+    "thaumaturge:victus",
+    "thaumaturge:desiderium"
+  ],
+  "texture": "forbiddenmagic:textures/aspects/luxuria.png",
+  "blend": 1
+}

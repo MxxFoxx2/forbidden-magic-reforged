@@ -1,0 +1,10 @@
+{
+  "tag": "desidia",
+  "color": 7237230,
+  "components": [
+    "thaumaturge:vinculum",
+    "thaumaturge:spiritus"
+  ],
+  "texture": "forbiddenmagic:textures/aspects/desidia.png",
+  "blend": 771
+}

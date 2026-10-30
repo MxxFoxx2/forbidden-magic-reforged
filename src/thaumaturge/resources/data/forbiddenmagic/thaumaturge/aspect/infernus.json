@@ -1,0 +1,10 @@
+{
+  "tag": "infernus",
+  "color": 16711680,
+  "components": [
+    "thaumaturge:ignis",
+    "thaumaturge:praecantatio"
+  ],
+  "texture": "forbiddenmagic:textures/aspects/infernus.png",
+  "blend": 771
+}

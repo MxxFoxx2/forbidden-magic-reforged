@@ -1,0 +1,10 @@
+{
+  "tag": "ira",
+  "color": 8848388,
+  "components": [
+    "thaumaturge:aversio",
+    "thaumaturge:ignis"
+  ],
+  "texture": "forbiddenmagic:textures/aspects/ira.png",
+  "blend": 771
+}

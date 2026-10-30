@@ -1,0 +1,10 @@
+{
+  "tag": "gula",
+  "color": 13999174,
+  "components": [
+    "thaumaturge:desiderium",
+    "thaumaturge:vacuos"
+  ],
+  "texture": "forbiddenmagic:textures/aspects/gula.png",
+  "blend": 1
+}

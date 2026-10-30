@@ -1,5 +1,7 @@
 # Forbidden Magic: Reforged
 
+> Ветка `port/thaumaturge` — отдельная сборка под Thaumaturge 1.0.3. Она пока содержит только скелет порта; актуальный статус и отличия описаны в [docs/thaumaturge.md](docs/thaumaturge.md). Текст ниже относится к каналу `26.1.2` на Thaumcraft 4: Reforged.
+
 Порт Forbidden Magic 0.574 (Minecraft 1.7.10) для Thaumcraft 4: Reforged на Minecraft 26.1.2. Перенесённый контент включает семь аспектов грехов, осколки, зачарования, хамелеоновы инструменты, материалы скверны, Mob Crystal и Wrath Cage.
 
 Полный паритет с оригиналом пока не подтверждён: сборка и GameTests зелёные, визуальные и полноценные игровые проверки ещё нужны.

@@ -1,0 +1,10 @@
+{
+  "tag": "invidia",
+  "color": 47616,
+  "components": [
+    "thaumaturge:sensus",
+    "thaumaturge:desiderium"
+  ],
+  "texture": "forbiddenmagic:textures/aspects/invidia.png",
+  "blend": 1
+}
