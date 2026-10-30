@@ -154,9 +154,12 @@ public final class FmGameTests {
     }
 
     private static void simpleItemsAreRegistered(GameTestHelper helper) {
-        for (String id : List.of("emerald_fragment", "taint_coal", "taint_fruit", "black_dye", "diabolist_fork")) {
+        for (String id : List.of("emerald_fragment", "taint_coal", "taint_fruit", "black_dye", "diabolist_fork",
+            "skull_axe", "riding_crop")) {
             helper.assertTrue(BuiltInRegistries.ITEM.containsKey(ForbiddenMagic.id(id)), id + " must be registered");
         }
+        helper.assertTrue(dev.visfox.forbiddenreforged.RidingCropItem.dropsLustShard(1), "lust shard roll inside");
+        helper.assertFalse(dev.visfox.forbiddenreforged.RidingCropItem.dropsLustShard(2), "lust shard roll outside");
         helper.succeed();
     }
 

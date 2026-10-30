@@ -3,10 +3,13 @@ package dev.visfox.forbiddenreforged;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.ToolMaterial;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -22,6 +25,8 @@ public final class FmItems {
     public static final DeferredItem<Item> TAINT_SHOVEL;
     public static final DeferredItem<Item> TAINT_PICKAXE;
     public static final DeferredItem<Item> MOB_CRYSTAL;
+    public static final DeferredItem<Item> SKULL_AXE;
+    public static final DeferredItem<Item> RIDING_CROP;
 
     static {
         for (String vice : List.of("wrath", "envy", "taint", "pride", "lust", "sloth", "greed")) {
@@ -42,6 +47,11 @@ public final class FmItems {
             properties -> properties.pickaxe(FmMaterials.ELEMENTAL, 2.0F, -2.8F).rarity(Rarity.UNCOMMON));
         MOB_CRYSTAL = ITEMS.registerItem("mob_crystal", MobCrystalItem::new,
             properties -> properties.stacksTo(1).rarity(Rarity.UNCOMMON));
+        SKULL_AXE = ITEMS.registerItem("skull_axe", SkullAxeItem::new,
+            properties -> properties.sword(FmMaterials.ELEMENTAL, 3.0F, -2.4F).rarity(Rarity.UNCOMMON));
+        RIDING_CROP = ITEMS.registerItem("riding_crop", RidingCropItem::new,
+            properties -> properties.sword(ToolMaterial.WOOD, 3.0F, -2.4F)
+                .repairable(TagKey.create(Registries.ITEM, ForbiddenMagic.id("riding_crop_repair"))));
     }
 
     private FmItems() {

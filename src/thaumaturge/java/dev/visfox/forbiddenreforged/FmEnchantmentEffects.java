@@ -159,6 +159,9 @@ public final class FmEnchantmentEffects {
             greedyDrops(event, player);
         }
         ItemStack weapon = player.getMainHandItem();
+        if (weapon.is(FmItems.SKULL_AXE.get())) {
+            skullAxeDrops(event, player, weapon);
+        }
         if (weapon.is(FmItems.DIABOLIST_FORK.get()) && FmSpawnerMobs.canImprint(event.getEntity().getType())) {
             String id = BuiltInRegistries.ENTITY_TYPE.getKey(event.getEntity().getType()).toString();
             for (int slot = 0; slot < player.getInventory().getContainerSize(); slot++) {
@@ -168,6 +171,32 @@ public final class FmEnchantmentEffects {
                     break;
                 }
             }
+        }
+    }
+
+    private static void skullAxeDrops(LivingDropsEvent event, ServerPlayer player, ItemStack weapon) {
+        LivingEntity victim = event.getEntity();
+        Identifier type = BuiltInRegistries.ENTITY_TYPE.getKey(victim.getType());
+        int looting = FmEnchantments.level(player.level().registryAccess(), weapon, Enchantments.LOOTING);
+        if (type.equals(Identifier.withDefaultNamespace("skeleton"))
+            || type.equals(Identifier.withDefaultNamespace("wither_skeleton"))) {
+            if (skullAxeRoll(victim.getRandom().nextInt(26), looting, 3, 1)) {
+                addDrop(event, new ItemStack(type.equals(Identifier.withDefaultNamespace("wither_skeleton"))
+                    ? Items.WITHER_SKELETON_SKULL : Items.SKELETON_SKULL));
+            }
+        } else if (type.equals(Identifier.withDefaultNamespace("zombie"))) {
+            if (skullAxeRoll(victim.getRandom().nextInt(26), looting, 2, 2)) {
+                addDrop(event, new ItemStack(Items.ZOMBIE_HEAD));
+            }
+        } else if (type.equals(Identifier.withDefaultNamespace("creeper"))) {
+            if (skullAxeRoll(victim.getRandom().nextInt(26), looting, 2, 2)) {
+                addDrop(event, new ItemStack(Items.CREEPER_HEAD));
+            }
+        } else if (victim instanceof Player target
+            && skullAxeRoll(victim.getRandom().nextInt(11), looting, 1, 1)) {
+            ItemStack head = new ItemStack(Items.PLAYER_HEAD);
+            head.set(DataComponents.PROFILE, ResolvableProfile.createResolved(target.getGameProfile()));
+            addDrop(event, head);
         }
     }
 

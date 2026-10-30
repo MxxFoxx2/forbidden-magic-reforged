@@ -71,5 +71,7 @@
   "enchantment.forbiddenmagic.corrupting": "Corrupting",
   "enchantment.forbiddenmagic.cluster": "Fiery Core",
   "enchantment.forbiddenmagic.impact": "Impact",
-  "enchantment.forbiddenmagic.voidtouched": "Voidtouched"
+  "enchantment.forbiddenmagic.voidtouched": "Voidtouched",
+  "item.forbiddenmagic.skull_axe": "Axe of the Skulltaker",
+  "item.forbiddenmagic.riding_crop": "Riding Crop"
 }
