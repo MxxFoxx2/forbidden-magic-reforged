@@ -128,7 +128,7 @@ public final class FmGameTests {
             helper.getLevel().registryAccess().lookup(IResearchEntry.REGISTRY_KEY).orElse(null);
         helper.assertTrue(entries != null, "research entry registry must exist");
         for (String id : List.of("nether_shards", "tainted_tree", "tainted_stone", "blackflower", "arcane_cake",
-            "emerald_transmutation", "taint_shovel", "taint_pickaxe", "wrath_cage")) {
+            "emerald_transmutation", "taint_shovel", "taint_pickaxe", "wrath_cage", "crystalwell")) {
             helper.assertTrue(entries.get(ResourceKey.create(IResearchEntry.REGISTRY_KEY, ForbiddenMagic.id(id))).isPresent(),
                 "forbiddenmagic:" + id + " entry must exist");
         }
@@ -155,7 +155,7 @@ public final class FmGameTests {
 
     private static void simpleItemsAreRegistered(GameTestHelper helper) {
         for (String id : List.of("emerald_fragment", "taint_coal", "taint_fruit", "black_dye", "diabolist_fork",
-            "skull_axe", "riding_crop")) {
+            "skull_axe", "riding_crop", "ring_nutrition", "crystalwell")) {
             helper.assertTrue(BuiltInRegistries.ITEM.containsKey(ForbiddenMagic.id(id)), id + " must be registered");
         }
         helper.assertTrue(dev.visfox.forbiddenreforged.RidingCropItem.dropsLustShard(1), "lust shard roll inside");

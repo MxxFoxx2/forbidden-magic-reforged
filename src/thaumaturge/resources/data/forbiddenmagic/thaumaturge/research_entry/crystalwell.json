@@ -1,0 +1,23 @@
+{
+  "category": "forbiddenmagic:forbidden",
+  "name": "research.forbiddenmagic.crystalwell.title",
+  "parents": [
+    "forbiddenmagic:nether_shards"
+  ],
+  "column": 4,
+  "row": 0,
+  "meta": [
+    "round"
+  ],
+  "icons": [
+    "forbiddenmagic:crystalwell"
+  ],
+  "stages": [
+    {
+      "text": "research.forbiddenmagic.crystalwell.stage_0"
+    },
+    {
+      "text": "research.forbiddenmagic.crystalwell.stage_1"
+    }
+  ]
+}
