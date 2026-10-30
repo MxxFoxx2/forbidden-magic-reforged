@@ -1,0 +1,20 @@
+{
+  "category": "forbiddenmagic:forbidden",
+  "name": "research.forbiddenmagic.impact.title",
+  "parents": [
+    "forbiddenmagic:nether_shards"
+  ],
+  "column": 1,
+  "row": 4,
+  "meta": [
+    "round"
+  ],
+  "icons": [
+    "forbiddenmagic:morph_shovel"
+  ],
+  "stages": [
+    {
+      "text": "research.forbiddenmagic.impact.stage_0"
+    }
+  ]
+}

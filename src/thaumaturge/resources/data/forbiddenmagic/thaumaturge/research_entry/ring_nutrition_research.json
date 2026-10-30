@@ -1,0 +1,20 @@
+{
+  "category": "forbiddenmagic:forbidden",
+  "name": "research.forbiddenmagic.ring_nutrition_research.title",
+  "parents": [
+    "forbiddenmagic:nether_shards"
+  ],
+  "column": 3,
+  "row": 5,
+  "meta": [
+    "round"
+  ],
+  "icons": [
+    "forbiddenmagic:ring_nutrition"
+  ],
+  "stages": [
+    {
+      "text": "research.forbiddenmagic.ring_nutrition_research.stage_0"
+    }
+  ]
+}

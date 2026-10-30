@@ -1,0 +1,20 @@
+{
+  "category": "forbiddenmagic:forbidden",
+  "name": "research.forbiddenmagic.consuming.title",
+  "parents": [
+    "forbiddenmagic:nether_shards"
+  ],
+  "column": 2,
+  "row": 3,
+  "meta": [
+    "round"
+  ],
+  "icons": [
+    "minecraft:cobblestone"
+  ],
+  "stages": [
+    {
+      "text": "research.forbiddenmagic.consuming.stage_0"
+    }
+  ]
+}

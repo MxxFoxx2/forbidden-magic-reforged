@@ -1,0 +1,20 @@
+{
+  "category": "forbiddenmagic:forbidden",
+  "name": "research.forbiddenmagic.cluster.title",
+  "parents": [
+    "forbiddenmagic:nether_shards"
+  ],
+  "column": 0,
+  "row": 4,
+  "meta": [
+    "round"
+  ],
+  "icons": [
+    "forbiddenmagic:morph_pickaxe"
+  ],
+  "stages": [
+    {
+      "text": "research.forbiddenmagic.cluster.stage_0"
+    }
+  ]
+}

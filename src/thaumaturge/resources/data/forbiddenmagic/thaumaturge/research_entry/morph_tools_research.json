@@ -1,0 +1,20 @@
+{
+  "category": "forbiddenmagic:forbidden",
+  "name": "research.forbiddenmagic.morph_tools_research.title",
+  "parents": [
+    "forbiddenmagic:nether_shards"
+  ],
+  "column": 2,
+  "row": 5,
+  "meta": [
+    "round"
+  ],
+  "icons": [
+    "forbiddenmagic:morph_pickaxe"
+  ],
+  "stages": [
+    {
+      "text": "research.forbiddenmagic.morph_tools_research.stage_0"
+    }
+  ]
+}

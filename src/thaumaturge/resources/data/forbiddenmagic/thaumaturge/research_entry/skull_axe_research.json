@@ -1,0 +1,20 @@
+{
+  "category": "forbiddenmagic:forbidden",
+  "name": "research.forbiddenmagic.skull_axe_research.title",
+  "parents": [
+    "forbiddenmagic:nether_shards"
+  ],
+  "column": 0,
+  "row": 5,
+  "meta": [
+    "round"
+  ],
+  "icons": [
+    "forbiddenmagic:skull_axe"
+  ],
+  "stages": [
+    {
+      "text": "research.forbiddenmagic.skull_axe_research.stage_0"
+    }
+  ]
+}

@@ -132,7 +132,9 @@ public final class FmGameTests {
             helper.getLevel().registryAccess().lookup(IResearchEntry.REGISTRY_KEY).orElse(null);
         helper.assertTrue(entries != null, "research entry registry must exist");
         for (String id : List.of("nether_shards", "tainted_tree", "tainted_stone", "blackflower", "arcane_cake",
-            "emerald_transmutation", "taint_shovel", "taint_pickaxe", "wrath_cage", "crystalwell", "primewell")) {
+            "emerald_transmutation", "taint_shovel", "taint_pickaxe", "wrath_cage", "crystalwell", "primewell",
+            "wrath", "greedy", "consuming", "educational", "corrupting", "cluster", "impact", "voidtouched",
+            "skull_axe_research", "diabolist_fork_research", "morph_tools_research", "ring_nutrition_research")) {
             helper.assertTrue(entries.get(ResourceKey.create(IResearchEntry.REGISTRY_KEY, ForbiddenMagic.id(id))).isPresent(),
                 "forbiddenmagic:" + id + " entry must exist");
         }

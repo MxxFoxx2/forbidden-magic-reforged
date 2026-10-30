@@ -1,0 +1,20 @@
+{
+  "category": "forbiddenmagic:forbidden",
+  "name": "research.forbiddenmagic.educational.title",
+  "parents": [
+    "forbiddenmagic:nether_shards"
+  ],
+  "column": 3,
+  "row": 3,
+  "meta": [
+    "round"
+  ],
+  "icons": [
+    "forbiddenmagic:emerald_fragment"
+  ],
+  "stages": [
+    {
+      "text": "research.forbiddenmagic.educational.stage_0"
+    }
+  ]
+}

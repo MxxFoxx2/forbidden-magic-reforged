@@ -1,0 +1,20 @@
+{
+  "category": "forbiddenmagic:forbidden",
+  "name": "research.forbiddenmagic.voidtouched.title",
+  "parents": [
+    "forbiddenmagic:nether_shards"
+  ],
+  "column": 2,
+  "row": 4,
+  "meta": [
+    "round"
+  ],
+  "icons": [
+    "forbiddenmagic:morph_sword"
+  ],
+  "stages": [
+    {
+      "text": "research.forbiddenmagic.voidtouched.stage_0"
+    }
+  ]
+}
