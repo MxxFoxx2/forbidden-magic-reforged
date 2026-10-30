@@ -56,5 +56,8 @@
   "research.forbiddenmagic.taint_shovel.title": "Shovel of the Purifier",
   "research.forbiddenmagic.taint_shovel.stage_0": "Sometimes, the easiest way to remove patches of taint is to just physically remove them. By reinforcing a thaumium shovel with Silverwood and Order Shards, you have created a tool capable of combating Taint. The Shovel of the Purifier can dig through pulpy tainted lands as effectively as it can through normal earth. If held in your hand and right-clicked, the shovel will purify all flux goo and gas from a small radius at the cost of durability. You no longer have to clean up infusion mishaps with a piece of cobblestone!",
   "research.forbiddenmagic.taint_pickaxe.title": "Pickaxe of Distortion",
-  "research.forbiddenmagic.taint_pickaxe.stage_0": "By infusing a thaumium pickaxe with taint, you create a tool capable of cutting through difficult materials. The Pickaxe of Distortion infects hard materials with taint, weakening them. The harder the material, the more effective the pickaxe is at removing it. Unfortunately, the effects of the taint have an inverse effect when mining softer materials, rendering the pickaxe less effective than just pawing at the block with your bare hands."
+  "research.forbiddenmagic.taint_pickaxe.stage_0": "By infusing a thaumium pickaxe with taint, you create a tool capable of cutting through difficult materials. The Pickaxe of Distortion infects hard materials with taint, weakening them. The harder the material, the more effective the pickaxe is at removing it. Unfortunately, the effects of the taint have an inverse effect when mining softer materials, rendering the pickaxe less effective than just pawing at the block with your bare hands.",
+  "item.forbiddenmagic.mob_crystal.empty": "Blank Imprinting Crystal",
+  "item.forbiddenmagic.mob_crystal.filled": "%s Imprinted Crystal",
+  "block.forbiddenmagic.wrath_cage": "Wrath Cage"
 }

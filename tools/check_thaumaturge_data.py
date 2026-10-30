@@ -10,10 +10,12 @@ HOST = ROOT.parent / "Thaumaturge"
 ASSETS = ROOT / "src" / "main" / "resources" / "assets"
 
 SHARDS = ["wrath", "envy", "taint", "pride", "lust", "sloth", "greed", "gluttony"]
-EXTRA_ITEMS = ["emerald_fragment", "taint_coal", "taint_fruit", "black_dye", "diabolist_fork", "taint_shovel", "taint_pickaxe"]
+EXTRA_ITEMS = ["emerald_fragment", "taint_coal", "taint_fruit", "black_dye", "diabolist_fork", "taint_shovel", "taint_pickaxe",
+               "mob_crystal"]
+ITEM_MODEL_PARTS = {"mob_crystal": ["mob_crystal_empty", "mob_crystal_filled"]}
 BLOCKS = ["taint_log", "taint_planks", "taint_stone_smooth", "taint_stone_brick", "star_block", "taint_leaves", "taint_sapling",
-          "umbral_rose", "umbral_rose_bush", "arcane_cake"]
-NO_LOOT = {"arcane_cake"}
+          "umbral_rose", "umbral_rose_bush", "arcane_cake", "wrath_cage"]
+NO_LOOT = {"arcane_cake", "wrath_cage"}
 MODEL_PARTS = {
     "umbral_rose_bush": ["umbral_rose_bush_bottom", "umbral_rose_bush_top"],
     "arcane_cake": ["arcane_cake_" + str(slice) for slice in range(12)],
@@ -143,13 +145,19 @@ def main():
 
     for item in EXTRA_ITEMS:
         definition = RES / "assets/forbiddenmagic/items" / (item + ".json")
-        model = RES / "assets/forbiddenmagic/models/item" / (item + ".json")
+        models = [RES / "assets/forbiddenmagic/models/item" / (name + ".json")
+                  for name in ITEM_MODEL_PARTS.get(item, [item])]
         if not definition.is_file():
             errors += fail(f"missing item definition {item}")
-        if not model.is_file():
-            errors += fail(f"missing item model {item}")
+        for model in models:
+            if not model.is_file():
+                errors += fail(f"missing item model {model.stem}")
         key = "item.forbiddenmagic." + item
-        if key not in lang_en or key not in lang_ru:
+        if item == "mob_crystal":
+            for suffix in (".empty", ".filled"):
+                if key + suffix not in lang_en or key + suffix not in lang_ru:
+                    errors += fail(f"missing {key}{suffix}")
+        elif key not in lang_en or key not in lang_ru:
             errors += fail(f"missing {key}")
 
     for block in BLOCKS:

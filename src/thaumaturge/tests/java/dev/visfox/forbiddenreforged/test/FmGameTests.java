@@ -7,6 +7,7 @@ import com.leclowndu93150.thaumaturge.api.taint.ITaintBlock;
 import dev.visfox.forbiddenreforged.FmAspects;
 import dev.visfox.forbiddenreforged.FmDrops;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
+import dev.visfox.forbiddenreforged.WrathCageBlockEntity;
 import java.util.List;
 import java.util.function.Consumer;
 import net.minecraft.core.Holder;
@@ -45,7 +46,9 @@ public final class FmGameTests {
         "rose_and_cake_blocks_are_registered",
         "recipes_are_loaded",
         "taint_tools_are_registered",
-        "drop_rules_match_original"
+        "drop_rules_match_original",
+        "mob_crystal_and_wrath_cage_are_registered",
+        "cage_rules_match_original"
     };
 
     static {
@@ -60,6 +63,8 @@ public final class FmGameTests {
         FUNCTIONS.register(TESTS[8], () -> FmGameTests::recipesAreLoaded);
         FUNCTIONS.register(TESTS[9], () -> FmGameTests::taintToolsAreRegistered);
         FUNCTIONS.register(TESTS[10], () -> FmGameTests::dropRulesMatchOriginal);
+        FUNCTIONS.register(TESTS[11], () -> FmGameTests::mobCrystalAndWrathCageAreRegistered);
+        FUNCTIONS.register(TESTS[12], () -> FmGameTests::cageRulesMatchOriginal);
     }
 
     private FmGameTests() {
@@ -194,6 +199,29 @@ public final class FmGameTests {
         helper.assertFalse(FmDrops.rollQuartzGreed(0, 0), "quartz greed needs fortune");
         helper.assertTrue(FmDrops.rollEnvy(1), "envy inside");
         helper.assertFalse(FmDrops.rollEnvy(2), "envy outside");
+        helper.succeed();
+    }
+
+    private static void mobCrystalAndWrathCageAreRegistered(GameTestHelper helper) {
+        helper.assertTrue(BuiltInRegistries.ITEM.containsKey(ForbiddenMagic.id("mob_crystal")), "mob crystal must be registered");
+        helper.assertTrue(BuiltInRegistries.BLOCK.containsKey(ForbiddenMagic.id("wrath_cage")), "wrath cage must be registered");
+        helper.assertTrue(BuiltInRegistries.ITEM.containsKey(ForbiddenMagic.id("wrath_cage")), "wrath cage item must be registered");
+        helper.succeed();
+    }
+
+    private static void cageRulesMatchOriginal(GameTestHelper helper) {
+        helper.assertTrue(WrathCageBlockEntity.shouldSpawn(false, true, 0, 5, 5), "available essentia starts a round");
+        helper.assertFalse(WrathCageBlockEntity.shouldSpawn(true, true, 5, 5, 5), "powered cage stays idle");
+        helper.assertFalse(WrathCageBlockEntity.shouldSpawn(false, false, 5, 5, 5), "cage without a mob stays idle");
+        helper.assertFalse(WrathCageBlockEntity.shouldSpawn(false, true, 0, 5, 4), "insufficient essentia stays idle");
+        helper.assertTrue(WrathCageBlockEntity.shouldSpawn(false, true, 0, 0, 0), "zero cost always runs");
+        var random = net.minecraft.util.RandomSource.create(7L);
+        for (int i = 0; i < 20; i++) {
+            int delay = WrathCageBlockEntity.nextDelay(random, false);
+            helper.assertTrue(delay >= 200 && delay < 300, "normal delay in range");
+            int slothDelay = WrathCageBlockEntity.nextDelay(random, true);
+            helper.assertTrue(slothDelay >= 400 && slothDelay < 500, "slothful delay in range");
+        }
         helper.succeed();
     }
 

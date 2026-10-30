@@ -13,7 +13,14 @@ public final class FmCreativeTab {
         () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.forbiddenmagic"))
             .icon(() -> new ItemStack(FmItems.DEADLY_SHARDS.get("lust").get()))
-            .displayItems((parameters, output) -> FmItems.ITEMS.getEntries().forEach(item -> output.accept(item.get())))
+            .displayItems((parameters, output) -> {
+                FmItems.ITEMS.getEntries().forEach(item -> output.accept(item.get()));
+                for (String mob : FmSpawnerMobs.ids()) {
+                    ItemStack crystal = new ItemStack(FmItems.MOB_CRYSTAL.get());
+                    MobCrystalItem.setMob(crystal, mob);
+                    output.accept(crystal);
+                }
+            })
             .build());
 
     private FmCreativeTab() {

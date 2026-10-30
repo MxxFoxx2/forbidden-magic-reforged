@@ -21,6 +21,7 @@ public final class FmItems {
     public static final DeferredItem<Item> DIABOLIST_FORK;
     public static final DeferredItem<Item> TAINT_SHOVEL;
     public static final DeferredItem<Item> TAINT_PICKAXE;
+    public static final DeferredItem<Item> MOB_CRYSTAL;
 
     static {
         for (String vice : List.of("wrath", "envy", "taint", "pride", "lust", "sloth", "greed")) {
@@ -39,6 +40,8 @@ public final class FmItems {
             properties -> properties.shovel(FmMaterials.ELEMENTAL, 1.0F, -3.0F).rarity(Rarity.UNCOMMON));
         TAINT_PICKAXE = ITEMS.registerItem("taint_pickaxe", Item::new,
             properties -> properties.pickaxe(FmMaterials.ELEMENTAL, 2.0F, -2.8F).rarity(Rarity.UNCOMMON));
+        MOB_CRYSTAL = ITEMS.registerItem("mob_crystal", MobCrystalItem::new,
+            properties -> properties.stacksTo(1).rarity(Rarity.UNCOMMON));
     }
 
     private FmItems() {
