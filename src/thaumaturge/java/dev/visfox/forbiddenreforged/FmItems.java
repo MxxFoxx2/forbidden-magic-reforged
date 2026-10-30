@@ -27,6 +27,7 @@ public final class FmItems {
     public static final DeferredItem<Item> MOB_CRYSTAL;
     public static final DeferredItem<Item> SKULL_AXE;
     public static final DeferredItem<Item> RIDING_CROP;
+    public static final DeferredItem<Item> RING_NUTRITION;
 
     static {
         for (String vice : List.of("wrath", "envy", "taint", "pride", "lust", "sloth", "greed")) {
@@ -52,6 +53,7 @@ public final class FmItems {
         RIDING_CROP = ITEMS.registerItem("riding_crop", RidingCropItem::new,
             properties -> properties.sword(ToolMaterial.WOOD, 3.0F, -2.4F)
                 .repairable(TagKey.create(Registries.ITEM, ForbiddenMagic.id("riding_crop_repair"))));
+        RING_NUTRITION = ITEMS.registerItem("ring_nutrition", RingNutritionItem::new);
     }
 
     private FmItems() {

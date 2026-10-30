@@ -73,5 +73,6 @@
   "enchantment.forbiddenmagic.impact": "Влияние",
   "enchantment.forbiddenmagic.voidtouched": "Касание пустоты",
   "item.forbiddenmagic.skull_axe": "Топор собирателя черепов",
-  "item.forbiddenmagic.riding_crop": "Хлыст"
+  "item.forbiddenmagic.riding_crop": "Хлыст",
+  "item.forbiddenmagic.ring_nutrition": "Кольцо насыщения"
 }

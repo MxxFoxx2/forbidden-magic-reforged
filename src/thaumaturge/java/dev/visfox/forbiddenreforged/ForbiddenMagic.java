@@ -22,6 +22,7 @@ public final class ForbiddenMagic {
         FmCreativeTab.TABS.register(modEventBus);
         FmDrops.register();
         FmEnchantmentEffects.register();
+        FmToolEvents.register();
         FmGameTests.FUNCTIONS.register(modEventBus);
     }
 

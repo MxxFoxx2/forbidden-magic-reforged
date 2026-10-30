@@ -99,6 +99,7 @@ if (thaumaturgeJar == null || !thaumaturgeJar.isFile()) {
 
 dependencies {
     compileOnly files(thaumaturgeJar)
+    compileOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}+${minecraft_version}:api"
     localRuntime files(thaumaturgeJar)
     localRuntime "maven.modrinth:lithostitched:${lithostitched_version}"
     localRuntime "top.theillusivec4.curios:curios-neoforge:${curios_version}+${minecraft_version}"

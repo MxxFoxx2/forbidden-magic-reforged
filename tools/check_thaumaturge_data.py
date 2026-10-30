@@ -11,7 +11,7 @@ ASSETS = ROOT / "src" / "main" / "resources" / "assets"
 
 SHARDS = ["wrath", "envy", "taint", "pride", "lust", "sloth", "greed", "gluttony"]
 EXTRA_ITEMS = ["emerald_fragment", "taint_coal", "taint_fruit", "black_dye", "diabolist_fork", "taint_shovel", "taint_pickaxe",
-               "mob_crystal", "skull_axe", "riding_crop"]
+               "mob_crystal", "skull_axe", "riding_crop", "ring_nutrition"]
 ITEM_MODEL_PARTS = {"mob_crystal": ["mob_crystal_empty", "mob_crystal_filled"]}
 BLOCKS = ["taint_log", "taint_planks", "taint_stone_smooth", "taint_stone_brick", "star_block", "taint_leaves", "taint_sapling",
           "umbral_rose", "umbral_rose_bush", "arcane_cake", "wrath_cage"]
