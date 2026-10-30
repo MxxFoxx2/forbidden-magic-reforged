@@ -37,7 +37,8 @@ public final class FmGameTests {
         "shards_are_registered",
         "forbidden_research_entry_and_category_resolve",
         "tainted_blocks_are_registered",
-        "tainted_blocks_use_taint_contract"
+        "tainted_blocks_use_taint_contract",
+        "simple_items_are_registered"
     };
 
     static {
@@ -47,6 +48,7 @@ public final class FmGameTests {
         FUNCTIONS.register(TESTS[3], () -> FmGameTests::forbiddenResearchResolves);
         FUNCTIONS.register(TESTS[4], () -> FmGameTests::taintedBlocksAreRegistered);
         FUNCTIONS.register(TESTS[5], () -> FmGameTests::taintedBlocksUseTaintContract);
+        FUNCTIONS.register(TESTS[6], () -> FmGameTests::simpleItemsAreRegistered);
     }
 
     private FmGameTests() {
@@ -122,6 +124,13 @@ public final class FmGameTests {
             "taint_leaves", "taint_sapling")) {
             Block block = BuiltInRegistries.BLOCK.getValue(ForbiddenMagic.id(id));
             helper.assertTrue(block instanceof ITaintBlock, id + " must implement ITaintBlock");
+        }
+        helper.succeed();
+    }
+
+    private static void simpleItemsAreRegistered(GameTestHelper helper) {
+        for (String id : List.of("emerald_fragment", "taint_coal", "taint_fruit", "black_dye", "diabolist_fork")) {
+            helper.assertTrue(BuiltInRegistries.ITEM.containsKey(ForbiddenMagic.id(id)), id + " must be registered");
         }
         helper.succeed();
     }

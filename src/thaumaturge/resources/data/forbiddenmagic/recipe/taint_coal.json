@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "ingredient": "forbiddenmagic:taint_log",
+  "result": {
+    "id": "forbiddenmagic:taint_coal"
+  },
+  "experience": 0.15,
+  "cookingtime": 200
+}

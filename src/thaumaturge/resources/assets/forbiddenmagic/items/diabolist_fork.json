@@ -1,0 +1,14 @@
+{
+  "model": {
+    "on_false": {
+      "model": "forbiddenmagic:item/diabolist_fork",
+      "type": "minecraft:model"
+    },
+    "on_true": {
+      "model": "forbiddenmagic:item/diabolist_fork_spork",
+      "type": "minecraft:model"
+    },
+    "property": "forbiddenmagic:spork",
+    "type": "minecraft:condition"
+  }
+}

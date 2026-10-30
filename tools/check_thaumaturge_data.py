@@ -10,6 +10,7 @@ HOST = ROOT.parent / "Thaumaturge"
 ASSETS = ROOT / "src" / "main" / "resources" / "assets"
 
 SHARDS = ["wrath", "envy", "taint", "pride", "lust", "sloth", "greed", "gluttony"]
+EXTRA_ITEMS = ["emerald_fragment", "taint_coal", "taint_fruit", "black_dye", "diabolist_fork"]
 BLOCKS = ["taint_log", "taint_planks", "taint_stone_smooth", "taint_stone_brick", "star_block", "taint_leaves", "taint_sapling"]
 ASPECTS = ["luxuria", "infernus", "superbia", "gula", "invidia", "desidia", "ira"]
 
@@ -130,6 +131,17 @@ def main():
         texture = ASSETS / "forbiddenmagic/textures/item" / (item + ".png")
         if not texture.is_file():
             errors += fail(f"missing item texture {item}")
+        key = "item.forbiddenmagic." + item
+        if key not in lang_en or key not in lang_ru:
+            errors += fail(f"missing {key}")
+
+    for item in EXTRA_ITEMS:
+        definition = RES / "assets/forbiddenmagic/items" / (item + ".json")
+        model = RES / "assets/forbiddenmagic/models/item" / (item + ".json")
+        if not definition.is_file():
+            errors += fail(f"missing item definition {item}")
+        if not model.is_file():
+            errors += fail(f"missing item model {item}")
         key = "item.forbiddenmagic." + item
         if key not in lang_en or key not in lang_ru:
             errors += fail(f"missing {key}")
