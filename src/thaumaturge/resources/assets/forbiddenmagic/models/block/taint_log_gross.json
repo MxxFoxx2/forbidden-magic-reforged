@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "forbiddenmagic:block/taint_log_bottom",
+    "side": "forbiddenmagic:block/taint_log_side_gross"
+  }
+}

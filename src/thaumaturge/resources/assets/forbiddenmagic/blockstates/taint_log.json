@@ -1,16 +1,13 @@
 {
   "variants": {
+    "axis=x": {
+      "type": "forbiddenmagic:taint_log_faces"
+    },
     "axis=y": {
-      "model": "forbiddenmagic:block/taint_log"
+      "type": "forbiddenmagic:taint_log_faces"
     },
     "axis=z": {
-      "model": "forbiddenmagic:block/taint_log_horizontal",
-      "x": 90
-    },
-    "axis=x": {
-      "model": "forbiddenmagic:block/taint_log_horizontal",
-      "x": 90,
-      "y": 90
+      "type": "forbiddenmagic:taint_log_faces"
     }
   }
 }
