@@ -1,0 +1,54 @@
+{
+  "type": "thaumaturge:arcane_workbench_shapeless",
+  "vis": 50,
+  "research": {
+    "entry": "forbiddenmagic:primewell"
+  },
+  "crystals": [
+    {
+      "aspect": "thaumaturge:aer",
+      "amount": 10
+    },
+    {
+      "aspect": "thaumaturge:ignis",
+      "amount": 10
+    },
+    {
+      "aspect": "thaumaturge:aqua",
+      "amount": 10
+    },
+    {
+      "aspect": "thaumaturge:terra",
+      "amount": 10
+    },
+    {
+      "aspect": "thaumaturge:ordo",
+      "amount": 10
+    },
+    {
+      "aspect": "thaumaturge:perditio",
+      "amount": 10
+    }
+  ],
+  "ingredients": [
+    {
+      "item": "minecraft:feather"
+    },
+    {
+      "item": "thaumaturge:primordial_pearl"
+    },
+    {
+      "item": "thaumaturge:scribing_tools"
+    },
+    {
+      "item": "thaumaturge:scribing_tools"
+    },
+    {
+      "item": "thaumaturge:salis_mundus"
+    }
+  ],
+  "result": {
+    "id": "forbiddenmagic:primewell",
+    "count": 1
+  }
+}

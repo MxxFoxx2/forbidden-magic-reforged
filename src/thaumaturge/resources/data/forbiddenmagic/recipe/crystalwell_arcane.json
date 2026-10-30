@@ -1,0 +1,35 @@
+{
+  "type": "thaumaturge:arcane_workbench_shapeless",
+  "vis": 1,
+  "research": {
+    "entry": "forbiddenmagic:crystalwell"
+  },
+  "crystals": [
+    {
+      "aspect": "thaumaturge:aqua",
+      "amount": 1
+    },
+    {
+      "aspect": "thaumaturge:ordo",
+      "amount": 1
+    }
+  ],
+  "ingredients": [
+    {
+      "item": "thaumaturge:scribing_tools"
+    },
+    {
+      "tag": "c:dyes/black"
+    },
+    {
+      "item": "thaumaturge:crystal_ordo"
+    },
+    {
+      "item": "thaumaturge:crystal_ordo"
+    }
+  ],
+  "result": {
+    "id": "forbiddenmagic:crystalwell",
+    "count": 1
+  }
+}

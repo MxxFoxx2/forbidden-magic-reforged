@@ -1,0 +1,45 @@
+{
+  "type": "thaumaturge:infusion",
+  "catalyst": {
+    "item": "thaumaturge:thaumium_shovel"
+  },
+  "components": [
+    {
+      "item": "forbiddenmagic:envy_shard"
+    },
+    {
+      "item": "forbiddenmagic:envy_shard"
+    },
+    {
+      "item": "minecraft:diamond"
+    },
+    {
+      "item": "minecraft:leather"
+    },
+    {
+      "item": "thaumaturge:log_silverwood"
+    }
+  ],
+  "aspects": [
+    {
+      "aspect": "thaumaturge:permutatio",
+      "amount": 32
+    },
+    {
+      "aspect": "forbiddenmagic:invidia",
+      "amount": 16
+    },
+    {
+      "aspect": "thaumaturge:instrumentum",
+      "amount": 16
+    }
+  ],
+  "instability": 6,
+  "result": {
+    "id": "forbiddenmagic:morph_shovel",
+    "count": 1
+  },
+  "research": {
+    "entry": "forbiddenmagic:tainted_tree"
+  }
+}
