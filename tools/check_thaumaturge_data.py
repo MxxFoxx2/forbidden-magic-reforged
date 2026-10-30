@@ -11,7 +11,7 @@ ASSETS = ROOT / "src" / "main" / "resources" / "assets"
 
 SHARDS = ["wrath", "envy", "taint", "pride", "lust", "sloth", "greed", "gluttony"]
 EXTRA_ITEMS = ["emerald_fragment", "taint_coal", "taint_fruit", "black_dye", "diabolist_fork", "taint_shovel", "taint_pickaxe",
-               "mob_crystal", "skull_axe", "riding_crop", "ring_nutrition", "crystalwell", "morph_pickaxe", "morph_sword", "morph_shovel", "morph_axe"]
+               "mob_crystal", "skull_axe", "riding_crop", "ring_nutrition", "crystalwell", "morph_pickaxe", "morph_sword", "morph_shovel", "morph_axe", "primewell"]
 ITEM_MODEL_PARTS = {"mob_crystal": ["mob_crystal_empty", "mob_crystal_filled"]}
 BLOCKS = ["taint_log", "taint_planks", "taint_stone_smooth", "taint_stone_brick", "star_block", "taint_leaves", "taint_sapling",
           "umbral_rose", "umbral_rose_bush", "arcane_cake", "wrath_cage"]
@@ -189,7 +189,7 @@ def main():
             item = result_id.split(":", 1)[1]
             if not (RES / "assets/forbiddenmagic/items" / (item + ".json")).is_file():
                 errors += fail(f"{path.name}: unknown result {result_id}")
-        for aspect in data.get("aspects", []):
+        for aspect in list(data.get("aspects", [])) + list(data.get("crystals", [])):
             namespace, _, name = aspect.get("aspect", "").partition(":")
             if namespace == "thaumaturge" and name not in known_aspects:
                 errors += fail(f"{path.name}: unknown recipe aspect {aspect.get('aspect')}")

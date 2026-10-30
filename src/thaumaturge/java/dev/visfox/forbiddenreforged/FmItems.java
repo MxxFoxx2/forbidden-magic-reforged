@@ -33,6 +33,7 @@ public final class FmItems {
     public static final DeferredItem<Item> MORPH_SWORD;
     public static final DeferredItem<Item> MORPH_SHOVEL;
     public static final DeferredItem<Item> MORPH_AXE;
+    public static final DeferredItem<Item> PRIMEWELL;
 
     static {
         for (String vice : List.of("wrath", "envy", "taint", "pride", "lust", "sloth", "greed")) {
@@ -68,6 +69,8 @@ public final class FmItems {
             properties -> repairable(properties.shovel(FmMaterials.ELEMENTAL, 1.0F, -3.0F).rarity(Rarity.EPIC)));
         MORPH_AXE = ITEMS.registerItem("morph_axe", MorphToolItem::new,
             properties -> repairable(properties.axe(FmMaterials.ELEMENTAL, 3.0F, -3.0F).rarity(Rarity.EPIC)));
+        PRIMEWELL = ITEMS.registerItem("primewell", PrimewellItem::new,
+            properties -> properties.rarity(Rarity.EPIC));
     }
 
     private FmItems() {

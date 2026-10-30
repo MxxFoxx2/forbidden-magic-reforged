@@ -82,5 +82,8 @@
   "item.forbiddenmagic.morph_pickaxe": "Chameleon Pickaxe",
   "item.forbiddenmagic.morph_sword": "Chameleon Sword",
   "item.forbiddenmagic.morph_shovel": "Chameleon Shovel",
-  "item.forbiddenmagic.morph_axe": "Chameleon Axe"
+  "item.forbiddenmagic.morph_axe": "Chameleon Axe",
+  "item.forbiddenmagic.primewell": "Primal Scribing Tools",
+  "research.forbiddenmagic.primewell.title": "Primal Scribing Tools",
+  "research.forbiddenmagic.primewell.stage_0": "You've learned things humans weren't meant to know, seen things humans weren't meant to see, and been places humans weren't meant to go. What these experiences have taught you is how to refill your inkwell. By utilizing the strange properties of the Primordial Pearl, you can create a set of scribing tools that will never run out of ink. At the cold, dark end of time when the light of a million stars have died out, the Primal Scribing Tools will still be ready to scribble onwards."
 }

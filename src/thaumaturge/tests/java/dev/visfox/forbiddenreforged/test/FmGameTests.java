@@ -132,7 +132,7 @@ public final class FmGameTests {
             helper.getLevel().registryAccess().lookup(IResearchEntry.REGISTRY_KEY).orElse(null);
         helper.assertTrue(entries != null, "research entry registry must exist");
         for (String id : List.of("nether_shards", "tainted_tree", "tainted_stone", "blackflower", "arcane_cake",
-            "emerald_transmutation", "taint_shovel", "taint_pickaxe", "wrath_cage", "crystalwell")) {
+            "emerald_transmutation", "taint_shovel", "taint_pickaxe", "wrath_cage", "crystalwell", "primewell")) {
             helper.assertTrue(entries.get(ResourceKey.create(IResearchEntry.REGISTRY_KEY, ForbiddenMagic.id(id))).isPresent(),
                 "forbiddenmagic:" + id + " entry must exist");
         }
@@ -159,7 +159,7 @@ public final class FmGameTests {
 
     private static void simpleItemsAreRegistered(GameTestHelper helper) {
         for (String id : List.of("emerald_fragment", "taint_coal", "taint_fruit", "black_dye", "diabolist_fork",
-            "skull_axe", "riding_crop", "ring_nutrition", "crystalwell")) {
+            "skull_axe", "riding_crop", "ring_nutrition", "crystalwell", "primewell")) {
             helper.assertTrue(BuiltInRegistries.ITEM.containsKey(ForbiddenMagic.id(id)), id + " must be registered");
         }
         helper.assertTrue(dev.visfox.forbiddenreforged.RidingCropItem.dropsLustShard(1), "lust shard roll inside");
@@ -179,7 +179,7 @@ public final class FmGameTests {
         for (String id : List.of("taint_planks", "taint_stone_brick", "star_block", "star_from_block", "taint_coal",
             "ink_from_rose", "taint_sapling_crucible", "umbral_rose_crucible", "emerald_fragment_crucible",
             "arcane_cake_infusion", "wrath_cage_infusion", "mob_crystal_crucible", "taint_shovel_infusion",
-            "taint_pickaxe_infusion")) {
+            "taint_pickaxe_infusion", "taint_stone_arcane")) {
             helper.assertTrue(helper.getLevel().getServer().getRecipeManager()
                 .byKey(ResourceKey.create(Registries.RECIPE, ForbiddenMagic.id(id))).isPresent(), id + " recipe must load");
         }

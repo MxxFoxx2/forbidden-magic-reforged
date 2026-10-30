@@ -1,0 +1,36 @@
+{
+  "type": "thaumaturge:arcane_workbench_shaped",
+  "vis": 1,
+  "research": {
+    "entry": "forbiddenmagic:tainted_stone"
+  },
+  "crystals": [
+    {
+      "aspect": "thaumaturge:perditio",
+      "amount": 2
+    },
+    {
+      "aspect": "thaumaturge:ordo",
+      "amount": 1
+    }
+  ],
+  "pattern": {
+    "key": {
+      "S": {
+        "item": "minecraft:stone"
+      },
+      "T": {
+        "tag": "forbiddenmagic:taint_ingredients"
+      }
+    },
+    "pattern": [
+      "SSS",
+      "STS",
+      "SSS"
+    ]
+  },
+  "result": {
+    "id": "forbiddenmagic:taint_stone_smooth",
+    "count": 9
+  }
+}

@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "forbiddenmagic:crystalwell"
+    "forbiddenmagic:crystalwell",
+    "forbiddenmagic:primewell"
   ]
 }
