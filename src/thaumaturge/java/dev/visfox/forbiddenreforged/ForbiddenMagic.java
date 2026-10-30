@@ -18,6 +18,7 @@ public final class ForbiddenMagic {
         FmBlocks.BLOCKS.register(modEventBus);
         FmItems.ITEMS.register(modEventBus);
         FmCreativeTab.TABS.register(modEventBus);
+        FmDrops.register();
         FmGameTests.FUNCTIONS.register(modEventBus);
     }
 

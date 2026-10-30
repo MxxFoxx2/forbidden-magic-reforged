@@ -5,6 +5,7 @@ import com.leclowndu93150.thaumaturge.api.research.IResearchCategory;
 import com.leclowndu93150.thaumaturge.api.research.IResearchEntry;
 import com.leclowndu93150.thaumaturge.api.taint.ITaintBlock;
 import dev.visfox.forbiddenreforged.FmAspects;
+import dev.visfox.forbiddenreforged.FmDrops;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
 import java.util.List;
 import java.util.function.Consumer;
@@ -18,6 +19,8 @@ import net.minecraft.gametest.framework.TestData;
 import net.minecraft.gametest.framework.TestEnvironmentDefinition;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Rotation;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -41,7 +44,8 @@ public final class FmGameTests {
         "simple_items_are_registered",
         "rose_and_cake_blocks_are_registered",
         "recipes_are_loaded",
-        "taint_tools_are_registered"
+        "taint_tools_are_registered",
+        "drop_rules_match_original"
     };
 
     static {
@@ -55,6 +59,7 @@ public final class FmGameTests {
         FUNCTIONS.register(TESTS[7], () -> FmGameTests::roseAndCakeBlocksAreRegistered);
         FUNCTIONS.register(TESTS[8], () -> FmGameTests::recipesAreLoaded);
         FUNCTIONS.register(TESTS[9], () -> FmGameTests::taintToolsAreRegistered);
+        FUNCTIONS.register(TESTS[10], () -> FmGameTests::dropRulesMatchOriginal);
     }
 
     private FmGameTests() {
@@ -162,6 +167,30 @@ public final class FmGameTests {
         for (String id : List.of("taint_shovel", "taint_pickaxe")) {
             helper.assertTrue(BuiltInRegistries.ITEM.containsKey(ForbiddenMagic.id(id)), id + " must be registered");
         }
+        helper.succeed();
+    }
+
+    private static void dropRulesMatchOriginal(GameTestHelper helper) {
+        helper.assertValueEqual(FmDrops.heldWrathDamage(new ItemStack(Items.WOODEN_SWORD)), 4, "wooden sword adds four wrath");
+        helper.assertValueEqual(FmDrops.heldWrathDamage(new ItemStack(Items.IRON_SWORD)), 6, "iron sword adds six wrath");
+        helper.assertValueEqual(FmDrops.heldWrathDamage(new ItemStack(Items.DIAMOND_SWORD)), 7, "diamond sword adds seven wrath");
+        helper.assertValueEqual(FmDrops.heldWrathDamage(new ItemStack(Items.IRON_PICKAXE)), 0, "tools add no wrath damage");
+        helper.assertTrue(FmDrops.rollWrath(5, 5), "roll equal to bonus succeeds");
+        helper.assertFalse(FmDrops.rollWrath(5, 6), "roll above bonus fails");
+        helper.assertValueEqual(FmDrops.prideCount(0, 0), 2, "pride base count");
+        helper.assertValueEqual(FmDrops.prideCount(3, 2), 5, "pride count adds roll");
+        helper.assertTrue(FmDrops.rollSloth(3), "sloth boundary inside");
+        helper.assertFalse(FmDrops.rollSloth(4), "sloth boundary outside");
+        helper.assertValueEqual(FmDrops.slothCount(2), 3, "sloth count adds roll");
+        helper.assertFalse(FmDrops.rollGreed(0, 0), "zero greed never rolls");
+        helper.assertTrue(FmDrops.rollGreed(2, 2), "greed boundary inside");
+        helper.assertFalse(FmDrops.rollGreed(2, 3), "greed boundary outside");
+        helper.assertTrue(FmDrops.rollGluttony(1), "gluttony inside");
+        helper.assertFalse(FmDrops.rollGluttony(2), "gluttony outside");
+        helper.assertTrue(FmDrops.rollQuartzGreed(1, 1), "quartz greed inside");
+        helper.assertFalse(FmDrops.rollQuartzGreed(0, 0), "quartz greed needs fortune");
+        helper.assertTrue(FmDrops.rollEnvy(1), "envy inside");
+        helper.assertFalse(FmDrops.rollEnvy(2), "envy outside");
         helper.succeed();
     }
 
