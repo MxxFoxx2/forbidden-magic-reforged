@@ -1,5 +1,7 @@
 package dev.visfox.forbiddenreforged.test;
 
+import com.leclowndu93150.thaumaturge.api.aspect.AspectDataMaps;
+import com.leclowndu93150.thaumaturge.api.aspect.AspectList;
 import com.leclowndu93150.thaumaturge.api.aspect.IAspect;
 import com.leclowndu93150.thaumaturge.api.research.IResearchCategory;
 import com.leclowndu93150.thaumaturge.api.research.IResearchEntry;
@@ -54,7 +56,8 @@ public final class FmGameTests {
         "enchantments_are_loaded",
         "enchantment_rules_match_original",
         "morph_tools_are_registered",
-        "morph_state_cycles"
+        "morph_state_cycles",
+        "item_aspects_match_original"
     };
 
     static {
@@ -75,6 +78,7 @@ public final class FmGameTests {
         FUNCTIONS.register(TESTS[14], () -> FmGameTests::enchantmentRulesMatchOriginal);
         FUNCTIONS.register(TESTS[15], () -> FmGameTests::morphToolsAreRegistered);
         FUNCTIONS.register(TESTS[16], () -> FmGameTests::morphStateCycles);
+        FUNCTIONS.register(TESTS[17], () -> FmGameTests::itemAspectsMatchOriginal);
     }
 
     private FmGameTests() {
@@ -284,6 +288,19 @@ public final class FmGameTests {
         helper.assertValueEqual(state.advance().advance().tintColor(), 0xFFE5DA00, "phase two tint");
         var stored = state.store(net.minecraft.world.item.enchantment.ItemEnchantments.EMPTY, "test");
         helper.assertValueEqual(stored.currentName(), "test", "store keeps the name in the active slot");
+        helper.succeed();
+    }
+
+    private static void itemAspectsMatchOriginal(GameTestHelper helper) {
+        var aspects = aspects(helper);
+        var wrath = BuiltInRegistries.ITEM.get(ForbiddenMagic.id("wrath_shard")).orElseThrow().getData(AspectDataMaps.BASE_ASPECTS);
+        helper.assertTrue(wrath != null, "wrath shard must declare aspects");
+        helper.assertValueEqual(wrath.amountOf(aspects.getOrThrow(FmAspects.IRA)), 2, "wrath shard carries ira two");
+        helper.assertValueEqual(wrath.amountOf(aspects.getOrThrow(FmAspects.INFERNUS)), 1, "wrath shard carries infernus one");
+        var coal = BuiltInRegistries.ITEM.get(ForbiddenMagic.id("taint_coal")).orElseThrow().getData(AspectDataMaps.BASE_ASPECTS);
+        helper.assertTrue(coal != null, "hexcoal must declare aspects");
+        helper.assertValueEqual(coal.amountOf(aspects.getOrThrow(com.leclowndu93150.thaumaturge.api.aspect.TTAspects.VITIUM)), 2,
+            "hexcoal carries vitium two");
         helper.succeed();
     }
 

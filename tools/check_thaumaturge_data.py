@@ -179,6 +179,22 @@ def main():
         if key not in lang_en or key not in lang_ru:
             errors += fail(f"missing {key}")
 
+    data_map = RES / "data/forbiddenmagic/data_maps/item/base_aspects.json"
+    if data_map.is_file():
+        for target, entries in load(data_map).get("values", {}).items():
+            namespace, _, name = target.partition(":")
+            if namespace == "forbiddenmagic" and not (RES / "assets/forbiddenmagic/items" / (name + ".json")).is_file():
+                errors += fail(f"aspect map: unknown item {target}")
+            for entry in entries:
+                aspect = entry.get("aspect", "")
+                aspect_ns, _, aspect_name = aspect.partition(":")
+                if aspect_ns == "thaumaturge" and aspect_name not in known_aspects:
+                    errors += fail(f"aspect map: unknown aspect {aspect}")
+                if aspect_ns == "forbiddenmagic" and aspect_name not in ASPECTS:
+                    errors += fail(f"aspect map: unknown aspect {aspect}")
+    else:
+        errors += fail("missing item base aspects data map")
+
     recipe_dir = RES / "data/forbiddenmagic/recipe"
     entry_ids = {"forbiddenmagic:" + path.stem for path in entry_dir.glob("*.json")}
     for path in sorted(recipe_dir.glob("*.json")):

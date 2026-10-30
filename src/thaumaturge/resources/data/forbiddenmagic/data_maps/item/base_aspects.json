@@ -1,0 +1,234 @@
+{
+  "values": {
+    "forbiddenmagic:wrath_shard": [
+      {
+        "aspect": "forbiddenmagic:infernus",
+        "amount": 1
+      },
+      {
+        "aspect": "forbiddenmagic:ira",
+        "amount": 2
+      },
+      {
+        "aspect": "thaumaturge:vitreus",
+        "amount": 1
+      }
+    ],
+    "forbiddenmagic:envy_shard": [
+      {
+        "aspect": "forbiddenmagic:infernus",
+        "amount": 1
+      },
+      {
+        "aspect": "forbiddenmagic:invidia",
+        "amount": 2
+      },
+      {
+        "aspect": "thaumaturge:vitreus",
+        "amount": 1
+      }
+    ],
+    "forbiddenmagic:taint_shard": [
+      {
+        "aspect": "thaumaturge:vitium",
+        "amount": 3
+      },
+      {
+        "aspect": "thaumaturge:vitreus",
+        "amount": 1
+      }
+    ],
+    "forbiddenmagic:pride_shard": [
+      {
+        "aspect": "forbiddenmagic:infernus",
+        "amount": 1
+      },
+      {
+        "aspect": "forbiddenmagic:superbia",
+        "amount": 2
+      },
+      {
+        "aspect": "thaumaturge:vitreus",
+        "amount": 1
+      }
+    ],
+    "forbiddenmagic:lust_shard": [
+      {
+        "aspect": "forbiddenmagic:infernus",
+        "amount": 1
+      },
+      {
+        "aspect": "forbiddenmagic:luxuria",
+        "amount": 2
+      },
+      {
+        "aspect": "thaumaturge:vitreus",
+        "amount": 1
+      }
+    ],
+    "forbiddenmagic:sloth_shard": [
+      {
+        "aspect": "forbiddenmagic:infernus",
+        "amount": 1
+      },
+      {
+        "aspect": "forbiddenmagic:desidia",
+        "amount": 2
+      },
+      {
+        "aspect": "thaumaturge:vitreus",
+        "amount": 1
+      }
+    ],
+    "forbiddenmagic:greed_shard": [
+      {
+        "aspect": "forbiddenmagic:infernus",
+        "amount": 1
+      },
+      {
+        "aspect": "thaumaturge:desiderium",
+        "amount": 2
+      },
+      {
+        "aspect": "thaumaturge:vitreus",
+        "amount": 1
+      }
+    ],
+    "forbiddenmagic:gluttony_shard": [
+      {
+        "aspect": "forbiddenmagic:infernus",
+        "amount": 1
+      },
+      {
+        "aspect": "forbiddenmagic:gula",
+        "amount": 2
+      },
+      {
+        "aspect": "thaumaturge:vitreus",
+        "amount": 1
+      }
+    ],
+    "forbiddenmagic:emerald_fragment": [
+      {
+        "aspect": "thaumaturge:vitreus",
+        "amount": 1
+      }
+    ],
+    "forbiddenmagic:black_dye": [
+      {
+        "aspect": "thaumaturge:tenebrae",
+        "amount": 1
+      }
+    ],
+    "forbiddenmagic:umbral_rose": [
+      {
+        "aspect": "thaumaturge:herba",
+        "amount": 1
+      },
+      {
+        "aspect": "thaumaturge:victus",
+        "amount": 1
+      },
+      {
+        "aspect": "thaumaturge:sensus",
+        "amount": 1
+      },
+      {
+        "aspect": "thaumaturge:tenebrae",
+        "amount": 1
+      }
+    ],
+    "forbiddenmagic:umbral_rose_bush": [
+      {
+        "aspect": "thaumaturge:herba",
+        "amount": 1
+      },
+      {
+        "aspect": "thaumaturge:victus",
+        "amount": 1
+      },
+      {
+        "aspect": "thaumaturge:sensus",
+        "amount": 1
+      },
+      {
+        "aspect": "thaumaturge:tenebrae",
+        "amount": 1
+      }
+    ],
+    "forbiddenmagic:riding_crop": [
+      {
+        "aspect": "thaumaturge:herba",
+        "amount": 2
+      },
+      {
+        "aspect": "thaumaturge:fabrico",
+        "amount": 2
+      },
+      {
+        "aspect": "thaumaturge:bestia",
+        "amount": 1
+      },
+      {
+        "aspect": "forbiddenmagic:luxuria",
+        "amount": 1
+      },
+      {
+        "aspect": "thaumaturge:instrumentum",
+        "amount": 1
+      }
+    ],
+    "forbiddenmagic:taint_fruit": [
+      {
+        "aspect": "thaumaturge:vitium",
+        "amount": 2
+      },
+      {
+        "aspect": "thaumaturge:mortuus",
+        "amount": 1
+      }
+    ],
+    "forbiddenmagic:taint_coal": [
+      {
+        "aspect": "thaumaturge:vitium",
+        "amount": 2
+      },
+      {
+        "aspect": "thaumaturge:perditio",
+        "amount": 2
+      }
+    ],
+    "forbiddenmagic:taint_leaves": [
+      {
+        "aspect": "thaumaturge:vitium",
+        "amount": 1
+      },
+      {
+        "aspect": "thaumaturge:herba",
+        "amount": 1
+      }
+    ],
+    "forbiddenmagic:taint_log": [
+      {
+        "aspect": "thaumaturge:vitium",
+        "amount": 1
+      },
+      {
+        "aspect": "thaumaturge:herba",
+        "amount": 3
+      }
+    ],
+    "forbiddenmagic:taint_planks": [
+      {
+        "aspect": "thaumaturge:herba",
+        "amount": 1
+      }
+    ],
+    "forbiddenmagic:taint_stone_brick": [
+      {
+        "aspect": "thaumaturge:terra",
+        "amount": 1
+      }
+    ]
+  }
+}
