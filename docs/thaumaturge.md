@@ -41,3 +41,9 @@ JAVA_HOME=<JDK 25> ./gradlew build
 Готово: сборка под Thaumaturge, семь аспектов, восемь осколков, своя creative-вкладка, категория `forbiddenmagic:forbidden` и autounlock-запись `forbiddenmagic:nether_shards`, модели и локализация `en_us`/`ru_ru`, четыре GameTest.
 
 Осталось: рецепты, инфузии, зачарования, исследования, жезлы и насадки, скверна, Mob Crystal, Wrath Cage, дропы, конфиг, остальные предметы и блоки.
+
+## Проверка
+
+- Компиляция проверена напрямую: `javac` с classpath Thaumaturge 1.0.3 и патченного Minecraft 26.1.2 собирает все классы порта без ошибок.
+- `python tools/check_thaumaturge_data.py` проверяет datapack-файлы, компоненты аспектов, ссылки research, текстуры, модели, предметные id и паритет ключей `en_us`/`ru_ru`. Проверка проходит.
+- `runGameTestServer` в этом окружении не запустился: `maven.neoforged.net` недоступен, а артефакт `neoforge-26.1.2.122-moddev-config.json` не был загружен ранее. Когда сеть восстановится, гейт — `./gradlew build` и `./gradlew runGameTestServer` с зелёными четырьмя тестами.
