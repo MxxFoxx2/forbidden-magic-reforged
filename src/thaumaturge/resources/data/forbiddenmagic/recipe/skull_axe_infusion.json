@@ -1,0 +1,42 @@
+{
+  "type": "thaumaturge:infusion",
+  "catalyst": {
+    "item": "thaumaturge:thaumium_axe"
+  },
+  "components": [
+    {
+      "item": "forbiddenmagic:wrath_shard"
+    },
+    {
+      "item": "forbiddenmagic:wrath_shard"
+    },
+    {
+      "item": "minecraft:diamond"
+    },
+    {
+      "item": "minecraft:wither_skeleton_skull"
+    }
+  ],
+  "aspects": [
+    {
+      "aspect": "forbiddenmagic:ira",
+      "amount": 8
+    },
+    {
+      "aspect": "thaumaturge:aversio",
+      "amount": 8
+    },
+    {
+      "aspect": "forbiddenmagic:infernus",
+      "amount": 8
+    }
+  ],
+  "instability": 1,
+  "result": {
+    "id": "forbiddenmagic:skull_axe",
+    "count": 1
+  },
+  "research": {
+    "entry": "forbiddenmagic:skull_axe_research"
+  }
+}

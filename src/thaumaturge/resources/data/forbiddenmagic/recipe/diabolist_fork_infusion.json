@@ -1,0 +1,42 @@
+{
+  "type": "thaumaturge:infusion",
+  "catalyst": {
+    "item": "thaumaturge:thaumium_sword"
+  },
+  "components": [
+    {
+      "item": "minecraft:quartz"
+    },
+    {
+      "item": "minecraft:quartz"
+    },
+    {
+      "item": "minecraft:quartz"
+    },
+    {
+      "item": "minecraft:redstone"
+    }
+  ],
+  "aspects": [
+    {
+      "aspect": "forbiddenmagic:infernus",
+      "amount": 8
+    },
+    {
+      "aspect": "thaumaturge:machina",
+      "amount": 8
+    },
+    {
+      "aspect": "thaumaturge:potentia",
+      "amount": 8
+    }
+  ],
+  "instability": 1,
+  "result": {
+    "id": "forbiddenmagic:diabolist_fork",
+    "count": 1
+  },
+  "research": {
+    "entry": "forbiddenmagic:diabolist_fork_research"
+  }
+}

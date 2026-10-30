@@ -186,7 +186,8 @@ public final class FmGameTests {
             "ink_from_rose", "taint_sapling_crucible", "umbral_rose_crucible", "emerald_fragment_crucible",
             "arcane_cake_infusion", "wrath_cage_infusion", "mob_crystal_crucible", "taint_shovel_infusion",
             "taint_pickaxe_infusion", "taint_stone_arcane", "morph_pickaxe_infusion", "morph_sword_infusion",
-            "morph_shovel_infusion", "morph_axe_infusion", "crystalwell_arcane", "primewell_arcane")) {
+            "morph_shovel_infusion", "morph_axe_infusion", "crystalwell_arcane", "primewell_arcane",
+            "skull_axe_infusion", "diabolist_fork_infusion", "ring_nutrition_arcane")) {
             helper.assertTrue(helper.getLevel().getServer().getRecipeManager()
                 .byKey(ResourceKey.create(Registries.RECIPE, ForbiddenMagic.id(id))).isPresent(), id + " recipe must load");
         }
