@@ -32,6 +32,7 @@ public final class FmItems {
     public static final DeferredItem<Item> GLUTTONY_SHARD;
     public static final DeferredItem<Item> SKULL_AXE;
     public static final DeferredItem<Item> EMERALD_FRAGMENT;
+    public static final DeferredItem<Item> TAINTED_BLOOD_SHARD;
     public static final DeferredItem<Item> MORPH_PICKAXE;
     public static final DeferredItem<Item> MORPH_SWORD;
     public static final DeferredItem<Item> MORPH_SHOVEL;
@@ -44,6 +45,12 @@ public final class FmItems {
     public static final DeferredItem<Item> TAINT_FRUIT;
     public static final DeferredItem<Item> RING_NUTRITION;
     public static final DeferredItem<Item> ALCHEMICAL_CAP;
+    public static final DeferredItem<Item> VINTEUM_CAP;
+    public static final DeferredItem<Item> TERRASTEEL_CAP;
+    public static final DeferredItem<Item> MANASTEEL_CAP;
+    public static final DeferredItem<Item> MANASTEEL_INERT_CAP;
+    public static final DeferredItem<Item> ELEMENTIUM_CAP;
+    public static final DeferredItem<Item> ELEMENTIUM_INERT_CAP;
     public static final DeferredItem<Item> EQUIVALENT_ROD;
     public static final DeferredItem<Item> TAINTED_ROD;
     public static final DeferredItem<Item> INFERNAL_ROD;
@@ -68,6 +75,7 @@ public final class FmItems {
             properties -> Registration.sword(properties.rarity(Rarity.UNCOMMON), TcMaterials.ELEMENTAL_TOOL, 3.0F, -2.4F)
                 .repairable(ModItems.THAUMIUM_INGOT.get()));
         EMERALD_FRAGMENT = ITEMS.registerSimpleItem("emerald_fragment");
+        TAINTED_BLOOD_SHARD = ITEMS.registerSimpleItem("tainted_blood_shard");
         MORPH_PICKAXE = ITEMS.registerItem("morph_pickaxe", MorphToolItem::new,
             properties -> repairable(Registration.pickaxe(properties.rarity(Rarity.EPIC), TcMaterials.ELEMENTAL_TOOL, 2.0F, -2.8F)));
         MORPH_SWORD = ITEMS.registerItem("morph_sword", MorphToolItem::new,
@@ -98,6 +106,12 @@ public final class FmItems {
         RING_NUTRITION = ITEMS.registerItem("ring_nutrition", RingNutritionItem::new,
             properties -> properties.stacksTo(1));
         ALCHEMICAL_CAP = ITEMS.registerSimpleItem("alchemical_cap");
+        VINTEUM_CAP = ITEMS.registerSimpleItem("vinteum_cap");
+        TERRASTEEL_CAP = ITEMS.registerSimpleItem("terrasteel_cap");
+        MANASTEEL_CAP = ITEMS.registerSimpleItem("manasteel_cap");
+        MANASTEEL_INERT_CAP = ITEMS.registerSimpleItem("manasteel_inert_cap");
+        ELEMENTIUM_CAP = ITEMS.registerSimpleItem("elementium_cap");
+        ELEMENTIUM_INERT_CAP = ITEMS.registerSimpleItem("elementium_inert_cap");
         EQUIVALENT_ROD = ITEMS.registerSimpleItem("equivalent_rod");
         TAINTED_ROD = ITEMS.registerSimpleItem("tainted_rod");
         INFERNAL_ROD = ITEMS.registerSimpleItem("infernal_rod");

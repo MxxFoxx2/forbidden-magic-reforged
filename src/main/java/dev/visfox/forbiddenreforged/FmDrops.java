@@ -32,7 +32,9 @@ import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
+import net.minecraft.world.effect.MobEffects;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
+import thaumcraft.entity.TaintedMob;
 import thaumcraft.entity.boss.ThaumcraftBoss;
 import thaumcraft.wand.Wands;
 
@@ -42,6 +44,7 @@ public final class FmDrops {
 
     public static void register() {
         NeoForge.EVENT_BUS.addListener(FmDrops::onLivingDrops);
+    NeoForge.EVENT_BUS.addListener(FmDrops::onTaintedBloodShardDrop);
         NeoForge.EVENT_BUS.addListener(FmDrops::onFoodFinished);
         NeoForge.EVENT_BUS.addListener(FmDrops::onQuartzOreDrops);
         NeoForge.EVENT_BUS.addListener(FmDrops::onEntityJoinLevel);
@@ -129,6 +132,29 @@ public final class FmDrops {
         if (entity instanceof ZombifiedPiglin pig && pig.getMainHandItem().is(FmItems.DEADLY_SHARDS.get("envy").get())) {
             addDrop(event, FmItems.DEADLY_SHARDS.get("envy").get(), 1);
         }
+    }
+
+    private static void onTaintedBloodShardDrop(LivingDropsEvent event) {
+        LivingEntity entity = event.getEntity();
+        if (!(entity instanceof TaintedMob)) {
+            return;
+        }
+        DamageSource source = event.getSource();
+        Entity attacker = source.getEntity();
+        boolean playerAttack = attacker instanceof Player && !(attacker instanceof FakePlayer);
+        int weaknessAmplifier = -1;
+        var weakness = entity.getEffect(MobEffects.WEAKNESS);
+        if (weakness != null) {
+            weaknessAmplifier = weakness.getAmplifier();
+        }
+        if (!taintedBloodShardRoll(true, playerAttack, weaknessAmplifier, entity.getRandom().nextDouble())) {
+            return;
+        }
+        addDrop(event, FmItems.TAINTED_BLOOD_SHARD.get(), 1);
+    }
+
+    public static boolean taintedBloodShardRoll(boolean taintedMob, boolean playerAttack, int weaknessAmplifier, double random) {
+        return taintedMob && playerAttack && weaknessAmplifier >= 2 && random < 0.5;
     }
 
     private static void onFoodFinished(LivingEntityUseItemEvent.Finish event) {

@@ -1,7 +1,7 @@
-From b550eff2402ede2460067a4fdecd7bfb9e77fbce Mon Sep 17 00:00:00 2001
+From df711b8f296c9b1a2d8a89107cd80857177ac972 Mon Sep 17 00:00:00 2001
 From: MxxFoxx2 <126578124+MxxFoxx2@users.noreply.github.com>
 Date: Mon, 26 Oct 2026 18:32:05 +0300
-Subject: [PATCH] feat: support block aspect scan targets
+Subject: [PATCH 1/2] feat: support block aspect scan targets
 
 ---
  .../thaumcraft/aspect/AspectRegistrar.java    |  7 ++++++
@@ -168,5 +168,5 @@ index 1961ee7..2e0ac5d 100644
          if (stack.isEmpty()) {
              return null;
 -- 
-2.34.1
+2.52.0.windows.1
 
