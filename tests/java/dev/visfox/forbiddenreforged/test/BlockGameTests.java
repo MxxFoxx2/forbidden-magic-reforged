@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.mojang.authlib.GameProfile;
 import io.netty.channel.embedded.EmbeddedChannel;
 import java.io.IOException;
 import java.io.InputStream;
@@ -104,8 +105,13 @@ public final class BlockGameTests {
     }
 
     private static ServerPlayer mockPlayer(GameTestHelper helper) {
-        ServerPlayer player = (ServerPlayer) helper.makeMockServerPlayer(GameType.SURVIVAL);
-        CommonListenerCookie cookie = CommonListenerCookie.createInitial(player.getGameProfile(), false);
+        CommonListenerCookie cookie = CommonListenerCookie.createInitial(new GameProfile(java.util.UUID.randomUUID(), "test-mock-player"), false);
+        ServerPlayer player = new ServerPlayer(helper.getLevel().getServer(), helper.getLevel(), cookie.gameProfile(), cookie.clientInformation()) {
+            @Override
+            public GameType gameMode() {
+                return GameType.SURVIVAL;
+            }
+        };
         Connection connection = new Connection(PacketFlow.SERVERBOUND);
         new EmbeddedChannel(connection);
         new ServerGamePacketListenerImpl(helper.getLevel().getServer(), connection, player, cookie) {
@@ -114,6 +120,7 @@ public final class BlockGameTests {
             }
         };
         player.connection.markClientLoaded();
+        player.gameMode.changeGameModeForPlayer(GameType.SURVIVAL);
         return player;
     }
 

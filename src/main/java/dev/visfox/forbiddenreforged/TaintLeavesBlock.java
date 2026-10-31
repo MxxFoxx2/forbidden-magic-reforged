@@ -1,10 +1,24 @@
 package dev.visfox.forbiddenreforged;
 
+import com.mojang.serialization.MapCodec;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LeavesBlock;
-import net.minecraft.world.level.block.sounds.AmbientLeavesBlockSoundPlayer;
 
 public class TaintLeavesBlock extends LeavesBlock {
+    public static final MapCodec<TaintLeavesBlock> CODEC = simpleCodec(TaintLeavesBlock::new);
+
     public TaintLeavesBlock(Properties properties) {
-        super(AmbientLeavesBlockSoundPlayer.noAmbientSound(), properties);
+        super(0.0F, properties);
+    }
+
+    @Override
+    public MapCodec<TaintLeavesBlock> codec() {
+        return CODEC;
+    }
+
+    @Override
+    protected void spawnFallingLeavesParticle(Level level, BlockPos pos, RandomSource random) {
     }
 }

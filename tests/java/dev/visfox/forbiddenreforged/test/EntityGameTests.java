@@ -12,7 +12,7 @@ import net.minecraft.gametest.framework.TestEnvironmentDefinition;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -76,14 +76,14 @@ public final class EntityGameTests {
         for (String id : FmSpawnerMobs.ids()) {
             helper.assertTrue(FmSpawnerMobs.aspect(id) != null, id + " must map to an aspect");
         }
-        helper.assertTrue(FmSpawnerMobs.isBoss(EntityTypes.ENDER_DRAGON), "the ender dragon is a boss");
-        helper.assertFalse(FmSpawnerMobs.isBoss(EntityTypes.ZOMBIE), "a zombie is not a boss");
+        helper.assertTrue(FmSpawnerMobs.isBoss(EntityType.ENDER_DRAGON), "the ender dragon is a boss");
+        helper.assertFalse(FmSpawnerMobs.isBoss(EntityType.ZOMBIE), "a zombie is not a boss");
         ItemStack stack = new ItemStack(FmItems.MOB_CRYSTAL.get());
         helper.assertTrue(MobCrystalItem.mob(stack) == null, "a fresh crystal is empty");
         MobCrystalItem.setMob(stack, "minecraft:zombie");
         helper.assertValueEqual(MobCrystalItem.mob(stack), "minecraft:zombie", "the crystal keeps the mob id");
-        helper.assertTrue(FmSpawnerMobs.canImprint(EntityTypes.ZOMBIE), "zombies can be imprinted");
-        helper.assertFalse(FmSpawnerMobs.canImprint(EntityTypes.ENDER_DRAGON), "bosses cannot be imprinted");
+        helper.assertTrue(FmSpawnerMobs.canImprint(EntityType.ZOMBIE), "zombies can be imprinted");
+        helper.assertFalse(FmSpawnerMobs.canImprint(EntityType.ENDER_DRAGON), "bosses cannot be imprinted");
         helper.succeed();
     }
 
@@ -106,7 +106,7 @@ public final class EntityGameTests {
         ItemStack crystal = WrathCageBlockEntity.crystalForBreak(cage);
         helper.assertValueEqual(MobCrystalItem.mob(crystal), "minecraft:skeleton", "breaking the cage yields the attuned crystal");
         helper.destroyBlock(pos);
-        ItemEntity dropped = helper.getEntities(EntityTypes.ITEM, pos, 1.0).stream().findFirst().orElse(null);
+        ItemEntity dropped = helper.getEntities(EntityType.ITEM, pos, 1.0).stream().findFirst().orElse(null);
         helper.assertTrue(dropped != null && "minecraft:skeleton".equals(MobCrystalItem.mob(dropped.getItem())), "removing the cage drops its crystal");
         helper.succeed();
     }

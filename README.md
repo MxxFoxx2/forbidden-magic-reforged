@@ -1,14 +1,14 @@
 # Forbidden Magic: Reforged
 
-Порт Forbidden Magic 0.574 (Minecraft 1.7.10) для Thaumcraft 4: Reforged на Minecraft 26.3. Перенесённый контент включает семь аспектов грехов, осколки, зачарования, хамелеоновы инструменты, материалы скверны, Mob Crystal и Wrath Cage.
+Порт Forbidden Magic 0.574 (Minecraft 1.7.10) для Thaumcraft 4: Reforged на Minecraft 26.1.2. Перенесённый контент включает семь аспектов грехов, осколки, зачарования, хамелеоновы инструменты, материалы скверны, Mob Crystal и Wrath Cage.
 
 Полный паритет с оригиналом пока не подтверждён: сборка и GameTests зелёные, визуальные и полноценные игровые проверки ещё нужны.
 
 ## Установка
 
-Требуются: Minecraft 26.3, NeoForge 26.3.0.57-beta или новее и [Thaumcraft 4: Reforged](https://github.com/notlikethiss/thaumcraft-4-reforged) 1.1.2+. Скачайте JAR из [Releases](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases) и поместите в `mods/` вместе с хост-модом.
+Требуются: Minecraft 26.1.2, NeoForge 26.1.2.122 или новее и [Thaumcraft 4: Reforged](https://github.com/notlikethiss/thaumcraft-4-reforged) 1.1.2+. Скачайте JAR из [Releases](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases) и поместите в `mods/` вместе с хост-модом.
 
-Основной канал — релиз `26.3`; отдельные релизы есть для Minecraft 26.1.2 и 1.21.1. Каждый канал — rolling-релиз под тегом `release/<версия>`: свежий билд всегда доступен по одному и тому же тегу.
+Эта ветка — канал `26.1.2` (rolling-релиз под тегом `release/26.1.2`). Основной канал — `26.3` в ветке `main`; для Minecraft 1.21.1 есть отдельный релиз `release/1.21.1`.
 
 ## Использование
 

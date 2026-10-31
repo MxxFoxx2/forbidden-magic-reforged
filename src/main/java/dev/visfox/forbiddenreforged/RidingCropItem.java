@@ -14,7 +14,6 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import thaumcraft.entity.golem.GolemBase;
@@ -55,7 +54,7 @@ public class RidingCropItem extends Item {
                 livingMount.hurt(player.damageSources().generic(), 1.0F);
                 livingMount.addEffect(new MobEffectInstance(MobEffects.SPEED, 200, 5));
             }
-            player.swing(hand, SwingAnimation.DEFAULT, true);
+            player.swing(hand, true);
             return InteractionResult.SUCCESS;
         }
         return super.use(level, player, hand);

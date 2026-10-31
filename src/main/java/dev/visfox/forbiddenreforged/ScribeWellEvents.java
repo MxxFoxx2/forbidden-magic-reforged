@@ -4,7 +4,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.Container;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.Prediction;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -88,7 +87,7 @@ public final class ScribeWellEvents {
         ItemStack returnedPearl = new ItemStack(pearl);
         player.getInventory().add(returnedPearl);
         if (!returnedPearl.isEmpty()) {
-            player.drop(returnedPearl, false, Prediction.PREDICTED);
+            player.drop(returnedPearl, false);
         }
     }
 }
