@@ -173,7 +173,7 @@ public final class FmResearch {
                 .registerResearchItem();
         }
         new FmResearchItem("RIDINGCROP", "FORBIDDEN", new AspectList(), 0, -8, 0, TcStack.of(FmItems.RIDING_CROP.getId().toString(), 1))
-            .setPages(ResearchPage.text("forbiddenmagic.research_page.RIDINGCROP.1"))
+            .setPages(ResearchPage.text("forbiddenmagic.research_page.RIDINGCROP.1"), ResearchPage.crafting("RidingCrop"))
             .setStub()
             .setRound()
             .setAutoUnlock()

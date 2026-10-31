@@ -36,7 +36,6 @@ import thaumcraft.damage.ModDamageTypes;
 import thaumcraft.wand.Wands;
 
 public final class FmEnchantmentEffects {
-    private static final Set<Item> GARBAGE = Set.of(Items.DIRT, Items.SAND, Items.GRAVEL, Items.COBBLESTONE, Items.NETHERRACK);
     private static final TagKey<Block> INFUSED_STONES = TagKey.create(Registries.BLOCK, ForbiddenMagic.id("infused_stones"));
     private static final List<String> SIN_POOL = List.of("wrath", "envy", "gluttony", "pride", "lust", "sloth", "greed");
 
@@ -51,7 +50,7 @@ public final class FmEnchantmentEffects {
     }
 
     public static boolean isGarbage(ItemStack stack) {
-        return GARBAGE.contains(stack.getItem());
+        return FmConfig.garbageBlocks().contains(stack.getItem());
     }
 
     public static ItemStack sinShard(RandomSource random) {

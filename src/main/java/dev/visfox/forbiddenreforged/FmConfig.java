@@ -1,5 +1,10 @@
 package dev.visfox.forbiddenreforged;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.common.ModConfigSpec;
@@ -19,6 +24,7 @@ public final class FmConfig {
     public static ModConfigSpec.BooleanValue spork;
     public static ModConfigSpec.BooleanValue silverfishEmeralds;
     public static ModConfigSpec.BooleanValue emeraldTrans;
+    public static ModConfigSpec.ConfigValue<String> garbageBlocks;
 
     static {
         noLust = BUILDER.comment("Enable to remove Luxuria aspect and related items.").define("general.no_lust", false);
@@ -33,6 +39,7 @@ public final class FmConfig {
         spork = BUILDER.comment("Rename the Diabolist Fork to 'Diabolist Spork' and use the spork texture.").define("general.spork", false);
         silverfishEmeralds = BUILDER.comment("Allow silverfish to drop emerald nuggets.").define("general.silverfish_emeralds", true);
         emeraldTrans = BUILDER.comment("Enable Emerald Transmutation research and recipe.").define("general.emerald_transmutation", true);
+        garbageBlocks = BUILDER.comment("Ore-dict names (modern: item ids) of garbage blocks for the Consuming enchantment to eat.").define("general.garbage_blocks", "minecraft:dirt;minecraft:sand;minecraft:gravel;minecraft:cobblestone;minecraft:netherrack");
         SPEC = BUILDER.build();
     }
 
@@ -89,5 +96,21 @@ public final class FmConfig {
 
     public static boolean emeraldTrans() {
         return SPEC.isLoaded() ? emeraldTrans.get() : emeraldTrans.getDefault();
+    }
+
+    public static Set<Item> garbageBlocks() {
+        String raw = SPEC.isLoaded() ? garbageBlocks.get() : garbageBlocks.getDefault();
+        Set<Item> result = new LinkedHashSet<>();
+        for (String part : raw.split(";")) {
+            String id = part.trim();
+            if (id.isEmpty()) {
+                continue;
+            }
+            if (!id.contains(":")) {
+                id = "minecraft:" + id;
+            }
+            BuiltInRegistries.ITEM.getOptional(ResourceLocation.parse(id)).ifPresent(result::add);
+        }
+        return result;
     }
 }
