@@ -25,7 +25,7 @@ public final class FmTinkerer {
             Method data = manager.getMethod("data");
             Map<Object, Object> costs = (Map<Object, Object>) data.invoke(null);
             Class<?> datum = Class.forName("thaumictinkerer.enchanting.EnchantmentManager$Data");
-            Constructor<?> constructor = datum.getConstructor(ResourceKey.class, net.minecraft.resources.Identifier.class, boolean.class, AspectList.class, String.class);
+            Constructor<?> constructor = datum.getConstructor(ResourceKey.class, net.minecraft.resources.ResourceLocation.class, boolean.class, AspectList.class, String.class);
             add(costs, constructor, FmEnchantments.WRATH, "textures/misc/wrath.png", new AspectList().add(Aspect.ENTROPY, 6).add(Aspect.FIRE, 6), "WRATH");
             add(costs, constructor, FmEnchantments.GREEDY, "textures/misc/greedy.png", new AspectList().add(Aspect.ENTROPY, 50).add(Aspect.EARTH, 30).add(Aspect.ORDER, 20), "GREEDY");
             add(costs, constructor, FmEnchantments.EDUCATIONAL, "textures/misc/educational.png", new AspectList().add(Aspect.AIR, 10).add(Aspect.FIRE, 10).add(Aspect.WATER, 10).add(Aspect.EARTH, 10).add(Aspect.ORDER, 15).add(Aspect.ENTROPY, 15), "EDUCATIONAL");

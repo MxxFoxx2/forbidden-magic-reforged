@@ -7,7 +7,6 @@ import net.minecraft.network.chat.Component;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
-import thaumcraft.aspect.Aspect;
 
 @EventBusSubscriber(modid = ForbiddenMagic.MODID)
 public final class FmCommands {
@@ -18,7 +17,7 @@ public final class FmCommands {
     static void register(RegisterCommandsEvent event) {
         event.getDispatcher().register(
             Commands.literal(ForbiddenMagic.MODID)
-                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(
                     Commands.literal("aspects")
                         .executes(FmCommands::showAspects)

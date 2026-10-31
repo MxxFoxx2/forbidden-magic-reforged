@@ -6,18 +6,15 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "forbiddenmagic:taint_sapling",
+          "name": "forbiddenmagic:taint_leaves",
           "conditions": [
             {
-              "condition": "minecraft:random_chance",
-              "chance": 0.0166
+              "condition": "minecraft:match_tool",
+              "predicate": {
+                "items": "minecraft:shears"
+              }
             }
           ]
-        }
-      ],
-      "conditions": [
-        {
-          "condition": "minecraft:survives_explosion"
         }
       ]
     },
@@ -26,21 +23,24 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "forbiddenmagic:taint_fruit",
-          "conditions": [
-            {
-              "condition": "minecraft:random_chance",
-              "chance": 0.05
-            }
-          ]
+          "name": "forbiddenmagic:taint_sapling"
         }
       ],
       "conditions": [
         {
           "condition": "minecraft:survives_explosion"
+        },
+        {
+          "condition": "minecraft:table_bonus",
+          "enchantment": "minecraft:fortune",
+          "chances": [
+            0.05,
+            0.0625,
+            0.083333336,
+            0.1
+          ]
         }
       ]
     }
-  ],
-  "random_sequence": "forbiddenmagic:blocks/taint_leaves"
+  ]
 }

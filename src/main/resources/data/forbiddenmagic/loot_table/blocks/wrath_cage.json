@@ -8,13 +8,7 @@
           "type": "minecraft:item",
           "name": "forbiddenmagic:wrath_cage"
         }
-      ],
-      "conditions": [
-        {
-          "condition": "minecraft:survives_explosion"
-        }
       ]
     }
-  ],
-  "random_sequence": "forbiddenmagic:blocks/wrath_cage"
+  ]
 }

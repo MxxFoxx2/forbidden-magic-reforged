@@ -21,7 +21,6 @@ skull_axe = "Axe of the Skulltaker"
 diabolist_fork = "Diabolist Fork"
 diabolist_fork_spork = "Spork of Doom"
 emerald_fragment = "Emerald Fragment"
-tainted_blood_shard = "Tainted Blood Shard"
 morph_pickaxe = "Chameleon Pickaxe"
 morph_sword = "Chameleon Sword"
 morph_shovel = "Chameleon Shovel"
@@ -31,14 +30,6 @@ riding_crop = "Riding Crop"
 black_dye = "Black Dye"
 taint_fruit = "Tainted Fruit"
 ring_nutrition = "Ring of Nutrition"
-vinteum_cap = "Vinteum Wand Cap"
-terrasteel_cap = "Terrasteel Wand Cap"
-manasteel_cap = "Manasteel Wand Cap"
-manasteel_inert_cap = "Inert Manasteel Wand Cap"
-elementium_cap = "Elementium Wand Cap"
-elementium_inert_cap = "Inert Elementium Wand Cap"
-alchemical_cap = "Alchemical Wand Cap"
-equivalent_rod = "Equivalent Wand Rod"
 tainted_rod = "Tainted Rod"
 infernal_rod = "Infernal Rod"
 witchwood_rod = "Witchwood Rod"
@@ -49,14 +40,10 @@ taint_pickaxe = "Pickaxe of Distortion"
 crystalwell = "Crystal Scribing Tools"
 primewell = "Primal Scribing Tools"
 blink_focus = "Wand Focus: Blink"
+
+alchemical_cap = "Alchemical Wand Cap"
+equivalent_rod = "Equivalent Wand Rod"
 sub_collar = "Collar of Pain"
-
-[item.Wand.alchemical]
-cap = "Alchemically Crowned"
-
-[item.Wand.equivalent]
-rod = "§kAlchemical§r"
-
 [item.Wand.tainted]
 rod = "Tainted"
 
@@ -114,8 +101,8 @@ PRIMEWELL = "Primal Scribing Tools"
 TAINTSHOVEL = "Shovel of the Purifier"
 TAINTPICK = "Pickaxe of Distortion"
 FOCUSBLINK = "Wand Focus: Blink"
-SUBCOLLAR = "Collar of Pain"
 
+SUBCOLLAR = "Collar of Pain"
 [tc.research_text]
 NETHERSHARDS = "Aim to misbehave."
 HELLFIRE = "Never get stranded again"
@@ -148,8 +135,8 @@ PRIMEWELL = "Bragging Rights"
 TAINTSHOVEL = "Like a hot knife through really gross butter"
 TAINTPICK = "Obsidian Buster"
 FOCUSBLINK = "Better than a stupid Ender Pearl"
-SUBCOLLAR = "Pain and Magic"
 
+SUBCOLLAR = "Pain and Magic"
 [focus.upgrade.hellfire]
 name = "Hellfire"
 text = "This upgrade unleashes a burst of fire upon teleporting to a location."
@@ -190,8 +177,8 @@ PRIMEWELL = "[FM] Bragging Rights"
 TAINTSHOVEL = "[FM] Like a hot knife through really gross butter"
 TAINTPICK = "[FM] Obsidian Buster"
 FOCUSBLINK = "[FM] Better than a stupid Ender Pearl"
-SUBCOLLAR = "[FM] Pain and Magic"
 
+SUBCOLLAR = "[FM] Pain and Magic"
 [forbiddenmagic.research_page.NETHERSHARDS]
 1 = "Strange energies swirl through the Nether. On occasion, they have been known to solidify into crystal shards when certain sympathetic events occur."
 2 = "These crystals are imbued with different vices and have many uses for more unscrupulous Thaumaturges.<BR>There are seven documented types of nether shard, each attuned to a different \"deadly sin.\"<BR><BR><IMG>forbiddenmagic:textures/misc/research.png:0:0:111:16:1</IMG><BR>"
@@ -314,9 +301,6 @@ wrath_cage = "Wrath Cage"
 [forbiddenmagic.research_page.TAINTPICK]
 1 = "By infusing a thaumium pickaxe with taint, you create a tool capable of cutting through difficult materials.<BR><BR>The Pickaxe of Distortion infects hard materials with taint, weakening them. The harder the material, the more effective the pickaxe is at removing it. Unfortunately, the effects of the taint have an inverse effect when mining softer materials, rendering the pickaxe less effective than just pawing at the block with your bare hands."
 
-[forbiddenmagic.research_page.SUBCOLLAR]
-1 = "Sometimes, people just want to get hurt. Especially if there's a benefit...<BR><BR>The Collar of Pain has all the capabilities of an Amulet of Vis Storage with the added bonus that it will generate vis whenever you take damage. The more you get hurt, the more vis it generates."
-
 [forbiddenmagic.research_page.FOCUSBLINK]
 1 = "Ugh.<BR><BR>The only thing that sucks more than getting up is having to walk places. So much woooooork. What's the point of being a big fancy magician if you still have to use your feet like everyone else?<BR><BR>The Blink focus eases the hardships of having to put one foot in front of the other. Just point your wand at a distant location and wave it to teleport yourself there.<BR><BR>Now all you need is a Shower focus and you'll be all set..."
 
@@ -325,11 +309,18 @@ heretic = "Heretic"
 
 [itemGroup]
 forbiddenmagic = "Forbidden Magic"
-forbiddenmagic_mobcrystal = "Forbidden Magic: Mob Crystals"
 
 [tooltip]
 creativeonly = "Creative Only"
 profane_contract = "Contract: %s"
+[item.Wand.alchemical]
+cap = "Alchemical"
+
+[item.Wand.equivalent]
+rod = "Equivalent"
+
+[forbiddenmagic.research_page.SUBCOLLAR]
+1 = "Sometimes, people just want to get hurt. Especially if there's a benefit...<BR><BR>The Collar of Pain has all the capabilities of an Amulet of Vis Storage with the added bonus that it will generate vis whenever you take damage. The more you get hurt, the more vis it generates."
 
 [tooltip.collar]
 owner = "Owner:"
@@ -338,3 +329,9 @@ owner = "Owner:"
 alreadywearing = "%s is already wearing something around their neck!"
 placescollar = "%s places a collar around your neck."
 youplacecollar = "You place the collar around %s's neck."
+
+[entity.minecraft.villager]
+heretic = "Heretic"
+
+[entity.minecraft.villager.forbiddenmagic]
+heretic = "Heretic"

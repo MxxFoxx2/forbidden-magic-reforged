@@ -3,7 +3,7 @@ package dev.visfox.forbiddenreforged;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.config.ModConfig;
@@ -109,7 +109,7 @@ public final class FmConfig {
             if (!id.contains(":")) {
                 id = "minecraft:" + id;
             }
-            BuiltInRegistries.ITEM.getOptional(Identifier.parse(id)).ifPresent(result::add);
+            BuiltInRegistries.ITEM.getOptional(ResourceLocation.parse(id)).ifPresent(result::add);
         }
         return result;
     }

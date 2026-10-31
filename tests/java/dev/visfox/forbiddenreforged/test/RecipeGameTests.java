@@ -4,18 +4,17 @@ import io.netty.channel.embedded.EmbeddedChannel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.FunctionGameTestInstance;
+import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.gametest.framework.TestData;
-import net.minecraft.gametest.framework.TestEnvironmentDefinition;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketFlow;
-import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
@@ -25,11 +24,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.event.RegisterGameTestsEvent;
-import net.neoforged.neoforge.registries.DeferredRegister;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
 import dev.visfox.forbiddenreforged.FmAspects;
 import dev.visfox.forbiddenreforged.FmBlocks;
@@ -37,6 +32,7 @@ import dev.visfox.forbiddenreforged.FmConfig;
 import dev.visfox.forbiddenreforged.FmDrops;
 import dev.visfox.forbiddenreforged.FmItems;
 import dev.visfox.forbiddenreforged.FmRecipes;
+import thaumcraft.test.TestSupport;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.aspect.AspectList;
 import thaumcraft.aspect.AspectRegistry;
@@ -55,76 +51,31 @@ import thaumcraft.research.ResearchManager;
 import thaumcraft.registry.ModItems;
 import thaumcraft.research.Warp;
 
-@EventBusSubscriber(modid = ForbiddenMagic.MODID)
+@GameTestHolder
+@PrefixGameTestTemplate(false)
 public final class RecipeGameTests {
-    public static final DeferredRegister<Consumer<GameTestHelper>> FUNCTIONS =
-        DeferredRegister.create(Registries.TEST_FUNCTION, ForbiddenMagic.MODID);
 
-    private static final String[] TESTS = {
-        "every_ported_recipe_resolves_its_inputs",
-        "chain_from_netherrack_to_wrath_shard",
-        "enchantment_recipes_cover_five",
-        "morph_recipes_match_the_original",
-        "materials_have_crafting_recipes",
-        "plant_research_and_recipes",
-        "wand_rod_recipes_registered",
-        "taintstone_research_and_arcane_recipe",
-        "ore_dictionary_entries_became_tags",
-        "emerald_transmutation_matches_original",
-        "ring_food_recipe_matches_original",
-        "subcollar_matches_original",
-        "warp_values_match_original",
-        "research_layout_matches_original"
-    };
 
-    static {
-        FUNCTIONS.register(TESTS[0], () -> RecipeGameTests::everyPortedRecipeResolvesItsInputs);
-        FUNCTIONS.register(TESTS[1], () -> RecipeGameTests::chainFromNetherrackToWrathShard);
-        FUNCTIONS.register(TESTS[2], () -> RecipeGameTests::enchantmentRecipesCoverFive);
-        FUNCTIONS.register(TESTS[3], () -> RecipeGameTests::morphRecipesMatchTheOriginal);
-        FUNCTIONS.register(TESTS[4], () -> RecipeGameTests::materialsHaveCraftingRecipes);
-        FUNCTIONS.register(TESTS[5], () -> RecipeGameTests::plantResearchAndRecipes);
-        FUNCTIONS.register(TESTS[6], () -> RecipeGameTests::wandRodRecipesRegistered);
-        FUNCTIONS.register(TESTS[7], () -> RecipeGameTests::taintstoneResearchAndArcaneRecipe);
-        FUNCTIONS.register(TESTS[8], () -> RecipeGameTests::oreDictionaryEntriesBecameTags);
-        FUNCTIONS.register(TESTS[9], () -> RecipeGameTests::emeraldTransmutationMatchesOriginal);
-        FUNCTIONS.register(TESTS[10], () -> RecipeGameTests::ringFoodRecipeMatchesOriginal);
-        FUNCTIONS.register(TESTS[11], () -> RecipeGameTests::subcollarMatchesOriginal);
-        FUNCTIONS.register(TESTS[12], () -> RecipeGameTests::warpValuesMatchOriginal);
-        FUNCTIONS.register(TESTS[13], () -> RecipeGameTests::researchLayoutMatchesOriginal);
-    }
 
     private RecipeGameTests() {}
 
-    @SubscribeEvent
-    static void registerTests(RegisterGameTestsEvent event) {
-        Holder<TestEnvironmentDefinition<?>> environment = event.registerEnvironment(
-            Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, "fm_recipes"), new TestEnvironmentDefinition.AllOf());
-        for (String name : TESTS) {
-            ResourceKey<Consumer<GameTestHelper>> function =
-                ResourceKey.create(Registries.TEST_FUNCTION, Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, name));
-            event.registerTest(
-                Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, name),
-                new FunctionGameTestInstance(function, new TestData<>(environment, Identifier.parse("thaumcraft:test/platform"), 100, 0, true))
-            );
-        }
-    }
 
     private static ServerPlayer mockPlayer(GameTestHelper helper) {
-        ServerPlayer player = (ServerPlayer) helper.makeMockServerPlayer(GameType.SURVIVAL);
+        ServerPlayer player = TestSupport.mockServerPlayer(helper);
+        player.setGameMode(GameType.SURVIVAL);
         CommonListenerCookie cookie = CommonListenerCookie.createInitial(player.getGameProfile(), false);
         Connection connection = new Connection(PacketFlow.SERVERBOUND);
         new EmbeddedChannel(connection);
-        new ServerGamePacketListenerImpl(helper.getLevel().getServer(), connection, player, cookie) {
+        player.connection = new ServerGamePacketListenerImpl(helper.getLevel().getServer(), connection, player, cookie) {
             @Override
             public void send(Packet<?> packet) {
             }
         };
-        player.connection.markClientLoaded();
         return player;
     }
 
-    private static void everyPortedRecipeResolvesItsInputs(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void everyPortedRecipeResolvesItsInputs(GameTestHelper helper) {
         List<String> missing = new ArrayList<>();
         for (TcRecipe recipe : TcRecipes.all()) {
             if (!FmRecipes.OWN_KEYS.contains(recipe.key())) {
@@ -152,7 +103,8 @@ public final class RecipeGameTests {
         }
     }
 
-    private static void chainFromNetherrackToWrathShard(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void chainFromNetherrackToWrathShard(GameTestHelper helper) {
         ServerPlayer player = mockPlayer(helper);
         AspectList tags = AspectRegistry.active().getObjectTags(Items.NETHERRACK);
         helper.assertTrue(tags != null && tags.getAmount(FmAspects.NETHER) >= 1, "netherrack yields infernus");
@@ -169,12 +121,13 @@ public final class RecipeGameTests {
         helper.succeed();
     }
 
-    private static void enchantmentRecipesCoverFive(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void enchantmentRecipesCoverFive(GameTestHelper helper) {
         for (String key : new String[]{"WRATH", "GREEDY", "CONSUMING", "EDUCATIONAL", "CORRUPTING"}) {
             TcRecipe recipe = TcRecipes.get(key);
             helper.assertTrue(recipe instanceof InfusionEnchantmentRecipe, key + " must be an infusion enchantment recipe");
             InfusionEnchantmentRecipe infusion = (InfusionEnchantmentRecipe) recipe;
-            helper.assertValueEqual(infusion.enchantment(), Identifier.parse("forbiddenmagic:" + key.toLowerCase(java.util.Locale.ROOT)), key + " enchantment id");
+            helper.assertValueEqual(infusion.enchantment(), ResourceLocation.parse("forbiddenmagic:" + key.toLowerCase(java.util.Locale.ROOT)), key + " enchantment id");
         }
         InfusionEnchantmentRecipe wrath = (InfusionEnchantmentRecipe) TcRecipes.get("WRATH");
         helper.assertValueEqual(wrath.instability(), 8, "wrath instability");
@@ -182,7 +135,8 @@ public final class RecipeGameTests {
         helper.succeed();
     }
 
-    private static void morphRecipesMatchTheOriginal(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void morphRecipesMatchTheOriginal(GameTestHelper helper) {
         for (String key : new String[]{"MORPHPICK", "MORPHSWORD", "MORPHSHOVEL", "MORPHAXE"}) {
             InfusionRecipe recipe = (InfusionRecipe) TcRecipes.get(key);
             helper.assertTrue(recipe != null, key + " recipe must exist");
@@ -197,16 +151,17 @@ public final class RecipeGameTests {
         helper.succeed();
     }
 
-    private static void materialsHaveCraftingRecipes(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void materialsHaveCraftingRecipes(GameTestHelper helper) {
         var manager = helper.getLevel().getServer().getRecipeManager();
         for (String name : new String[]{"taint_planks", "taint_stone_brick", "star_block", "star_from_block"}) {
-            var key = ResourceKey.create(Registries.RECIPE, Identifier.parse("forbiddenmagic:" + name));
-            helper.assertTrue(manager.byKey(key).isPresent(), name + " recipe must load");
+            helper.assertTrue(manager.byKey(ResourceLocation.parse("forbiddenmagic:" + name)).isPresent(), name + " recipe must load");
         }
         helper.succeed();
     }
 
-    private static void plantResearchAndRecipes(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void plantResearchAndRecipes(GameTestHelper helper) {
         ResearchItem tree = ResearchCategories.getResearch("TAINTTREE");
         helper.assertTrue(tree != null, "taint tree research must exist");
         helper.assertValueEqual(tree.pages().size(), 2, "taint tree has text and crucible pages");
@@ -227,14 +182,14 @@ public final class RecipeGameTests {
         ItemStack inkResult = ink.result().create();
         helper.assertTrue(inkResult.is(FmItems.BLACK_DYE.get()), "rose petals yield the legacy black dye resource");
         helper.assertValueEqual(inkResult.getCount(), 2, "black ink recipe yields two dye items");
-        var inkRecipeKey = ResourceKey.create(Registries.RECIPE, ForbiddenMagic.id("ink_from_rose"));
-        helper.assertTrue(helper.getLevel().getServer().getRecipeManager().byKey(inkRecipeKey).isPresent(),
+        helper.assertTrue(helper.getLevel().getServer().getRecipeManager().byKey(ForbiddenMagic.id("ink_from_rose")).isPresent(),
             "the linked black ink crafting recipe loads");
 
         helper.succeed();
     }
 
-    private static void wandRodRecipesRegistered(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void wandRodRecipesRegistered(GameTestHelper helper) {
         InfusionRecipe taintedRod = (InfusionRecipe) TcRecipes.get("ROD_TAINTED");
         helper.assertTrue(taintedRod != null, "tainted rod recipe must exist");
         helper.assertValueEqual(taintedRod.instability(), 5, "tainted rod instability");
@@ -246,7 +201,8 @@ public final class RecipeGameTests {
         helper.succeed();
     }
 
-    private static void taintstoneResearchAndArcaneRecipe(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void taintstoneResearchAndArcaneRecipe(GameTestHelper helper) {
         ResearchItem research = ResearchCategories.getResearch("TAINTSTONE");
         helper.assertTrue(research != null, "taint stone research must exist");
         helper.assertTrue(research.isConcealed(), "taint stone research is concealed");
@@ -264,7 +220,7 @@ public final class RecipeGameTests {
         helper.assertValueEqual(recipe.aspects().getAmount(Aspect.ORDER), 1, "taint stone order cost");
         helper.assertTrue(recipe.grid().get(4).test(new ItemStack(FmItems.DEADLY_SHARDS.get("taint").get())), "centre slot takes a Forbidden Magic taint shard");
         helper.assertTrue(recipe.grid().get(4).test(new ItemStack(ModItems.TAINTED_GOO.get())), "centre slot also takes the modern equivalent of original Thaumcraft ItemResource meta 11 (Taint Slime/Tainted Goo)");
-        TagKey<Item> taintIngredients = TagKey.create(Registries.ITEM, Identifier.parse("forbiddenmagic:taint_ingredients"));
+        TagKey<Item> taintIngredients = TagKey.create(Registries.ITEM, ResourceLocation.parse("forbiddenmagic:taint_ingredients"));
         helper.assertTrue(new ItemStack(FmItems.DEADLY_SHARDS.get("taint").get()).is(taintIngredients), "Forbidden Magic taint shard is tagged as a taint ingredient");
         helper.assertTrue(new ItemStack(ModItems.TAINTED_GOO.get()).is(taintIngredients), "Thaumcraft tainted goo is tagged as a taint ingredient");
         for (int slot : new int[]{0, 1, 2, 3, 5, 6, 7, 8}) {
@@ -277,7 +233,8 @@ public final class RecipeGameTests {
         helper.succeed();
     }
 
-    private static void emeraldTransmutationMatchesOriginal(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void emeraldTransmutationMatchesOriginal(GameTestHelper helper) {
         if (!FmConfig.emeraldTrans()) {
             helper.assertTrue(TcRecipes.get("TRANSEMERALD") == null, "disabled emerald transmutation has no recipe");
             helper.succeed();
@@ -291,7 +248,7 @@ public final class RecipeGameTests {
         helper.assertValueEqual(recipe.aspects().getAmount(Aspect.GREED), 2, "transmutation costs two greed");
         helper.assertTrue(recipe.catalyst().test(new ItemStack(FmItems.EMERALD_FRAGMENT.get())),
             "emerald fragment is accepted as the nuggetEmerald catalyst");
-        TagKey<Item> emeraldNuggets = TagKey.create(Registries.ITEM, Identifier.parse("c:nuggets/emerald"));
+        TagKey<Item> emeraldNuggets = TagKey.create(Registries.ITEM, ResourceLocation.parse("c:nuggets/emerald"));
         helper.assertTrue(new ItemStack(FmItems.EMERALD_FRAGMENT.get()).is(emeraldNuggets),
             "emerald fragment carries the common emerald nugget tag");
 
@@ -302,11 +259,12 @@ public final class RecipeGameTests {
         helper.succeed();
     }
 
-    private static void oreDictionaryEntriesBecameTags(GameTestHelper helper) {
-        TagKey<Item> netherStars = TagKey.create(Registries.ITEM, Identifier.parse("c:nether_stars"));
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void oreDictionaryEntriesBecameTags(GameTestHelper helper) {
+        TagKey<Item> netherStars = TagKey.create(Registries.ITEM, ResourceLocation.parse("c:nether_stars"));
         helper.assertTrue(new ItemStack(FmBlocks.STAR_BLOCK.get().asItem()).is(netherStars), "the star block joins c:nether_stars like the blockNetherStar ore entry");
 
-        TagKey<Item> taintShards = TagKey.create(Registries.ITEM, Identifier.parse("forbiddenmagic:taint_shards"));
+        TagKey<Item> taintShards = TagKey.create(Registries.ITEM, ResourceLocation.parse("forbiddenmagic:taint_shards"));
         helper.assertTrue(new ItemStack(FmItems.DEADLY_SHARDS.get("taint").get()).is(taintShards), "the taint shard joins forbiddenmagic:taint_shards like the resourceTaint ore entry");
 
         ShapedArcaneRecipe recipe = (ShapedArcaneRecipe) TcRecipes.get("TaintStone");
@@ -315,7 +273,8 @@ public final class RecipeGameTests {
         helper.succeed();
     }
     
-    private static void ringFoodRecipeMatchesOriginal(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void ringFoodRecipeMatchesOriginal(GameTestHelper helper) {
         TcRecipe base = TcRecipes.get("RINGFOOD");
         helper.assertTrue(base instanceof ShapedArcaneRecipe, "Ring of Nutrition is an arcane crafting recipe");
         ShapedArcaneRecipe recipe = (ShapedArcaneRecipe) base;
@@ -329,7 +288,8 @@ public final class RecipeGameTests {
         helper.succeed();
     }
 
-    private static void researchLayoutMatchesOriginal(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void researchLayoutMatchesOriginal(GameTestHelper helper) {
         assertResearchLayout(helper, "MORPHTOOLS", -9, -3, 3);
         assertResearchLayout(helper, "ROD_tainted", -8, 3, 3);
         if (ModList.get().isLoaded("arsmagica2")) {
@@ -372,7 +332,8 @@ public final class RecipeGameTests {
         helper.assertValueEqual(research.complexity(), complexity, id + " complexity");
     }
 
-    private static void warpValuesMatchOriginal(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void warpValuesMatchOriginal(GameTestHelper helper) {
         helper.assertValueEqual(ResearchCategories.getResearch("ROD_infernal").warp(), 2, "infernal rod research warp");
         helper.assertValueEqual(ResearchCategories.getResearch("TAINTPICK").warp(), 0, "taint pick research has no warp");
         helper.assertValueEqual(ResearchCategories.getResearch("ROD_tainted").warp(), 2, "tainted rod research warp");
@@ -385,7 +346,8 @@ public final class RecipeGameTests {
         helper.succeed();
     }
 
-    private static void subcollarMatchesOriginal(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void subcollarMatchesOriginal(GameTestHelper helper) {
         if (FmConfig.lustDisabled()) {
             helper.assertTrue(BuiltInRegistries.ITEM.getOptional(ForbiddenMagic.id("sub_collar")).isEmpty(), "no_lust leaves out the collar item");
             helper.assertTrue(TcRecipes.get("SUBCOLLAR") == null, "no_lust leaves out the collar recipe");

@@ -1,7 +1,7 @@
 package dev.visfox.forbiddenreforged;
 
-import net.minecraft.resources.Identifier;
-import org.jspecify.annotations.Nullable;
+import javax.annotation.Nullable;
+import net.minecraft.resources.ResourceLocation;
 import thaumcraft.aspect.AddonAspects;
 import thaumcraft.aspect.Aspect;
 
@@ -47,7 +47,7 @@ public final class FmAspects {
         return Aspect.values().length;
     }
 
-    private static Identifier texture(String name) {
-        return Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, "textures/aspects/" + name + ".png");
+    private static ResourceLocation texture(String name) {
+        return ResourceLocation.fromNamespaceAndPath(ForbiddenMagic.MODID, "textures/aspects/" + name + ".png");
     }
 }

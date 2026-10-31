@@ -7,11 +7,12 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class FmBlockEntities {
-    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
+    private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
         DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, ForbiddenMagic.MODID);
+
     public static final Supplier<BlockEntityType<WrathCageBlockEntity>> WRATH_CAGE =
-        BLOCK_ENTITIES.register("wrath_cage", () -> new BlockEntityType<>(
-            WrathCageBlockEntity::new, FmBlocks.WRATH_CAGE.get()));
+        BLOCK_ENTITIES.register("wrath_cage", () ->
+            BlockEntityType.Builder.of(WrathCageBlockEntity::new, FmBlocks.WRATH_CAGE.get()).build(null));
 
     private FmBlockEntities() {
     }

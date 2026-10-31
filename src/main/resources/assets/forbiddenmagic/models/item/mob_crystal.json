@@ -1,0 +1,11 @@
+{
+  "parent": "forbiddenmagic:item/mob_crystal_empty",
+  "overrides": [
+    {
+      "predicate": {
+        "forbiddenmagic:filled": 1
+      },
+      "model": "forbiddenmagic:item/mob_crystal_filled"
+    }
+  ]
+}

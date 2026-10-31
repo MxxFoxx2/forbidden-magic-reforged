@@ -3,7 +3,7 @@ package dev.visfox.forbiddenreforged;
 import java.util.List;
 import java.util.Set;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -16,7 +16,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Enemy;
-import net.minecraft.world.entity.npc.villager.Villager;
+import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.item.Item;
@@ -132,15 +132,15 @@ public final class FmEnchantmentEffects {
 
     private static void onLivingDrops(LivingDropsEvent event) {
         LivingEntity victim = event.getEntity();
-        Identifier victimType = BuiltInRegistries.ENTITY_TYPE.getKey(victim.getType());
+        ResourceLocation victimType = BuiltInRegistries.ENTITY_TYPE.getKey(victim.getType());
         if (FmConfig.silverfishEmeralds()
             && event.isRecentlyHit()
-            && victimType.equals(Identifier.withDefaultNamespace("silverfish"))) {
+            && victimType.equals(ResourceLocation.withDefaultNamespace("silverfish"))) {
             Entity killer = event.getSource().getEntity();
             if (killer instanceof ServerPlayer player) {
                 // Legacy extremeHills has no exact modern equivalent; fidelity.md records this nearest-biome mapping.
                 boolean windsweptHills = victim.level().getBiome(victim.blockPosition()).is(
-                    ResourceKey.create(Registries.BIOME, Identifier.withDefaultNamespace("windswept_hills")));
+                    ResourceKey.create(Registries.BIOME, ResourceLocation.withDefaultNamespace("windswept_hills")));
                 if (windsweptHills || !(killer instanceof FakePlayer)) {
                     int looting = FmEnchantments.level(
                         player.level().registryAccess(), player.getMainHandItem(), Enchantments.LOOTING);
@@ -181,26 +181,26 @@ public final class FmEnchantmentEffects {
 
     private static void skullAxeDrops(LivingDropsEvent event, ServerPlayer player, ItemStack weapon) {
         LivingEntity victim = event.getEntity();
-        Identifier type = BuiltInRegistries.ENTITY_TYPE.getKey(victim.getType());
+        ResourceLocation type = BuiltInRegistries.ENTITY_TYPE.getKey(victim.getType());
         int looting = FmEnchantments.level(player.level().registryAccess(), weapon, Enchantments.LOOTING);
-        if (type.equals(Identifier.withDefaultNamespace("skeleton"))
-            || type.equals(Identifier.withDefaultNamespace("wither_skeleton"))) {
+        if (type.equals(ResourceLocation.withDefaultNamespace("skeleton"))
+            || type.equals(ResourceLocation.withDefaultNamespace("wither_skeleton"))) {
             if (skullAxeRoll(victim.getRandom().nextInt(26), looting, 3, 1)) {
-                addDrop(event, new ItemStack(type.equals(Identifier.withDefaultNamespace("wither_skeleton"))
+                addDrop(event, new ItemStack(type.equals(ResourceLocation.withDefaultNamespace("wither_skeleton"))
                     ? Items.WITHER_SKELETON_SKULL : Items.SKELETON_SKULL));
             }
-        } else if (type.equals(Identifier.withDefaultNamespace("zombie"))) {
+        } else if (type.equals(ResourceLocation.withDefaultNamespace("zombie"))) {
             if (skullAxeRoll(victim.getRandom().nextInt(26), looting, 2, 2)) {
                 addDrop(event, new ItemStack(Items.ZOMBIE_HEAD));
             }
-        } else if (type.equals(Identifier.withDefaultNamespace("creeper"))) {
+        } else if (type.equals(ResourceLocation.withDefaultNamespace("creeper"))) {
             if (skullAxeRoll(victim.getRandom().nextInt(26), looting, 2, 2)) {
                 addDrop(event, new ItemStack(Items.CREEPER_HEAD));
             }
         } else if (victim instanceof Player target
             && skullAxeRoll(victim.getRandom().nextInt(11), looting, 1, 1)) {
             ItemStack head = new ItemStack(Items.PLAYER_HEAD);
-            head.set(DataComponents.PROFILE, ResolvableProfile.createResolved(target.getGameProfile()));
+            head.set(DataComponents.PROFILE, new ResolvableProfile(target.getGameProfile()));
             addDrop(event, head);
         }
     }

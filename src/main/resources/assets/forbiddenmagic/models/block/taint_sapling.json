@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": {
+    "cross": "forbiddenmagic:block/sapling_taint"
+  }
+}

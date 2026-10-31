@@ -2,22 +2,16 @@ package dev.visfox.forbiddenreforged.test;
 
 import java.util.function.Consumer;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.FunctionGameTestInstance;
+import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.gametest.framework.TestData;
-import net.minecraft.gametest.framework.TestEnvironmentDefinition;
-import net.minecraft.resources.Identifier;
-import net.minecraft.resources.ResourceKey;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.RegisterGameTestsEvent;
-import net.neoforged.neoforge.registries.DeferredRegister;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
 import dev.visfox.forbiddenreforged.FmAspects;
 import dev.visfox.forbiddenreforged.FmBlocks;
@@ -33,42 +27,17 @@ import thaumcraft.crafting.TcRecipes;
 import thaumcraft.research.ResearchCategories;
 import thaumcraft.research.ResearchItem;
 
-@EventBusSubscriber(modid = ForbiddenMagic.MODID)
+@GameTestHolder
+@PrefixGameTestTemplate(false)
 public final class EntityGameTests {
-    public static final DeferredRegister<Consumer<GameTestHelper>> FUNCTIONS =
-        DeferredRegister.create(Registries.TEST_FUNCTION, ForbiddenMagic.MODID);
 
-    private static final String[] TESTS = {
-        "mob_crystal_and_spawn_table",
-        "wrath_cage_block_and_entity",
-        "wrath_cage_crystal_and_spawn_rules",
-        "wrath_cage_research_and_recipes"
-    };
 
-    static {
-        FUNCTIONS.register(TESTS[0], () -> EntityGameTests::mobCrystalAndSpawnTable);
-        FUNCTIONS.register(TESTS[1], () -> EntityGameTests::wrathCageBlockAndEntity);
-        FUNCTIONS.register(TESTS[2], () -> EntityGameTests::wrathCageCrystalAndSpawnRules);
-        FUNCTIONS.register(TESTS[3], () -> EntityGameTests::wrathCageResearchAndRecipes);
-    }
 
     private EntityGameTests() {}
 
-    @SubscribeEvent
-    static void registerTests(RegisterGameTestsEvent event) {
-        Holder<TestEnvironmentDefinition<?>> environment = event.registerEnvironment(
-            Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, "fm_entities"), new TestEnvironmentDefinition.AllOf());
-        for (String name : TESTS) {
-            ResourceKey<Consumer<GameTestHelper>> function =
-                ResourceKey.create(Registries.TEST_FUNCTION, Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, name));
-            event.registerTest(
-                Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, name),
-                new FunctionGameTestInstance(function, new TestData<>(environment, Identifier.parse("thaumcraft:test/platform"), 100, 0, true))
-            );
-        }
-    }
 
-    private static void mobCrystalAndSpawnTable(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void mobCrystalAndSpawnTable(GameTestHelper helper) {
         helper.assertTrue(FmSpawnerMobs.aspect("minecraft:zombie") == Aspect.FLESH, "zombie carries flesh");
         helper.assertTrue(FmSpawnerMobs.aspect("thaumcraft:brainy_zombie") == Aspect.MIND, "brainy zombie carries mind");
         helper.assertTrue(FmSpawnerMobs.aspect("minecraft:pig") == Aspect.BEAST, "pig carries beast");
@@ -76,21 +45,22 @@ public final class EntityGameTests {
         for (String id : FmSpawnerMobs.ids()) {
             helper.assertTrue(FmSpawnerMobs.aspect(id) != null, id + " must map to an aspect");
         }
-        helper.assertTrue(FmSpawnerMobs.isBoss(EntityTypes.ENDER_DRAGON), "the ender dragon is a boss");
-        helper.assertFalse(FmSpawnerMobs.isBoss(EntityTypes.ZOMBIE), "a zombie is not a boss");
+        helper.assertTrue(FmSpawnerMobs.isBoss(EntityType.ENDER_DRAGON), "the ender dragon is a boss");
+        helper.assertFalse(FmSpawnerMobs.isBoss(EntityType.ZOMBIE), "a zombie is not a boss");
         ItemStack stack = new ItemStack(FmItems.MOB_CRYSTAL.get());
         helper.assertTrue(MobCrystalItem.mob(stack) == null, "a fresh crystal is empty");
         MobCrystalItem.setMob(stack, "minecraft:zombie");
         helper.assertValueEqual(MobCrystalItem.mob(stack), "minecraft:zombie", "the crystal keeps the mob id");
-        helper.assertTrue(FmSpawnerMobs.canImprint(EntityTypes.ZOMBIE), "zombies can be imprinted");
-        helper.assertFalse(FmSpawnerMobs.canImprint(EntityTypes.ENDER_DRAGON), "bosses cannot be imprinted");
+        helper.assertTrue(FmSpawnerMobs.canImprint(EntityType.ZOMBIE), "zombies can be imprinted");
+        helper.assertFalse(FmSpawnerMobs.canImprint(EntityType.ENDER_DRAGON), "bosses cannot be imprinted");
         helper.succeed();
     }
 
-    private static void wrathCageBlockAndEntity(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void wrathCageBlockAndEntity(GameTestHelper helper) {
         BlockPos pos = new BlockPos(5, 4, 5);
         helper.setBlock(pos, FmBlocks.WRATH_CAGE.get().defaultBlockState());
-        WrathCageBlockEntity cage = helper.getBlockEntity(pos, WrathCageBlockEntity.class);
+        WrathCageBlockEntity cage = (WrathCageBlockEntity) helper.getBlockEntity(pos);
         helper.assertTrue(cage != null, "cage creates its block entity");
         helper.assertTrue(cage != null && cage.getMobId() == null, "a fresh cage is unattuned");
         ItemStack zombieCrystal = new ItemStack(FmItems.MOB_CRYSTAL.get());
@@ -106,12 +76,13 @@ public final class EntityGameTests {
         ItemStack crystal = WrathCageBlockEntity.crystalForBreak(cage);
         helper.assertValueEqual(MobCrystalItem.mob(crystal), "minecraft:skeleton", "breaking the cage yields the attuned crystal");
         helper.destroyBlock(pos);
-        ItemEntity dropped = helper.getEntities(EntityTypes.ITEM, pos, 1.0).stream().findFirst().orElse(null);
+        ItemEntity dropped = helper.getEntities(EntityType.ITEM, pos, 1.0).stream().findFirst().orElse(null);
         helper.assertTrue(dropped != null && "minecraft:skeleton".equals(MobCrystalItem.mob(dropped.getItem())), "removing the cage drops its crystal");
         helper.succeed();
     }
 
-    private static void wrathCageCrystalAndSpawnRules(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void wrathCageCrystalAndSpawnRules(GameTestHelper helper) {
         helper.assertFalse(WrathCageBlockEntity.shouldSpawn(true, true, 10, 5, 0), "a powered cage waits");
         helper.assertTrue(WrathCageBlockEntity.shouldSpawn(false, true, 10, 5, 0), "an attuned fuelled cage spawns");
         helper.assertFalse(WrathCageBlockEntity.shouldSpawn(false, true, 0, 5, 4), "no fuel and too little essentia waits");
@@ -121,7 +92,8 @@ public final class EntityGameTests {
         helper.succeed();
     }
 
-    private static void wrathCageResearchAndRecipes(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void wrathCageResearchAndRecipes(GameTestHelper helper) {
         ResearchItem cage = ResearchCategories.getResearch("WRATHCAGE");
         helper.assertTrue(cage != null, "wrath cage research exists");
         helper.assertValueEqual(cage.warp(), 3, "wrath cage warp is 3");

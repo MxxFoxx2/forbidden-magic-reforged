@@ -8,13 +8,7 @@
           "type": "minecraft:item",
           "name": "forbiddenmagic:taint_stone_smooth"
         }
-      ],
-      "conditions": [
-        {
-          "condition": "minecraft:survives_explosion"
-        }
       ]
     }
-  ],
-  "random_sequence": "forbiddenmagic:blocks/taint_stone_smooth"
+  ]
 }

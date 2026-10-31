@@ -1,6 +1,6 @@
 package dev.visfox.forbiddenreforged;
 
-import java.util.function.Consumer;
+import java.util.List;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -9,11 +9,10 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
 import thaumcraft.item.bauble.VisAmuletItem;
 import thaumcraft.platform.Baubles;
 
-public class SubCollarItem extends VisAmuletItem {
+public final class SubCollarItem extends VisAmuletItem {
     public SubCollarItem(Properties properties) {
         super(properties, false);
     }
@@ -42,11 +41,11 @@ public class SubCollarItem extends VisAmuletItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag flag) {
-        super.appendHoverText(stack, context, display, builder, flag);
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        super.appendHoverText(stack, context, tooltip, flag);
         String owner = stack.get(FmComponents.COLLAR_OWNER.get());
         if (owner != null && !owner.isEmpty()) {
-            builder.accept(Component.translatable("tooltip.collar.owner").append(" " + owner));
+            tooltip.add(Component.translatable("tooltip.collar.owner").append(" " + owner));
         }
     }
 }

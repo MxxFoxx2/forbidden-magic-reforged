@@ -1,44 +1,14 @@
-# Build outputs
 .gradle/
 build/
-*.hprof
-
-# Local development artifacts
 host/
 maven/
 reference/
 run/
-.worktrees/
-
-# Caches and temporary files
-.cache/
 .codegraph/
-logs/
-*.log
-*.tmp
-
-# IDE
+forbidden-magic-reforged/
 .idea/
 *.iml
 .vscode/
-
-# Private upstream notes (kept locally, never published)
-docs/upstream/
-
-# Secrets and local settings
-.env
-*.key
-*.p12
-
-# Machine-local agent rules (paths, shell, toolchain quirks)
-AGENTS.local.md
-
-# Nested clone of this repository
-forbidden-magic-reforged/
-
-# Local scratch and diagnostic output
-.api-check/
-.superpowers/
-
-# Local tool config
-opencode.jsonc*
+logs/
+*.hprof
+*.log

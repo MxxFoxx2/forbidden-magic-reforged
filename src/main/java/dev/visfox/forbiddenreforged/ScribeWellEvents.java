@@ -1,23 +1,21 @@
 package dev.visfox.forbiddenreforged;
 
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.Container;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.Prediction;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
-import thaumcraft.Config;
+import thaumcraft.research.ResearchConfig;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.research.ResearchManager;
 
 /** Restores player-side behavior for the two original Forbidden Magic scribing tools. */
 public final class ScribeWellEvents {
-    private static final Identifier PRIMORDIAL_PEARL_ID = Identifier.parse("thaumcraft:primordial_pearl");
+    private static final ResourceLocation PRIMORDIAL_PEARL_ID = ResourceLocation.parse("thaumcraft:primordial_pearl");
 
     private ScribeWellEvents() {
     }
@@ -29,7 +27,7 @@ public final class ScribeWellEvents {
 
     private static void onPlayerTick(PlayerTickEvent.Post event) {
         if (!(event.getEntity() instanceof ServerPlayer player)
-            || Config.researchDifficulty() != -1
+            || ResearchConfig.RESEARCH_DIFFICULTY != -1
             || player.tickCount % 200 != 0) {
             return;
         }
@@ -65,7 +63,7 @@ public final class ScribeWellEvents {
         }
 
         // The original Primewell crafting hook returns its primordial pearl.
-        Item pearl = BuiltInRegistries.ITEM.getValue(PRIMORDIAL_PEARL_ID);
+        Item pearl = BuiltInRegistries.ITEM.get(PRIMORDIAL_PEARL_ID);
         if (pearl == Items.AIR) {
             ForbiddenMagic.LOGGER.warn("Could not refund Primewell's primordial pearl: {} is not registered", PRIMORDIAL_PEARL_ID);
             return;
@@ -88,7 +86,7 @@ public final class ScribeWellEvents {
         ItemStack returnedPearl = new ItemStack(pearl);
         player.getInventory().add(returnedPearl);
         if (!returnedPearl.isEmpty()) {
-            player.drop(returnedPearl, false, Prediction.PREDICTED);
+            player.drop(returnedPearl, false);
         }
     }
 }

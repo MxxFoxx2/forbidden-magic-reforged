@@ -146,8 +146,12 @@ public final class FmToolEvents {
     }
 
     public static boolean hasNutritionRingInRingSlot(Player player) {
-        return Baubles.get(player, 1).is(FmItems.RING_NUTRITION.get())
-            || Baubles.get(player, 2).is(FmItems.RING_NUTRITION.get());
+        return hasNutritionRingInRingSlots(Baubles.get(player, 1), Baubles.get(player, 2));
+    }
+
+    public static boolean hasNutritionRingInRingSlots(ItemStack firstRingSlot, ItemStack secondRingSlot) {
+        return firstRingSlot.is(FmItems.RING_NUTRITION.get())
+            || secondRingSlot.is(FmItems.RING_NUTRITION.get());
     }
 
     public static boolean cancelsInfernalDamage(ItemStack held, boolean fireOrWither) {

@@ -4,21 +4,21 @@ import java.util.Objects;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
+import thaumcraft.compat.ValueInput;
+import thaumcraft.compat.ValueOutput;
 import net.minecraft.world.phys.AABB;
-import org.jspecify.annotations.Nullable;
+import javax.annotation.Nullable;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.aspect.AspectList;
 import thaumcraft.aspect.AspectSource;
@@ -157,16 +157,21 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
         if (level.getNearestPlayer(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, PLAYER_RANGE, false) == null) {
             return;
         }
-        Identifier id = mobId == null ? null : Identifier.tryParse(mobId);
+        ResourceLocation id = mobId == null ? null : ResourceLocation.tryParse(mobId);
         if (id == null || !BuiltInRegistries.ENTITY_TYPE.containsKey(id)) {
             spawnDelay = nextDelay(level.getRandom(), slothful);
             return;
         }
-        EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.getValue(id);
+        EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.getOptional(id).orElse(null);
+        if (type == null) {
+            spawnDelay = nextDelay(level.getRandom(), slothful);
+            return;
+        }
         AABB nearby = new AABB(pos.getX() - 4, pos.getY() - 1, pos.getZ() - 4, pos.getX() + 5, pos.getY() + 2, pos.getZ() + 5);
         int cost = FmConfig.wrathCost();
         for (int attempt = 0; attempt < SPAWN_COUNT && (fuel > 0 || cost <= 0); attempt++) {
-            Entity entity = type.create(level, EntitySpawnReason.SPAWNER);
+            // Minecraft 1.21.1 exposes the spawn-aware overload with level, consumer, position and flags.
+            Entity entity = type.create(level, null, pos, MobSpawnType.SPAWNER, false, false);
             if (entity == null) {
                 break;
             }
@@ -176,7 +181,7 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
             double x = pos.getX() + 0.5 + (level.getRandom().nextDouble() - level.getRandom().nextDouble()) * SPAWN_RANGE;
             double y = pos.getY() + level.getRandom().nextInt(3) - 1;
             double z = pos.getZ() + 0.5 + (level.getRandom().nextDouble() - level.getRandom().nextDouble()) * SPAWN_RANGE;
-            entity.snapTo(x, y, z, level.getRandom().nextFloat() * 360.0F, 0.0F);
+            entity.moveTo(x, y, z, level.getRandom().nextFloat() * 360.0F, 0.0F);
             if (level.noCollision(entity) && !level.containsAnyLiquid(entity.getBoundingBox())) {
                 level.addFreshEntity(entity);
                 if (fuel > 0) {

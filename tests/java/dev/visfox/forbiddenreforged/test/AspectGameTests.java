@@ -10,34 +10,28 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.gametest.framework.FunctionGameTestInstance;
+import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.gametest.framework.TestData;
-import net.minecraft.gametest.framework.TestEnvironmentDefinition;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketFlow;
-import net.minecraft.resources.Identifier;
-import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.permissions.PermissionSet;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.GameType;
-import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.RegisterGameTestsEvent;
-import net.neoforged.neoforge.registries.DeferredRegister;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
 import dev.visfox.forbiddenreforged.FmAspectDiagnostics;
 import dev.visfox.forbiddenreforged.FmAspects;
@@ -54,73 +48,23 @@ import thaumcraft.research.ResearchCategories;
 import thaumcraft.research.ResearchItem;
 import thaumcraft.research.ScanManager;
 
-@EventBusSubscriber(modid = ForbiddenMagic.MODID)
+@GameTestHolder
+@PrefixGameTestTemplate(false)
 public final class AspectGameTests {
-    public static final DeferredRegister<Consumer<GameTestHelper>> FUNCTIONS =
-        DeferredRegister.create(Registries.TEST_FUNCTION, ForbiddenMagic.MODID);
 
-    private static final String[] TESTS = {
-        "mod_loads_and_host_is_present",
-        "aspect_registry_keeps_builtin_order_and_combines",
-        "addon_aspect_survives_client_sync",
-        "sin_aspects_registered_with_own_textures",
-        "sin_aspect_tags_merge_with_existing",
-        "entity_aspect_tags_merge_with_existing",
-        "every_tag_target_resolved",
-        "shards_are_registered_with_seven_ids",
-        "no_lust_removes_luxuria_items",
-        "mob_killed_by_player_drops_wrath_shard",
-        "boss_drops_pride_shards",
-        "unattended_death_drops_sloth_shard",
-        "forbidden_category_and_shard_entries_resolve",
-        "nether_shard_drop_rules_match_original_boundaries",
-        "aspect_diagnostics_expose_stable_registry_table",
-        "forbiddenmagic_aspects_command_is_registered",
-        "addon_item_aspects_match_original_assignments"
-    };
 
-    static {
-        FUNCTIONS.register(TESTS[0], () -> AspectGameTests::modLoadsAndHostIsPresent);
-        FUNCTIONS.register(TESTS[1], () -> AspectGameTests::aspectRegistryKeepsBuiltinOrderAndCombines);
-        FUNCTIONS.register(TESTS[2], () -> AspectGameTests::addonAspectSurvivesClientSync);
-        FUNCTIONS.register(TESTS[3], () -> AspectGameTests::sinAspectsRegisteredWithOwnTextures);
-        FUNCTIONS.register(TESTS[4], () -> AspectGameTests::sinAspectTagsMergeWithExisting);
-        FUNCTIONS.register(TESTS[5], () -> AspectGameTests::entityAspectTagsMergeWithExisting);
-        FUNCTIONS.register(TESTS[6], () -> AspectGameTests::everyTagTargetResolved);
-        FUNCTIONS.register(TESTS[7], () -> AspectGameTests::shardsAreRegisteredWithSevenIds);
-        FUNCTIONS.register(TESTS[8], () -> AspectGameTests::noLustRemovesLuxuriaItems);
-        FUNCTIONS.register(TESTS[9], () -> AspectGameTests::mobKilledByPlayerDropsWrathShard);
-        FUNCTIONS.register(TESTS[10], () -> AspectGameTests::bossDropsPrideShards);
-        FUNCTIONS.register(TESTS[11], () -> AspectGameTests::unattendedDeathDropsSlothShard);
-        FUNCTIONS.register(TESTS[12], () -> AspectGameTests::forbiddenCategoryAndShardEntriesResolve);
-        FUNCTIONS.register(TESTS[13], () -> AspectGameTests::netherShardDropRulesMatchOriginalBoundaries);
-        FUNCTIONS.register(TESTS[14], () -> AspectGameTests::aspectDiagnosticsExposeStableRegistryTable);
-        FUNCTIONS.register(TESTS[15], () -> AspectGameTests::forbiddenmagicAspectsCommandIsRegistered);
-        FUNCTIONS.register(TESTS[16], () -> AspectGameTests::addonItemAspectsMatchOriginalAssignments);
-    }
 
     private AspectGameTests() {}
 
-    @SubscribeEvent
-    static void registerTests(RegisterGameTestsEvent event) {
-        Holder<TestEnvironmentDefinition<?>> environment = event.registerEnvironment(
-            Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, "fm_aspects"), new TestEnvironmentDefinition.AllOf());
-        for (String name : TESTS) {
-            ResourceKey<Consumer<GameTestHelper>> function =
-                ResourceKey.create(Registries.TEST_FUNCTION, Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, name));
-            event.registerTest(
-                Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, name),
-                new FunctionGameTestInstance(function, new TestData<>(environment, Identifier.parse("thaumcraft:test/platform"), 100, 0, true))
-            );
-        }
-    }
 
-    private static void modLoadsAndHostIsPresent(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void modLoadsAndHostIsPresent(GameTestHelper helper) {
         helper.assertTrue(ModList.get().isLoaded("thaumcraft"), "thaumcraft must be loaded");
         helper.succeed();
     }
 
-    private static void aspectRegistryKeepsBuiltinOrderAndCombines(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void aspectRegistryKeepsBuiltinOrderAndCombines(GameTestHelper helper) {
         Aspect[] all = Aspect.values();
         helper.assertValueEqual(FmAspects.BUILTIN_ASPECT_COUNT, 48, "exactly 48 builtin aspects");
         helper.assertTrue(all.length >= 48, "builtins must remain registered");
@@ -132,7 +76,8 @@ public final class AspectGameTests {
         helper.succeed();
     }
 
-    private static void addonAspectSurvivesClientSync(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void addonAspectSurvivesClientSync(GameTestHelper helper) {
         Aspect nether = FmAspects.NETHER;
         helper.assertTrue(nether != null && nether.ordinal() >= FmAspects.BUILTIN_ASPECT_COUNT, "infernus must be an add-on aspect");
         helper.assertValueEqual(Aspect.getAspect("infernus"), nether, "by-tag lookup must find the add-on aspect");
@@ -145,7 +90,8 @@ public final class AspectGameTests {
         helper.succeed();
     }
 
-    private static void sinAspectsRegisteredWithOwnTextures(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void sinAspectsRegisteredWithOwnTextures(GameTestHelper helper) {
         helper.assertTrue(FmAspects.available(), "add-on aspect API missing: host too old");
         Aspect[] sins = {FmAspects.NETHER, FmAspects.WRATH, FmAspects.ENVY, FmAspects.GLUTTONY, FmAspects.PRIDE, FmAspects.SLOTH};
         for (Aspect aspect : sins) {
@@ -161,7 +107,8 @@ public final class AspectGameTests {
         helper.succeed();
     }
 
-    private static void sinAspectTagsMergeWithExisting(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void sinAspectTagsMergeWithExisting(GameTestHelper helper) {
         AspectRegistry active = AspectRegistry.active();
         AspectList netherrack = active.getObjectTags(Items.NETHERRACK);
         helper.assertTrue(netherrack != null && netherrack.getAmount(FmAspects.NETHER) >= 1, "netherrack must carry infernus");
@@ -171,10 +118,11 @@ public final class AspectGameTests {
         helper.succeed();
     }
 
-    private static void entityAspectTagsMergeWithExisting(GameTestHelper helper) {
-        EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.getOptional(Identifier.parse("thaumcraft:brainy_zombie")).orElse(null);
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void entityAspectTagsMergeWithExisting(GameTestHelper helper) {
+        EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.getOptional(ResourceLocation.parse("thaumcraft:brainy_zombie")).orElse(null);
         helper.assertTrue(type != null, "brainy zombie type must exist");
-        Entity entity = type.create(helper.getLevel(), EntitySpawnReason.TRIGGERED);
+        Entity entity = type.create(helper.getLevel());
         helper.assertTrue(entity != null, "brainy zombie must be creatable");
         AspectList tags = AspectRegistry.active().getEntityTags(entity);
         helper.assertTrue(tags != null && tags.getAmount(Aspect.UNDEAD) >= 3, "brainy zombie keeps its base undead tag");
@@ -182,19 +130,20 @@ public final class AspectGameTests {
         helper.succeed();
     }
 
-    private static void everyTagTargetResolved(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void everyTagTargetResolved(GameTestHelper helper) {
         List<String> unresolved = new ArrayList<>();
         for (String target : FmAspectTags.declaredTargets()) {
             if (target.startsWith("entity:")) {
-                if (BuiltInRegistries.ENTITY_TYPE.getOptional(Identifier.parse(target.substring("entity:".length()))).isEmpty()) {
+                if (BuiltInRegistries.ENTITY_TYPE.getOptional(ResourceLocation.parse(target.substring("entity:".length()))).isEmpty()) {
                     unresolved.add(target);
                 }
             } else if (target.startsWith("block:")) {
-                if (BuiltInRegistries.BLOCK.getOptional(Identifier.parse(target.substring("block:".length()))).isEmpty()) {
+                if (BuiltInRegistries.BLOCK.getOptional(ResourceLocation.parse(target.substring("block:".length()))).isEmpty()) {
                     unresolved.add(target);
                 }
             } else if (target.startsWith("#")) {
-                TagKey<Item> tag = TagKey.create(Registries.ITEM, Identifier.parse(target.substring(1)));
+                TagKey<Item> tag = TagKey.create(Registries.ITEM, ResourceLocation.parse(target.substring(1)));
                 boolean found = false;
                 for (Holder<Item> holder : BuiltInRegistries.ITEM.getTagOrEmpty(tag)) {
                     found = true;
@@ -203,7 +152,7 @@ public final class AspectGameTests {
                 if (!found) {
                     unresolved.add(target);
                 }
-            } else if (BuiltInRegistries.ITEM.getOptional(Identifier.parse(target)).isEmpty()) {
+            } else if (BuiltInRegistries.ITEM.getOptional(ResourceLocation.parse(target)).isEmpty()) {
                 unresolved.add(target);
             }
         }
@@ -211,7 +160,8 @@ public final class AspectGameTests {
         helper.succeed();
     }
 
-    private static void shardsAreRegisteredWithSevenIds(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void shardsAreRegisteredWithSevenIds(GameTestHelper helper) {
         helper.assertValueEqual(FmItems.DEADLY_SHARDS.size(), 7, "the original registers seven vices");
         for (var entry : FmItems.DEADLY_SHARDS.entrySet()) {
             Item item = entry.getValue().get();
@@ -222,7 +172,8 @@ public final class AspectGameTests {
         helper.succeed();
     }
 
-    private static void noLustRemovesLuxuriaItems(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void noLustRemovesLuxuriaItems(GameTestHelper helper) {
         ForbiddenMagic.LOGGER.info("no_lust gate: disabled={}, luxuria={}", FmConfig.lustDisabled(), Aspect.getAspect("luxuria"));
         if (!FmConfig.lustDisabled()) {
             helper.succeed();
@@ -239,14 +190,16 @@ public final class AspectGameTests {
         helper.succeed();
     }
 
-    private static void mobKilledByPlayerDropsWrathShard(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void mobKilledByPlayerDropsWrathShard(GameTestHelper helper) {
         helper.assertTrue(FmDrops.rollWrath(2, 2), "chance 2 must drop at roll 2, the original uses nextInt(61) <= wrath");
         helper.assertFalse(FmDrops.rollWrath(2, 3), "chance 2 must not drop at roll 3");
         helper.assertValueEqual(FmDrops.wrathShardStack().getItem(), FmItems.DEADLY_SHARDS.get("wrath").get(), "wrath drop must be the wrath shard");
         helper.succeed();
     }
 
-    private static void addonItemAspectsMatchOriginalAssignments(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void addonItemAspectsMatchOriginalAssignments(GameTestHelper helper) {
         AspectRegistry registry = AspectRegistry.active();
 
         AspectList emerald = registry.getObjectTags(FmItems.EMERALD_FRAGMENT.get());
@@ -315,7 +268,8 @@ public final class AspectGameTests {
         helper.succeed();
     }
 
-    private static void netherShardDropRulesMatchOriginalBoundaries(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void netherShardDropRulesMatchOriginalBoundaries(GameTestHelper helper) {
         helper.assertTrue(FmDrops.rollGluttony(0), "gluttony shard drops at roll 0");
         helper.assertTrue(FmDrops.rollGluttony(1), "gluttony shard drops at roll 1");
         helper.assertFalse(FmDrops.rollGluttony(2), "gluttony shard does not drop at roll 2");
@@ -334,13 +288,15 @@ public final class AspectGameTests {
         helper.succeed();
     }
 
-    private static void bossDropsPrideShards(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void bossDropsPrideShards(GameTestHelper helper) {
         helper.assertValueEqual(FmDrops.prideCount(0, 0), 2, "boss without looting drops two pride shards");
         helper.assertValueEqual(FmDrops.prideCount(2, 1), 3, "looting 2 with roll 1 gives three");
         helper.succeed();
     }
 
-    private static void unattendedDeathDropsSlothShard(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void unattendedDeathDropsSlothShard(GameTestHelper helper) {
         helper.assertTrue(FmDrops.rollSloth(3), "sloth drops on the last allowed roll");
         helper.assertFalse(FmDrops.rollSloth(4), "sloth must not drop on roll 4");
         helper.assertValueEqual(FmDrops.slothCount(0), 1, "minimum sloth drop is one");
@@ -348,17 +304,19 @@ public final class AspectGameTests {
         helper.succeed();
     }
 
-    private static void forbiddenmagicAspectsCommandIsRegistered(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void forbiddenmagicAspectsCommandIsRegistered(GameTestHelper helper) {
             var root = helper.getLevel().getServer().getCommands().getDispatcher().getRoot();
             helper.assertTrue(root.getChild("forbiddenmagic") != null, "forbiddenmagic command must be registered");
             helper.assertTrue(root.getChild("forbiddenmagic").getChild("aspects") != null, "forbiddenmagic aspects command must be registered");
             var source = helper.getLevel().getServer().createCommandSourceStack();
-            helper.assertTrue(root.getChild("forbiddenmagic").getRequirement().test(source.withPermission(PermissionSet.ALL_PERMISSIONS)), "game masters must be allowed");
-            helper.assertFalse(root.getChild("forbiddenmagic").getRequirement().test(source.withPermission(PermissionSet.NO_PERMISSIONS)), "ordinary players must be denied");
+            helper.assertTrue(root.getChild("forbiddenmagic").getRequirement().test(source.withPermission(4)), "game masters must be allowed");
+            helper.assertFalse(root.getChild("forbiddenmagic").getRequirement().test(source.withPermission(0)), "ordinary players must be denied");
             helper.succeed();
         }
 
-    private static void aspectDiagnosticsExposeStableRegistryTable(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void aspectDiagnosticsExposeStableRegistryTable(GameTestHelper helper) {
             List<String> registryLines = FmAspectDiagnostics.registryLines();
             helper.assertValueEqual(registryLines.size(), FmAspects.count(), "diagnostics must contain every registered aspect");
             for (int index = 0; index < Aspect.values().length; index++) {
@@ -394,7 +352,8 @@ public final class AspectGameTests {
             helper.succeed();
         }
 
-    private static void forbiddenCategoryAndShardEntriesResolve(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void forbiddenCategoryAndShardEntriesResolve(GameTestHelper helper) {
         ResearchItem shards = ResearchCategories.getResearch("NETHERSHARDS");
         helper.assertTrue(shards != null, "NETHERSHARDS must be registered");
         helper.assertValueEqual(shards.category(), "FORBIDDEN", "category");

@@ -59,7 +59,7 @@ public final class TaintShovelItem extends Item {
             return InteractionResult.PASS;
         }
         if (!level.isClientSide() && player != null) {
-            stack.hurtAndBreak(Math.min(purified, 15), player, context.getHand());
+            stack.hurtAndBreak(Math.min(purified, 15), player, context.getHand() == net.minecraft.world.InteractionHand.MAIN_HAND ? net.minecraft.world.entity.EquipmentSlot.MAINHAND : net.minecraft.world.entity.EquipmentSlot.OFFHAND);
             level.playSound(null, center, ModSounds.WANDFAIL.get(), SoundSource.PLAYERS,
                 0.2F, 0.2F + level.getRandom().nextFloat() * 0.2F);
         }

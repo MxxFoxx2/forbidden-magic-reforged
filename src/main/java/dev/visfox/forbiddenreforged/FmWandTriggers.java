@@ -5,7 +5,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -46,7 +45,7 @@ public final class FmWandTriggers {
         }
         level.playSound(null, firePos, SoundEvents.FLINTANDSTEEL_USE, SoundSource.BLOCKS,
             1.0F, level.getRandom().nextFloat() * 0.4F + 0.8F);
-        player.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, true);
+        player.swing(InteractionHand.MAIN_HAND);
         return true;
     }
 }

@@ -3,8 +3,12 @@ package dev.visfox.forbiddenreforged.test;
 import com.google.gson.JsonArray;
 import dev.visfox.forbiddenreforged.BlinkFocusItem;
 import dev.visfox.forbiddenreforged.CrystalwellItem;
+import dev.visfox.forbiddenreforged.FmVillagers;
 import dev.visfox.forbiddenreforged.PrimewellItem;
+import net.minecraft.world.entity.npc.VillagerTrades;
+import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.item.Rarity;
+import thaumcraft.test.TestSupport;
 import thaumcraft.item.ScribingToolsItem;
 import thaumcraft.crafting.TcStack;
 import thaumcraft.crafting.ShapelessArcaneRecipe;
@@ -24,20 +28,18 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.gametest.framework.FunctionGameTestInstance;
+import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.gametest.framework.TestData;
-import net.minecraft.gametest.framework.TestEnvironmentDefinition;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketFlow;
-import net.minecraft.resources.Identifier;
-import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
@@ -45,15 +47,17 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.EntityTypes;
-import net.minecraft.world.entity.animal.equine.Horse;
-import net.minecraft.world.entity.animal.pig.Pig;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.animal.horse.Horse;
+import net.minecraft.world.entity.animal.Pig;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.CookingFuel;
+import net.neoforged.neoforge.event.furnace.FurnaceFuelBurnTimeEvent;
+import net.minecraft.world.item.crafting.RecipeType;
+import dev.visfox.forbiddenreforged.FmItemEvents;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.storage.loot.LootContext;
@@ -62,11 +66,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
-import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.RegisterGameTestsEvent;
-import net.neoforged.neoforge.registries.DeferredRegister;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
 import dev.visfox.forbiddenreforged.FmAspects;
 import dev.visfox.forbiddenreforged.FmComponents;
@@ -84,8 +84,8 @@ import thaumcraft.aspect.Aspect;
 import thaumcraft.aspect.AspectList;
 import thaumcraft.crafting.InfusionRecipe;
 import thaumcraft.crafting.TcRecipes;
-import thaumcraft.Config;
 import thaumcraft.node.EnergizedNodeBlockEntity;
+import thaumcraft.research.ResearchConfig;
 import thaumcraft.research.ResearchCategories;
 import thaumcraft.research.ResearchItem;
 import thaumcraft.research.ResearchPage;
@@ -101,108 +101,17 @@ import thaumcraft.wand.focus.FocusItem;
 import thaumcraft.wand.focus.FocusKeys;
 import thaumcraft.wand.focus.FocusUpgradeType;
 
-@EventBusSubscriber(modid = ForbiddenMagic.MODID)
+@GameTestHolder
+@PrefixGameTestTemplate(false)
 public final class ItemGameTests {
-    public static final DeferredRegister<Consumer<GameTestHelper>> FUNCTIONS =
-        DeferredRegister.create(Registries.TEST_FUNCTION, ForbiddenMagic.MODID);
 
-    private static final String[] TESTS = {
-        "skull_axe_infusion_recipe_matches_original",
-        "diabolist_fork_research_and_recipe",
-        "taint_coal_is_registered_and_is_fuel",
-        "taint_coal_burn_time_varies_within_original_range",
-        "emerald_fragment_is_registered",
-        "riding_crop_is_registered_as_sword",
-        "wand_rods_register_as_functional_cores",
-        "creative_tab_is_registered_with_fork_icon",
-        "creative_tab_lists_every_registered_item",
-        "orichalcum_cap_is_registered",
-        "diabolist_fork_switches_to_the_spork_model",
-        "lust_shard_switches_to_the_despair_model",
-        "creative_wand_family_matches_original",
-        "morph_phase_tints_match_original",
-        "tool_and_skull_axe_chance_rules_preserve_original_boundaries",
-        "silverfish_emerald_drop_thresholds_match_original",
-        "wand_tooltip_kinds_preserve_original_hints",
-        "crystalwell_is_a_scribing_tool_with_original_durability",
-        "primewell_is_a_permanent_epic_scribing_tool",
-        "scribe_wells_keep_original_recipes_and_research",
-        "research_prefix_respects_tag_research",
-        "item_translation_keys_are_not_nested_under_research_pages",
-        "research_translation_keys_are_complete",
-        "crystalwell_research_page_matches_difficulty",
-        "infernal_and_tainted_wand_damage_behaviors_match_original",
-        "hellfire_trigger_targets_netherrack_and_obsidian",
-        "subcollar_places_on_another_player_and_stores_damage_vis",
-        "riding_crop_effects_match_original",
-        "heretic_trades_match_original_listing",
-        "witchwood_requires_ars_magica",
-        "wrath_shard_formula_matches_original",
-        "alchemical_cap_and_equivalent_rod_match_original",
-        "ring_of_nutrition_only_works_in_ring_slots",
-        "blink_focus_upgrades_use_original_icon_assets",
-        "research_icons_resolve_to_real_content",
-        "blink_focus_hellfire_applies_through_focal_manipulator",
-        "blink_focus_reaches_beyond_wand_reach_and_lands_like_original"
-    };
 
-    static {
-        FUNCTIONS.register(TESTS[0], () -> ItemGameTests::skullAxeInfusionRecipeMatchesOriginal);
-        FUNCTIONS.register(TESTS[1], () -> ItemGameTests::diabolistForkResearchAndRecipe);
-        FUNCTIONS.register(TESTS[2], () -> ItemGameTests::taintCoalIsRegisteredAndIsFuel);
-        FUNCTIONS.register(TESTS[3], () -> ItemGameTests::taintCoalBurnTimeVariesWithinOriginalRange);
-        FUNCTIONS.register(TESTS[4], () -> ItemGameTests::emeraldFragmentIsRegistered);
-        FUNCTIONS.register(TESTS[5], () -> ItemGameTests::ridingCropIsRegisteredAsSword);
-        FUNCTIONS.register(TESTS[6], () -> ItemGameTests::wandRodsRegisterAsFunctionalCores);
-        FUNCTIONS.register(TESTS[7], () -> ItemGameTests::creativeTabIsRegisteredWithForkIcon);
-        FUNCTIONS.register(TESTS[8], () -> ItemGameTests::creativeTabListsEveryRegisteredItem);
-        FUNCTIONS.register(TESTS[9], () -> ItemGameTests::orichalcumCapIsRegistered);
-        FUNCTIONS.register(TESTS[10], () -> ItemGameTests::diabolistForkSwitchesToTheSporkModel);
-        FUNCTIONS.register(TESTS[11], () -> ItemGameTests::lustShardSwitchesToTheDespairModel);
-        FUNCTIONS.register(TESTS[12], () -> ItemGameTests::creativeWandFamilyMatchesOriginal);
-        FUNCTIONS.register(TESTS[13], () -> ItemGameTests::morphPhaseTintsMatchOriginal);
-        FUNCTIONS.register(TESTS[14], () -> ItemGameTests::toolAndSkullAxeChanceRulesPreserveOriginalBoundaries);
-        FUNCTIONS.register(TESTS[15], () -> ItemGameTests::silverfishEmeraldDropThresholdsMatchOriginal);
-        FUNCTIONS.register(TESTS[16], () -> ItemGameTests::wandTooltipKindsPreserveOriginalHints);
-        FUNCTIONS.register(TESTS[17], () -> ItemGameTests::crystalwellIsAScribingToolWithOriginalDurability);
-        FUNCTIONS.register(TESTS[18], () -> ItemGameTests::primewellIsAPermanentEpicScribingTool);
-        FUNCTIONS.register(TESTS[19], () -> ItemGameTests::scribeWellsKeepOriginalRecipesAndResearch);
-        FUNCTIONS.register(TESTS[20], () -> ItemGameTests::researchPrefixRespectsTagResearch);
-        FUNCTIONS.register(TESTS[21], () -> ItemGameTests::itemTranslationKeysAreNotNestedUnderResearchPages);
-        FUNCTIONS.register(TESTS[22], () -> ItemGameTests::researchTranslationKeysAreComplete);
-        FUNCTIONS.register(TESTS[23], () -> ItemGameTests::crystalwellResearchPageMatchesDifficulty);
-        FUNCTIONS.register(TESTS[24], () -> ItemGameTests::infernalAndTaintedWandDamageBehaviorsMatchOriginal);
-        FUNCTIONS.register(TESTS[25], () -> ItemGameTests::hellfireTriggerTargetsNetherrackAndObsidian);
-        FUNCTIONS.register(TESTS[26], () -> ItemGameTests::subcollarPlacesOnAnotherPlayerAndStoresDamageVis);
-        FUNCTIONS.register(TESTS[27], () -> ItemGameTests::ridingCropEffectsMatchOriginal);
-        FUNCTIONS.register(TESTS[28], () -> ItemGameTests::hereticTradesMatchOriginalListing);
-        FUNCTIONS.register(TESTS[29], () -> ItemGameTests::witchwoodRequiresArsMagica);
-        FUNCTIONS.register(TESTS[30], () -> ItemGameTests::wrathShardFormulaMatchesOriginal);
-        FUNCTIONS.register(TESTS[31], () -> ItemGameTests::alchemicalCapAndEquivalentRodMatchOriginal);
-        FUNCTIONS.register(TESTS[32], () -> ItemGameTests::ringOfNutritionOnlyWorksInRingSlots);
-        FUNCTIONS.register(TESTS[33], () -> ItemGameTests::blinkFocusUpgradesUseOriginalIconAssets);
-        FUNCTIONS.register(TESTS[34], () -> ItemGameTests::researchIconsResolveToRealContent);
-        FUNCTIONS.register(TESTS[35], () -> ItemGameTests::blinkFocusHellfireAppliesThroughFocalManipulator);
-        FUNCTIONS.register(TESTS[36], () -> ItemGameTests::blinkFocusReachesBeyondWandReachAndLandsLikeOriginal);
-    }
 
     private ItemGameTests() {}
 
-    @SubscribeEvent
-    static void registerTests(RegisterGameTestsEvent event) {
-        Holder<TestEnvironmentDefinition<?>> environment = event.registerEnvironment(
-            Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, "fm_items"), new TestEnvironmentDefinition.AllOf());
-        for (String name : TESTS) {
-            ResourceKey<Consumer<GameTestHelper>> function =
-                ResourceKey.create(Registries.TEST_FUNCTION, Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, name));
-            event.registerTest(
-                Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, name),
-                new FunctionGameTestInstance(function, new TestData<>(environment, Identifier.parse("thaumcraft:test/platform"), 100, 0, true))
-            );
-        }
-    }
 
-    private static void skullAxeInfusionRecipeMatchesOriginal(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void skullAxeInfusionRecipeMatchesOriginal(GameTestHelper helper) {
         InfusionRecipe recipe = (InfusionRecipe) TcRecipes.get("SKULLAXE");
         helper.assertTrue(recipe != null, "skull axe recipe must be registered");
         helper.assertValueEqual(recipe.instability(), 1, "instability");
@@ -213,7 +122,8 @@ public final class ItemGameTests {
         helper.succeed();
     }
 
-    private static void diabolistForkResearchAndRecipe(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void diabolistForkResearchAndRecipe(GameTestHelper helper) {
         ResearchItem fork = ResearchCategories.getResearch("FORK");
         helper.assertTrue(fork != null, "FORK research must be registered");
         helper.assertTrue(fork.isSecondary(), "FORK is secondary");
@@ -237,47 +147,50 @@ public final class ItemGameTests {
         helper.succeed();
     }
 
-    private static void taintCoalIsRegisteredAndIsFuel(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void taintCoalIsRegisteredAndIsFuel(GameTestHelper helper) {
         ItemStack stack = new ItemStack(FmItems.TAINT_COAL.get());
         helper.assertFalse(stack.isEmpty(), "taint coal must exist");
-        helper.assertValueEqual(BuiltInRegistries.ITEM.getKey(stack.getItem()), Identifier.parse("forbiddenmagic:taint_coal"), "taint coal id");
-        helper.assertTrue(stack.has(DataComponents.COOKING_FUEL), "taint coal is a fuel");
+        helper.assertValueEqual(BuiltInRegistries.ITEM.getKey(stack.getItem()), ResourceLocation.parse("forbiddenmagic:taint_coal"), "taint coal id");
+        FurnaceFuelBurnTimeEvent event = new FurnaceFuelBurnTimeEvent(stack, 0, RecipeType.SMELTING);
+        FmItemEvents.onFuel(event);
+        helper.assertTrue(event.getBurnTime() >= 1, "taint coal is a fuel");
         helper.succeed();
     }
 
-    private static void taintCoalBurnTimeVariesWithinOriginalRange(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void taintCoalBurnTimeVariesWithinOriginalRange(GameTestHelper helper) {
         ItemStack stack = new ItemStack(FmItems.TAINT_COAL.get());
-        CookingFuel fuel = stack.get(DataComponents.COOKING_FUEL);
-        helper.assertTrue(fuel != null, "taint coal carries a cooking fuel component");
-        LootContext context = new LootContext.Builder(
-            new LootParams.Builder(helper.getLevel()).create(LootContextParamSets.EMPTY)
-        ).create(Optional.empty());
         Set<Integer> drawn = new HashSet<>();
         for (int i = 0; i < 40; i++) {
-            int burn = fuel.burnTime().get(context, 0);
+            FurnaceFuelBurnTimeEvent event = new FurnaceFuelBurnTimeEvent(stack, 0, RecipeType.SMELTING);
+            FmItemEvents.onFuel(event);
+            int burn = event.getBurnTime();
             helper.assertTrue(burn >= 1 && burn <= 2400, "burn time " + burn + " must stay within 1..2400");
             drawn.add(burn);
         }
         helper.assertTrue(drawn.size() > 1, "burn time must be drawn per use, not a constant");
-        helper.assertTrue(ItemStack.CODEC.encodeStart(NbtOps.INSTANCE, stack).result().isPresent(), "taint coal must serialize its fuel component");
         helper.succeed();
     }
 
-    private static void emeraldFragmentIsRegistered(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void emeraldFragmentIsRegistered(GameTestHelper helper) {
         ItemStack stack = new ItemStack(FmItems.EMERALD_FRAGMENT.get());
         helper.assertFalse(stack.isEmpty(), "emerald fragment must exist");
-        helper.assertValueEqual(BuiltInRegistries.ITEM.getKey(stack.getItem()), Identifier.parse("forbiddenmagic:emerald_fragment"), "emerald fragment id");
+        helper.assertValueEqual(BuiltInRegistries.ITEM.getKey(stack.getItem()), ResourceLocation.parse("forbiddenmagic:emerald_fragment"), "emerald fragment id");
         helper.succeed();
     }
 
-    private static void ridingCropIsRegisteredAsSword(GameTestHelper helper) {
-        Item crop = BuiltInRegistries.ITEM.getValue(Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, "riding_crop"));
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void ridingCropIsRegisteredAsSword(GameTestHelper helper) {
+        Item crop = BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(ForbiddenMagic.MODID, "riding_crop"));
         helper.assertTrue(crop != Items.AIR, "riding crop must be registered");
         helper.assertTrue(crop instanceof RidingCropItem, "riding crop must be RidingCropItem");
         helper.succeed();
     }
 
-    private static void wandRodsRegisterAsFunctionalCores(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void wandRodsRegisterAsFunctionalCores(GameTestHelper helper) {
         WandRod tainted = WandRegistry.findRod("tainted");
         helper.assertTrue(tainted != null, "tainted rod must be registered in WandRegistry");
         helper.assertValueEqual(tainted.capacity(), 150, "tainted capacity");
@@ -300,22 +213,19 @@ public final class ItemGameTests {
         helper.succeed();
     }
 
-    private static void creativeTabIsRegisteredWithForkIcon(GameTestHelper helper) {
-        CreativeModeTab tab = BuiltInRegistries.CREATIVE_MODE_TAB.get(ForbiddenMagic.id("forbidden"))
-            .map(holder -> holder.value())
-            .orElse(null);
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void creativeTabIsRegisteredWithForkIcon(GameTestHelper helper) {
+        CreativeModeTab tab = BuiltInRegistries.CREATIVE_MODE_TAB.get(ForbiddenMagic.id("forbidden"));
         helper.assertTrue(tab != null, "the addon registers its own creative tab");
         helper.assertValueEqual(tab.getIconItem().getItem(), FmItems.DIABOLIST_FORK.get(), "the tab icon is the diabolist fork");
         helper.succeed();
     }
 
-    private static void creativeTabListsEveryRegisteredItem(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void creativeTabListsEveryRegisteredItem(GameTestHelper helper) {
         List<ItemStack> stacks = dev.visfox.forbiddenreforged.FmCreativeTab.stacks();
         java.util.Set<Item> listed = new java.util.HashSet<>();
         for (ItemStack stack : stacks) {
-            listed.add(stack.getItem());
-        }
-        for (ItemStack stack : dev.visfox.forbiddenreforged.FmCreativeTab.mobCrystalStacks()) {
             listed.add(stack.getItem());
         }
         for (var holder : FmItems.ITEMS.getEntries()) {
@@ -332,7 +242,8 @@ public final class ItemGameTests {
         helper.succeed();
     }
 
-    private static void orichalcumCapIsRegistered(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void orichalcumCapIsRegistered(GameTestHelper helper) {
         thaumcraft.wand.WandCap cap = WandRegistry.findCap("orichalcum");
         helper.assertTrue(cap != null, "the creative orichalcum cap is registered");
         helper.assertValueEqual(cap.baseCostModifier(), 0.0F, "orichalcum charges no vis");
@@ -341,33 +252,34 @@ public final class ItemGameTests {
         helper.succeed();
     }
 
-    private static void diabolistForkSwitchesToTheSporkModel(GameTestHelper helper) {
-        JsonObject definition = readJson(helper, "/assets/forbiddenmagic/items/diabolist_fork.json");
-        JsonObject model = definition.getAsJsonObject("model");
-        helper.assertValueEqual(model.get("type").getAsString(), "minecraft:condition", "the fork model is conditional");
-        helper.assertValueEqual(model.get("property").getAsString(), "forbiddenmagic:spork", "condition reads the spork config");
-        helper.assertValueEqual(model.getAsJsonObject("on_true").get("model").getAsString(), "forbiddenmagic:item/diabolist_fork_spork", "on_true is the spork");
-        helper.assertValueEqual(model.getAsJsonObject("on_false").get("model").getAsString(), "forbiddenmagic:item/diabolist_fork", "on_false is the ordinary fork");
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void diabolistForkSwitchesToTheSporkModel(GameTestHelper helper) {
+        JsonObject definition = readJson(helper, "/assets/forbiddenmagic/models/item/diabolist_fork.json");
+        helper.assertValueEqual(definition.getAsJsonObject("textures").get("layer0").getAsString(), "forbiddenmagic:item/diabolist_fork", "base model is the ordinary fork");
+        JsonObject override = definition.getAsJsonArray("overrides").get(0).getAsJsonObject();
+        helper.assertValueEqual(override.getAsJsonObject("predicate").get("forbiddenmagic:spork").getAsInt(), 1, "override reads the spork predicate");
+        helper.assertValueEqual(override.get("model").getAsString(), "forbiddenmagic:item/diabolist_fork_spork", "override resolves to the spork model");
         JsonObject spork = readJson(helper, "/assets/forbiddenmagic/models/item/diabolist_fork_spork.json");
         helper.assertValueEqual(spork.getAsJsonObject("textures").get("layer0").getAsString(), "forbiddenmagic:item/spork", "spork model uses the spork texture");
         helper.assertTrue(ForbiddenMagic.class.getResourceAsStream("/assets/forbiddenmagic/textures/item/spork.png") != null, "spork texture ships with the mod");
         helper.succeed();
     }
 
-    private static void lustShardSwitchesToTheDespairModel(GameTestHelper helper) {
-        JsonObject definition = readJson(helper, "/assets/forbiddenmagic/items/lust_shard.json");
-        JsonObject model = definition.getAsJsonObject("model");
-        helper.assertValueEqual(model.get("type").getAsString(), "minecraft:condition", "the lust shard model is conditional");
-        helper.assertValueEqual(model.get("property").getAsString(), "forbiddenmagic:no_lust", "condition reads the no_lust config");
-        helper.assertValueEqual(model.getAsJsonObject("on_true").get("model").getAsString(), "forbiddenmagic:item/lust_shard_despair", "on_true is the despair shard");
-        helper.assertValueEqual(model.getAsJsonObject("on_false").get("model").getAsString(), "forbiddenmagic:item/lust_shard", "on_false is the lust shard");
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void lustShardSwitchesToTheDespairModel(GameTestHelper helper) {
+        JsonObject definition = readJson(helper, "/assets/forbiddenmagic/models/item/lust_shard.json");
+        helper.assertValueEqual(definition.getAsJsonObject("textures").get("layer0").getAsString(), "forbiddenmagic:item/lust_shard", "base model is the lust shard");
+        JsonObject override = definition.getAsJsonArray("overrides").get(0).getAsJsonObject();
+        helper.assertValueEqual(override.getAsJsonObject("predicate").get("forbiddenmagic:no_lust").getAsInt(), 1, "override reads the no_lust predicate");
+        helper.assertValueEqual(override.get("model").getAsString(), "forbiddenmagic:item/lust_shard_despair", "override resolves to the despair shard");
         JsonObject despair = readJson(helper, "/assets/forbiddenmagic/models/item/lust_shard_despair.json");
         helper.assertValueEqual(despair.getAsJsonObject("textures").get("layer0").getAsString(), "forbiddenmagic:item/despair_shard", "despair model uses the despair texture");
         helper.assertTrue(ForbiddenMagic.class.getResourceAsStream("/assets/forbiddenmagic/textures/item/despair_shard.png") != null, "despair texture ships with the mod");
         helper.succeed();
     }
 
-    private static void ringOfNutritionOnlyWorksInRingSlots(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void ringOfNutritionOnlyWorksInRingSlots(GameTestHelper helper) {
         ServerPlayer player = mockConnectedPlayer(helper);
         for (int slot = 0; slot < Baubles.slotCount(); slot++) {
             Baubles.set(player, slot, ItemStack.EMPTY);
@@ -387,7 +299,8 @@ public final class ItemGameTests {
         helper.succeed();
     }
 
-    private static void blinkFocusUpgradesUseOriginalIconAssets(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void blinkFocusUpgradesUseOriginalIconAssets(GameTestHelper helper) {
         helper.assertValueEqual(dev.visfox.forbiddenreforged.BlinkFocusItem.HELLFIRE.icon(),
             ForbiddenMagic.id("textures/misc/hellfire.png"), "Hellfire uses the bundled original icon");
         helper.assertValueEqual(dev.visfox.forbiddenreforged.BlinkFocusItem.PANDEMONIUM.icon(),
@@ -399,7 +312,8 @@ public final class ItemGameTests {
         helper.succeed();
     }
 
-    private static void alchemicalCapAndEquivalentRodMatchOriginal(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void alchemicalCapAndEquivalentRodMatchOriginal(GameTestHelper helper) {
         WandCap cap = WandRegistry.findCap("alchemical");
         helper.assertTrue(cap != null, "alchemical wand cap is registered");
         if (cap != null) {
@@ -439,7 +353,8 @@ public final class ItemGameTests {
         helper.succeed();
     }
 
-    private static void creativeWandFamilyMatchesOriginal(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void creativeWandFamilyMatchesOriginal(GameTestHelper helper) {
         WandRod neutronium = WandRegistry.findRod("neutronium");
         WandRod staff = WandRegistry.findRod("neutronium_staff");
         helper.assertTrue(neutronium != null, "neutronium rod is registered");
@@ -451,8 +366,8 @@ public final class ItemGameTests {
         helper.assertValueEqual(neutronium.craftCost(), 1000, "neutronium rod craft cost");
         helper.assertValueEqual(staff.craftCost(), 1000, "neutronium staff craft cost");
         helper.assertTrue(neutronium.onUpdate() != null && staff.onUpdate() != null, "creative rods refill vis on update");
-        helper.assertValueEqual(neutronium.item(), Identifier.withDefaultNamespace("bedrock"), "creative rod uses bedrock");
-        helper.assertValueEqual(staff.item(), Identifier.withDefaultNamespace("bedrock"), "creative staff uses bedrock");
+        helper.assertValueEqual(neutronium.item(), ResourceLocation.withDefaultNamespace("bedrock"), "creative rod uses bedrock");
+        helper.assertValueEqual(staff.item(), ResourceLocation.withDefaultNamespace("bedrock"), "creative staff uses bedrock");
         helper.assertTrue(ForbiddenMagic.class.getResourceAsStream("/assets/forbiddenmagic/textures/model/wand_rod_neutronium.png") != null, "neutronium rod texture ships with the mod");
 
         List<ItemStack> stacks = dev.visfox.forbiddenreforged.FmCreativeTab.stacks();
@@ -473,7 +388,8 @@ public final class ItemGameTests {
             .findFirst().orElse(ItemStack.EMPTY);
         helper.assertFalse(neutroniumWand.isEmpty(), "creative neutronium wand can be located");
         helper.assertFalse(staffWand.isEmpty(), "creative neutronium staff can be located");
-        var creativePlayer = helper.makeMockServerPlayer(net.minecraft.world.level.GameType.CREATIVE);
+        var creativePlayer = TestSupport.mockServerPlayer(helper);
+        creativePlayer.setGameMode(GameType.CREATIVE);
         Wands.getRod(neutroniumWand).onUpdate().onUpdate(neutroniumWand, creativePlayer);
         Wands.getRod(staffWand).onUpdate().onUpdate(staffWand, creativePlayer);
         for (Aspect aspect : Aspect.getPrimalAspects()) {
@@ -491,7 +407,8 @@ public final class ItemGameTests {
         helper.succeed();
     }
 
-    private static void morphPhaseTintsMatchOriginal(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void morphPhaseTintsMatchOriginal(GameTestHelper helper) {
         MorphState state = MorphState.EMPTY;
         int[] colors = {0xFF980000, 0xFF0010CC, 0xFFE5DA00};
         for (int i = 0; i < colors.length; i++) {
@@ -499,18 +416,16 @@ public final class ItemGameTests {
             state = state.advance();
         }
         for (String name : List.of("morph_pickaxe", "morph_sword", "morph_shovel", "morph_axe")) {
-            JsonObject definition = readJson(helper, "/assets/forbiddenmagic/items/" + name + ".json");
-            JsonObject model = definition.getAsJsonObject("model");
-            JsonArray tints = model.getAsJsonArray("tints");
-            helper.assertValueEqual(tints.size(), 2, name + " has a base tint and a phase tint");
-            helper.assertValueEqual(tints.get(0).getAsJsonObject().get("type").getAsString(), "minecraft:constant", name + " keeps the base layer white");
-            helper.assertValueEqual(tints.get(0).getAsJsonObject().get("value").getAsInt(), 16777215, name + " base layer remains untinted");
-            helper.assertValueEqual(tints.get(1).getAsJsonObject().get("type").getAsString(), "forbiddenmagic:morph_phase", name + " overlay tint uses the phase source");
+            JsonObject definition = readJson(helper, "/assets/forbiddenmagic/models/item/" + name + ".json");
+            JsonObject textures = definition.getAsJsonObject("textures");
+            helper.assertTrue(textures.has("layer0"), name + " keeps the untinted base layer");
+            helper.assertTrue(textures.has("layer1"), name + " keeps the phase-tinted overlay layer");
         }
         helper.succeed();
     }
 
-    private static void toolAndSkullAxeChanceRulesPreserveOriginalBoundaries(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void toolAndSkullAxeChanceRulesPreserveOriginalBoundaries(GameTestHelper helper) {
         helper.assertValueEqual(FmToolEvents.taintPickaxeSpeed(0.0F), 0.0F, "zero-hardness blocks remain instant");
         helper.assertValueEqual(FmToolEvents.taintPickaxeSpeed(2.0F), 0.1F, "hardness below five uses the original slow speed");
         helper.assertValueEqual(FmToolEvents.taintPickaxeSpeed(10.0F), 5.0F, "hardness below twenty is halved");
@@ -547,7 +462,8 @@ public final class ItemGameTests {
         helper.succeed();
     }
 
-    private static void silverfishEmeraldDropThresholdsMatchOriginal(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void silverfishEmeraldDropThresholdsMatchOriginal(GameTestHelper helper) {
         helper.assertTrue(FmEnchantmentEffects.silverfishEmeraldRoll(true, 2, 0), "Windswept Hills includes roll 2 at Looting 0");
         helper.assertFalse(FmEnchantmentEffects.silverfishEmeraldRoll(true, 3, 0), "Windswept Hills excludes roll 3 at Looting 0");
         helper.assertTrue(FmEnchantmentEffects.silverfishEmeraldRoll(true, 4, 1), "Windswept Hills adds two per Looting level");
@@ -560,7 +476,8 @@ public final class ItemGameTests {
         helper.succeed();
     }
 
-    private static void wandTooltipKindsPreserveOriginalHints(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void wandTooltipKindsPreserveOriginalHints(GameTestHelper helper) {
         helper.assertValueEqual(FmToolEvents.wandTooltipKind("neutronium"), "creativeonly",
             "neutronium wand exposes the creative-only tooltip");
         helper.assertValueEqual(FmToolEvents.wandTooltipKind("neutronium_staff"), "creativeonly",
@@ -576,17 +493,19 @@ public final class ItemGameTests {
         helper.succeed();
     }
 
-    private static void crystalwellIsAScribingToolWithOriginalDurability(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void crystalwellIsAScribingToolWithOriginalDurability(GameTestHelper helper) {
         ItemStack stack = new ItemStack(FmItems.CRYSTALWELL.get());
         helper.assertTrue(stack.getItem() instanceof CrystalwellItem, "crystalwell uses its behavior item");
         helper.assertTrue(stack.getItem() instanceof ScribingToolsItem, "crystalwell can occupy the research table scribe slot");
-        int expectedMaxDamage = thaumcraft.Config.researchDifficulty() == -1 ? 50 : 100;
+        int expectedMaxDamage = ResearchConfig.RESEARCH_DIFFICULTY == -1 ? 50 : 100;
         helper.assertValueEqual(stack.getMaxDamage(), expectedMaxDamage, "crystalwell durability follows research difficulty");
         helper.assertValueEqual(stack.getCount(), 1, "crystalwell is unstackable");
         helper.succeed();
     }
 
-    private static void primewellIsAPermanentEpicScribingTool(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void primewellIsAPermanentEpicScribingTool(GameTestHelper helper) {
         ItemStack stack = new ItemStack(FmItems.PRIMEWELL.get());
         helper.assertTrue(stack.getItem() instanceof PrimewellItem, "primewell uses its behavior item");
         helper.assertTrue(stack.getItem() instanceof ScribingToolsItem, "primewell can occupy the research table scribe slot");
@@ -598,7 +517,8 @@ public final class ItemGameTests {
         helper.succeed();
     }
 
-    private static void scribeWellsKeepOriginalRecipesAndResearch(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void scribeWellsKeepOriginalRecipesAndResearch(GameTestHelper helper) {
         ShapelessArcaneRecipe crystalwell = (ShapelessArcaneRecipe) TcRecipes.get("CRYSTALWELL");
         helper.assertTrue(crystalwell != null, "crystalwell arcane recipe is registered");
         helper.assertTrue(TcRecipes.get("PRIMEWELL") != null, "primewell arcane recipe is registered");
@@ -606,7 +526,7 @@ public final class ItemGameTests {
         helper.assertTrue(ResearchCategories.getResearch("PRIMEWELL") != null, "primewell research is registered");
         helper.assertTrue(crystalwell.ingredients().get(0).test(new ItemStack(ModItems.SCRIBING_TOOLS.get())),
             "crystalwell recipe uses the registered scribing tools item");
-        if (thaumcraft.Config.researchDifficulty() == -1) {
+        if (ResearchConfig.RESEARCH_DIFFICULTY == -1) {
             helper.assertValueEqual(crystalwell.ingredients().size(), 4, "easy research uses two arbitrary Thaumcraft shards");
             helper.assertTrue(crystalwell.ingredients().get(2).test(new ItemStack(ModItems.BALANCED_SHARD.get())),
                 "the easy recipe accepts any shard through the shard tag");
@@ -620,7 +540,8 @@ public final class ItemGameTests {
         helper.succeed();
     }
 
-    private static void itemTranslationKeysAreNotNestedUnderResearchPages(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void itemTranslationKeysAreNotNestedUnderResearchPages(GameTestHelper helper) {
             JsonObject english = readJson(helper, "/assets/forbiddenmagic/lang/en_us.json");
             JsonObject russian = readJson(helper, "/assets/forbiddenmagic/lang/ru_ru.json");
             List<String> expected = List.of(
@@ -673,7 +594,8 @@ public final class ItemGameTests {
             helper.succeed();
         }
 
-    private static void researchTranslationKeysAreComplete(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void researchTranslationKeysAreComplete(GameTestHelper helper) {
         JsonObject english = readJson(helper, "/assets/forbiddenmagic/lang/en_us.json");
         JsonObject russian = readJson(helper, "/assets/forbiddenmagic/lang/ru_ru.json");
         List<String> researchIds = ResearchCategories.allResearch().stream()
@@ -730,7 +652,8 @@ public final class ItemGameTests {
         helper.succeed();
     }
 
-    private static void crystalwellResearchPageMatchesDifficulty(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void crystalwellResearchPageMatchesDifficulty(GameTestHelper helper) {
         ResearchItem item = ResearchCategories.getResearch("CRYSTALWELL");
         helper.assertTrue(item != null, "crystalwell research is registered");
         List<String> textPages = item.pages().stream()
@@ -738,7 +661,7 @@ public final class ItemGameTests {
             .map(ResearchPage.Text.class::cast)
             .map(ResearchPage.Text::text)
             .toList();
-        String expected = Config.researchDifficulty() == -1
+        String expected = ResearchConfig.RESEARCH_DIFFICULTY == -1
             ? "forbiddenmagic.research_page.CRYSTALWELL.1b"
             : "forbiddenmagic.research_page.CRYSTALWELL.1";
         helper.assertValueEqual(textPages.size(), 1, "crystalwell exposes one behavior page");
@@ -746,7 +669,8 @@ public final class ItemGameTests {
         helper.succeed();
     }
 
-    private static void infernalAndTaintedWandDamageBehaviorsMatchOriginal(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void infernalAndTaintedWandDamageBehaviorsMatchOriginal(GameTestHelper helper) {
         WandRod tainted = WandRegistry.findRod("tainted");
         WandRod infernal = WandRegistry.findRod("infernal");
         helper.assertTrue(tainted != null && infernal != null, "both behavior-bearing rods must be registered");
@@ -775,7 +699,8 @@ public final class ItemGameTests {
         helper.succeed();
     }
 
-    private static void hellfireTriggerTargetsNetherrackAndObsidian(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void hellfireTriggerTargetsNetherrackAndObsidian(GameTestHelper helper) {
         helper.assertTrue(WandTriggers.hasTrigger(Blocks.NETHERRACK.defaultBlockState()),
             "Hellfire trigger must be registered for netherrack");
         helper.assertTrue(WandTriggers.hasTrigger(Blocks.OBSIDIAN.defaultBlockState()),
@@ -796,7 +721,8 @@ public final class ItemGameTests {
         }
     }
     
-    private static void researchPrefixRespectsTagResearch(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void researchPrefixRespectsTagResearch(GameTestHelper helper) {
         ResearchItem item = new FmResearchItem("TEST", "FORBIDDEN", new AspectList(), 0, 0, 1,
             ForbiddenMagic.id("textures/misc/forbidden.png"));
         String expected = FmConfig.tagResearchEnabled()
@@ -806,12 +732,13 @@ public final class ItemGameTests {
         helper.succeed();
     }
 
-    private static void subcollarPlacesOnAnotherPlayerAndStoresDamageVis(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void subcollarPlacesOnAnotherPlayerAndStoresDamageVis(GameTestHelper helper) {
         if (FmConfig.lustDisabled()) {
             helper.succeed();
             return;
         }
-        Item item = BuiltInRegistries.ITEM.getValue(ForbiddenMagic.id("sub_collar"));
+        Item item = BuiltInRegistries.ITEM.get(ForbiddenMagic.id("sub_collar"));
         helper.assertTrue(item != Items.AIR, "the collar item exists");
         ServerPlayer owner = mockConnectedPlayer(helper);
         ServerPlayer target = mockConnectedPlayer(helper);
@@ -832,23 +759,24 @@ public final class ItemGameTests {
         helper.succeed();
     }
 
-    private static void ridingCropEffectsMatchOriginal(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void ridingCropEffectsMatchOriginal(GameTestHelper helper) {
         ItemStack crop = new ItemStack(FmItems.RIDING_CROP.get());
         ServerPlayer attacker = mockConnectedPlayer(helper);
 
-        Horse horse = helper.spawn(EntityTypes.HORSE, new BlockPos(2, 4, 2));
+        Horse horse = helper.spawn(EntityType.HORSE, new BlockPos(2, 4, 2));
         crop.getItem().hurtEnemy(crop, horse, attacker);
-        MobEffectInstance horseSpeed = horse.getEffect(MobEffects.SPEED);
+        MobEffectInstance horseSpeed = horse.getEffect(MobEffects.MOVEMENT_SPEED);
         helper.assertTrue(horseSpeed != null && horseSpeed.getDuration() == 200 && horseSpeed.getAmplifier() == 5, "a horse gets speed 200 at amplifier 5");
 
-        Pig pig = helper.spawn(EntityTypes.PIG, new BlockPos(4, 4, 4));
+        Pig pig = helper.spawn(EntityType.PIG, new BlockPos(4, 4, 4));
         crop.getItem().hurtEnemy(crop, pig, attacker);
-        MobEffectInstance pigSpeed = pig.getEffect(MobEffects.SPEED);
+        MobEffectInstance pigSpeed = pig.getEffect(MobEffects.MOVEMENT_SPEED);
         helper.assertTrue(pigSpeed != null && pigSpeed.getDuration() == 200 && pigSpeed.getAmplifier() == 5, "a pig gets speed 200 at amplifier 5");
 
         ServerPlayer victim = mockConnectedPlayer(helper);
         crop.getItem().hurtEnemy(crop, victim, attacker);
-        helper.assertTrue(victim.hasEffect(MobEffects.SPEED) && victim.hasEffect(MobEffects.HASTE) && victim.hasEffect(MobEffects.STRENGTH), "players get speed, haste and strength");
+        helper.assertTrue(victim.hasEffect(MobEffects.MOVEMENT_SPEED) && victim.hasEffect(MobEffects.DIG_SPEED) && victim.hasEffect(MobEffects.DAMAGE_BOOST), "players get speed, haste and strength");
 
         helper.assertTrue(RidingCropItem.dropsLustShard(1), "roll 1 drops a shard");
         helper.assertFalse(RidingCropItem.dropsLustShard(0) || RidingCropItem.dropsLustShard(2) || RidingCropItem.dropsLustShard(14), "only roll 1 of 15 drops a shard");
@@ -860,59 +788,42 @@ public final class ItemGameTests {
         helper.assertValueEqual(crop.getRarity(), Rarity.COMMON, "the crop keeps the original common rarity");
         helper.assertValueEqual(crop.getItem().getDestroySpeed(crop, Blocks.STONE.defaultBlockState()), 1.0F, "the crop always digs at speed 1");
 
-        Horse mount = helper.spawn(EntityTypes.HORSE, new BlockPos(6, 4, 6));
+        Horse mount = helper.spawn(EntityType.HORSE, new BlockPos(6, 4, 6));
         float health = mount.getHealth();
         attacker.startRiding(mount);
         crop.getItem().use(helper.getLevel(), attacker, InteractionHand.MAIN_HAND);
-        MobEffectInstance mountSpeed = mount.getEffect(MobEffects.SPEED);
+        MobEffectInstance mountSpeed = mount.getEffect(MobEffects.MOVEMENT_SPEED);
         helper.assertTrue(mountSpeed != null && mountSpeed.getDuration() == 200 && mountSpeed.getAmplifier() == 5, "right-click while riding gives the mount speed 200 at amplifier 5");
         helper.assertValueEqual(mount.getHealth(), health - 1.0F, "right-click while riding deals one damage to the mount");
         helper.succeed();
     }
 
-    private static void hereticTradesMatchOriginalListing(GameTestHelper helper) {
-        JsonObject level1 = readJson(helper, "/data/forbiddenmagic/trade_set/heretic/level_1.json");
-        helper.assertValueEqual(level1.get("amount").getAsInt(), 9, "all nine heretic offers are available from the first level");
-        for (int level = 2; level <= 5; level++) {
-            JsonObject set = readJson(helper, "/data/forbiddenmagic/trade_set/heretic/level_" + level + ".json");
-            helper.assertValueEqual(set.get("amount").getAsInt(), 0, "level " + level + " adds no extra offers");
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void hereticTradesMatchOriginalListing(GameTestHelper helper) {
+        List<VillagerTrades.ItemListing> listings = new ArrayList<>();
+        FmVillagers.hereticNoviceTrades(listings);
+        helper.assertValueEqual(listings.size(), FmConfig.lustDisabled() ? 8 : 9, "all heretic offers are available from the first level");
+        RandomSource random = RandomSource.create(42L);
+        int sevenUse = 0;
+        int singleUse = 0;
+        for (VillagerTrades.ItemListing listing : listings) {
+            MerchantOffer offer = listing.getOffer(null, random);
+            helper.assertTrue(offer != null, "every listing produces an offer");
+            helper.assertValueEqual(offer.getXp(), 0, "trade grants no xp");
+            helper.assertValueEqual(offer.getPriceMultiplier(), 0.0F, "trade has no reputation discount");
+            if (offer.getMaxUses() == 7) {
+                sevenUse++;
+            } else if (offer.getMaxUses() == 1) {
+                singleUse++;
+            }
         }
-
-        JsonArray pool = readJson(helper, "/data/forbiddenmagic/tags/villager_trade/heretic/pool.json").getAsJsonArray("values");
-        helper.assertValueEqual(pool.size(), 9, "the lust pool lists nine offers");
-        Set<String> unique = new HashSet<>();
-        for (var value : pool) {
-            unique.add(value.getAsString());
-        }
-        helper.assertValueEqual(unique.size(), 9, "the lust pool has no duplicate offers");
-        JsonArray noLustPool = readJson(helper, "/data/forbiddenmagic/tags/villager_trade/heretic/no_lust_pool.json").getAsJsonArray("values");
-        helper.assertValueEqual(noLustPool.size(), 8, "the no_lust pool lists eight offers");
-        JsonObject noLustLevel1 = readJson(helper, "/data/forbiddenmagic/trade_set/heretic/no_lust/level_1.json");
-        helper.assertValueEqual(noLustLevel1.get("amount").getAsInt(), 9, "the no_lust profession also offers everything at once");
-        for (int level = 2; level <= 5; level++) {
-            JsonObject set = readJson(helper, "/data/forbiddenmagic/trade_set/heretic/no_lust/level_" + level + ".json");
-            helper.assertValueEqual(set.get("amount").getAsInt(), 0, "no_lust level " + level + " adds no extra offers");
-        }
-
-        String[] normal = {
-            "emerald_greed_shard", "lust_shard_emerald", "wrath_shard_emerald", "gluttony_shard_emerald",
-            "emerald_skull", "emerald_ghast_tear", "emerald_glowstone"
-        };
-        for (String name : normal) {
-            JsonObject trade = readJson(helper, "/data/forbiddenmagic/villager_trade/heretic/" + name + ".json");
-            helper.assertValueEqual(trade.get("max_uses").getAsInt(), 7, name + " keeps the original seven uses");
-            helper.assertValueEqual(trade.get("xp").getAsInt(), 0, name + " grants no trade xp");
-            helper.assertValueEqual(trade.get("reputation_discount").getAsDouble(), 0.0, name + " has no reputation discount");
-        }
-        for (String name : new String[]{"emerald_profane_wand", "emerald_fire_focus"}) {
-            JsonObject trade = readJson(helper, "/data/forbiddenmagic/villager_trade/heretic/" + name + ".json");
-            helper.assertValueEqual(trade.get("max_uses").getAsInt(), 1, name + " keeps the original single use");
-            helper.assertValueEqual(trade.get("xp").getAsInt(), 0, name + " grants no trade xp");
-        }
+        helper.assertValueEqual(sevenUse, FmConfig.lustDisabled() ? 6 : 7, "seven-use offers keep the original count");
+        helper.assertValueEqual(singleUse, 2, "the wand and focus offers keep the original single use");
         helper.succeed();
     }
 
-    private static void wrathShardFormulaMatchesOriginal(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void wrathShardFormulaMatchesOriginal(GameTestHelper helper) {
         helper.assertValueEqual(FmDrops.heldWrathDamage(new ItemStack(Items.WOODEN_SWORD)), 4, "wooden sword adds four wrath");
         helper.assertValueEqual(FmDrops.heldWrathDamage(new ItemStack(Items.IRON_SWORD)), 6, "iron sword adds six wrath");
         helper.assertValueEqual(FmDrops.heldWrathDamage(new ItemStack(Items.DIAMOND_SWORD)), 7, "diamond sword adds seven wrath");
@@ -921,12 +832,13 @@ public final class ItemGameTests {
         helper.assertValueEqual(FmDrops.heldWrathDamage(new ItemStack(FmItems.SKULL_AXE.get())), 7, "the skull axe counts as elemental sword damage");
         helper.assertValueEqual(FmDrops.heldWrathDamage(new ItemStack(FmItems.MORPH_SWORD.get())), 7, "the morph sword counts as elemental sword damage");
         helper.assertValueEqual(FmDrops.heldWrathDamage(new ItemStack(FmItems.RIDING_CROP.get())), 4, "the riding crop counts as wooden sword damage");
-        helper.assertTrue(FmDrops.wrathEligible(helper.spawn(EntityTypes.ZOMBIE, new BlockPos(2, 4, 2))), "hostile mobs are eligible");
-        helper.assertFalse(FmDrops.wrathEligible(helper.spawn(EntityTypes.PIG, new BlockPos(4, 4, 4))), "passive animals are not eligible");
+        helper.assertTrue(FmDrops.wrathEligible(helper.spawn(EntityType.ZOMBIE, new BlockPos(2, 4, 2))), "hostile mobs are eligible");
+        helper.assertFalse(FmDrops.wrathEligible(helper.spawn(EntityType.PIG, new BlockPos(4, 4, 4))), "passive animals are not eligible");
         helper.succeed();
     }
 
-    private static void witchwoodRequiresArsMagica(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void witchwoodRequiresArsMagica(GameTestHelper helper) {
         boolean am2 = ModList.get().isLoaded("arsmagica2");
         helper.assertValueEqual(BuiltInRegistries.ITEM.getOptional(ForbiddenMagic.id("witchwood_rod")).isPresent(), am2, "the witchwood rod exists only with Ars Magica 2");
         helper.assertValueEqual(BuiltInRegistries.ITEM.getOptional(ForbiddenMagic.id("witchwood_staff_rod")).isPresent(), am2, "the witchwood staff rod exists only with Ars Magica 2");
@@ -936,7 +848,8 @@ public final class ItemGameTests {
     }
 
 
-    private static void researchIconsResolveToRealContent(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void researchIconsResolveToRealContent(GameTestHelper helper) {
         List<String> broken = new ArrayList<>();
         for (ResearchItem item : ResearchCategories.allResearch()) {
             if (!"FORBIDDEN".equals(item.category())) {
@@ -954,13 +867,14 @@ public final class ItemGameTests {
         helper.succeed();
     }
 
-    private static void blinkFocusHellfireAppliesThroughFocalManipulator(GameTestHelper helper) {
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void blinkFocusHellfireAppliesThroughFocalManipulator(GameTestHelper helper) {
         BlockPos tablePos = new BlockPos(2, 2, 2);
         BlockPos nodePos = new BlockPos(5, 2, 2);
         helper.setBlock(tablePos, ModBlocks.FOCAL_MANIPULATOR.get());
         helper.setBlock(nodePos, ModBlocks.ENERGIZED_AURA_NODE.get());
-        FocalManipulatorBlockEntity table = helper.getBlockEntity(tablePos, FocalManipulatorBlockEntity.class);
-        EnergizedNodeBlockEntity node = helper.getBlockEntity(nodePos, EnergizedNodeBlockEntity.class);
+        FocalManipulatorBlockEntity table = (FocalManipulatorBlockEntity) helper.getBlockEntity(tablePos);
+        EnergizedNodeBlockEntity node = (EnergizedNodeBlockEntity) helper.getBlockEntity(nodePos);
 
         ItemStack focus = new ItemStack(FmItems.BLINK_FOCUS.get());
         FocusKeys.UPGRADES.set(focus, List.of(FocusUpgradeType.FRUGAL.id()));
@@ -995,8 +909,9 @@ public final class ItemGameTests {
         helper.succeed();
     }
 
-    private static void blinkFocusReachesBeyondWandReachAndLandsLikeOriginal(GameTestHelper helper) {
-        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void blinkFocusReachesBeyondWandReachAndLandsLikeOriginal(GameTestHelper helper) {
+        Player player = mockConnectedPlayer(helper);
         BlockPos base = helper.absolutePos(new BlockPos(2, 3, 2));
         double px = base.getX() + 0.5;
         double py = 40.0;
@@ -1026,16 +941,16 @@ public final class ItemGameTests {
         helper.succeed();
     }
 
-    private static ServerPlayer mockConnectedPlayer(GameTestHelper helper) {        ServerPlayer player = (ServerPlayer) helper.makeMockServerPlayer(GameType.SURVIVAL);
+    private static ServerPlayer mockConnectedPlayer(GameTestHelper helper) {        ServerPlayer player = TestSupport.mockServerPlayer(helper);
+        player.setGameMode(GameType.SURVIVAL);
         CommonListenerCookie cookie = CommonListenerCookie.createInitial(player.getGameProfile(), false);
         Connection connection = new Connection(PacketFlow.SERVERBOUND);
         new EmbeddedChannel(connection);
-        new ServerGamePacketListenerImpl(helper.getLevel().getServer(), connection, player, cookie) {
+        player.connection = new ServerGamePacketListenerImpl(helper.getLevel().getServer(), connection, player, cookie) {
             @Override
             public void send(Packet<?> packet) {
             }
         };
-        player.connection.markClientLoaded();
         return player;
     }
 

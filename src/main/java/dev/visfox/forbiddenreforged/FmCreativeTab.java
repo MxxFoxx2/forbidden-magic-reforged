@@ -27,12 +27,6 @@ public final class FmCreativeTab {
         .displayItems((parameters, output) -> stacks().forEach(output::accept))
         .build());
 
-    public static final Supplier<CreativeModeTab> MOB_CRYSTAL = TABS.register("mobcrystal", () -> CreativeModeTab.builder()
-        .title(Component.translatable("itemGroup.forbiddenmagic_mobcrystal"))
-        .icon(() -> new ItemStack(FmItems.MOB_CRYSTAL.get()))
-        .displayItems((parameters, output) -> mobCrystalStacks().forEach(output::accept))
-        .build());
-
     private FmCreativeTab() {
     }
 
@@ -48,20 +42,12 @@ public final class FmCreativeTab {
             }
             stacks.add(new ItemStack(holder.get()));
         }
-        addCreativeWands(stacks);
-        return stacks;
-    }
-
-    public static List<ItemStack> mobCrystalStacks() {
-        if (!FmConfig.wrathCage()) {
-            return List.of();
-        }
-        List<ItemStack> stacks = new ArrayList<>();
         for (String mobId : FmSpawnerMobs.ids()) {
             ItemStack crystal = new ItemStack(FmItems.MOB_CRYSTAL.get());
             MobCrystalItem.setMob(crystal, mobId);
             stacks.add(crystal);
         }
+        addCreativeWands(stacks);
         return stacks;
     }
 

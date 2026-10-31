@@ -3,14 +3,16 @@ plugins {
     id 'net.neoforged.moddev' version '2.0.148'
 }
 
+tasks.named('wrapper', Wrapper).configure {
+    distributionType = Wrapper.DistributionType.BIN
+}
+
 version = mod_version
 group = mod_group_id
 
 base {
     archivesName = "forbidden-magic"
 }
-
-java.toolchain.languageVersion = JavaLanguageVersion.of(Integer.parseInt(java_version))
 
 sourceSets {
     client {
@@ -19,8 +21,15 @@ sourceSets {
     }
 }
 
+java.toolchain.languageVersion = JavaLanguageVersion.of(Integer.parseInt(java_version))
+
 neoForge {
     version = project.neo_version
+
+    parchment {
+        minecraftVersion = project.parchment_minecraft_version
+        mappingsVersion = project.parchment_mappings_version
+    }
 
     runs {
         client {
@@ -28,15 +37,25 @@ neoForge {
             sourceSet = sourceSets.client
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
-        gameTestServer {
-            type = "gameTestServer"
-            programArgument '--tests'
-            programArgument "${mod_id}:*"
+        server {
+            server()
+            programArgument '--nogui'
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
-        configureEach {
+        gameTestServer {
+            type = "gameTestServer"
+            // These tests use vanilla's empty structure template, so permit both the addon namespace and minecraft.
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
-            logLevel = org.slf4j.event.Level.DEBUG
+        }
+        data {
+            data()
+            programArguments.addAll '--mod', project.mod_id, '--all',
+                '--output', file('src/generated/resources/').getAbsolutePath(),
+                '--existing', file('src/main/resources/').getAbsolutePath()
+        }
+        configureEach {
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            logLevel = org.slf4j.event.Level.INFO
         }
     }
 
@@ -48,17 +67,22 @@ neoForge {
 }
 
 repositories {
-    maven { url = uri("maven") }
+    maven {
+        name = "Curios"
+        url = uri("https://maven.theillusivec4.top/")
+    }
+
     maven {
         name = "Minecraft Forge"
-        url = "https://maven.minecraftforge.net/"
+        url = uri("https://maven.minecraftforge.net/")
         content {
             includeGroup "com.github.glitchfiend"
         }
     }
+
     maven {
         name = "BlameJared"
-        url = "https://maven.blamejared.com/"
+        url = uri("https://maven.blamejared.com/")
         content {
             includeGroup "mezz.jei"
             includeGroup "net.mezzdev.config"
@@ -82,8 +106,14 @@ if (file('host').isDirectory()) {
 
 dependencies {
     implementation "com.github.glitchfiend:TerraBlender-neoforge:${terrablender_version}"
+
     compileOnly "thaumcraft:thaumcraft:${thaumcraft_version}"
     localRuntime "thaumcraft:thaumcraft:${thaumcraft_version}"
+    // Thaumcraft 1.21.1 has a mandatory Curios runtime dependency; include it in GameTest runs.
+    localRuntime "top.theillusivec4.curios:curios-neoforge:${curios_version}"
+
+    compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
+    compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
     clientRuntimeOnly "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
 }
 
@@ -91,14 +121,26 @@ tasks.named('jar', Jar) {
     archiveFileName = "forbidden-magic-${mod_version}.jar"
 }
 
-sourceSets.main.resources { srcDir('src/generated/resources') }
-sourceSets.main.java { srcDir('tests/java') }
+sourceSets.main.resources {
+    srcDir('src/generated/resources')
+}
+sourceSets.main.java {
+    srcDir('tests/java')
+}
 
 def generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
     var replaceProperties = [
-        minecraft_version: minecraft_version, minecraft_version_range: minecraft_version_range,
-        neo_version: neo_version, mod_id: mod_id, mod_name: mod_name, mod_version: mod_version,
-        mod_authors: mod_authors, mod_credits: mod_credits, mod_description: mod_description,
+        minecraft_version: minecraft_version,
+        minecraft_version_range: minecraft_version_range,
+        neo_version: neo_version,
+        loader_version_range: loader_version_range,
+        mod_id: mod_id,
+        mod_name: mod_name,
+        mod_version: mod_version,
+        mod_license: mod_license,
+        mod_authors: mod_authors,
+        mod_credits: mod_credits,
+        mod_description: mod_description,
         thaumcraft_version: thaumcraft_version
     ]
     inputs.properties replaceProperties
@@ -109,5 +151,8 @@ def generateModMetadata = tasks.register("generateModMetadata", ProcessResources
 sourceSets.main.resources.srcDir generateModMetadata
 neoForge.ideSyncTask generateModMetadata
 
-tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
 tasks.register('verify', GradleBuild) { }

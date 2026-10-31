@@ -12,7 +12,7 @@ public final class TaintTree {
 
     public static boolean grow(ServerLevel level, BlockPos pos, RandomSource random) {
         int height = 4 + random.nextInt(3);
-        if (pos.getY() < level.getMinY() || pos.getY() + height + 2 >= level.getMaxY()) {
+        if (pos.getY() < level.getMinBuildHeight() || pos.getY() + height + 2 >= level.getMaxBuildHeight()) {
             return false;
         }
         if (!FmBlocks.TAINT_SAPLING.get().defaultBlockState().canSurvive(level, pos)) {

@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Set;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
-import org.jspecify.annotations.Nullable;
+import javax.annotation.Nullable;
 import thaumcraft.aspect.Aspect;
 
 public final class FmSpawnerMobs {
@@ -25,7 +25,7 @@ public final class FmSpawnerMobs {
         Map.entry("minecraft:bat", Aspect.FLIGHT),
         Map.entry("minecraft:spider", Aspect.CLOTH),
         Map.entry("minecraft:slime", Aspect.SLIME),
-        Map.entry("minecraft:ghast", FmAspects.NETHER),
+        Map.entry("minecraft:ghast", Aspect.FIRE),
         Map.entry("minecraft:zombified_piglin", Aspect.GREED),
         Map.entry("minecraft:enderman", Aspect.ELDRITCH),
         Map.entry("minecraft:cave_spider", Aspect.POISON),
@@ -66,12 +66,9 @@ public final class FmSpawnerMobs {
     }
 
     public static @Nullable Aspect aspect(@Nullable String id) {
-        if (id == null) {
-            return null;
-        }
-        if (id.equals("minecraft:silverfish")) {
-            return FmConfig.silverfishEmeralds() ? Aspect.GREED : Aspect.BEAST;
-        }
+        if (id == null) return null;
+        if (id.equals("minecraft:ghast")) return FmAspects.NETHER;
+        if (id.equals("minecraft:silverfish")) return FmConfig.silverfishEmeralds() ? Aspect.GREED : Aspect.BEAST;
         return MOBS.get(id);
     }
 

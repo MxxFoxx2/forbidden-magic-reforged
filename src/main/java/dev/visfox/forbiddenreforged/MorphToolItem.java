@@ -4,17 +4,18 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -28,13 +29,18 @@ public class MorphToolItem extends Item implements WarpingGear {
     }
 
     @Override
-    public InteractionResult use(Level level, Player player, InteractionHand hand) {
+    public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
+        return repair.is(FmItems.DEADLY_SHARDS.get("envy").get()) || super.isValidRepairItem(toRepair, repair);
+    }
+
+    @Override
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         if (!player.isShiftKeyDown()) {
-            return InteractionResult.PASS;
+            return InteractionResultHolder.pass(player.getItemInHand(hand));
         }
         ItemStack stack = player.getItemInHand(hand);
         if (!hasTags(stack) || stack.getMaxDamage() - stack.getDamageValue() <= 5) {
-            return InteractionResult.PASS;
+            return InteractionResultHolder.pass(stack);
         }
         if (!level.isClientSide()) {
             MorphState state = stack.getOrDefault(FmComponents.MORPH_STATE.get(), MorphState.EMPTY);
@@ -47,15 +53,15 @@ public class MorphToolItem extends Item implements WarpingGear {
             } else {
                 stack.set(DataComponents.CUSTOM_NAME, Component.literal(next.currentName()).withStyle(ChatFormatting.ITALIC));
             }
-            stack.hurtAndBreak(5, player, EquipmentSlot.MAINHAND);
+            stack.hurtAndBreak(5, player, hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
             level.playSound(null, player.blockPosition(), ModSounds.WANDFAIL.get(), SoundSource.PLAYERS, 0.2F, 0.2F + player.getRandom().nextFloat() * 0.2F);
         }
-        player.swing(hand, net.minecraft.world.item.component.SwingAnimation.DEFAULT, true);
-        return InteractionResult.SUCCESS;
+        player.swing(hand);
+        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
     }
 
     @Override
-    public void inventoryTick(ItemStack stack, ServerLevel level, Entity owner, EquipmentSlot slot) {
+    public void inventoryTick(ItemStack stack, Level level, Entity owner, int slot, boolean selected) {
         if (!(owner instanceof LivingEntity) || !stack.isDamaged() || owner.tickCount % 10 != 0) {
             return;
         }

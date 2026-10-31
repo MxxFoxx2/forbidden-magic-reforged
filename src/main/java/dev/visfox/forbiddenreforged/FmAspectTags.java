@@ -58,7 +58,6 @@ public final class FmAspectTags {
             merge("minecraft:nether_wart", tags().add(FmAspects.NETHER, 1));
             merge("minecraft:nether_brick", tags().add(FmAspects.NETHER, 1));
             merge("minecraft:nether_bricks", tags().add(FmAspects.NETHER, 2));
-            register("#forbiddenmagic:item_bacon", tags().add(Aspect.FLESH, 6).add(Aspect.LIFE, 6).add(Aspect.ENERGY, 6).add(Aspect.BEAST, 4).add(FmAspects.GLUTTONY, 6));
             merge("minecraft:ghast_tear", tags().add(FmAspects.WRATH, 4));
             merge("minecraft:wither_skeleton_skull", tags().add(FmAspects.NETHER, 4));
             merge("minecraft:creeper_head", tags().add(FmAspects.WRATH, 2));

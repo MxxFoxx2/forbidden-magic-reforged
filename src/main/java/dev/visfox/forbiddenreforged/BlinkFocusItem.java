@@ -3,7 +3,7 @@ package dev.visfox.forbiddenreforged;
 import java.util.List;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.particles.SimpleParticleType;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -18,7 +18,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import org.jspecify.annotations.Nullable;
+import javax.annotation.Nullable;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.aspect.AspectList;
 import thaumcraft.wand.WandItem;
@@ -49,12 +49,12 @@ public class BlinkFocusItem extends FocusItem {
     }
 
     @Override
-    public @Nullable Identifier getFocusTexture(ItemStack focus) {
+    public @Nullable ResourceLocation getFocusTexture(ItemStack focus) {
         return ForbiddenMagic.id("item/blink_focus");
     }
 
     @Override
-    public @Nullable Identifier getOrnamentTexture(ItemStack focus) {
+    public @Nullable ResourceLocation getOrnamentTexture(ItemStack focus) {
         return ForbiddenMagic.id("item/blink_focus_ornament");
     }
 
@@ -64,7 +64,7 @@ public class BlinkFocusItem extends FocusItem {
     }
 
     @Override
-    public FocusUpgradeType @Nullable [] getPossibleUpgradesByRank(ItemStack focus, int rank) {
+    public @Nullable FocusUpgradeType[] getPossibleUpgradesByRank(ItemStack focus, int rank) {
         switch (rank) {
             case 1:
                 return new FocusUpgradeType[]{FocusUpgradeType.FRUGAL};
@@ -134,7 +134,7 @@ public class BlinkFocusItem extends FocusItem {
                 if (entity == player) {
                     continue;
                 }
-                entity.hurtServer(serverLevel, serverLevel.damageSources().source(DamageTypes.FIREBALL, player), damage);
+                entity.hurt(serverLevel.damageSources().source(DamageTypes.FIREBALL, player), damage);
                 entity.setRemainingFireTicks((3 + 3 * potency) * 20);
                 puff(serverLevel, ParticleTypes.FLAME, entity);
             }

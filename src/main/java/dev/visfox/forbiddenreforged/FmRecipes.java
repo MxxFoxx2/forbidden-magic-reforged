@@ -13,6 +13,7 @@ import thaumcraft.crafting.ShapelessArcaneRecipe;
 import thaumcraft.crafting.TcIngredient;
 import thaumcraft.crafting.TcRecipes;
 import thaumcraft.crafting.TcStack;
+import thaumcraft.research.ResearchConfig;
 
 public final class FmRecipes {
     public static final Set<String> OWN_KEYS = Set.of("SKULLAXE", "FORK", "WRATH", "GREEDY", "CONSUMING", "EDUCATIONAL", "CORRUPTING",
@@ -272,7 +273,7 @@ public final class FmRecipes {
                 TcIngredient.item("thaumcraft:greatwood_log")
             )
         ));
-        if (thaumcraft.Config.researchDifficulty() == -1) {
+        if (ResearchConfig.RESEARCH_DIFFICULTY == -1) {
             TcRecipes.register(new ShapelessArcaneRecipe("CRYSTALWELL", "CRYSTALWELL",
                 TcStack.of(FmItems.CRYSTALWELL.getId().toString(), 1),
                 new AspectList().add(Aspect.WATER, 1).add(Aspect.ORDER, 1),

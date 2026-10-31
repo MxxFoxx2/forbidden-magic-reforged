@@ -1,6 +1,6 @@
 package dev.visfox.forbiddenreforged;
 
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import thaumcraft.aspect.AspectList;
 import thaumcraft.crafting.TcStack;
 import thaumcraft.research.ResearchItem;
@@ -10,7 +10,7 @@ public final class FmResearchItem extends ResearchItem {
         super(key, category, tags, column, row, complexity, icon);
     }
 
-    public FmResearchItem(String key, String category, AspectList tags, int column, int row, int complexity, Identifier icon) {
+    public FmResearchItem(String key, String category, AspectList tags, int column, int row, int complexity, ResourceLocation icon) {
         super(key, category, tags, column, row, complexity, icon);
     }
 

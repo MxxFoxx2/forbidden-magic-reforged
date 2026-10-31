@@ -1,6 +1,6 @@
 modLoader="javafml"
-loaderVersion="[1,)"
-license="MIT"
+loaderVersion="${loader_version_range}"
+license="${mod_license}"
 
 [[mods]]
 modId="${mod_id}"
@@ -29,6 +29,6 @@ ${mod_description}
 [[dependencies.${mod_id}]]
     modId="thaumcraft"
     type="required"
-    versionRange="[${thaumcraft_version},)"
+    versionRange="[${thaumcraft_version}]"
     ordering="AFTER"
     side="BOTH"
