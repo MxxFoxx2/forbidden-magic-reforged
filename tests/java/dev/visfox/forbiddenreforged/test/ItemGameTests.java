@@ -308,6 +308,9 @@ public final class ItemGameTests {
         for (ItemStack stack : stacks) {
             listed.add(stack.getItem());
         }
+        for (ItemStack stack : dev.visfox.forbiddenreforged.FmCreativeTab.mobCrystalStacks()) {
+            listed.add(stack.getItem());
+        }
         for (var holder : FmItems.ITEMS.getEntries()) {
             helper.assertTrue(listed.contains(holder.get()), "the tab is missing the item " + holder.getId());
         }

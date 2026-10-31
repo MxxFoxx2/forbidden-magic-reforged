@@ -3,7 +3,10 @@ package dev.visfox.forbiddenreforged;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import thaumcraft.aspect.AddonAspects;
+import thaumcraft.device.SmeltingBonuses;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.research.Warp;
 
@@ -21,6 +24,9 @@ public final class FmSetup {
             FmWandTriggers.register();
             FmRecipes.register();
             FmResearch.register();
+            thaumcraft.device.SmeltingBonuses.register(
+                net.minecraft.world.item.Items.EMERALD,
+                FmItems.EMERALD_FRAGMENT.get());
             Warp.registerItem(ForbiddenMagic.id("wrath_cage"), 5);
             Warp.registerItem(ForbiddenMagic.id("taint_sapling"), 1);
             FmTinkerer.register();

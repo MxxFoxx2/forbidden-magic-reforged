@@ -105,6 +105,18 @@
 - JEI `31.16.0.90` подключается только к classpath клиентского run для разработки. В опубликованный
   jar, общий runtime classpath и GameTest-сервер JEI не входит.
 
+## Закрытые пробелы паритета (26.3)
+
+- Riding Crop recipe (a): JSON recipe + CraftingRecipeRef + research page.
+- Emerald conversions (b): 9 fragments <-> 1 emerald recipes.
+- Tainted blood shard (c): new item + drop rule (TaintedMob + player attack + Weakness amp>=2 -> 50%).
+- itemBacon tag (d): aspects on forbiddenmagic:item_bacon tag (empty by default).
+- Smelting bonus (e): inert in original (no emerald smelting recipe, size-0 stack); not ported.
+- Wand caps (f): 6 subtypes + 4 cap registrations + textures.
+- Silverfish aspect (g): config-dependent (GREED iff silverfishEmeralds).
+- Garbage blocks config (h): general.garbage_blocks.
+- mobcrystal creative tab (i): separate tab.
+
 ## Правила закрытия пунктов
 
 Считать пункт закрытым только после проверки кода против оригинального источника и успешного CI; визуальные пункты дополнительно требуют проверки в `runClient`. Успешная компиляция сама по себе не доказывает геймплейную эквивалентность.

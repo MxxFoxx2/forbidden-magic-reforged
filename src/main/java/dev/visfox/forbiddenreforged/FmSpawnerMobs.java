@@ -66,7 +66,13 @@ public final class FmSpawnerMobs {
     }
 
     public static @Nullable Aspect aspect(@Nullable String id) {
-        return id == null ? null : MOBS.get(id);
+        if (id == null) {
+            return null;
+        }
+        if (id.equals("minecraft:silverfish")) {
+            return FmConfig.silverfishEmeralds() ? Aspect.GREED : Aspect.BEAST;
+        }
+        return MOBS.get(id);
     }
 
     public static List<String> ids() {

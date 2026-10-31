@@ -41,6 +41,18 @@ public final class FmWands {
         WandRegistry.registerCap("alchemical", 0.9F, List.of(Aspect.WATER), 0.8F,
             ForbiddenMagic.id("alchemical_cap"), 7, null,
             ForbiddenMagic.id("textures/model/wand_cap_alchemical.png"));
+        WandRegistry.registerCap("vinteum", 0.9F, List.of(), 0.0F,
+            ForbiddenMagic.id("vinteum_cap"), 6, null,
+            ForbiddenMagic.id("textures/model/wand_cap_vinteum.png"));
+        WandRegistry.registerCap("manasteel", 0.9F, List.of(), 0.0F,
+            ForbiddenMagic.id("manasteel_cap"), 6, null,
+            ForbiddenMagic.id("textures/model/wand_cap_manasteel.png"));
+        WandRegistry.registerCap("elementium", 0.8F, List.of(), 0.0F,
+            ForbiddenMagic.id("elementium_cap"), 9, null,
+            ForbiddenMagic.id("textures/model/wand_cap_elementium.png"));
+        WandRegistry.registerCap("terrasteel", 1.8F, List.of(), 0.0F,
+            ForbiddenMagic.id("terrasteel_cap"), 1, null,
+            ForbiddenMagic.id("textures/model/wand_cap_terrasteel.png"));
         WandRegistry.registerRod("equivalent", 100, ForbiddenMagic.id("equivalent_rod"), 12,
             null, false, false, false,
             ForbiddenMagic.id("textures/model/wand_rod_equivalent.png"));
