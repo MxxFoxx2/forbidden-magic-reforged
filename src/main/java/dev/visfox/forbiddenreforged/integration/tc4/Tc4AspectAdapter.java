@@ -42,8 +42,23 @@ public final class Tc4AspectAdapter {
     }
 
     
+    public static ContentId toContentId(Aspect aspect) {
+        for (Map.Entry<ContentId, Aspect> entry : registeredAspects.entrySet()) {
+            if (entry.getValue().equals(aspect)) {
+                return entry.getKey();
+            }
+        }
+        return new ContentId("thaumcraft", aspect.getTag());
+    }
+
     public static Aspect resolveAspect(ContentId id) {
         Aspect addonAspect = registeredAspects.get(id);
+        if (addonAspect == null && "thaumcraft".equals(id.namespace())) {
+            Aspect hostAspect = Aspect.getAspect(id.path());
+            if (hostAspect != null) {
+                return hostAspect;
+            }
+        }
         if (addonAspect != null) {
             return addonAspect;
         }
