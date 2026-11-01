@@ -4,12 +4,6 @@ import dev.visfox.forbiddenreforged.core.model.ContentId;
 import java.util.Map;
 import java.util.Objects;
 
-/**
- * Declared integration surface of one host and one Minecraft target.
- *
- * <p>Unlisted features are unsupported by default. ADAPTED and PARTIAL are intentionally distinct
- * from NATIVE so compatibility reports cannot silently claim semantic parity.
- */
 public record HostProfile(
     ContentId id,
     String hostVersion,
