@@ -1,22 +1,17 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
-import dev.visfox.forbiddenreforged.FmConfig;
-import dev.visfox.forbiddenreforged.FmItems;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
 import dev.visfox.forbiddenreforged.core.wand.WandBehaviors;
 import dev.visfox.forbiddenreforged.core.wand.WandPartsAccess;
 import dev.visfox.forbiddenreforged.core.wand.WandVisAccess;
 import java.util.List;
 import net.minecraft.resources.Identifier;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.taint.TaintBiomes;
 import thaumcraft.wand.RodUpdate;
 import thaumcraft.wand.WandCap;
-import thaumcraft.wand.WandParts;
 import thaumcraft.wand.WandRegistry;
 import thaumcraft.wand.WandRod;
 import thaumcraft.wand.Wands;
