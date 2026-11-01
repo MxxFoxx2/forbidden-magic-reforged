@@ -311,6 +311,7 @@ def main() -> int:
         "TaintShovelItem.java": ("requireTaintBlocks()",),
         "FmBlockEntities.java": ("requireBlockEntities()",),
         "WrathCageBlock.java": ("requireBlockEntities()",),
+        "TaintFruitItem.java": ("requireWarp()",),
     }
     for filename, lookups in capability_consumers.items():
         source = ROOT / "src/main/java/dev/visfox/forbiddenreforged" / filename
