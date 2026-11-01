@@ -12,13 +12,12 @@
 
 ## Host-agnostic architecture branch
 
-- Branch: [`architecture/host-agnostic-core`](https://github.com/MxxFoxx2/forbidden-magic-reforged/tree/architecture/host-agnostic-core).
-- Verified commit: [`ddfb1f5`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/ddfb1f51df8c5950e53c9de822d76c739603c7fb).
-- [Java CI with Gradle #41311521396](https://github.com/MxxFoxx2/forbidden-magic-reforged/actions/runs/41311521396) completed successfully on 1 November 2026.
-- The branch CI passed the host-agnostic boundary check, pinned host build, mod build, artifact provenance, generated-resource freshness and both `no_lust=false` and `no_lust=true` GameTest runs.
-- This result verifies only the isolated architecture branch. It does not change or replace the latest verification of `main`.
-- Follow-up [Java CI with Gradle #41312807272](https://github.com/MxxFoxx2/forbidden-magic-reforged/actions/runs/41312807272) passed on commit [`5cbbb8f`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/5cbbb8f5331c484b639a747f43ee80d9f2c9da30), including the host-free `core/wand` boundary, the neutral wand vis/parts GameTest, and both `no_lust` configurations.
-- Follow-up [Java CI with Gradle #41315306825](https://github.com/MxxFoxx2/forbidden-magic-reforged/actions/runs/41315306825) passed on commit [`a30e9b2`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/a30e9b2fa0ac7f717a926feb96b8dd9da7a40f86), including the host-free Blink Focus behavior boundary, TC4 `FocusItem` adapter compilation, and both `no_lust` configurations.
+- Implemented branch: [`architecture/host-agnostic-core`](https://github.com/MxxFoxx2/forbidden-magic-reforged/tree/architecture/host-agnostic-core).
+- Verified head: [`d072f3b`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/d072f3b97e780bff88a08104e36671af529ab454).
+- [Java CI with Gradle #405](https://github.com/MxxFoxx2/forbidden-magic-reforged/actions/runs/41346637813) completed successfully on 1 November 2026.
+- The exact verified head passed the host-agnostic boundary check, pinned host preparation and build, mod build, artifact provenance, generated-resource freshness, and both GameTest configurations (`no_lust=false` and `no_lust=true`).
+- The architecture refactor is complete within its declared scope: shared content models/catalogs and extracted gameplay rules do not depend on TC4 APIs; host-specific behavior is behind the adapter and capability contracts.
+- This does not claim a second implemented host adapter or cross-Minecraft-version compatibility. The branch remains isolated; `main` was not modified or merged.
 
 ## Проверки вне CI
 
