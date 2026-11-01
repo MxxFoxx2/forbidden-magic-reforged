@@ -46,7 +46,7 @@ import dev.visfox.forbiddenreforged.FmConfig;
 import dev.visfox.forbiddenreforged.FmEnchantmentEffects;
 import dev.visfox.forbiddenreforged.FmEnchantments;
 import dev.visfox.forbiddenreforged.FmItems;
-import dev.visfox.forbiddenreforged.FmTinkerer;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4TinkererAdapter;
 import dev.visfox.forbiddenreforged.MorphState;
 import dev.visfox.forbiddenreforged.MorphToolItem;
 import thaumcraft.aspect.Aspect;
@@ -213,9 +213,9 @@ public final class EnchantmentGameTests {
     private static void tinkererIntegrationIsOptional(GameTestHelper helper) {
         boolean loaded = ModList.get().isLoaded("thaumictinkerer");
         if (!loaded) {
-            helper.assertValueEqual(FmTinkerer.registeredCount(), 0, "no TT means no registered costs");
+            helper.assertValueEqual(Tc4TinkererAdapter.registeredCount(), 0, "no TT means no registered costs");
         } else {
-            helper.assertValueEqual(FmTinkerer.registeredCount(), 8, "TT receives eight enchantment costs");
+            helper.assertValueEqual(Tc4TinkererAdapter.registeredCount(), 8, "TT receives eight enchantment costs");
         }
         helper.succeed();
     }

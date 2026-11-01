@@ -6,7 +6,6 @@ import dev.visfox.forbiddenreforged.FmConfig;
 import dev.visfox.forbiddenreforged.FmItems;
 import dev.visfox.forbiddenreforged.FmRecipes;
 import dev.visfox.forbiddenreforged.FmResearch;
-import dev.visfox.forbiddenreforged.FmTinkerer;
 import dev.visfox.forbiddenreforged.FmWandTriggers;
 import dev.visfox.forbiddenreforged.FmWands;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
@@ -30,7 +29,7 @@ public final class Tc4BootstrapAdapter {
         FmRecipes.register();
         FmResearch.register();
         SmeltingBonuses.register(Items.EMERALD, FmItems.EMERALD_FRAGMENT.get());
-        FmTinkerer.register();
+        Tc4TinkererAdapter.register();
     }
 
     private static void logAspectRegistry() {
