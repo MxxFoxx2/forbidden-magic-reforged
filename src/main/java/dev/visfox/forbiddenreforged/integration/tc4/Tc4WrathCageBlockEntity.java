@@ -1,6 +1,6 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
-import dev.visfox.forbiddenreforged.FmAspects;
+import dev.visfox.forbiddenreforged.FmBlockEntities;
 import dev.visfox.forbiddenreforged.FmSpawnerMobs;
 import dev.visfox.forbiddenreforged.WrathCageBlockEntity;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
@@ -15,7 +15,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
 import thaumcraft.aspect.Aspect;
-import thaumcraft.aspect.AspectContainer;
 import thaumcraft.aspect.AspectList;
 import thaumcraft.aspect.AspectSource;
 import thaumcraft.essentia.EssentiaTransport;
