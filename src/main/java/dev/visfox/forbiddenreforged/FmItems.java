@@ -19,10 +19,8 @@ import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4BlinkFocusItem;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4ItemRegistrationAdapter;
 import org.jspecify.annotations.Nullable;
-import thaumcraft.item.gear.TcMaterials;
-import thaumcraft.platform.Registration;
-import thaumcraft.registry.ModItems;
 
 public final class FmItems {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(ForbiddenMagic.MODID);
@@ -70,24 +68,23 @@ public final class FmItems {
                 ? ITEMS.registerItem("lust_shard", LustShardItem::new)
                 : ITEMS.registerSimpleItem(vice + "_shard"));
         }
-        GLUTTONY_SHARD = ITEMS.registerSimpleItem("gluttony_shard", properties -> Registration.food(properties, 2, 0.1F));
+        GLUTTONY_SHARD = ITEMS.registerSimpleItem("gluttony_shard", Tc4ItemRegistrationAdapter::gluttonyFood);
         SKULL_AXE = ITEMS.registerItem("skull_axe", SkullAxeItem::new,
-            properties -> Registration.sword(properties.rarity(Rarity.UNCOMMON), TcMaterials.ELEMENTAL_TOOL, 3.0F, -2.4F)
-                .repairable(ModItems.THAUMIUM_INGOT.get()));
+            Tc4ItemRegistrationAdapter::skullAxe);
         EMERALD_FRAGMENT = ITEMS.registerSimpleItem("emerald_fragment");
         TAINTED_BLOOD_SHARD = ITEMS.registerSimpleItem("tainted_blood_shard");
         MORPH_PICKAXE = ITEMS.registerItem("morph_pickaxe", MorphToolItem::new,
-            properties -> repairable(Registration.pickaxe(properties.rarity(Rarity.EPIC), TcMaterials.ELEMENTAL_TOOL, 2.0F, -2.8F)));
+            properties -> repairable(Tc4ItemRegistrationAdapter.morphPickaxe(properties)));
         MORPH_SWORD = ITEMS.registerItem("morph_sword", MorphToolItem::new,
-            properties -> repairable(Registration.sword(properties.rarity(Rarity.EPIC), TcMaterials.ELEMENTAL_TOOL, 3.0F, -2.4F)));
+            properties -> repairable(Tc4ItemRegistrationAdapter.morphSword(properties)));
         MORPH_SHOVEL = ITEMS.registerItem("morph_shovel", MorphToolItem::new,
-            properties -> repairable(Registration.shovel(properties.rarity(Rarity.EPIC), TcMaterials.ELEMENTAL_TOOL, 1.0F, -3.0F)));
+            properties -> repairable(Tc4ItemRegistrationAdapter.morphShovel(properties)));
         MORPH_AXE = ITEMS.registerItem("morph_axe", MorphToolItem::new,
-            properties -> repairable(Registration.axe(properties.rarity(Rarity.EPIC), TcMaterials.ELEMENTAL_TOOL, 3.0F, -3.0F)));
+            properties -> repairable(Tc4ItemRegistrationAdapter.morphAxe(properties)));
         MOB_CRYSTAL = ITEMS.registerItem("mob_crystal", MobCrystalItem::new,
             properties -> properties.stacksTo(1).rarity(Rarity.UNCOMMON));
         DIABOLIST_FORK = ITEMS.registerItem("diabolist_fork", DiabolistForkItem::new,
-            properties -> Registration.sword(properties.rarity(Rarity.UNCOMMON), TcMaterials.THAUMIUM_TOOL, 3.0F, -2.4F)
+            properties -> Tc4ItemRegistrationAdapter.diabolistFork(properties)
                 .repairable(net.minecraft.world.item.Items.QUARTZ));
         TAINT_COAL = ITEMS.registerSimpleItem("taint_coal", properties -> properties.component(
             DataComponents.COOKING_FUEL,
@@ -124,11 +121,9 @@ public final class FmItems {
         }
         PROFANE_ROD = ITEMS.registerSimpleItem("profane_rod");
         TAINT_SHOVEL = ITEMS.registerItem("taint_shovel", TaintShovelItem::new,
-            properties -> Registration.shovel(properties.rarity(Rarity.UNCOMMON), TcMaterials.ELEMENTAL_TOOL, 1.0F, -3.0F)
-                .repairable(ModItems.THAUMIUM_INGOT.get()));
+            Tc4ItemRegistrationAdapter::taintShovel);
         TAINT_PICKAXE = ITEMS.registerItem("taint_pickaxe", Item::new,
-            properties -> Registration.pickaxe(properties.rarity(Rarity.UNCOMMON), TcMaterials.ELEMENTAL_TOOL, 1.0F, -2.8F)
-                .repairable(ModItems.THAUMIUM_INGOT.get()));
+            Tc4ItemRegistrationAdapter::taintPickaxe);
         CRYSTALWELL = ITEMS.registerItem("crystalwell", CrystalwellItem::new, properties -> properties.stacksTo(1));
         PRIMEWELL = ITEMS.registerItem("primewell", PrimewellItem::new, properties -> properties.stacksTo(1).rarity(Rarity.EPIC));
         BLINK_FOCUS = ITEMS.registerItem("blink_focus", Tc4BlinkFocusItem::new,
