@@ -166,12 +166,12 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
     }
 
     @Override
-    public Map<String, ContentId> aspectCatalog(boolean silverfishEmeralds) {
+    public Map<ContentId, ContentId> aspectCatalog(boolean silverfishEmeralds) {
         return Tc4EntityAdapter.aspectCatalog(silverfishEmeralds);
     }
 
     @Override
-    public Set<String> bossEntityIds() {
+    public Set<ContentId> bossEntityIds() {
         return Tc4EntityAdapter.bossEntityIds();
     }
 
