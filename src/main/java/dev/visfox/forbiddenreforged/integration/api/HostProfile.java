@@ -43,6 +43,7 @@ public record HostProfile(
         ESSENTIA_STORAGE,
         ESSENTIA_TRANSPORT,
         WARP_POOLS,
+        STICKY_WARP,
         TAINT_ORIGINS,
         ENTITY_ASPECTS
     }
