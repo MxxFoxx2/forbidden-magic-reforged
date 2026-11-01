@@ -12,6 +12,7 @@ BOUNDARIES = (
 HOST_NEUTRAL_GAMEPLAY = (
     ROOT / "src/main/java/dev/visfox/forbiddenreforged/WrathCageBlockEntity.java",
     ROOT / "src/main/java/dev/visfox/forbiddenreforged/core/wand",
+    ROOT / "src/main/java/dev/visfox/forbiddenreforged/core/wand",
 )
 FORBIDDEN = (
     "import thaumcraft.",
