@@ -321,8 +321,9 @@ public final class ForbiddenMagicResearchCatalog {
         );
     }
 
-    private static ResearchDefinition.Icon item(String path) {
-        return ResearchDefinition.Icon.item(id(path.contains(":") ? path : path));
+    private static ResearchDefinition.Icon item(String item) {
+        ContentId itemId = item.contains(":") ? ContentId.parse(item) : id(item);
+        return ResearchDefinition.Icon.item(itemId);
     }
 
     private static ResearchDefinition.Icon texture(String path) {
