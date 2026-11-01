@@ -71,13 +71,13 @@ def main() -> int:
             if "integration/tc4" in source.as_posix():
                 continue
             content = source.read_text(encoding="utf-8")
-            if re.search(r"\\bWands\\b", content):
+            if re.search(r"\bWands\b", content):
                 failures.append(
                     f"{source.relative_to(ROOT)} accesses the TC4 wand API outside integration/tc4"
                 )
 
     if failures:
-        print("\\n".join(failures), file=sys.stderr)
+        print("\n".join(failures), file=sys.stderr)
         return 1
 
     print(f"Host-agnostic API boundary check passed ({checked} Java files).")
