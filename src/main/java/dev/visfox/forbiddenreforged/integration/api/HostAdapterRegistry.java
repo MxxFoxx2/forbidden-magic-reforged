@@ -48,13 +48,7 @@ public final class HostAdapterRegistry {
      * Returns the host's entity taxonomy, aspect catalog, and host entity predicates.
      */
     public static HostEntityServices requireEntities() {
-        HostAdapter adapter = require();
-        if (adapter instanceof HostEntityServices entities) {
-            return entities;
-        }
-        throw new IllegalStateException(
-            "Selected host adapter does not expose entity services: " + adapter.profile().id()
-        );
+        return capability(HostEntityServices.class, "entity");
     }
 
     public static HostAspectServices requireAspects() {
@@ -95,25 +89,13 @@ public final class HostAdapterRegistry {
      * Returns host-specific item factories and item property adapters.
      */
     public static HostItemServices requireItems() {
-        HostAdapter adapter = require();
-        if (adapter instanceof HostItemServices items) {
-            return items;
-        }
-        throw new IllegalStateException(
-            "Selected host adapter does not expose item services: " + adapter.profile().id()
-        );
+        return capability(HostItemServices.class, "item");
     }
 
     /**
      * Returns host-specific startup, trigger, and creative-tab services.
      */
     public static HostBootstrapServices requireBootstrap() {
-        HostAdapter adapter = require();
-        if (adapter instanceof HostBootstrapServices bootstrap) {
-            return bootstrap;
-        }
-        throw new IllegalStateException(
-            "Selected host adapter does not expose bootstrap services: " + adapter.profile().id()
-        );
+        return capability(HostBootstrapServices.class, "bootstrap");
     }
 }
