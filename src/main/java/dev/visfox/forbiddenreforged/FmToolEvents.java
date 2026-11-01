@@ -21,6 +21,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
+import org.jspecify.annotations.Nullable;
 
 public final class FmToolEvents {
     private static final List<ContentId> TAINTED_PRIMALS = List.of(
@@ -96,7 +97,7 @@ public final class FmToolEvents {
         return wandTooltipKind(HostAdapterRegistry.requireWandInspection().wandRodTag(stack));
     }
 
-    public static String wandTooltipKind(String rodTag) {
+    public static String wandTooltipKind(@Nullable String rodTag) {
         if (rodTag == null) {
             return "";
         }

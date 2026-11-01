@@ -355,6 +355,9 @@ def main() -> int:
     for feature in ("TAINT_BLOCK_SERVICES", "ENCHANTMENT_EFFECTS"):
         if feature not in profile_content:
             failures.append(f"HostProfile is missing the taint/enchantment capability feature declaration: {feature}")
+    tool_events_content = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmToolEvents.java").read_text(encoding="utf-8")
+    if "wandTooltipKind(@Nullable String rodTag)" not in tool_events_content:
+        failures.append("FmToolEvents must preserve nullable wand rod tags at the tooltip boundary")
 
     items_facade = ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmItems.java"
     items_content = items_facade.read_text(encoding="utf-8")
