@@ -54,10 +54,11 @@ Runtime contracts are separated by responsibility rather than combined in one se
 | `HostItemPropertyServices` | Host-specific `Item.Properties` customization; declared by `ITEM_PROPERTIES` |
 | `HostItemFactoryServices` | Host-backed item implementations and remainder items; declared by `ITEM_FACTORIES` |
 | `HostBootstrapServices` | Wand/trigger/optional-enchantment registration and creative-tab entries |
+| `HostWarpServices` | Applies semantic permanent/sticky/temporary warp changes through `WarpAccess`; host mapping remains in `Tc4WarpAdapter` |
 
 These ports may use Minecraft runtime types such as `ItemStack`, `LivingEntity`, `BlockState`, and `ServerPlayer`: this is a host-agnostic boundary within the current Minecraft/NeoForge target, not a cross-Minecraft-version abstraction. They must not expose TC4 or another magic-host's API types.
 
-The old aggregate `HostRuntimeServices`, mixed `HostEntityServices`, combined `HostItemServices`, and combined `HostWandServices` and `HostTaintServices` contracts were removed. Consumers request the narrow capability they need through `HostAdapterRegistry`.
+The old aggregate `HostRuntimeServices`, mixed `HostEntityServices`, combined `HostItemServices`, combined `HostWandServices`, and combined `HostTaintServices` contracts were removed. Consumers request the narrow capability they need through `HostAdapterRegistry`.
 
 ### 4. Concrete host integration — `integration/tc4/`
 
@@ -73,7 +74,8 @@ The Mob Crystal/spawner lookup is now split:
 - `HostEntityAspectServices` supplies the `Map<ContentId, ContentId>` from entity IDs to aspect IDs.
 - `HostEntityClassificationServices` supplies host-specific boss/taint/golem predicates and boss IDs.
 - `Tc4EntityAdapter` owns the TC4 entity taxonomy and translates both entity and aspect identifiers to semantic `ContentId` values.
-- `Tc4WarpAdapter` maps all three semantic warp kinds directly to TC4 `WarpType` values, including distinct `STICKY`; the profile declares `WARP_POOLS` and `STICKY_WARP`. GameTests exercise all three mappings and an actual sticky-warp event.
+- `Tc4WarpAdapter` maps all three semantic warp kinds directly to TC4 `WarpType` values, including distinct `STICKY`; the profile declares `WARP_POOLS` and `STICKY_WARP`. GameTests exercise all three mappings and a sticky-warp change through `HostWarpServices`.
+- Core wand progression uses `WandContractAccess` for the Profane Contract component and `WarpAccess` for sticky-warp mutations. The concrete data-component adapter lives outside `core`; the host warp operation is exposed through `HostWarpServices`. No core warp class extends NeoForge `Event` or posts to the NeoForge event bus.
 - Host taint-origin registration is not implemented; `TAINT_ORIGINS` is explicitly declared `UNSUPPORTED` by the TC4 adapter. Every `HostProfile.Feature` has one explicit support declaration.
 
 The silverfish configuration is passed to the host capability as an explicit option. The common mob catalog no longer hard-codes `thaumcraft:` entity or aspect identifiers.

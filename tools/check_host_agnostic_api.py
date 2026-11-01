@@ -17,6 +17,7 @@ HOST_NEUTRAL_GAMEPLAY = (
     ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostEntityClassificationServices.java",
     ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmWandTriggers.java",
     ROOT / "src/main/java/dev/visfox/forbiddenreforged/core/wand",
+    ROOT / "src/main/java/dev/visfox/forbiddenreforged/core/warp",
 )
 FORBIDDEN = (
     "import thaumcraft.",
@@ -70,6 +71,30 @@ def main() -> int:
                     failures.append(
                         f"{source.relative_to(ROOT)} crosses host boundary: {forbidden}"
                     )
+
+    core_root = ROOT / "src/main/java/dev/visfox/forbiddenreforged/core"
+    for source in core_root.rglob("*.java"):
+        content = source.read_text(encoding="utf-8")
+        if re.search(r"import dev\.visfox\.forbiddenreforged\.(?!core\.)", content):
+            failures.append(f"{source.relative_to(ROOT)} depends on outer mod/composition code from core")
+        if "import net.neoforged." in content:
+            failures.append(f"{source.relative_to(ROOT)} imports the NeoForge lifecycle/event framework from core")
+        if "WarpChangeRequested" in content:
+            failures.append(f"{source.relative_to(ROOT)} still references the removed framework event from core")
+
+    if (ROOT / "src/main/java/dev/visfox/forbiddenreforged/core/warp/WarpChangeRequested.java").exists():
+        failures.append("WarpChangeRequested must not live in core because it extended the NeoForge Event API")
+    wand_behaviors = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/core/wand/WandBehaviors.java").read_text(encoding="utf-8")
+    if "FmComponents" in wand_behaviors:
+        failures.append("WandBehaviors must use WandContractAccess instead of depending on FmComponents")
+    contract_access = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/core/wand/WandContractAccess.java").read_text(encoding="utf-8")
+    for method in ("remaining(ItemStack wand)", "setRemaining(ItemStack wand, int amount)", "clear(ItemStack wand)"):
+        if method not in contract_access:
+            failures.append(f"WandContractAccess is missing the Profane Contract operation: {method}")
+    fm_contract_access = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmWandContractAccess.java").read_text(encoding="utf-8")
+    if "implements WandContractAccess" not in fm_contract_access or "FmComponents.PROFANE_CONTRACT" not in fm_contract_access:
+        failures.append("FmWandContractAccess must bridge the common data component outside core")
+
 
     for source_root in WANDS_USAGE_BOUNDARY:
         for source in source_root.rglob("*.java"):
@@ -205,6 +230,7 @@ def main() -> int:
         "HostTaintBlockServices.java": ("boolean isTaintMaterial(", "boolean isTaintShovelPurificationTarget(", "float taintShovelMiningSpeed()", "void playTaintShovelSound("),
         "HostEnchantmentEffectServices.java": ("ItemStack specialMiningDrop(", "boolean isTaintDamage("),
         "HostScribingServices.java": ("boolean isNoResearchDifficulty()", "List<ContentId> primalAspectIds()", "boolean addAspectPool(ServerPlayer player",),
+        "HostWarpServices.java": ("extends WarpAccess",),
         "HostEntityAspectServices.java": ("Map<ContentId, ContentId> aspectCatalog(boolean silverfishEmeralds)",),
         "HostEntityClassificationServices.java": ("boolean isTaintedMob(LivingEntity entity)", "boolean isHostBoss(LivingEntity entity)", "boolean isHostGolem(LivingEntity entity)", "Set<ContentId> bossEntityIds()"),
     }
@@ -239,10 +265,39 @@ def main() -> int:
         "HostTaintBlockServices requireTaintBlocks()",
         "HostEnchantmentEffectServices requireEnchantmentEffects()",
         "HostScribingServices requireScribing()",
+        "HostWarpServices requireWarp()",
     )
     for lookup in capability_lookups:
         if lookup not in runtime_registry:
             failures.append(f"HostAdapterRegistry is missing a focused runtime capability lookup: {lookup}")
+    warp_access = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/core/warp/WarpAccess.java").read_text(encoding="utf-8")
+    if "void changeWarp(ServerPlayer player, int amount, WarpKind kind)" not in warp_access:
+        failures.append("WarpAccess is missing the semantic warp operation")
+    tc4_warp_adapter = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/tc4/Tc4WarpAdapter.java").read_text(encoding="utf-8")
+    if "Warp.add(player, amount, toHostType(kind))" not in tc4_warp_adapter:
+        failures.append("Tc4WarpAdapter does not apply semantic warp changes through the host API")
+    if "NeoForge.EVENT_BUS" in tc4_warp_adapter or "WarpChangeRequested" in tc4_warp_adapter:
+        failures.append("Tc4WarpAdapter must implement the direct warp capability instead of an event-bus bridge")
+    tc4_host_adapter = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/tc4/Tc4HostAdapter.java").read_text(encoding="utf-8")
+    if "HostWarpServices" not in tc4_host_adapter or "changeWarp(ServerPlayer player, int amount, WarpKind kind)" not in tc4_host_adapter:
+        failures.append("Tc4HostAdapter does not expose HostWarpServices")
+    wand_adapter = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/tc4/Tc4WandAdapter.java").read_text(encoding="utf-8")
+    if "FmWandContractAccess.INSTANCE" not in wand_adapter or "HostAdapterRegistry.requireWarp()" not in wand_adapter:
+        failures.append("TC4 Profane Wand setup does not inject component and warp ports")
+
+    for source_root in (ROOT / "src/main/java", ROOT / "tests/java"):
+        if not source_root.is_dir():
+            continue
+        for source in source_root.rglob("*.java"):
+            if "WarpChangeRequested" in source.read_text(encoding="utf-8"):
+                failures.append(f"{source.relative_to(ROOT)} still references the removed NeoForge warp event")
+
+    if "HostAdapterRegistry.requireWarp().changeWarp(player, 1, WarpKind.STICKY)" not in game_tests:
+        failures.append("Warp GameTest must exercise the direct HostWarpServices capability")
+    if "FmWandContractAccess.INSTANCE.remaining(contractProbe)" not in game_tests:
+        failures.append("GameTests must verify Profane Contract component access outside core")
+;
+
 
     capability_consumers = {
         "FmSpawnerMobs.java": ("requireEntityAspects()", "requireEntityClassification()"),

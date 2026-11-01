@@ -1,6 +1,8 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
+import dev.visfox.forbiddenreforged.FmWandContractAccess;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 import dev.visfox.forbiddenreforged.core.wand.WandBehaviors;
 import dev.visfox.forbiddenreforged.core.wand.WandPartsAccess;
 import dev.visfox.forbiddenreforged.core.wand.WandVisAccess;
@@ -123,7 +125,7 @@ public final class Tc4WandAdapter {
     private static final class ProfaneWandUpdate implements RodUpdate {
         @Override
         public void onUpdate(ItemStack stack, Player player) {
-            WandBehaviors.profane(stack, player, VIS, PARTS);
+            WandBehaviors.profane(stack, player, VIS, PARTS, FmWandContractAccess.INSTANCE, HostAdapterRegistry.requireWarp());
         }
     }
 }

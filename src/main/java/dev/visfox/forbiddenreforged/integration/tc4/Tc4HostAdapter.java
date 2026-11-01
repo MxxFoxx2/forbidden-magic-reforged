@@ -22,6 +22,8 @@ import dev.visfox.forbiddenreforged.integration.runtime.HostItemPropertyServices
 import dev.visfox.forbiddenreforged.integration.runtime.HostBootstrapServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostEntityAspectServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostEntityClassificationServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostWarpServices;
+import dev.visfox.forbiddenreforged.core.warp.WarpKind;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
@@ -43,7 +45,7 @@ import java.util.Set;
 /**
  * Thaumcraft 4: Reforged implementation of the host-neutral content contract.
  */
-public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, HostMorphToolServices, HostBlockEntityServices, HostWandInspectionServices, HostWandVisServices, HostAccessoryServices, HostTaintBlockServices, HostEnchantmentEffectServices, HostScribingServices, HostItemPropertyServices, HostItemFactoryServices, HostBootstrapServices, HostEntityAspectServices, HostEntityClassificationServices {
+public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, HostMorphToolServices, HostBlockEntityServices, HostWandInspectionServices, HostWandVisServices, HostAccessoryServices, HostTaintBlockServices, HostEnchantmentEffectServices, HostScribingServices, HostItemPropertyServices, HostItemFactoryServices, HostBootstrapServices, HostEntityAspectServices, HostEntityClassificationServices, HostWarpServices {
     public static final Tc4HostAdapter INSTANCE = new Tc4HostAdapter();
 
     private static final HostProfile PROFILE = new HostProfile(
@@ -202,6 +204,11 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
     @Override
     public Set<ContentId> bossEntityIds() {
         return Tc4EntityAdapter.bossEntityIds();
+    }
+
+    @Override
+    public void changeWarp(ServerPlayer player, int amount, WarpKind kind) {
+        Tc4WarpAdapter.changeWarp(player, amount, kind);
     }
 
     @Override

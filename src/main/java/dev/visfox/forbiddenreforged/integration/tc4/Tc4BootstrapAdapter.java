@@ -19,7 +19,6 @@ public final class Tc4BootstrapAdapter {
 
     public static void initialize() {
         logAspectRegistry();
-        Tc4WarpAdapter.register();
         Tc4WarpAdapter.registerWarpItem(ContentId.parse("forbiddenmagic:wrath_cage"), 5);
         Tc4WarpAdapter.registerWarpItem(ContentId.parse("forbiddenmagic:taint_sapling"), 1);
         FmWands.register();

@@ -1,8 +1,7 @@
 package dev.visfox.forbiddenreforged.core.wand;
 
-import dev.visfox.forbiddenreforged.FmComponents;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
-import dev.visfox.forbiddenreforged.core.warp.WarpChangeRequested;
+import dev.visfox.forbiddenreforged.core.warp.WarpAccess;
 import dev.visfox.forbiddenreforged.core.warp.WarpKind;
 import java.util.List;
 import net.minecraft.core.particles.ParticleTypes;
@@ -67,35 +66,37 @@ public final class WandBehaviors {
         ItemStack wand,
         Player entity,
         WandVisAccess vis,
-        WandPartsAccess parts
+        WandPartsAccess parts,
+        WandContractAccess contractAccess,
+        WarpAccess warpAccess
     ) {
         if (!(entity instanceof ServerPlayer player) || player.tickCount % 20 != 0) {
             return;
         }
-        Integer stored = wand.get(FmComponents.PROFANE_CONTRACT.get());
-        int contract = stored == null ? beginContract(wand) : stored;
-        if (contract <= 0) {
+        Integer stored = contractAccess.remaining(wand);
+        int remainingContract = stored == null ? beginContract(wand, contractAccess) : stored;
+        if (remainingContract <= 0) {
             return;
         }
         int maximum = vis.maximumVis(wand);
         for (ContentId aspect : vis.primalAspects()) {
-            if (contract <= 0) {
+            if (remainingContract <= 0) {
                 break;
             }
             int deficit = maximum - vis.vis(wand, aspect);
             if (deficit > 0) {
-                int restore = Math.min(contract, deficit);
+                int restore = Math.min(remainingContract, deficit);
                 vis.addRealVis(wand, aspect, restore, true);
-                contract -= restore;
+                remainingContract -= restore;
                 if (player.getRandom().nextInt(2501) < restore) {
-                    WarpChangeRequested.request(player, 1, WarpKind.STICKY);
+                    warpAccess.changeWarp(player, 1, WarpKind.STICKY);
                 }
             }
         }
-        if (contract <= 0) {
+        if (remainingContract <= 0) {
             parts.setRod(wand, PROFANED_ROD);
-            wand.remove(FmComponents.PROFANE_CONTRACT.get());
-            WarpChangeRequested.request(player, 1, WarpKind.STICKY);
+            contractAccess.clear(wand);
+            warpAccess.changeWarp(player, 1, WarpKind.STICKY);
             player.level().sendParticles(
                 ParticleTypes.EXPLOSION,
                 player.getX(),
@@ -109,11 +110,11 @@ public final class WandBehaviors {
             );
             return;
         }
-        wand.set(FmComponents.PROFANE_CONTRACT.get(), contract);
+        contractAccess.setRemaining(wand, remainingContract);
     }
 
-    private static int beginContract(ItemStack wand) {
-        wand.set(FmComponents.PROFANE_CONTRACT.get(), 25000);
+    private static int beginContract(ItemStack wand, WandContractAccess contractAccess) {
+        contractAccess.setRemaining(wand, 25000);
         return 25000;
     }
 

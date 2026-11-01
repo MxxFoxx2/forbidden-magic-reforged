@@ -41,12 +41,12 @@ import dev.visfox.forbiddenreforged.FmDrops;
 import dev.visfox.forbiddenreforged.FmItems;
 import dev.visfox.forbiddenreforged.FmRecipes;
 import dev.visfox.forbiddenreforged.FmSpawnerMobs;
+import dev.visfox.forbiddenreforged.FmWandContractAccess;
 import dev.visfox.forbiddenreforged.core.research.ForbiddenMagicResearchCatalog;
 import dev.visfox.forbiddenreforged.core.research.ResearchDefinition;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4ResearchAdapter;
 import dev.visfox.forbiddenreforged.core.warp.WarpKind;
-import dev.visfox.forbiddenreforged.core.warp.WarpChangeRequested;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4WarpAdapter;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.core.model.HostContent;
@@ -355,6 +355,26 @@ public final class RecipeGameTests {
             "the selected host exposes Scribing Well services"
         );
         helper.assertTrue(
+            HostAdapterRegistry.requireWarp() != null,
+            "the selected host exposes semantic warp mutation services"
+        );
+        ItemStack contractProbe = new ItemStack(Items.STICK);
+        helper.assertTrue(
+            FmWandContractAccess.INSTANCE.remaining(contractProbe) == null,
+            "a wand without a Profane Contract starts without stored contract progress"
+        );
+        FmWandContractAccess.INSTANCE.setRemaining(contractProbe, 25000);
+        helper.assertValueEqual(
+            FmWandContractAccess.INSTANCE.remaining(contractProbe),
+            25000,
+            "the common Profane Contract component adapter stores remaining progress"
+        );
+        FmWandContractAccess.INSTANCE.clear(contractProbe);
+        helper.assertTrue(
+            FmWandContractAccess.INSTANCE.remaining(contractProbe) == null,
+            "the common Profane Contract component adapter clears completed progress"
+        );
+        helper.assertTrue(
             HostAdapterRegistry.requireEntityAspects() != null,
             "the selected host exposes its entity aspect catalog"
         );
@@ -625,7 +645,7 @@ public final class RecipeGameTests {
             "Tainted Sapling item must keep one warp");
         ServerPlayer player = mockPlayer(helper);
         int stickyBefore = Warp.get(player, WarpType.STICKY);
-        WarpChangeRequested.request(player, 1, WarpKind.STICKY);
+        HostAdapterRegistry.requireWarp().changeWarp(player, 1, WarpKind.STICKY);
         helper.assertValueEqual(Warp.get(player, WarpType.STICKY), stickyBefore + 1,
             "common warp request must reach the TC4 runtime adapter");
         helper.succeed();

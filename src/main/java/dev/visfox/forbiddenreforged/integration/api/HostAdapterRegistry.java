@@ -14,6 +14,7 @@ import dev.visfox.forbiddenreforged.integration.runtime.HostAccessoryServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostTaintBlockServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostEnchantmentEffectServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostScribingServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostWarpServices;
 import java.util.Objects;
 
 /**
@@ -93,6 +94,10 @@ public final class HostAdapterRegistry {
 
     public static HostScribingServices requireScribing() {
         return capability(HostScribingServices.class, "scribing");
+    }
+
+    public static HostWarpServices requireWarp() {
+        return capability(HostWarpServices.class, "warp");
     }
 
     private static <T> T capability(Class<T> type, String name) {
