@@ -24,7 +24,7 @@ public class WrathCageBlock extends Block implements EntityBlock {
 
     @Override
     public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return HostAdapterRegistry.requireRuntime().createWrathCageBlockEntity(pos, state);
+        return HostAdapterRegistry.requireBlockEntities().createWrathCageBlockEntity(pos, state);
     }
 
     @Override

@@ -17,8 +17,8 @@ public final class TaintShovelItem extends Item {
 
     @Override
     public float getDestroySpeed(ItemStack stack, BlockState state) {
-        if (HostAdapterRegistry.requireRuntime().isTaintMaterial(state) || state.is(FmBlocks.TAINT_LEAVES.get())) {
-            return HostAdapterRegistry.requireRuntime().taintShovelMiningSpeed();
+        if (HostAdapterRegistry.requireTaint().isTaintMaterial(state) || state.is(FmBlocks.TAINT_LEAVES.get())) {
+            return HostAdapterRegistry.requireTaint().taintShovelMiningSpeed();
         }
         return super.getDestroySpeed(stack, state);
     }
@@ -39,7 +39,7 @@ public final class TaintShovelItem extends Item {
                         continue;
                     }
                     BlockState state = level.getBlockState(target);
-                    if (!HostAdapterRegistry.requireRuntime().isTaintShovelPurificationTarget(state)) {
+                    if (!HostAdapterRegistry.requireTaint().isTaintShovelPurificationTarget(state)) {
                         continue;
                     }
                     purified++;
@@ -55,7 +55,7 @@ public final class TaintShovelItem extends Item {
         }
         if (!level.isClientSide() && player != null) {
             stack.hurtAndBreak(Math.min(purified, 15), player, context.getHand());
-            HostAdapterRegistry.requireRuntime().playTaintShovelSound(level, center);
+            HostAdapterRegistry.requireTaint().playTaintShovelSound(level, center);
         }
         return InteractionResult.SUCCESS;
     }

@@ -39,7 +39,7 @@ public class MobCrystalItem extends Item {
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
         ContentId aspect = FmSpawnerMobs.aspect(mob(stack));
         if (aspect != null) {
-            tooltip.accept(HostAdapterRegistry.requireRuntime().aspectDescription(aspect));
+            tooltip.accept(HostAdapterRegistry.requireAspects().aspectDescription(aspect));
         }
     }
 }

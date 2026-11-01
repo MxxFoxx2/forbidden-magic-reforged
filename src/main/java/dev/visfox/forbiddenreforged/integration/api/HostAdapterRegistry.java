@@ -1,9 +1,14 @@
 package dev.visfox.forbiddenreforged.integration.api;
 
-import dev.visfox.forbiddenreforged.integration.runtime.HostRuntimeServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostItemServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostBootstrapServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostEntityServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostAspectServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostMorphToolServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostBlockEntityServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostWandServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostTaintServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostScribingServices;
 import java.util.Objects;
 
 /**
@@ -40,19 +45,6 @@ public final class HostAdapterRegistry {
     }
 
     /**
-     * Returns the Minecraft-runtime capabilities of the selected host.
-     */
-    public static HostRuntimeServices requireRuntime() {
-        HostAdapter adapter = require();
-        if (adapter instanceof HostRuntimeServices runtime) {
-            return runtime;
-        }
-        throw new IllegalStateException(
-            "Selected host adapter does not expose runtime services: " + adapter.profile().id()
-        );
-    }
-
-    /**
      * Returns the host's entity taxonomy, aspect catalog, and host entity predicates.
      */
     public static HostEntityServices requireEntities() {
@@ -62,6 +54,40 @@ public final class HostAdapterRegistry {
         }
         throw new IllegalStateException(
             "Selected host adapter does not expose entity services: " + adapter.profile().id()
+        );
+    }
+
+    public static HostAspectServices requireAspects() {
+        return capability(HostAspectServices.class, "aspect");
+    }
+
+    public static HostMorphToolServices requireMorphTools() {
+        return capability(HostMorphToolServices.class, "morph tool");
+    }
+
+    public static HostBlockEntityServices requireBlockEntities() {
+        return capability(HostBlockEntityServices.class, "block entity");
+    }
+
+    public static HostWandServices requireWands() {
+        return capability(HostWandServices.class, "wand");
+    }
+
+    public static HostTaintServices requireTaint() {
+        return capability(HostTaintServices.class, "taint");
+    }
+
+    public static HostScribingServices requireScribing() {
+        return capability(HostScribingServices.class, "scribing");
+    }
+
+    private static <T> T capability(Class<T> type, String name) {
+        HostAdapter adapter = require();
+        if (type.isInstance(adapter)) {
+            return type.cast(adapter);
+        }
+        throw new IllegalStateException(
+            "Selected host adapter does not expose " + name + " services: " + adapter.profile().id()
         );
     }
 

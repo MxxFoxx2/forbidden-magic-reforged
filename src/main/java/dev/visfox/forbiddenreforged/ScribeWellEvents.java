@@ -24,13 +24,13 @@ public final class ScribeWellEvents {
 
     private static void onPlayerTick(PlayerTickEvent.Post event) {
         if (!(event.getEntity() instanceof ServerPlayer player)
-            || !HostAdapterRegistry.requireRuntime().isNoResearchDifficulty()
+            || !HostAdapterRegistry.requireScribing().isNoResearchDifficulty()
             || player.tickCount % 200 != 0) {
             return;
         }
 
         var inventory = player.getInventory();
-        var primals = HostAdapterRegistry.requireRuntime().primalAspectIds();
+        var primals = HostAdapterRegistry.requireScribing().primalAspectIds();
         if (primals.isEmpty()) {
             return;
         }
@@ -42,7 +42,7 @@ public final class ScribeWellEvents {
             }
 
             ContentId aspect = primals.get(player.getRandom().nextInt(primals.size()));
-            HostAdapterRegistry.requireRuntime().addAspectPool(player, aspect, player.getRandom().nextInt(4) + 1);
+            HostAdapterRegistry.requireScribing().addAspectPool(player, aspect, player.getRandom().nextInt(4) + 1);
             int nextDamage = stack.getDamageValue() + 1;
             if (nextDamage >= stack.getMaxDamage()) {
                 inventory.setItem(slot, ItemStack.EMPTY);

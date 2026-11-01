@@ -183,8 +183,24 @@ public final class RecipeGameTests {
             "aspect diagnostics are declared by the selected adapter"
         );
         helper.assertTrue(
-            profile.supportOf(HostProfile.Feature.RUNTIME_SERVICES).level() == HostProfile.SupportLevel.ADAPTED,
-            "runtime services are declared by the selected adapter"
+            profile.supportOf(HostProfile.Feature.ASPECT_PRESENTATION).level() == HostProfile.SupportLevel.ADAPTED,
+            "host aspect presentation is declared by the selected adapter"
+        );
+        helper.assertTrue(
+            profile.supportOf(HostProfile.Feature.MORPH_TOOL_RUNTIME).level() == HostProfile.SupportLevel.ADAPTED,
+            "morph-tool runtime behavior is declared by the selected adapter"
+        );
+        helper.assertTrue(
+            profile.supportOf(HostProfile.Feature.WAND_RUNTIME).level() == HostProfile.SupportLevel.ADAPTED,
+            "wand runtime behavior is declared by the selected adapter"
+        );
+        helper.assertTrue(
+            profile.supportOf(HostProfile.Feature.TAINT_RUNTIME).level() == HostProfile.SupportLevel.ADAPTED,
+            "taint runtime behavior is declared by the selected adapter"
+        );
+        helper.assertTrue(
+            profile.supportOf(HostProfile.Feature.SCRIBING_RUNTIME).level() == HostProfile.SupportLevel.ADAPTED,
+            "Scribing Well runtime behavior is declared by the selected adapter"
         );
         helper.assertTrue(
             profile.supportOf(HostProfile.Feature.ITEM_REGISTRATION).level() == HostProfile.SupportLevel.ADAPTED,
@@ -219,8 +235,28 @@ public final class RecipeGameTests {
             "the selected host exposes its bootstrap and creative-tab services"
         );
         helper.assertTrue(
-            HostAdapterRegistry.requireRuntime() != null,
-            "the selected host exposes its runtime service boundary"
+            HostAdapterRegistry.requireAspects() != null,
+            "the selected host exposes aspect presentation services"
+        );
+        helper.assertTrue(
+            HostAdapterRegistry.requireMorphTools() != null,
+            "the selected host exposes morph-tool services"
+        );
+        helper.assertTrue(
+            HostAdapterRegistry.requireBlockEntities() != null,
+            "the selected host exposes block-entity services"
+        );
+        helper.assertTrue(
+            HostAdapterRegistry.requireWands() != null,
+            "the selected host exposes wand services"
+        );
+        helper.assertTrue(
+            HostAdapterRegistry.requireTaint() != null,
+            "the selected host exposes taint services"
+        );
+        helper.assertTrue(
+            HostAdapterRegistry.requireScribing() != null,
+            "the selected host exposes Scribing Well services"
         );
         helper.assertTrue(
             HostAdapterRegistry.requireEntities() != null,
@@ -250,19 +286,19 @@ public final class RecipeGameTests {
             "the selected host exposes its item factory boundary"
         );
         helper.assertTrue(
-            !HostAdapterRegistry.requireRuntime().primalAspectIds().isEmpty(),
+            !HostAdapterRegistry.requireScribing().primalAspectIds().isEmpty(),
             "scripting integrations expose primal aspects as semantic IDs"
         );
         helper.assertTrue(
-            HostAdapterRegistry.requireRuntime().aspectDescription(FmAspects.NETHER) != null,
+            HostAdapterRegistry.requireAspects().aspectDescription(FmAspects.NETHER) != null,
             "host aspect descriptions are retrieved through runtime services"
         );
         helper.assertTrue(
-            HostAdapterRegistry.requireRuntime().taintShovelMiningSpeed() > 0.0F,
+            HostAdapterRegistry.requireTaint().taintShovelMiningSpeed() > 0.0F,
             "host taint tool properties are retrieved through runtime services"
         );
         helper.assertFalse(
-            HostAdapterRegistry.requireRuntime().isAreaHarvesting(),
+            HostAdapterRegistry.requireMorphTools().isAreaHarvesting(),
             "the host area-harvest state is queried through runtime services"
         );
         helper.assertTrue(

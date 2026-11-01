@@ -8,7 +8,12 @@ import dev.visfox.forbiddenreforged.core.research.ResearchCategoryDefinition;
 import dev.visfox.forbiddenreforged.core.research.ResearchDefinition;
 import dev.visfox.forbiddenreforged.integration.api.HostAdapter;
 import dev.visfox.forbiddenreforged.integration.api.HostProfile;
-import dev.visfox.forbiddenreforged.integration.runtime.HostRuntimeServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostAspectServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostMorphToolServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostBlockEntityServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostWandServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostTaintServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostScribingServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostItemServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostBootstrapServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostEntityServices;
@@ -33,7 +38,7 @@ import java.util.Set;
 /**
  * Thaumcraft 4: Reforged implementation of the host-neutral content contract.
  */
-public final class Tc4HostAdapter implements HostAdapter, HostRuntimeServices, HostItemServices, HostBootstrapServices, HostEntityServices {
+public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, HostMorphToolServices, HostBlockEntityServices, HostWandServices, HostTaintServices, HostScribingServices, HostItemServices, HostBootstrapServices, HostEntityServices {
     public static final Tc4HostAdapter INSTANCE = new Tc4HostAdapter();
 
     private static final HostProfile PROFILE = new HostProfile(
@@ -47,8 +52,18 @@ public final class Tc4HostAdapter implements HostAdapter, HostRuntimeServices, H
                 HostProfile.FeatureSupport.adapted("Registers item, block and entity scan targets through the TC4 AspectSync API")),
             Map.entry(HostProfile.Feature.ASPECT_DIAGNOSTICS,
                 HostProfile.FeatureSupport.adapted("Reports native and add-on aspects from the TC4 registry")),
+            Map.entry(HostProfile.Feature.ASPECT_PRESENTATION,
+                HostProfile.FeatureSupport.adapted("Resolves display components for host aspects")),
             Map.entry(HostProfile.Feature.RUNTIME_BOOTSTRAP,
                 HostProfile.FeatureSupport.adapted("Initializes TC4 warp, wand, recipe, research and add-on integrations")),
+            Map.entry(HostProfile.Feature.MORPH_TOOL_RUNTIME,
+                HostProfile.FeatureSupport.adapted("Provides morph-tool cycle sounds and area-mining behavior")),
+            Map.entry(HostProfile.Feature.WAND_RUNTIME,
+                HostProfile.FeatureSupport.adapted("Provides wand detection, focus properties, Vis storage and Baubles accessories")),
+            Map.entry(HostProfile.Feature.TAINT_RUNTIME,
+                HostProfile.FeatureSupport.adapted("Provides taint material rules, purification, special drops and damage semantics")),
+            Map.entry(HostProfile.Feature.SCRIBING_RUNTIME,
+                HostProfile.FeatureSupport.adapted("Provides research difficulty and player aspect-pool access")),
             Map.entry(HostProfile.Feature.WAND_RODS,
                 HostProfile.FeatureSupport.adapted("Registers TC4 wand rods and their update behaviors")),
             Map.entry(HostProfile.Feature.WAND_CAPS,
@@ -59,8 +74,6 @@ public final class Tc4HostAdapter implements HostAdapter, HostRuntimeServices, H
                 HostProfile.FeatureSupport.adapted("Integrates the Blink Focus with the TC4 wand/focus API")),
             Map.entry(HostProfile.Feature.OPTIONAL_ENCHANTMENT_INTEGRATION,
                 HostProfile.FeatureSupport.partial("Thaumic Tinkerer enchantment costs are registered only when the optional mod is installed")),
-            Map.entry(HostProfile.Feature.RUNTIME_SERVICES,
-                HostProfile.FeatureSupport.adapted("Provides entity, wand, accessory, taint, damage and special-mining runtime services")),
             Map.entry(HostProfile.Feature.ITEM_REGISTRATION,
                 HostProfile.FeatureSupport.adapted("Creates TC4-backed items and applies TC4 tool material/food property adapters")),
             Map.entry(HostProfile.Feature.BLOCK_ENTITY_IMPLEMENTATION,

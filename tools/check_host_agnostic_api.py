@@ -186,56 +186,68 @@ def main() -> int:
             )
 
 
-    runtime_contract = ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostRuntimeServices.java"
-    runtime_content = runtime_contract.read_text(encoding="utf-8")
-    for forbidden in ("thaumcraft.", "com.leclowndu93150.thaumaturge."):
-        if forbidden in runtime_content:
-            failures.append(
-                f"{runtime_contract.relative_to(ROOT)} exposes a concrete host API type: {forbidden}"
-            )
-
-    runtime_consumers = (
-        ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmDrops.java",
-        ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmEnchantmentEffects.java",
-        ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmToolEvents.java",
-        ROOT / "src/main/java/dev/visfox/forbiddenreforged/RidingCropItem.java",
-        ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmBlockEntities.java",
-        ROOT / "src/main/java/dev/visfox/forbiddenreforged/WrathCageBlock.java",
-        ROOT / "src/main/java/dev/visfox/forbiddenreforged/ScribeWellEvents.java",
-        ROOT / "src/main/java/dev/visfox/forbiddenreforged/MobCrystalItem.java",
-        ROOT / "src/main/java/dev/visfox/forbiddenreforged/MorphToolItem.java",
-        ROOT / "src/main/java/dev/visfox/forbiddenreforged/TaintShovelItem.java",
-    )
-    for source in runtime_consumers:
-        source_content = source.read_text(encoding="utf-8")
-        if "integration.tc4" in source_content or "thaumcraft." in source_content:
-            failures.append(
-                f"{source.relative_to(ROOT)} calls a concrete host adapter instead of HostRuntimeServices"
-            )
-
     runtime_registry = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/api/HostAdapterRegistry.java").read_text(encoding="utf-8")
-    if "HostRuntimeServices requireRuntime()" not in runtime_registry:
-        failures.append("HostAdapterRegistry is missing the runtime capability lookup")
+    if "HostRuntimeServices" in runtime_registry or "requireRuntime()" in runtime_registry:
+        failures.append("HostAdapterRegistry must expose narrow runtime capabilities instead of a monolithic runtime accessor")
     if "HostEntityServices requireEntities()" not in runtime_registry:
         failures.append("HostAdapterRegistry is missing the host entity capability lookup")
-    for contract_method in (
-        "Component aspectDescription(ContentId aspect)",
-        "void playMorphCycleSound(",
-        "boolean isAreaHarvesting()",
-        "void breakArea(",
-        "boolean isTaintShovelPurificationTarget(",
-        "float taintShovelMiningSpeed()",
-        "void playTaintShovelSound(",
-    ):
-        if contract_method not in runtime_content:
-            failures.append(f"HostRuntimeServices is missing a shared game-runtime capability: {contract_method}")
-    if "HostItemServices requireItems()" not in runtime_registry:
-        failures.append("HostAdapterRegistry is missing the host item factory lookup")
-    if "List<ContentId> primalAspectIds()" not in runtime_content or "boolean addAspectPool(ServerPlayer player" not in runtime_content:
-        failures.append("HostRuntimeServices is missing the host-neutral Scribing Well aspect-pool contract")
-    if "WrathCageBlockEntity createWrathCageBlockEntity(" not in runtime_content:
-        failures.append("HostRuntimeServices is missing the host-provided Wrath Cage block entity factory")
 
+    service_contracts = {
+        "HostAspectServices.java": ("Component aspectDescription(ContentId aspect)",),
+        "HostMorphToolServices.java": ("playMorphCycleSound(", "boolean isAreaHarvesting()", "void breakArea("),
+        "HostBlockEntityServices.java": ("WrathCageBlockEntity createWrathCageBlockEntity(",),
+        "HostWandServices.java": ("boolean isWand(", "String wandRodTag(", "void addWandVis(", "void addRealVis(", "ItemStack accessory("),
+        "HostTaintServices.java": ("boolean isTaintMaterial(", "boolean isTaintShovelPurificationTarget(", "float taintShovelMiningSpeed()", "void playTaintShovelSound(", "ItemStack specialMiningDrop(", "boolean isTaintDamage("),
+        "HostScribingServices.java": ("boolean isNoResearchDifficulty()", "List<ContentId> primalAspectIds()", "boolean addAspectPool(ServerPlayer player",),
+    }
+    for filename, methods in service_contracts.items():
+        contract = ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime" / filename
+        if not contract.is_file():
+            failures.append(f"Missing focused host capability contract: {filename}")
+            continue
+        content = contract.read_text(encoding="utf-8")
+        for forbidden in ("thaumcraft.", "thaumcraft:", "com.leclowndu93150.thaumaturge.", "com.leclowndu93150.thaumaturge:"):
+            if forbidden in content:
+                failures.append(f"{contract.relative_to(ROOT)} exposes a concrete host API type or namespace: {forbidden}")
+        for method in methods:
+            if method not in content:
+                failures.append(f"{filename} is missing the host-neutral capability: {method}")
+
+    if (ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostRuntimeServices.java").exists():
+        failures.append("The monolithic HostRuntimeServices contract should be removed after capability splitting")
+
+    capability_lookups = (
+        "HostAspectServices requireAspects()",
+        "HostMorphToolServices requireMorphTools()",
+        "HostBlockEntityServices requireBlockEntities()",
+        "HostWandServices requireWands()",
+        "HostTaintServices requireTaint()",
+        "HostScribingServices requireScribing()",
+    )
+    for lookup in capability_lookups:
+        if lookup not in runtime_registry:
+            failures.append(f"HostAdapterRegistry is missing a focused runtime capability lookup: {lookup}")
+
+    capability_consumers = {
+        "FmEnchantmentEffects.java": ("requireTaint()", "requireWands()"),
+        "FmToolEvents.java": ("requireWands()", "requireTaint()"),
+        "ScribeWellEvents.java": ("requireScribing()",),
+        "MobCrystalItem.java": ("requireAspects()",),
+        "MorphToolItem.java": ("requireMorphTools()",),
+        "TaintShovelItem.java": ("requireTaint()",),
+        "FmBlockEntities.java": ("requireBlockEntities()",),
+        "WrathCageBlock.java": ("requireBlockEntities()",),
+    }
+    for filename, lookups in capability_consumers.items():
+        source = ROOT / "src/main/java/dev/visfox/forbiddenreforged" / filename
+        content = source.read_text(encoding="utf-8")
+        if "requireRuntime()" in content:
+            failures.append(f"{source.relative_to(ROOT)} uses the removed monolithic runtime service accessor")
+        for lookup in lookups:
+            if lookup not in content:
+                failures.append(f"{source.relative_to(ROOT)} does not use its focused capability: {lookup}")
+        if "integration.tc4" in content or "thaumcraft." in content:
+            failures.append(f"{source.relative_to(ROOT)} calls a concrete host adapter instead of a host capability")
 
     item_contract = ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostItemServices.java"
     item_content = item_contract.read_text(encoding="utf-8")
