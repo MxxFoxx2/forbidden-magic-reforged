@@ -9,11 +9,21 @@ BOUNDARIES = (
     ROOT / "src/main/java/dev/visfox/forbiddenreforged/core/research",
     ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/api",
 )
+HOST_NEUTRAL_GAMEPLAY = (
+    ROOT / "src/main/java/dev/visfox/forbiddenreforged/WrathCageBlockEntity.java",
+)
 FORBIDDEN = (
     "import thaumcraft.",
     "import com.leclowndu93150.thaumaturge.",
     "import net.minecraft.",
     "import net.neoforged.",
+)
+HOST_FORBIDDEN = (
+    "thaumcraft.",
+    "com.leclowndu93150.thaumaturge.",
+    "TcBlockEntity",
+    "AspectSource",
+    "EssentiaTransport",
 )
 
 
@@ -35,8 +45,20 @@ def main() -> int:
                         f"{source.relative_to(ROOT)} imports forbidden dependency: {forbidden}"
                     )
 
+    for source in HOST_NEUTRAL_GAMEPLAY:
+        if not source.is_file():
+            failures.append(f"Missing host-neutral gameplay source: {source.relative_to(ROOT)}")
+            continue
+        checked += 1
+        content = source.read_text(encoding="utf-8")
+        for forbidden in HOST_FORBIDDEN:
+            if forbidden in content:
+                failures.append(
+                    f"{source.relative_to(ROOT)} crosses host boundary: {forbidden}"
+                )
+
     if failures:
-        print("\n".join(failures), file=sys.stderr)
+        print("\\n".join(failures), file=sys.stderr)
         return 1
 
     print(f"Host-agnostic API boundary check passed ({checked} Java files).")
