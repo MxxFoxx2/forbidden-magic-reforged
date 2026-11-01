@@ -34,7 +34,7 @@ public final class ForbiddenMagicRecipeCatalog {
         recipes.add(infusion("skullaxe", "skullaxe", "forbiddenmagic:skull_axe", 1,
             cost(custom("ira", 8), a("weapon", 8), custom("infernus", 8)),
             item("thaumcraft:thaumium_axe"),
-            item("forbiddenmagic:wrath"), item("forbiddenmagic:wrath"),
+            item("forbiddenmagic:wrath_shard"), item("forbiddenmagic:wrath_shard"),
             item("minecraft:diamond"), item("minecraft:wither_skeleton_skull")));
 
         recipes.add(infusion("fork", "fork", "forbiddenmagic:diabolist_fork", 1,
@@ -47,14 +47,14 @@ public final class ForbiddenMagicRecipeCatalog {
             recipes.add(enchantment("wrath", "wrath", 8,
                 cost(custom("ira", 16), a("weapon", 16), custom("infernus", 8)),
                 item("thaumcraft:salis_mundus"), item("minecraft:diamond_sword"),
-                item("forbiddenmagic:wrath"), item("forbiddenmagic:wrath"),
-                item("forbiddenmagic:wrath")));
+                item("forbiddenmagic:wrath_shard"), item("forbiddenmagic:wrath_shard"),
+                item("forbiddenmagic:wrath_shard")));
 
             if (options.greedyEnchantmentEnabled()) {
                 recipes.add(enchantment("greedy", "greedy", 4,
                     cost(custom("infernus", 16), a("weapon", 8), a("greed", 16)),
                     item("minecraft:golden_sword"), item("minecraft:diamond"),
-                    item("forbiddenmagic:greed"), item("forbiddenmagic:greed"),
+                    item("forbiddenmagic:greed_shard"), item("forbiddenmagic:greed_shard"),
                     item("thaumcraft:salis_mundus")));
             }
 
@@ -79,15 +79,15 @@ public final class ForbiddenMagicRecipeCatalog {
 
             recipes.add(enchantment("impact", "impact", 4,
                 cost(a("entropy", 16), a("mine", 16)),
-                item("thaumcraft:salis_mundus"), item("forbiddenmagic:envy"),
-                item("forbiddenmagic:envy"), item("thaumcraft:elemental_shovel")));
+                item("thaumcraft:salis_mundus"), item("forbiddenmagic:envy_shard"),
+                item("forbiddenmagic:envy_shard"), item("thaumcraft:elemental_shovel")));
 
             recipes.add(enchantment("voidtouched", "voidtouched", 8,
                 cost(a("void", 16), a("darkness", 16), custom("invidia", 24), a("eldritch", 16)),
                 item("thaumcraft:salis_mundus"), item("thaumcraft:void_seed"),
                 item("thaumcraft:void_seed"), item("thaumcraft:void_seed"),
-                item("forbiddenmagic:envy"), item("forbiddenmagic:envy"),
-                item("forbiddenmagic:envy")));
+                item("forbiddenmagic:envy_shard"), item("forbiddenmagic:envy_shard"),
+                item("forbiddenmagic:envy_shard")));
         }
 
         addMorphToolRecipes(recipes);
@@ -131,8 +131,8 @@ public final class ForbiddenMagicRecipeCatalog {
             recipes.add(infusion("sub_collar", "subcollar", "forbiddenmagic:sub_collar", 1,
                 cost(custom("luxuria", 8), a("trap", 8), custom("infernus", 4), a("flesh", 4)),
                 item("thaumcraft:vis_amulet"),
-                item("forbiddenmagic:lust"), item("forbiddenmagic:lust"),
-                item("forbiddenmagic:lust"), item("minecraft:lead"),
+                item("forbiddenmagic:lust_shard"), item("forbiddenmagic:lust_shard"),
+                item("forbiddenmagic:lust_shard"), item("minecraft:lead"),
                 item("thaumcraft:mundane_belt")));
         }
 
@@ -148,8 +148,8 @@ public final class ForbiddenMagicRecipeCatalog {
         recipes.add(infusion("wrathcage", "wrathcage", "forbiddenmagic:wrath_cage", 10,
             cost(custom("ira", 32), a("magic", 32), a("beast", 32), a("mechanism", 16)),
             item("thaumcraft:thaumium_block"),
-            item("forbiddenmagic:wrath"), item("forbiddenmagic:wrath"),
-            item("forbiddenmagic:wrath"), item("forbiddenmagic:wrath"),
+            item("forbiddenmagic:wrath_shard"), item("forbiddenmagic:wrath_shard"),
+            item("forbiddenmagic:wrath_shard"), item("forbiddenmagic:wrath_shard"),
             item("minecraft:diamond"), item("minecraft:diamond"),
             item("minecraft:diamond"), item("minecraft:diamond"),
             item("thaumcraft:warded_jar"), item("thaumcraft:warded_jar"),
@@ -162,15 +162,15 @@ public final class ForbiddenMagicRecipeCatalog {
             cost(a("taint", 24), a("magic", 12), a("entropy", 12)),
             item("thaumcraft:tainted_goo"),
             item("thaumcraft:salis_mundus"),
-            item("forbiddenmagic:taint"), item("forbiddenmagic:taint"),
-            item("forbiddenmagic:taint"), item("forbiddenmagic:taint"),
-            item("forbiddenmagic:taint"), item("forbiddenmagic:taint")));
+            item("forbiddenmagic:taint_shard"), item("forbiddenmagic:taint_shard"),
+            item("forbiddenmagic:taint_shard"), item("forbiddenmagic:taint_shard"),
+            item("forbiddenmagic:taint_shard"), item("forbiddenmagic:taint_shard")));
 
         recipes.add(infusion("rod_infernal", "rod_infernal", "forbiddenmagic:infernal_rod", 5,
             cost(custom("infernus", 32), a("magic", 12), custom("superbia", 12)),
             item("minecraft:blaze_rod"),
             item("thaumcraft:salis_mundus"),
-            item("forbiddenmagic:pride"), item("forbiddenmagic:pride"),
+            item("forbiddenmagic:pride_shard"), item("forbiddenmagic:pride_shard"),
             item("minecraft:soul_sand"), item("minecraft:wither_skeleton_skull"),
             item("minecraft:quartz"), item("minecraft:blaze_powder")));
 
@@ -220,9 +220,9 @@ public final class ForbiddenMagicRecipeCatalog {
         recipes.add(infusion("focus_blink", "focusblink", "forbiddenmagic:blink_focus", 3,
             cost(a("travel", 25), custom("infernus", 10), custom("desidia", 10), a("entropy", 25)),
             item("minecraft:ender_pearl"),
-            item("minecraft:quartz"), item("forbiddenmagic:sloth"),
-            item("minecraft:quartz"), item("forbiddenmagic:sloth"),
-            item("minecraft:quartz"), item("forbiddenmagic:sloth")));
+            item("minecraft:quartz"), item("forbiddenmagic:sloth_shard"),
+            item("minecraft:quartz"), item("forbiddenmagic:sloth_shard"),
+            item("minecraft:quartz"), item("forbiddenmagic:sloth_shard")));
 
         return List.copyOf(recipes);
     }
@@ -240,7 +240,7 @@ public final class ForbiddenMagicRecipeCatalog {
             : cost(a("exchange", 32), custom("invidia", 16), a("tool", 16));
         return infusion(key, "morphtools", "forbiddenmagic:" + output, 6, aspects,
             item(base),
-            item("forbiddenmagic:envy"), item("forbiddenmagic:envy"),
+            item("forbiddenmagic:envy_shard"), item("forbiddenmagic:envy_shard"),
             item("minecraft:diamond"), item("thaumcraft:enchanted_fabric"),
             item("thaumcraft:silverwood_log"));
     }
