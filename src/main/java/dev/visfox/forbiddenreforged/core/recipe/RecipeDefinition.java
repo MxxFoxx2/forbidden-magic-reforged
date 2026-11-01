@@ -6,21 +6,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-/**
- * Host-neutral descriptions of Forbidden Magic recipe content.
- *
- * <p>These are domain data, not Minecraft Recipe implementations. A host adapter translates each
- * variant into the recipe serializers, registries and research links provided by that host.
- */
 public sealed interface RecipeDefinition
     permits RecipeDefinition.Infusion, RecipeDefinition.InfusionEnchantment,
         RecipeDefinition.Crucible, RecipeDefinition.ArcaneShaped,
         RecipeDefinition.ArcaneShapeless, RecipeDefinition.CraftingReference {
 
-    /** Stable, host-independent identifier of this recipe definition. */
+    
     ContentId id();
 
-    /** Semantic research entry that owns this recipe, if any. */
+    
     Optional<ContentId> research();
 
     enum IngredientKind {
@@ -86,10 +80,7 @@ public sealed interface RecipeDefinition
         }
     }
 
-    /**
-     * Recipe that applies a Forbidden Magic enchantment to a compatible target. The target is
-     * selected by the host's infusion-enchantment system, so this definition has no fixed output.
-     */
+    
     record InfusionEnchantment(
         ContentId id,
         Optional<ContentId> research,
@@ -127,10 +118,7 @@ public sealed interface RecipeDefinition
         }
     }
 
-    /**
-     * Pattern cells are row-major and have exactly width * height entries. Empty cells are
-     * represented explicitly so adapters do not need to infer shape from a string format.
-     */
+    
     record ArcaneShaped(
         ContentId id,
         Optional<ContentId> research,
@@ -179,10 +167,7 @@ public sealed interface RecipeDefinition
         }
     }
 
-    /**
-     * Reference to a regular Minecraft crafting recipe that is displayed under a research entry.
-     * The host does not own or execute the referenced vanilla recipe.
-     */
+    
     record CraftingReference(
         ContentId id,
         Optional<ContentId> research,
