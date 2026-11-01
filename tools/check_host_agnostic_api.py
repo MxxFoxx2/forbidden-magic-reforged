@@ -296,7 +296,6 @@ def main() -> int:
         failures.append("Warp GameTest must exercise the direct HostWarpServices capability")
     if "FmWandContractAccess.INSTANCE.remaining(contractProbe)" not in game_tests:
         failures.append("GameTests must verify Profane Contract component access outside core")
-;
 
 
     capability_consumers = {
