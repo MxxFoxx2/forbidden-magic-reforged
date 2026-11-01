@@ -11,6 +11,7 @@ BOUNDARIES = (
 )
 HOST_NEUTRAL_GAMEPLAY = (
     ROOT / "src/main/java/dev/visfox/forbiddenreforged/WrathCageBlockEntity.java",
+    ROOT / "src/main/java/dev/visfox/forbiddenreforged/core/wand",
 )
 FORBIDDEN = (
     "import thaumcraft.",
@@ -45,17 +46,19 @@ def main() -> int:
                         f"{source.relative_to(ROOT)} imports forbidden dependency: {forbidden}"
                     )
 
-    for source in HOST_NEUTRAL_GAMEPLAY:
-        if not source.is_file():
-            failures.append(f"Missing host-neutral gameplay source: {source.relative_to(ROOT)}")
+    for boundary in HOST_NEUTRAL_GAMEPLAY:
+        if not boundary.exists():
+            failures.append(f"Missing host-neutral gameplay boundary: {boundary.relative_to(ROOT)}")
             continue
-        checked += 1
-        content = source.read_text(encoding="utf-8")
-        for forbidden in HOST_FORBIDDEN:
-            if forbidden in content:
-                failures.append(
-                    f"{source.relative_to(ROOT)} crosses host boundary: {forbidden}"
-                )
+        sources = boundary.rglob("*.java") if boundary.is_dir() else (boundary,)
+        for source in sources:
+            checked += 1
+            content = source.read_text(encoding="utf-8")
+            for forbidden in HOST_FORBIDDEN:
+                if forbidden in content:
+                    failures.append(
+                        f"{source.relative_to(ROOT)} crosses host boundary: {forbidden}"
+                    )
 
     if failures:
         print("\\n".join(failures), file=sys.stderr)
