@@ -86,7 +86,7 @@ import dev.visfox.forbiddenreforged.FmDrops;
 import dev.visfox.forbiddenreforged.FmItems;
 import dev.visfox.forbiddenreforged.FmCreativeTab;
 import dev.visfox.forbiddenreforged.FmConfig;
-import dev.visfox.forbiddenreforged.FmResearchItem;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4ResearchItem;
 import dev.visfox.forbiddenreforged.MorphState;
 import dev.visfox.forbiddenreforged.FmEnchantmentEffects;
 import dev.visfox.forbiddenreforged.FmToolEvents;
@@ -932,7 +932,7 @@ public final class ItemGameTests {
     }
     
     private static void researchPrefixRespectsTagResearch(GameTestHelper helper) {
-        ResearchItem item = new FmResearchItem("TEST", "FORBIDDEN", new AspectList(), 0, 0, 1,
+        ResearchItem item = new Tc4ResearchItem("TEST", "FORBIDDEN", new AspectList(), 0, 0, 1,
             ForbiddenMagic.id("textures/misc/forbidden.png"));
         String expected = FmConfig.tagResearchEnabled()
             ? "forbiddenmagic.research_text.TEST"

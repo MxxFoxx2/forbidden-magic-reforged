@@ -1,6 +1,6 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
-import dev.visfox.forbiddenreforged.FmResearchItem;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4ResearchItem;
 import dev.visfox.forbiddenreforged.core.aspect.AspectDefinition;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.core.research.ResearchCategoryDefinition;
@@ -65,7 +65,7 @@ public final class Tc4ResearchAdapter {
         String category = categoryKey(definition.category());
         ResearchItem item;
         if (definition.icon().kind() == ResearchDefinition.IconKind.ITEM) {
-            item = new FmResearchItem(
+            item = new Tc4ResearchItem(
                 key,
                 category,
                 Tc4AspectAdapter.toAspectList(definition.noteCost()),
@@ -75,7 +75,7 @@ public final class Tc4ResearchAdapter {
                 TcStack.of(definition.icon().value().toString(), 1)
             );
         } else {
-            item = new FmResearchItem(
+            item = new Tc4ResearchItem(
                 key,
                 category,
                 Tc4AspectAdapter.toAspectList(definition.noteCost()),
