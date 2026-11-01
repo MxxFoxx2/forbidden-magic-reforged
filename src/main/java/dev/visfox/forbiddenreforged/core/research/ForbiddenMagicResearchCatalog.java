@@ -66,7 +66,7 @@ public final class ForbiddenMagicResearchCatalog {
         entries.add(entry("hellfire", item("minecraft:flint_and_steel"),
             cost(a("fire", 3), custom("infernus", 4), a("travel", 2)),
             -8, -8, 1, parents("nethershards"), noParents(), flags(ROUND_ICON, HIDDEN),
-            triggers(custom("infernus")), 0,
+            triggers(custom("infernus", 1)), 0,
             text("forbiddenmagic.research_page.HELLFIRE.1")));
 
         entries.add(entry("skullaxe", item("skull_axe"),
@@ -119,7 +119,7 @@ public final class ForbiddenMagicResearchCatalog {
         entries.add(entry("arcanecake", item("arcane_cake"),
             cost(custom("gula", 6), a("hunger", 3), a("craft", 2)),
             -12, -6, 2, parents("nethershards", "infusion"), noParents(),
-            flags(CONCEALED), triggers(custom("gula")), 0,
+            flags(CONCEALED), triggers(custom("gula", 1)), 0,
             text("forbiddenmagic.research_page.ARCANECAKE.1"),
             recipe(ResearchDefinition.PageKind.INFUSION_RECIPE, "ARCANECAKE")));
 
@@ -150,7 +150,7 @@ public final class ForbiddenMagicResearchCatalog {
 
         entries.add(entry("blackflower", item("umbral_rose"),
             cost(a("plant", 3), a("senses", 2), a("darkness", 4)),
-            -2, -6, 1, noParents(), noParents(), flags(), triggers(a("senses")), 0,
+            -2, -6, 1, noParents(), noParents(), flags(), triggers(a("senses", 1)), 0,
             text("forbiddenmagic.research_page.BLACKFLOWER.1"),
             recipe(ResearchDefinition.PageKind.CRUCIBLE_RECIPE, "BLACKFLOWER"),
             recipe(ResearchDefinition.PageKind.CRAFTING_RECIPE, "BlackInk")));
@@ -223,7 +223,7 @@ public final class ForbiddenMagicResearchCatalog {
             entries.add(entry("subcollar", item("sub_collar"),
                 cost(a("aura", 3), custom("luxuria", 8), a("magic", 3), a("trap", 6), a("flesh", 4)),
                 -11, -5, 2, parents("nethershards", "visamulet", "infusion"), noParents(),
-                flags(HIDDEN), triggers(custom("luxuria")), 0,
+                flags(HIDDEN), triggers(custom("luxuria", 1)), 0,
                 text("forbiddenmagic.research_page.SUBCOLLAR.1"),
                 recipe(ResearchDefinition.PageKind.INFUSION_RECIPE, "SUBCOLLAR")));
         }
