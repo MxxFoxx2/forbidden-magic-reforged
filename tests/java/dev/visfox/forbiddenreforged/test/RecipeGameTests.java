@@ -46,6 +46,7 @@ import dev.visfox.forbiddenreforged.integration.tc4.Tc4ResearchAdapter;
 import dev.visfox.forbiddenreforged.core.recipe.ForbiddenMagicRecipeCatalog;
 import dev.visfox.forbiddenreforged.core.recipe.RecipeDefinition;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4RecipeAdapter;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectAdapter;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.aspect.AspectList;
 import thaumcraft.aspect.AspectRegistry;
