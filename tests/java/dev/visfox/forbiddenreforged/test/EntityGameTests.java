@@ -183,19 +183,19 @@ public final class EntityGameTests {
             "special channel is exposed through the host aspect view");
 
         cage.cycleMode();
-        helper.assertValueEqual(transport.addEssentia(FmAspects.WRATH, 5, Direction.UP), 5,
+        helper.assertValueEqual(transport.addEssentia(Tc4AspectAdapter.resolveAspect(FmAspects.WRATH), 5, Direction.UP), 5,
             "wrath channel accepts essentia");
-        helper.assertValueEqual(transport.getEssentiaType(Direction.UP), FmAspects.WRATH,
+        helper.assertValueEqual(transport.getEssentiaType(Direction.UP), Tc4AspectAdapter.resolveAspect(FmAspects.WRATH),
             "mode one selects wrath for tube suction");
-        helper.assertValueEqual(source.getAspects().getAmount(FmAspects.WRATH), 5,
+        helper.assertValueEqual(source.getAspects().getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.WRATH)), 5,
             "wrath channel is exposed through the host aspect view");
 
         cage.cycleMode();
-        helper.assertValueEqual(transport.addEssentia(FmAspects.SLOTH, 3, Direction.UP), 3,
+        helper.assertValueEqual(transport.addEssentia(Tc4AspectAdapter.resolveAspect(FmAspects.SLOTH), 3, Direction.UP), 3,
             "sloth channel accepts essentia");
-        helper.assertValueEqual(transport.getEssentiaType(Direction.UP), FmAspects.SLOTH,
+        helper.assertValueEqual(transport.getEssentiaType(Direction.UP), Tc4AspectAdapter.resolveAspect(FmAspects.SLOTH),
             "mode two selects sloth for tube suction");
-        helper.assertValueEqual(source.getAspects().getAmount(FmAspects.SLOTH), 3,
+        helper.assertValueEqual(source.getAspects().getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.SLOTH)), 3,
             "sloth channel is exposed through the host aspect view");
 
         helper.assertTrue(source.doesContainerAccept(Aspect.FLESH), "aspect container accepts the attuned mob aspect");
@@ -212,7 +212,7 @@ public final class EntityGameTests {
         helper.assertValueEqual(cage.pages().size(), 5, "wrath cage has 5 pages");
         InfusionRecipe cageRecipe = (InfusionRecipe) TcRecipes.get("WRATHCAGE");
         helper.assertTrue(cageRecipe != null, "wrath cage infusion recipe exists");
-        helper.assertTrue(cageRecipe.aspects().getAmount(FmAspects.WRATH) >= 32, "wrath cage recipe needs WRATH 32");
+        helper.assertTrue(cageRecipe.aspects().getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.WRATH)) >= 32, "wrath cage recipe needs WRATH 32");
         CrucibleRecipe crystalRecipe = (CrucibleRecipe) TcRecipes.get("MOBCRYSTAL");
         helper.assertTrue(crystalRecipe != null, "mob crystal crucible recipe exists");
         helper.assertTrue(crystalRecipe.aspects().getAmount(Aspect.MIND) >= 10, "mob crystal recipe needs MIND 10");

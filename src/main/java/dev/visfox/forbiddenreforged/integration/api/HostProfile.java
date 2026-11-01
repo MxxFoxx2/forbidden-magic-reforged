@@ -28,6 +28,8 @@ public record HostProfile(
 
     public enum Feature {
         ASPECT_REGISTRATION,
+        ASPECT_DIAGNOSTICS,
+        RUNTIME_BOOTSTRAP,
         ASPECT_RECIPE_DERIVATION,
         ASPECT_SCAN_TARGETS,
         RESEARCH_ENTRIES,

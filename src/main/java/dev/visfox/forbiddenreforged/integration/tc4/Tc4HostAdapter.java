@@ -23,6 +23,10 @@ public final class Tc4HostAdapter implements HostAdapter {
         Map.of(
             HostProfile.Feature.ASPECT_REGISTRATION,
             HostProfile.FeatureSupport.adapted("Uses the AddonAspects registration API"),
+            HostProfile.Feature.ASPECT_DIAGNOSTICS,
+            HostProfile.FeatureSupport.adapted("Reports native and add-on aspects from the TC4 registry"),
+            HostProfile.Feature.RUNTIME_BOOTSTRAP,
+            HostProfile.FeatureSupport.adapted("Initializes TC4 warp, wand, recipe, research and add-on integrations"),
             HostProfile.Feature.RESEARCH_ENTRIES,
             HostProfile.FeatureSupport.adapted("Translates common research definitions to ResearchItem"),
             HostProfile.Feature.RESEARCH_STAGES,
@@ -49,8 +53,25 @@ public final class Tc4HostAdapter implements HostAdapter {
     }
 
     @Override
+    public void initializeRuntime() {
+        Tc4BootstrapAdapter.initialize();
+    }
+
+    @Override
+    public List<String> aspectDiagnostics() {
+        return Tc4AspectDiagnostics.registryLines();
+    }
+
+    @Override
     public void registerAspects(List<AspectDefinition> aspects) {
-        Tc4AspectAdapter.registerAspects(aspects);
+        try {
+            Tc4AspectAdapter.registerAspects(aspects);
+        } catch (NoSuchMethodError | NoClassDefFoundError absent) {
+            throw new IllegalStateException(
+                "Forbidden Magic requires Thaumcraft 4: Reforged 1.1.2 or newer with the add-on aspect API",
+                absent
+            );
+        }
     }
 
     @Override

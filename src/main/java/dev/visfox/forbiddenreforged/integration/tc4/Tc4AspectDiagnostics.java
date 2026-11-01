@@ -1,21 +1,24 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
-import dev.visfox.forbiddenreforged.FmAspects;
-
 import java.util.ArrayList;
 import java.util.List;
 import thaumcraft.aspect.Aspect;
 
 public final class Tc4AspectDiagnostics {
+    public static final int BUILTIN_ASPECT_COUNT = 48;
     private Tc4AspectDiagnostics() {
     }
 
     public static List<String> registryLines() {
         List<String> lines = new ArrayList<>();
         for (Aspect aspect : Aspect.values()) {
-            lines.add(line(aspect, aspect.ordinal() < FmAspects.BUILTIN_ASPECT_COUNT ? "builtin" : "addon"));
+            lines.add(line(aspect, aspect.ordinal() < BUILTIN_ASPECT_COUNT ? "builtin" : "addon"));
         }
         return List.copyOf(lines);
+    }
+
+    public static int totalCount() {
+        return Aspect.values().length;
     }
 
     public static List<String> addonLines() {

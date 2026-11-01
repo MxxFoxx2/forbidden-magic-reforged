@@ -169,6 +169,20 @@ public final class RecipeGameTests {
             profile.supportOf(HostProfile.Feature.RESEARCH_STAGES).level() == HostProfile.SupportLevel.PARTIAL,
             "multi-stage research limitations are declared by the adapter"
         );
+        helper.assertTrue(
+            profile.supportOf(HostProfile.Feature.RUNTIME_BOOTSTRAP).level() == HostProfile.SupportLevel.ADAPTED,
+            "runtime bootstrap is declared by the selected adapter"
+        );
+        helper.assertTrue(
+            profile.supportOf(HostProfile.Feature.ASPECT_DIAGNOSTICS).level() == HostProfile.SupportLevel.ADAPTED,
+            "aspect diagnostics are declared by the selected adapter"
+        );
+        helper.assertTrue(
+            !HostAdapterRegistry.require().aspectDiagnostics().isEmpty(),
+            "host diagnostics are retrieved through the shared adapter contract"
+        );
+        helper.assertValueEqual(FmAspects.NETHER, ContentId.parse("forbiddenmagic:infernus"),
+            "custom aspects are exposed as host-neutral content IDs");
         helper.succeed();
     }
 
@@ -367,17 +381,17 @@ public final class RecipeGameTests {
     private static void chainFromNetherrackToWrathShard(GameTestHelper helper) {
         ServerPlayer player = mockPlayer(helper);
         AspectList tags = AspectRegistry.active().getObjectTags(Items.NETHERRACK);
-        helper.assertTrue(tags != null && tags.getAmount(FmAspects.NETHER) >= 1, "netherrack yields infernus");
+        helper.assertTrue(tags != null && tags.getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER)) >= 1, "netherrack yields infernus");
         helper.assertTrue(ResearchCategories.getResearch("NETHERSHARDS") != null, "shard research exists");
         ResearchManager.grantAutoUnlock(player);
         helper.assertTrue(ResearchManager.isComplete(player, "NETHERSHARDS"), "the auto-unlock entry is known after a join");
         ItemStack wrathShard = new ItemStack(FmItems.DEADLY_SHARDS.get("wrath").get());
         AspectList shardTags = AspectRegistry.active().getObjectTags(wrathShard.getItem());
-        helper.assertTrue(shardTags != null && shardTags.getAmount(FmAspects.WRATH) >= 2, "the wrath shard carries ira");
+        helper.assertTrue(shardTags != null && shardTags.getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.WRATH)) >= 2, "the wrath shard carries ira");
         helper.assertTrue(FmDrops.rollWrath(2, 2), "the wrath drop rule fires at the original boundary");
         InfusionRecipe skullAxe = (InfusionRecipe) TcRecipes.get("SKULLAXE");
         helper.assertTrue(skullAxe != null, "skull axe recipe registered");
-        helper.assertValueEqual(skullAxe.aspects().getAmount(FmAspects.WRATH), 8, "skull axe costs eight ira");
+        helper.assertValueEqual(skullAxe.aspects().getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.WRATH)), 8, "skull axe costs eight ira");
         helper.succeed();
     }
 
@@ -390,7 +404,7 @@ public final class RecipeGameTests {
         }
         InfusionEnchantmentRecipe wrath = (InfusionEnchantmentRecipe) TcRecipes.get("WRATH");
         helper.assertValueEqual(wrath.instability(), 8, "wrath instability");
-        helper.assertValueEqual(wrath.aspects().getAmount(FmAspects.WRATH), 16, "wrath aspect cost");
+        helper.assertValueEqual(wrath.aspects().getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.WRATH)), 16, "wrath aspect cost");
         helper.succeed();
     }
 
@@ -399,13 +413,13 @@ public final class RecipeGameTests {
             InfusionRecipe recipe = (InfusionRecipe) TcRecipes.get(key);
             helper.assertTrue(recipe != null, key + " recipe must exist");
             helper.assertValueEqual(recipe.instability(), 6, key + " instability");
-            helper.assertValueEqual(recipe.aspects().getAmount(FmAspects.ENVY), 16, key + " envy cost");
+            helper.assertValueEqual(recipe.aspects().getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.ENVY)), 16, key + " envy cost");
         }
         for (String key : new String[]{"CLUSTER", "IMPACT", "VOIDTOUCHED"}) {
             helper.assertTrue(TcRecipes.get(key) instanceof InfusionEnchantmentRecipe, key + " must be an enchantment recipe");
         }
         InfusionEnchantmentRecipe voidtouched = (InfusionEnchantmentRecipe) TcRecipes.get("VOIDTOUCHED");
-        helper.assertValueEqual(voidtouched.aspects().getAmount(FmAspects.ENVY), 24, "voidtouched envy cost");
+        helper.assertValueEqual(voidtouched.aspects().getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.ENVY)), 24, "voidtouched envy cost");
         helper.succeed();
     }
 
@@ -454,7 +468,7 @@ public final class RecipeGameTests {
         InfusionRecipe infernalRod = (InfusionRecipe) TcRecipes.get("ROD_INFERNAL");
         helper.assertTrue(infernalRod != null, "infernal rod recipe must exist");
         helper.assertValueEqual(infernalRod.instability(), 5, "infernal rod instability");
-        helper.assertValueEqual(infernalRod.aspects().getAmount(FmAspects.NETHER), 32, "infernal rod nether cost");
+        helper.assertValueEqual(infernalRod.aspects().getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER)), 32, "infernal rod nether cost");
         helper.succeed();
     }
 
@@ -610,9 +624,9 @@ public final class RecipeGameTests {
         helper.assertTrue(raw instanceof InfusionRecipe, "the collar is an infusion recipe");
         InfusionRecipe recipe = (InfusionRecipe) raw;
         helper.assertValueEqual(recipe.instability(), 1, "collar instability");
-        helper.assertValueEqual(recipe.aspects().getAmount(FmAspects.LUST), 8, "collar lust cost");
+        helper.assertValueEqual(recipe.aspects().getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.LUST)), 8, "collar lust cost");
         helper.assertValueEqual(recipe.aspects().getAmount(Aspect.TRAP), 8, "collar trap cost");
-        helper.assertValueEqual(recipe.aspects().getAmount(FmAspects.NETHER), 4, "collar nether cost");
+        helper.assertValueEqual(recipe.aspects().getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER)), 4, "collar nether cost");
         helper.assertValueEqual(recipe.aspects().getAmount(Aspect.FLESH), 4, "collar flesh cost");
         helper.assertTrue(recipe.central().test(new ItemStack(ModItems.VIS_AMULET.get())), "the centre is an amulet of vis storage");
         helper.assertValueEqual(recipe.components().size(), 5, "three lust shards, lead and a mundane belt");
@@ -628,7 +642,7 @@ public final class RecipeGameTests {
         helper.assertValueEqual(research.pages().size(), 2, "collar has text and infusion pages");
         helper.assertValueEqual(research.parents(), List.of("NETHERSHARDS", "VISAMULET", "INFUSION"), "collar parents");
         helper.assertTrue(research.isHidden(), "collar research is hidden");
-        helper.assertTrue(research.aspectTriggers().contains(FmAspects.LUST), "lust triggers the collar research");
+        helper.assertTrue(research.aspectTriggers().contains(Tc4AspectAdapter.resolveAspect(FmAspects.LUST)), "lust triggers the collar research");
         helper.succeed();
     }
 

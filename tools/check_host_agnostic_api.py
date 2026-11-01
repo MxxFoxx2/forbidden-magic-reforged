@@ -142,6 +142,33 @@ def main() -> int:
             "ForbiddenMagic must install the host adapter before initializing aspect catalogs"
         )
 
+
+    neutral_facades = (
+        ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmAspects.java",
+        ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmSetup.java",
+        ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmCommands.java",
+    )
+    for source in neutral_facades:
+        source_content = source.read_text(encoding="utf-8")
+        if "integration.tc4" in source_content or "thaumcraft." in source_content:
+            failures.append(
+                f"{source.relative_to(ROOT)} leaks a concrete host integration into a shared facade"
+            )
+
+    fm_aspects = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmAspects.java").read_text(encoding="utf-8")
+    for host_import in ("import thaumcraft.", "import net.minecraft.", "import net.neoforged."):
+        if host_import in fm_aspects:
+            failures.append(
+                f"FmAspects must expose ContentId values, not host/game API types ({host_import})"
+            )
+
+    host_api = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/api/HostAdapter.java").read_text(encoding="utf-8")
+    for contract_method in ("initializeRuntime()", "aspectDiagnostics()"):
+        if contract_method not in host_api:
+            failures.append(
+                f"HostAdapter is missing the host-neutral lifecycle/diagnostic contract: {contract_method}"
+            )
+
     if failures:
         print("\n".join(failures), file=sys.stderr)
         return 1

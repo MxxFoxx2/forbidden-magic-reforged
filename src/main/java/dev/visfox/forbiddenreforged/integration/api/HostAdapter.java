@@ -9,6 +9,18 @@ import java.util.List;
 public interface HostAdapter {
     HostProfile profile();
 
+    /**
+     * Performs host-specific runtime bootstrap after common mod registration.
+     */
+    void initializeRuntime();
+
+    /**
+     * Returns human-readable host diagnostics for the shared admin command.
+     */
+    default List<String> aspectDiagnostics() {
+        return List.of();
+    }
+
     void registerAspects(List<AspectDefinition> aspects);
 
     void registerRecipes(List<RecipeDefinition> recipes);

@@ -3,48 +3,38 @@ package dev.visfox.forbiddenreforged;
 import dev.visfox.forbiddenreforged.core.aspect.ForbiddenMagicAspectCatalog;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
-import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectAdapter;
-import java.util.Map;
-import org.jspecify.annotations.Nullable;
-import thaumcraft.aspect.Aspect;
 
+/**
+ * Stable, host-independent identifiers for Forbidden Magic's custom aspects.
+ *
+ * This class deliberately contains no host Aspect objects. Host integrations
+ * resolve these IDs to their native aspect representation at the boundary.
+ */
 public final class FmAspects {
-    public static @Nullable Aspect LUST;
-    public static @Nullable Aspect NETHER;
-    public static @Nullable Aspect PRIDE;
-    public static @Nullable Aspect GLUTTONY;
-    public static @Nullable Aspect ENVY;
-    public static @Nullable Aspect SLOTH;
-    public static @Nullable Aspect WRATH;
+    public static final ContentId LUST = ForbiddenMagicAspectCatalog.LUXURIA;
+    public static final ContentId NETHER = ForbiddenMagicAspectCatalog.INFERNUS;
+    public static final ContentId PRIDE = ForbiddenMagicAspectCatalog.SUPERBIA;
+    public static final ContentId GLUTTONY = ForbiddenMagicAspectCatalog.GULA;
+    public static final ContentId ENVY = ForbiddenMagicAspectCatalog.INVIDIA;
+    public static final ContentId SLOTH = ForbiddenMagicAspectCatalog.DESIDIA;
+    public static final ContentId WRATH = ForbiddenMagicAspectCatalog.IRA;
+
+    private static volatile boolean initialized;
 
     private FmAspects() {
     }
 
+    /**
+     * Indicates that the selected host successfully registered the aspect catalog.
+     */
     public static boolean available() {
-        return NETHER != null;
+        return initialized;
     }
 
     public static void init() {
-        try {
-            HostAdapterRegistry.require().registerAspects(
-                ForbiddenMagicAspectCatalog.definitions(!FmConfig.lustDisabled())
-            );
-            Map<ContentId, Aspect> registered = Tc4AspectAdapter.registeredAspects();
-            LUST = registered.get(ForbiddenMagicAspectCatalog.LUXURIA);
-            NETHER = registered.get(ForbiddenMagicAspectCatalog.INFERNUS);
-            PRIDE = registered.get(ForbiddenMagicAspectCatalog.SUPERBIA);
-            GLUTTONY = registered.get(ForbiddenMagicAspectCatalog.GULA);
-            ENVY = registered.get(ForbiddenMagicAspectCatalog.INVIDIA);
-            SLOTH = registered.get(ForbiddenMagicAspectCatalog.DESIDIA);
-            WRATH = registered.get(ForbiddenMagicAspectCatalog.IRA);
-        } catch (NoSuchMethodError | NoClassDefFoundError absent) {
-            throw new IllegalStateException("Forbidden Magic requires Thaumcraft 4: Reforged 1.1.2 or newer with the add-on aspect API", absent);
-        }
-    }
-
-    public static final int BUILTIN_ASPECT_COUNT = 48;
-
-    public static int count() {
-        return Aspect.values().length;
+        HostAdapterRegistry.require().registerAspects(
+            ForbiddenMagicAspectCatalog.definitions(!FmConfig.lustDisabled())
+        );
+        initialized = true;
     }
 }

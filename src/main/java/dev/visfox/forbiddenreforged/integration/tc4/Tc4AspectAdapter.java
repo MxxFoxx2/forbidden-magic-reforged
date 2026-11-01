@@ -16,7 +16,7 @@ public final class Tc4AspectAdapter {
     private Tc4AspectAdapter() {
     }
 
-    public static Map<ContentId, Aspect> registerAspects(List<AspectDefinition> definitions) {
+    public static void registerAspects(List<AspectDefinition> definitions) {
         Map<ContentId, Aspect> registered = new LinkedHashMap<>();
         AddonAspects.addRegistrar(api -> {
             for (AspectDefinition definition : definitions) {
@@ -38,13 +38,8 @@ public final class Tc4AspectAdapter {
         });
         AddonAspects.init();
         registeredAspects = Map.copyOf(registered);
-        return registeredAspects;
     }
 
-    
-    public static Map<ContentId, Aspect> registeredAspects() {
-        return registeredAspects;
-    }
 
     public static ContentId toContentId(Aspect aspect) {
         for (Map.Entry<ContentId, Aspect> entry : registeredAspects.entrySet()) {
