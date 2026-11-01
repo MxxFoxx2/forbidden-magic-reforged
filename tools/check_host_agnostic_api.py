@@ -272,6 +272,10 @@ def main() -> int:
                 failures.append(
                     f"{source.relative_to(ROOT)} still references the removed mixed entity capability"
                 )
+            if "HostItemServices" in content or "requireItems()" in content:
+                failures.append(
+                    f"{source.relative_to(ROOT)} still references the removed combined item capability"
+                )
 
     old_item_contract = ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostItemServices.java"
     if old_item_contract.exists():
