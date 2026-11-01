@@ -7,13 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-/**
- * Host-neutral description of a Forbidden Magic aspect.
- *
- * <p>Component identifiers are semantic references. A host adapter resolves them to the host's
- * native aspect objects and records any unavoidable mapping differences in its compatibility
- * report; the common model never imports a host's Aspect class.
- */
 public record AspectDefinition(
     ContentId id,
     int color,
@@ -43,7 +36,7 @@ public record AspectDefinition(
         ONE_MINUS_SOURCE_COLOR
     }
 
-    /** One positive quantity of a semantic aspect. */
+    
     public record Amount(ContentId aspect, int amount) {
         public Amount {
             Objects.requireNonNull(aspect, "aspect");
@@ -53,10 +46,7 @@ public record AspectDefinition(
         }
     }
 
-    /**
-     * Immutable, insertion-ordered aspect cost. Duplicate identifiers are combined with overflow
-     * checking, so host adapters receive one unambiguous amount per aspect.
-     */
+    
     public static final class Cost {
         public static final Cost EMPTY = new Cost(List.of());
 
