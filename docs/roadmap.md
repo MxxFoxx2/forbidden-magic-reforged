@@ -11,7 +11,7 @@
 - Триггер Hellfire вынесен в общий `core/wand/HellfireWandBehavior`: проверка направления, предмета-жезла, фокуса, исследования, разрешения на установку и расход vis выполняется через узкий `WandTriggerAccess`. `integration/tc4/Tc4WandTriggerAdapter` сохраняет регистрацию на обсидиане/незераке и переводит семантические ID исследования и аспекта в API TC4.
 - Blink Focus разделён на общий `core/wand/BlinkFocusBehavior` (поиск цели, телепортация, Hellfire и Pandemonium) и `integration/tc4/Tc4BlinkFocusItem` (`FocusItem`, upgrade registry, aspect costs и vis consumption через TC4). Прямые вызовы `Wands` остаются допустимыми только в TC4-адаптерах и должны проходить аудит по мере переноса потребителей.
 - Реализация находится в `architecture/host-agnostic-core` и пока не входит в `main`.
-- Следующие срезы: оставшиеся `Wands`-доступы и lifecycle других фокусов; затем проверка второго хоста Thaumaturge.
+- Аудит второго хоста выполнен на публичном API Thaumaturge 1.0.3 / Minecraft 26.1.2; матрица соответствий, version blocker и оставшиеся API gaps записаны в [Thaumaturge compatibility audit](host-compatibility/thaumaturge-26.1.2.md). Адаптер пока не создавался: основной релизный трек проекта — 26.3, поэтому отдельная версия сборки обязательна.
 - Критерии каждого среза: общая модель не импортирует хост; адаптер сохраняет существующие ключи и игровое поведение; оба режима GameTest проходят; все неполные соответствия явно документированы.
 - Не объединять версии Minecraft в один source set или бинарник. Отдельные release tracks сохраняются.
 
