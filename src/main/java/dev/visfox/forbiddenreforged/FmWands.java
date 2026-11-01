@@ -9,14 +9,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import thaumcraft.aspect.Aspect;
-import thaumcraft.research.Warp;
-import thaumcraft.research.WarpType;
 import thaumcraft.taint.TaintBiomes;
 import thaumcraft.wand.RodUpdate;
 import thaumcraft.wand.WandKeys;
 import thaumcraft.wand.WandParts;
 import thaumcraft.wand.WandRegistry;
 import thaumcraft.wand.Wands;
+import dev.visfox.forbiddenreforged.core.warp.WarpChangeRequested;
+import dev.visfox.forbiddenreforged.core.warp.WarpKind;
 
 public final class FmWands {
     private FmWands() {
@@ -138,7 +138,7 @@ public final class FmWands {
                     Wands.addRealVis(stack, aspect, restore, true);
                     contract -= restore;
                     if (player.getRandom().nextInt(2501) < restore) {
-                        Warp.add(player, 1, WarpType.STICKY);
+                        WarpChangeRequested.request(player, 1, WarpKind.STICKY);
                     }
                 }
             }
@@ -146,7 +146,7 @@ public final class FmWands {
                 WandParts parts = Wands.getParts(stack);
                 WandKeys.PARTS.set(stack, new WandParts(parts.cap(), "profaned", parts.sceptre()));
                 stack.remove(FmComponents.PROFANE_CONTRACT.get());
-                Warp.add(player, 1, WarpType.STICKY);
+                WarpChangeRequested.request(player, 1, WarpKind.STICKY);
                 player.level().sendParticles(ParticleTypes.EXPLOSION,
                     player.getX(), player.getY() + player.getBbHeight() / 2.0, player.getZ(),
                     1, 0.0, 0.0, 0.0, 0.0);
