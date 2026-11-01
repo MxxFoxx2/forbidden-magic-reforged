@@ -42,7 +42,6 @@ import dev.visfox.forbiddenreforged.FmRecipes;
 import dev.visfox.forbiddenreforged.core.research.ForbiddenMagicResearchCatalog;
 import dev.visfox.forbiddenreforged.core.research.ResearchDefinition;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
-import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4ResearchAdapter;
 import dev.visfox.forbiddenreforged.core.recipe.ForbiddenMagicRecipeCatalog;
 import dev.visfox.forbiddenreforged.core.recipe.RecipeDefinition;
