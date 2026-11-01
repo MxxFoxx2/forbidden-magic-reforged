@@ -42,7 +42,7 @@ import dev.visfox.forbiddenreforged.ForbiddenMagic;
 import dev.visfox.forbiddenreforged.core.aspect.AspectDefinition;
 import dev.visfox.forbiddenreforged.core.aspect.ForbiddenMagicAspectCatalog;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
-import dev.visfox.forbiddenreforged.FmAspectDiagnostics;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectDiagnostics;
 import dev.visfox.forbiddenreforged.FmAspects;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectTagAdapter;
 import dev.visfox.forbiddenreforged.FmConfig;
@@ -398,7 +398,7 @@ public final class AspectGameTests {
         }
 
     private static void aspectDiagnosticsExposeStableRegistryTable(GameTestHelper helper) {
-            List<String> registryLines = FmAspectDiagnostics.registryLines();
+            List<String> registryLines = Tc4AspectDiagnostics.registryLines();
             helper.assertValueEqual(registryLines.size(), FmAspects.count(), "diagnostics must contain every registered aspect");
             for (int index = 0; index < Aspect.values().length; index++) {
                 Aspect aspect = Aspect.values()[index];
@@ -412,7 +412,7 @@ public final class AspectGameTests {
                 }
             }
     
-            List<String> addonLines = FmAspectDiagnostics.addonLines();
+            List<String> addonLines = Tc4AspectDiagnostics.addonLines();
             int expected = FmConfig.lustDisabled() ? 6 : 7;
             helper.assertValueEqual(addonLines.size(), expected, "diagnostics must list every registered Forbidden Magic aspect");
             helper.assertValueEqual(

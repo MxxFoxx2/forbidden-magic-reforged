@@ -1,6 +1,6 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
-import dev.visfox.forbiddenreforged.FmAspectDiagnostics;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectDiagnostics;
 import dev.visfox.forbiddenreforged.FmAspects;
 import dev.visfox.forbiddenreforged.FmConfig;
 import dev.visfox.forbiddenreforged.FmItems;
@@ -33,7 +33,7 @@ public final class Tc4BootstrapAdapter {
     }
 
     private static void logAspectRegistry() {
-        int fmAddonCount = FmAspectDiagnostics.addonLines().size();
+        int fmAddonCount = Tc4AspectDiagnostics.addonLines().size();
         int expectedAddonCount = FmConfig.lustDisabled() ? 6 : 7;
         String luxuriaStatus;
         if (FmConfig.lustDisabled()) {
@@ -52,7 +52,7 @@ public final class Tc4BootstrapAdapter {
             expectedAddonCount,
             luxuriaStatus
         );
-        for (String line : FmAspectDiagnostics.registryLines()) {
+        for (String line : Tc4AspectDiagnostics.registryLines()) {
             ForbiddenMagic.LOGGER.info("Aspect registry: {}", line);
         }
     }

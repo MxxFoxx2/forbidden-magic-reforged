@@ -1,11 +1,13 @@
-package dev.visfox.forbiddenreforged;
+package dev.visfox.forbiddenreforged.integration.tc4;
+
+import dev.visfox.forbiddenreforged.FmAspects;
 
 import java.util.ArrayList;
 import java.util.List;
 import thaumcraft.aspect.Aspect;
 
-public final class FmAspectDiagnostics {
-    private FmAspectDiagnostics() {
+public final class Tc4AspectDiagnostics {
+    private Tc4AspectDiagnostics() {
     }
 
     public static List<String> registryLines() {
