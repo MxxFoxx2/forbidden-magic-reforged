@@ -39,6 +39,9 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
+import dev.visfox.forbiddenreforged.core.aspect.AspectDefinition;
+import dev.visfox.forbiddenreforged.core.aspect.ForbiddenMagicAspectCatalog;
+import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.FmAspectDiagnostics;
 import dev.visfox.forbiddenreforged.FmAspects;
 import dev.visfox.forbiddenreforged.FmAspectTags;
@@ -76,7 +79,8 @@ public final class AspectGameTests {
         "nether_shard_drop_rules_match_original_boundaries",
         "aspect_diagnostics_expose_stable_registry_table",
         "forbiddenmagic_aspects_command_is_registered",
-        "addon_item_aspects_match_original_assignments"
+        "addon_item_aspects_match_original_assignments",
+        "core_aspect_catalog_is_host_neutral_and_complete"
     };
 
     static {
@@ -97,6 +101,7 @@ public final class AspectGameTests {
         FUNCTIONS.register(TESTS[14], () -> AspectGameTests::aspectDiagnosticsExposeStableRegistryTable);
         FUNCTIONS.register(TESTS[15], () -> AspectGameTests::forbiddenmagicAspectsCommandIsRegistered);
         FUNCTIONS.register(TESTS[16], () -> AspectGameTests::addonItemAspectsMatchOriginalAssignments);
+        FUNCTIONS.register(TESTS[17], () -> AspectGameTests::coreAspectCatalogIsHostNeutralAndComplete);
     }
 
     private AspectGameTests() {}
@@ -113,6 +118,40 @@ public final class AspectGameTests {
                 new FunctionGameTestInstance(function, new TestData<>(environment, Identifier.parse("thaumcraft:test/platform"), 100, 0, true))
             );
         }
+    }
+
+    private static void coreAspectCatalogIsHostNeutralAndComplete(GameTestHelper helper) {
+        List<AspectDefinition> enabled = ForbiddenMagicAspectCatalog.definitions(true);
+        List<AspectDefinition> disabled = ForbiddenMagicAspectCatalog.definitions(false);
+        helper.assertValueEqual(enabled.size(), 7, "full catalog must define seven Forbidden Magic aspects");
+        helper.assertValueEqual(disabled.size(), 6, "no-lust catalog must define six aspects");
+        helper.assertTrue(enabled.stream().allMatch(definition ->
+            definition.id().namespace().equals(ForbiddenMagic.MODID)
+                && definition.components().stream().allMatch(component ->
+                    component.namespace().equals(ForbiddenMagic.MODID)
+                        && component.path().startsWith("concept/"))),
+            "catalog component references must use semantic IDs, not host aspect IDs");
+
+        AspectDefinition luxuria = enabled.get(0);
+        helper.assertValueEqual(luxuria.id(), ForbiddenMagicAspectCatalog.LUXURIA, "Luxuria must be the first enabled definition");
+        helper.assertValueEqual(luxuria.components(), List.of(
+            ContentId.parse("forbiddenmagic:concept/flesh"),
+            ContentId.parse("forbiddenmagic:concept/hunger")
+        ), "Luxuria must preserve its original semantic components");
+        helper.assertValueEqual(enabled.get(1).blendMode(), AspectDefinition.BlendMode.ONE_MINUS_SOURCE_COLOR,
+            "Infernus must retain its original blend mode");
+        helper.assertTrue(disabled.stream().noneMatch(definition ->
+            definition.id().equals(ForbiddenMagicAspectCatalog.LUXURIA)),
+            "no-lust catalog must omit Luxuria");
+
+        ContentId fire = ContentId.parse("forbiddenmagic:concept/fire");
+        AspectDefinition.Cost merged = new AspectDefinition.Cost(List.of(
+            new AspectDefinition.Amount(fire, 2),
+            new AspectDefinition.Amount(fire, 3)
+        ));
+        helper.assertValueEqual(merged.amountOf(fire), 5, "duplicate aspect costs must merge");
+        helper.assertValueEqual(merged.totalAmount(), 5, "merged cost total must remain stable");
+        helper.succeed();
     }
 
     private static void modLoadsAndHostIsPresent(GameTestHelper helper) {
