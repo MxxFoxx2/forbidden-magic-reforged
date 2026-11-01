@@ -39,10 +39,14 @@ Runtime contracts are separated by responsibility rather than combined in one se
 | `HostEntityAspectServices` | Typed entity-to-aspect catalog; declared by `ENTITY_ASPECTS` |
 | `HostEntityClassificationServices` | Tainted-mob/boss/golem predicates and boss IDs; declared by `ENTITY_CLASSIFICATION` |
 | `HostAspectServices` | Host-provided aspect display components |
+| TC4 aspect registration | Declares `ASPECT_RECIPE_DERIVATION` because semantic component lists are passed into the host AddonAspects registrar |
+| `Tc4WarpAdapter` | Maps `PERMANENT`, `STICKY`, and `TEMPORARY` to distinct TC4 pools; declared by `WARP_POOLS` and `STICKY_WARP` |
 | `HostMorphToolServices` | Morph-tool cycle sound and area mining |
 | `HostBlockEntityServices` | Host-backed Wrath Cage block-entity factory |
+| TC4 Wrath Cage bridge | Declares `ESSENTIA_STORAGE` and `ESSENTIA_TRANSPORT` because its host subclass implements `AspectSource` and `EssentiaTransport` |
 | `HostWandInspectionServices` | Read-only wand and focus queries; declared by `WAND_INSPECTION` |
 | `HostWandVisServices` | Writes semantic aspects to wand and real Vis stores; declared by `WAND_VIS_STORAGE` |
+| `Tc4WandPartsAdapter` | Implements rod replacement through the TC4 `WandParts` component; declared by `WAND_PARTS` |
 | `HostAccessoryServices` | Host accessory slot lookup; declared by `ACCESSORY_INTEGRATION` |
 | `HostTaintBlockServices` | Taint block classification and taint-shovel behavior; declared by `TAINT_BLOCK_SERVICES` |
 | `HostEnchantmentEffectServices` | Host-specific special-mining drops and taint damage classification; declared by `ENCHANTMENT_EFFECTS` |
@@ -69,6 +73,8 @@ The Mob Crystal/spawner lookup is now split:
 - `HostEntityAspectServices` supplies the `Map<ContentId, ContentId>` from entity IDs to aspect IDs.
 - `HostEntityClassificationServices` supplies host-specific boss/taint/golem predicates and boss IDs.
 - `Tc4EntityAdapter` owns the TC4 entity taxonomy and translates both entity and aspect identifiers to semantic `ContentId` values.
+- `Tc4WarpAdapter` maps all three semantic warp kinds directly to TC4 `WarpType` values, including distinct `STICKY`; the profile declares `WARP_POOLS` and `STICKY_WARP`. GameTests exercise all three mappings and an actual sticky-warp event.
+- Host taint-origin registration is not implemented; `TAINT_ORIGINS` therefore remains `UNSUPPORTED` by default.
 
 The silverfish configuration is passed to the host capability as an explicit option. The common mob catalog no longer hard-codes `thaumcraft:` entity or aspect identifiers.
 

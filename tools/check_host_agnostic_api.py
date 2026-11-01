@@ -352,6 +352,44 @@ def main() -> int:
     for feature in ("WAND_INSPECTION", "WAND_VIS_STORAGE", "ACCESSORY_INTEGRATION"):
         if feature not in profile_content:
             failures.append(f"HostProfile is missing the wand capability feature declaration: {feature}")
+    tc4_adapter_content = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/tc4/Tc4HostAdapter.java").read_text(encoding="utf-8")
+    for feature in ("ASPECT_RECIPE_DERIVATION", "WAND_PARTS", "ESSENTIA_STORAGE", "ESSENTIA_TRANSPORT", "WARP_POOLS", "STICKY_WARP"):
+        if f"Map.entry(HostProfile.Feature.{feature}" not in tc4_adapter_content:
+            failures.append(f"Tc4HostAdapter does not declare implemented host feature support: {feature}")
+    for feature in ("ASPECT_RECIPE_DERIVATION", "WAND_PARTS", "ESSENTIA_STORAGE", "ESSENTIA_TRANSPORT", "WARP_POOLS", "STICKY_WARP"):
+        if feature not in profile_content:
+            failures.append(f"HostProfile is missing an implemented feature declaration: {feature}")
+    if "TAINT_ORIGINS" in tc4_adapter_content:
+        failures.append("Tc4HostAdapter must not claim taint-origin support without an implemented adapter")
+
+    aspect_adapter = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/tc4/Tc4AspectAdapter.java").read_text(encoding="utf-8")
+    if "definition.components()" not in aspect_adapter or "api.register(" not in aspect_adapter:
+        failures.append("ASPECT_RECIPE_DERIVATION is declared without passing component recipes to the host aspect registrar")
+
+    wand_parts_adapter = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/tc4/Tc4WandPartsAdapter.java").read_text(encoding="utf-8")
+    if "implements WandPartsAccess" not in wand_parts_adapter or "new WandParts(parts.cap(), rod.path(), parts.sceptre())" not in wand_parts_adapter:
+        failures.append("WAND_PARTS is declared without a concrete rod-replacement bridge")
+
+    wrath_cage_adapter = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/tc4/Tc4WrathCageBlockEntity.java").read_text(encoding="utf-8")
+    if "implements AspectSource, EssentiaTransport" not in wrath_cage_adapter:
+        failures.append("Essentia storage/transport is declared without the Wrath Cage host bridge")
+
+    warp_adapter = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/tc4/Tc4WarpAdapter.java").read_text(encoding="utf-8")
+    for semantic, host_type in (("PERMANENT", "PERMANENT"), ("STICKY", "STICKY"), ("TEMPORARY", "TEMPORARY")):
+        if f"case {semantic} -> WarpType.{host_type}" not in warp_adapter:
+            failures.append(f"WARP_POOLS mapping is missing the {semantic} semantic pool")
+
+    game_tests = (ROOT / "tests/java/dev/visfox/forbiddenreforged/test/RecipeGameTests.java").read_text(encoding="utf-8")
+    for contract_check in (
+        "wrathCageBridge instanceof thaumcraft.aspect.AspectSource",
+        "wrathCageBridge instanceof thaumcraft.essentia.EssentiaTransport",
+        'Wands.getRod(wandPartsProbe).tag()',
+        'Tc4WarpAdapter.toHostType(WarpKind.STICKY)',
+    ):
+        if contract_check not in game_tests:
+            failures.append(f"Host capability claim lacks a GameTest assertion: {contract_check}")
+
+
     for feature in ("TAINT_BLOCK_SERVICES", "ENCHANTMENT_EFFECTS"):
         if feature not in profile_content:
             failures.append(f"HostProfile is missing the taint/enchantment capability feature declaration: {feature}")

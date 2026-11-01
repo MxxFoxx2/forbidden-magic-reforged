@@ -8,6 +8,9 @@ import thaumcraft.wand.WandParts;
 import thaumcraft.wand.Wands;
 
 public final class Tc4WandPartsAdapter implements WandPartsAccess {
+    public Tc4WandPartsAdapter() {
+    }
+
     @Override
     public void setRod(ItemStack wand, ContentId rod) {
         WandParts parts = Wands.getParts(wand);

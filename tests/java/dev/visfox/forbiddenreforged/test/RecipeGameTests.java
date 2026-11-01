@@ -167,6 +167,10 @@ public final class RecipeGameTests {
             "aspect registration is exposed through the adapter"
         );
         helper.assertTrue(
+            profile.supportOf(HostProfile.Feature.ASPECT_RECIPE_DERIVATION).level() == HostProfile.SupportLevel.ADAPTED,
+            "custom aspect component recipes are declared by the selected adapter"
+        );
+        helper.assertTrue(
             profile.supportOf(HostProfile.Feature.ASPECT_SCAN_TARGETS).level() == HostProfile.SupportLevel.ADAPTED,
             "host aspect scan-target registration is declared by the adapter"
         );
@@ -227,6 +231,14 @@ public final class RecipeGameTests {
             "host block entity implementation is declared by the selected adapter"
         );
         helper.assertTrue(
+            profile.supportOf(HostProfile.Feature.ESSENTIA_STORAGE).level() == HostProfile.SupportLevel.ADAPTED,
+            "Wrath Cage essentia storage is declared by the selected adapter"
+        );
+        helper.assertTrue(
+            profile.supportOf(HostProfile.Feature.ESSENTIA_TRANSPORT).level() == HostProfile.SupportLevel.ADAPTED,
+            "Wrath Cage essentia transport is declared by the selected adapter"
+        );
+        helper.assertTrue(
             profile.supportOf(HostProfile.Feature.ENTITY_ASPECTS).level() == HostProfile.SupportLevel.ADAPTED,
             "the selected host declares its entity aspect catalog"
         );
@@ -243,8 +255,38 @@ public final class RecipeGameTests {
             "host wand cap registration is declared by the selected adapter"
         );
         helper.assertTrue(
+            profile.supportOf(HostProfile.Feature.WAND_PARTS).level() == HostProfile.SupportLevel.ADAPTED,
+            "host wand part replacement is declared by the selected adapter"
+        );
+        ItemStack wandPartsProbe = thaumcraft.wand.Wands.create(
+            thaumcraft.wand.WandRegistry.CAP_THAUMIUM,
+            java.util.Objects.requireNonNull(thaumcraft.wand.WandRegistry.findRod("infernal")),
+            false
+        );
+        new dev.visfox.forbiddenreforged.integration.tc4.Tc4WandPartsAdapter().setRod(
+            wandPartsProbe,
+            ContentId.parse("forbiddenmagic:profaned")
+        );
+        helper.assertValueEqual(
+            thaumcraft.wand.Wands.getRod(wandPartsProbe).tag(),
+            "profaned",
+            "the host wand-parts adapter replaces the rod while preserving wand data"
+        );
+        helper.assertTrue(
             profile.supportOf(HostProfile.Feature.WAND_TRIGGERS).level() == HostProfile.SupportLevel.ADAPTED,
             "host wand triggers are declared by the selected adapter"
+        );
+        helper.assertTrue(
+            profile.supportOf(HostProfile.Feature.WARP_POOLS).level() == HostProfile.SupportLevel.ADAPTED,
+            "host warp pool integration is declared by the selected adapter"
+        );
+        helper.assertTrue(
+            profile.supportOf(HostProfile.Feature.STICKY_WARP).level() == HostProfile.SupportLevel.ADAPTED,
+            "sticky warp semantics are declared by the selected adapter"
+        );
+        helper.assertTrue(
+            profile.supportOf(HostProfile.Feature.TAINT_ORIGINS).level() == HostProfile.SupportLevel.UNSUPPORTED,
+            "unimplemented host taint-origin integration remains explicitly unsupported"
         );
         helper.assertTrue(
             profile.supportOf(HostProfile.Feature.OPTIONAL_ENCHANTMENT_INTEGRATION).level() == HostProfile.SupportLevel.PARTIAL,
@@ -265,6 +307,18 @@ public final class RecipeGameTests {
         helper.assertTrue(
             HostAdapterRegistry.requireBlockEntities() != null,
             "the selected host exposes block-entity services"
+        );
+        var wrathCageBridge = HostAdapterRegistry.requireBlockEntities().createWrathCageBlockEntity(
+            net.minecraft.core.BlockPos.ZERO,
+            FmBlocks.WRATH_CAGE.get().defaultBlockState()
+        );
+        helper.assertTrue(
+            wrathCageBridge instanceof thaumcraft.aspect.AspectSource,
+            "Wrath Cage exposes the host essentia storage contract"
+        );
+        helper.assertTrue(
+            wrathCageBridge instanceof thaumcraft.essentia.EssentiaTransport,
+            "Wrath Cage exposes the host essentia transport contract"
         );
         helper.assertTrue(
             HostAdapterRegistry.requireWandInspection() != null,
