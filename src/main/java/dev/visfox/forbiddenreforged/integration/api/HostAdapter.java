@@ -9,6 +9,9 @@ import java.util.List;
 public interface HostAdapter {
     HostProfile profile();
 
+    /** Returns the host's configured Crystalwell ingredient mode. */
+    boolean crystalwellUsesShardTag();
+
     /**
      * Performs host-specific runtime bootstrap after common mod registration.
      */

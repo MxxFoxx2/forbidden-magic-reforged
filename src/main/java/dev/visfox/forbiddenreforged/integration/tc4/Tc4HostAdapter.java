@@ -92,6 +92,11 @@ public final class Tc4HostAdapter implements HostAdapter, HostRuntimeServices, H
     }
 
     @Override
+    public boolean crystalwellUsesShardTag() {
+        return Tc4RecipeAdapter.crystalwellUsesShardTag();
+    }
+
+    @Override
     public void registerRecipes(List<RecipeDefinition> recipes) {
         Tc4RecipeAdapter.registerRecipes(recipes);
     }

@@ -201,6 +201,10 @@ public final class RecipeGameTests {
             !HostAdapterRegistry.require().aspectDiagnostics().isEmpty(),
             "host diagnostics are retrieved through the shared adapter contract"
         );
+        helper.assertTrue(
+            HostAdapterRegistry.require().crystalwellUsesShardTag() == Tc4RecipeAdapter.crystalwellUsesShardTag(),
+            "Crystalwell ingredient mode is queried through HostAdapter"
+        );
         helper.assertValueEqual(FmAspects.NETHER, ContentId.parse("forbiddenmagic:infernus"),
             "custom aspects are exposed as host-neutral content IDs");
         helper.succeed();

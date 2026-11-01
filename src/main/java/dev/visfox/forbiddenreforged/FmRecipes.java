@@ -2,7 +2,6 @@ package dev.visfox.forbiddenreforged;
 
 import dev.visfox.forbiddenreforged.core.recipe.ForbiddenMagicRecipeCatalog;
 import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
-import dev.visfox.forbiddenreforged.integration.tc4.Tc4RecipeAdapter;
 import java.util.Set;
 
 public final class FmRecipes {
@@ -24,7 +23,7 @@ public final class FmRecipes {
             FmConfig.emeraldTrans(),
             FmConfig.gluttonyMode(),
             FmConfig.lustDisabled(),
-            Tc4RecipeAdapter.crystalwellUsesShardTag()
+            HostAdapterRegistry.require().crystalwellUsesShardTag()
         );
         HostAdapterRegistry.require().registerRecipes(ForbiddenMagicRecipeCatalog.definitions(options));
     }

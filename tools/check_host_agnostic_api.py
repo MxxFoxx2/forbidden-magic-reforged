@@ -123,6 +123,10 @@ def main() -> int:
             failures.append(
                 f"{source.relative_to(ROOT)} bypasses the host-neutral registration contract"
             )
+        if "integration.tc4" in content or "thaumcraft." in content:
+            failures.append(
+                f"{source.relative_to(ROOT)} references a concrete host implementation"
+            )
         for direct_registration in (
             "Tc4AspectAdapter.registerAspects(",
             "Tc4RecipeAdapter.registerRecipes(",
@@ -163,6 +167,8 @@ def main() -> int:
             )
 
     host_api = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/api/HostAdapter.java").read_text(encoding="utf-8")
+    if "crystalwellUsesShardTag()" not in host_api:
+        failures.append("HostAdapter is missing the Crystalwell ingredient configuration query")
     for contract_method in ("initializeRuntime()", "aspectDiagnostics()"):
         if contract_method not in host_api:
             failures.append(
