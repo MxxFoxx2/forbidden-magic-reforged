@@ -11,7 +11,9 @@ import dev.visfox.forbiddenreforged.integration.api.HostProfile;
 import dev.visfox.forbiddenreforged.integration.runtime.HostAspectServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostMorphToolServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostBlockEntityServices;
-import dev.visfox.forbiddenreforged.integration.runtime.HostWandServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostWandInspectionServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostWandVisServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostAccessoryServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostTaintServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostScribingServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostItemFactoryServices;
@@ -40,7 +42,7 @@ import java.util.Set;
 /**
  * Thaumcraft 4: Reforged implementation of the host-neutral content contract.
  */
-public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, HostMorphToolServices, HostBlockEntityServices, HostWandServices, HostTaintServices, HostScribingServices, HostItemPropertyServices, HostItemFactoryServices, HostBootstrapServices, HostEntityAspectServices, HostEntityClassificationServices {
+public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, HostMorphToolServices, HostBlockEntityServices, HostWandInspectionServices, HostWandVisServices, HostAccessoryServices, HostTaintServices, HostScribingServices, HostItemPropertyServices, HostItemFactoryServices, HostBootstrapServices, HostEntityAspectServices, HostEntityClassificationServices {
     public static final Tc4HostAdapter INSTANCE = new Tc4HostAdapter();
 
     private static final HostProfile PROFILE = new HostProfile(
@@ -60,8 +62,12 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
                 HostProfile.FeatureSupport.adapted("Initializes TC4 warp, wand, recipe, research and add-on integrations")),
             Map.entry(HostProfile.Feature.MORPH_TOOL_RUNTIME,
                 HostProfile.FeatureSupport.adapted("Provides morph-tool cycle sounds and area-mining behavior")),
-            Map.entry(HostProfile.Feature.WAND_RUNTIME,
-                HostProfile.FeatureSupport.adapted("Provides wand detection, focus properties, Vis storage and Baubles accessories")),
+            Map.entry(HostProfile.Feature.WAND_INSPECTION,
+                HostProfile.FeatureSupport.adapted("Provides wand detection, rod tags, and focus-upgrade queries")),
+            Map.entry(HostProfile.Feature.WAND_VIS_STORAGE,
+                HostProfile.FeatureSupport.adapted("Adds semantic aspects to wand and real Vis stores")),
+            Map.entry(HostProfile.Feature.ACCESSORY_INTEGRATION,
+                HostProfile.FeatureSupport.adapted("Reads host accessory slots through the accessory provider API")),
             Map.entry(HostProfile.Feature.TAINT_RUNTIME,
                 HostProfile.FeatureSupport.adapted("Provides taint material rules, purification, special drops and damage semantics")),
             Map.entry(HostProfile.Feature.SCRIBING_RUNTIME,
@@ -218,7 +224,7 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
     }
 
     @Override
-    public String wandRodTag(ItemStack stack) {
+    public @org.jspecify.annotations.Nullable String wandRodTag(ItemStack stack) {
         return Tc4WandRuntimeAdapter.rodTag(stack);
     }
 

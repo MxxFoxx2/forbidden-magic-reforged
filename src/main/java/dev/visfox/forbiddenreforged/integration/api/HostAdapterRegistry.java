@@ -8,7 +8,9 @@ import dev.visfox.forbiddenreforged.integration.runtime.HostEntityClassification
 import dev.visfox.forbiddenreforged.integration.runtime.HostAspectServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostMorphToolServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostBlockEntityServices;
-import dev.visfox.forbiddenreforged.integration.runtime.HostWandServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostWandInspectionServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostWandVisServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostAccessoryServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostTaintServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostScribingServices;
 import java.util.Objects;
@@ -68,8 +70,16 @@ public final class HostAdapterRegistry {
         return capability(HostBlockEntityServices.class, "block entity");
     }
 
-    public static HostWandServices requireWands() {
-        return capability(HostWandServices.class, "wand");
+    public static HostWandInspectionServices requireWandInspection() {
+        return capability(HostWandInspectionServices.class, "wand inspection");
+    }
+
+    public static HostWandVisServices requireWandVis() {
+        return capability(HostWandVisServices.class, "wand Vis");
+    }
+
+    public static HostAccessoryServices requireAccessories() {
+        return capability(HostAccessoryServices.class, "accessory");
     }
 
     public static HostTaintServices requireTaint() {

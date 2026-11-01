@@ -4,6 +4,7 @@ import dev.visfox.forbiddenreforged.core.model.ContentId;
 import net.minecraft.world.item.ItemStack;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.wand.Wands;
+import org.jspecify.annotations.Nullable;
 
 public final class Tc4WandRuntimeAdapter {
     private Tc4WandRuntimeAdapter() {
@@ -13,7 +14,7 @@ public final class Tc4WandRuntimeAdapter {
         return Wands.isWand(wand);
     }
 
-    public static String rodTag(ItemStack wand) {
+    public static @Nullable String rodTag(ItemStack wand) {
         return Wands.isWand(wand) ? Wands.getRod(wand).tag() : null;
     }
 

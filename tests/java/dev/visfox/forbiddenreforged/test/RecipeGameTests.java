@@ -191,8 +191,16 @@ public final class RecipeGameTests {
             "morph-tool runtime behavior is declared by the selected adapter"
         );
         helper.assertTrue(
-            profile.supportOf(HostProfile.Feature.WAND_RUNTIME).level() == HostProfile.SupportLevel.ADAPTED,
-            "wand runtime behavior is declared by the selected adapter"
+            profile.supportOf(HostProfile.Feature.WAND_INSPECTION).level() == HostProfile.SupportLevel.ADAPTED,
+            "wand and focus inspection is declared by the selected adapter"
+        );
+        helper.assertTrue(
+            profile.supportOf(HostProfile.Feature.WAND_VIS_STORAGE).level() == HostProfile.SupportLevel.ADAPTED,
+            "wand and real Vis operations are declared by the selected adapter"
+        );
+        helper.assertTrue(
+            profile.supportOf(HostProfile.Feature.ACCESSORY_INTEGRATION).level() == HostProfile.SupportLevel.ADAPTED,
+            "host accessory slot access is declared by the selected adapter"
         );
         helper.assertTrue(
             profile.supportOf(HostProfile.Feature.TAINT_RUNTIME).level() == HostProfile.SupportLevel.ADAPTED,
@@ -255,8 +263,24 @@ public final class RecipeGameTests {
             "the selected host exposes block-entity services"
         );
         helper.assertTrue(
-            HostAdapterRegistry.requireWands() != null,
-            "the selected host exposes wand services"
+            HostAdapterRegistry.requireWandInspection() != null,
+            "the selected host exposes wand and focus inspection"
+        );
+        helper.assertTrue(
+            HostAdapterRegistry.requireWandVis() != null,
+            "the selected host exposes Vis operations"
+        );
+        helper.assertTrue(
+            HostAdapterRegistry.requireAccessories() != null,
+            "the selected host exposes accessory slot access"
+        );
+        helper.assertFalse(
+            HostAdapterRegistry.requireWandInspection().isWand(Items.AIR),
+            "the host wand inspection rejects a non-wand item"
+        );
+        helper.assertTrue(
+            HostAdapterRegistry.requireWandInspection().wandRodTag(Items.AIR) == null,
+            "the host wand rod tag is nullable for a non-wand item"
         );
         helper.assertTrue(
             HostAdapterRegistry.requireTaint() != null,

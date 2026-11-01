@@ -122,7 +122,7 @@ public final class FmDrops {
                 int looting = enchant(player, held, Enchantments.LOOTING);
                 addDrop(event, FmItems.DEADLY_SHARDS.get("pride").get(), prideCount(looting, entity.getRandom().nextInt(1 + looting)));
             }
-            int greed = enchant(player, held, Enchantments.LOOTING) + HostAdapterRegistry.requireWands().wandFocusTreasure(held);
+            int greed = enchant(player, held, Enchantments.LOOTING) + HostAdapterRegistry.requireWandInspection().wandFocusTreasure(held);
             if (rollGreed(greed, entity.getRandom().nextInt(20))) {
                 addDrop(event, FmItems.DEADLY_SHARDS.get("greed").get(), 1);
             }
@@ -237,7 +237,7 @@ public final class FmDrops {
         if (isTagged(target.getType(), EntityTypeTags.SENSITIVE_TO_BANE_OF_ARTHROPODS)) {
             wrath += enchant(player, held, Enchantments.BANE_OF_ARTHROPODS);
         }
-        wrath += HostAdapterRegistry.requireWands().wandFocusPotency(held);
+        wrath += HostAdapterRegistry.requireWandInspection().wandFocusPotency(held);
         return wrath;
     }
 

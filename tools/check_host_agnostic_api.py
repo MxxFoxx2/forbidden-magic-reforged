@@ -199,7 +199,9 @@ def main() -> int:
         "HostAspectServices.java": ("Component aspectDescription(ContentId aspect)",),
         "HostMorphToolServices.java": ("playMorphCycleSound(", "boolean isAreaHarvesting()", "void breakArea("),
         "HostBlockEntityServices.java": ("WrathCageBlockEntity createWrathCageBlockEntity(",),
-        "HostWandServices.java": ("boolean isWand(", "String wandRodTag(", "void addWandVis(", "void addRealVis(", "ItemStack accessory("),
+        "HostWandInspectionServices.java": ("boolean isWand(", "@Nullable String wandRodTag(", "int wandFocusTreasure(", "int wandFocusPotency("),
+        "HostWandVisServices.java": ("void addWandVis(", "void addRealVis("),
+        "HostAccessoryServices.java": ("ItemStack accessory(Player player, int slot)",),
         "HostTaintServices.java": ("boolean isTaintMaterial(", "boolean isTaintShovelPurificationTarget(", "float taintShovelMiningSpeed()", "void playTaintShovelSound(", "ItemStack specialMiningDrop(", "boolean isTaintDamage("),
         "HostScribingServices.java": ("boolean isNoResearchDifficulty()", "List<ContentId> primalAspectIds()", "boolean addAspectPool(ServerPlayer player",),
         "HostEntityAspectServices.java": ("Map<ContentId, ContentId> aspectCatalog(boolean silverfishEmeralds)",),
@@ -222,12 +224,17 @@ def main() -> int:
         failures.append("The monolithic HostRuntimeServices contract should be removed after capability splitting")
 
     capability_lookups = (
+        "HostWandInspectionServices requireWandInspection()",
+        "HostWandVisServices requireWandVis()",
+        "HostAccessoryServices requireAccessories()",
         "HostEntityAspectServices requireEntityAspects()",
         "HostEntityClassificationServices requireEntityClassification()",
         "HostAspectServices requireAspects()",
         "HostMorphToolServices requireMorphTools()",
         "HostBlockEntityServices requireBlockEntities()",
-        "HostWandServices requireWands()",
+        "HostWandInspectionServices requireWandInspection()",
+        "HostWandVisServices requireWandVis()",
+        "HostAccessoryServices requireAccessories()",
         "HostTaintServices requireTaint()",
         "HostScribingServices requireScribing()",
     )
@@ -237,10 +244,10 @@ def main() -> int:
 
     capability_consumers = {
         "FmSpawnerMobs.java": ("requireEntityAspects()", "requireEntityClassification()"),
-        "FmDrops.java": ("requireEntityClassification()", "requireWands()"),
+        "FmDrops.java": ("requireEntityClassification()", "requireWandInspection()"),
         "RidingCropItem.java": ("requireEntityClassification()",),
-        "FmEnchantmentEffects.java": ("requireTaint()", "requireWands()"),
-        "FmToolEvents.java": ("requireWands()", "requireTaint()"),
+        "FmEnchantmentEffects.java": ("requireTaint()", "requireWandInspection()", "requireWandVis()"),
+        "FmToolEvents.java": ("requireWandInspection()", "requireWandVis()", "requireAccessories()", "requireTaint()"),
         "ScribeWellEvents.java": ("requireScribing()", "requireItemFactories()"),
         "MobCrystalItem.java": ("requireAspects()",),
         "MorphToolItem.java": ("requireMorphTools()",),
@@ -276,10 +283,18 @@ def main() -> int:
                 failures.append(
                     f"{source.relative_to(ROOT)} still references the removed combined item capability"
                 )
+            if "HostWandServices" in content or "requireWands()" in content:
+                failures.append(
+                    f"{source.relative_to(ROOT)} still references the removed combined wand capability"
+                )
 
     old_item_contract = ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostItemServices.java"
     if old_item_contract.exists():
         failures.append("The combined HostItemServices contract must be removed after the item capability split")
+
+    old_wand_contract = ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostWandServices.java"
+    if old_wand_contract.exists():
+        failures.append("The combined HostWandServices contract must be removed after the wand capability split")
 
     item_property_contract = ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostItemPropertyServices.java"
     item_factory_contract = ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostItemFactoryServices.java"
@@ -324,6 +339,9 @@ def main() -> int:
     for feature in ("ITEM_PROPERTIES", "ITEM_FACTORIES"):
         if feature not in profile_content:
             failures.append(f"HostProfile is missing the item capability feature declaration: {feature}")
+    for feature in ("WAND_INSPECTION", "WAND_VIS_STORAGE", "ACCESSORY_INTEGRATION"):
+        if feature not in profile_content:
+            failures.append(f"HostProfile is missing the wand capability feature declaration: {feature}")
 
     items_facade = ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmItems.java"
     items_content = items_facade.read_text(encoding="utf-8")

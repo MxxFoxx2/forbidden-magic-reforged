@@ -41,7 +41,9 @@ Runtime contracts are separated by responsibility rather than combined in one se
 | `HostAspectServices` | Host-provided aspect display components |
 | `HostMorphToolServices` | Morph-tool cycle sound and area mining |
 | `HostBlockEntityServices` | Host-backed Wrath Cage block-entity factory |
-| `HostWandServices` | Wand/focus queries, Vis storage, and accessory lookup |
+| `HostWandInspectionServices` | Read-only wand and focus queries; declared by `WAND_INSPECTION` |
+| `HostWandVisServices` | Writes semantic aspects to wand and real Vis stores; declared by `WAND_VIS_STORAGE` |
+| `HostAccessoryServices` | Host accessory slot lookup; declared by `ACCESSORY_INTEGRATION` |
 | `HostTaintServices` | Taint materials, purification targets, taint damage, shovel behavior, and special mining drops |
 | `HostScribingServices` | Research difficulty, primal aspect IDs, and player aspect-pool operations |
 | `HostItemPropertyServices` | Host-specific `Item.Properties` customization; declared by `ITEM_PROPERTIES` |
@@ -50,7 +52,7 @@ Runtime contracts are separated by responsibility rather than combined in one se
 
 These ports may use Minecraft runtime types such as `ItemStack`, `LivingEntity`, `BlockState`, and `ServerPlayer`: this is a host-agnostic boundary within the current Minecraft/NeoForge target, not a cross-Minecraft-version abstraction. They must not expose TC4 or another magic-host's API types.
 
-The old aggregate `HostRuntimeServices` and mixed `HostEntityServices` contracts were removed. Consumers request the narrow capability they need through `HostAdapterRegistry`.
+The old aggregate `HostRuntimeServices`, mixed `HostEntityServices`, combined `HostItemServices`, and combined `HostWandServices` contracts were removed. Consumers request the narrow capability they need through `HostAdapterRegistry`.
 
 ### 4. Concrete host integration — `integration/tc4/`
 

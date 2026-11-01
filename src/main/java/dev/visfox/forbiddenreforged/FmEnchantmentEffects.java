@@ -245,7 +245,7 @@ public final class FmEnchantmentEffects {
         if (event.getEntity() instanceof Player wearer && !wearer.level().isClientSide()) {
             FmToolEvents.collarDamage(wearer, event.getAmount(), event.getSource().getEntity());
             ItemStack held = wearer.getMainHandItem();
-            if (HostAdapterRegistry.requireWands().isWand(held)) {
+            if (HostAdapterRegistry.requireWandInspection().isWand(held)) {
                 boolean fireOrWither = event.getSource().is(DamageTypeTags.IS_FIRE)
                     || event.getSource().is(DamageTypes.WITHER);
                 if (FmToolEvents.cancelsInfernalDamage(held, fireOrWither)) {
@@ -254,7 +254,7 @@ public final class FmEnchantmentEffects {
                 }
                 if (FmToolEvents.restoresTaintedVis(held, HostAdapterRegistry.requireTaint().isTaintDamage(event.getSource()))) {
                     for (ContentId aspect : FmToolEvents.taintedVisRolls(wearer.getRandom())) {
-                        HostAdapterRegistry.requireWands().addWandVis(held, aspect, 1, true);
+                        HostAdapterRegistry.requireWandVis().addWandVis(held, aspect, 1, true);
                     }
                 }
             }
