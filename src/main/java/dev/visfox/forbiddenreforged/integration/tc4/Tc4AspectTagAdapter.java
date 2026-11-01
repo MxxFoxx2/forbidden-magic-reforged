@@ -1,4 +1,9 @@
-package dev.visfox.forbiddenreforged;
+package dev.visfox.forbiddenreforged.integration.tc4;
+
+import dev.visfox.forbiddenreforged.FmAspects;
+import dev.visfox.forbiddenreforged.FmConfig;
+import dev.visfox.forbiddenreforged.FmItems;
+import dev.visfox.forbiddenreforged.ForbiddenMagic;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -9,10 +14,10 @@ import thaumcraft.aspect.AspectRegistrar;
 import thaumcraft.aspect.AspectRegistry;
 import thaumcraft.aspect.AspectSync;
 
-public final class FmAspectTags {
+public final class Tc4AspectTagAdapter {
     private static final Set<String> DECLARED = new LinkedHashSet<>();
 
-    private FmAspectTags() {
+    private Tc4AspectTagAdapter() {
     }
 
     public static void register() {

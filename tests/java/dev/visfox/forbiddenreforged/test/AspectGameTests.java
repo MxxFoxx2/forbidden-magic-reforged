@@ -44,7 +44,7 @@ import dev.visfox.forbiddenreforged.core.aspect.ForbiddenMagicAspectCatalog;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.FmAspectDiagnostics;
 import dev.visfox.forbiddenreforged.FmAspects;
-import dev.visfox.forbiddenreforged.FmAspectTags;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectTagAdapter;
 import dev.visfox.forbiddenreforged.FmConfig;
 import dev.visfox.forbiddenreforged.FmCreativeTab;
 import dev.visfox.forbiddenreforged.FmDrops;
@@ -223,7 +223,7 @@ public final class AspectGameTests {
 
     private static void everyTagTargetResolved(GameTestHelper helper) {
         List<String> unresolved = new ArrayList<>();
-        for (String target : FmAspectTags.declaredTargets()) {
+        for (String target : Tc4AspectTagAdapter.declaredTargets()) {
             if (target.startsWith("entity:")) {
                 if (BuiltInRegistries.ENTITY_TYPE.getOptional(Identifier.parse(target.substring("entity:".length()))).isEmpty()) {
                     unresolved.add(target);
@@ -335,7 +335,7 @@ public final class AspectGameTests {
         BlockPos portalPos = helper.absolutePos(new BlockPos(3, 3, 3));
         helper.getLevel().setBlockAndUpdate(portalPos, Blocks.NETHER_PORTAL.defaultBlockState());
         ScanManager.Target portal = ScanManager.resolveBlock(helper.getLevel(), portalPos);
-        if (!FmAspectTags.blockTargetsAvailable()) {
+        if (!Tc4AspectTagAdapter.blockTargetsAvailable()) {
             helper.assertTrue(portal == null || !portal.key().startsWith("block:"),
                 "without block aspect targets the portal cannot resolve through its block identity");
             helper.succeed();
