@@ -17,12 +17,13 @@ import java.util.Objects;
 public record AspectDefinition(
     ContentId id,
     int color,
-    int sortOrder,
+    BlendMode blendMode,
     List<ContentId> components,
     ContentId texture
 ) {
     public AspectDefinition {
         Objects.requireNonNull(id, "id");
+        Objects.requireNonNull(blendMode, "blendMode");
         Objects.requireNonNull(components, "components");
         Objects.requireNonNull(texture, "texture");
         if ((color & 0xFF000000) != 0) {
@@ -35,6 +36,11 @@ public record AspectDefinition(
         if (components.contains(id)) {
             throw new IllegalArgumentException("An aspect cannot be a component of itself");
         }
+    }
+
+    public enum BlendMode {
+        ADDITIVE,
+        ONE_MINUS_SOURCE_COLOR
     }
 
     /** One positive quantity of a semantic aspect. */
