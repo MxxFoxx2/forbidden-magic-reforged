@@ -11,7 +11,8 @@ import dev.visfox.forbiddenreforged.integration.runtime.HostBlockEntityServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandInspectionServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandVisServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostAccessoryServices;
-import dev.visfox.forbiddenreforged.integration.runtime.HostTaintServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostTaintBlockServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostEnchantmentEffectServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostScribingServices;
 import java.util.Objects;
 
@@ -82,8 +83,12 @@ public final class HostAdapterRegistry {
         return capability(HostAccessoryServices.class, "accessory");
     }
 
-    public static HostTaintServices requireTaint() {
-        return capability(HostTaintServices.class, "taint");
+    public static HostTaintBlockServices requireTaintBlocks() {
+        return capability(HostTaintBlockServices.class, "taint block");
+    }
+
+    public static HostEnchantmentEffectServices requireEnchantmentEffects() {
+        return capability(HostEnchantmentEffectServices.class, "enchantment effect");
     }
 
     public static HostScribingServices requireScribing() {

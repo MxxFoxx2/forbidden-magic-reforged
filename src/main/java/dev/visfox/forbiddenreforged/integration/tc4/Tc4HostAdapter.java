@@ -14,7 +14,8 @@ import dev.visfox.forbiddenreforged.integration.runtime.HostBlockEntityServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandInspectionServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandVisServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostAccessoryServices;
-import dev.visfox.forbiddenreforged.integration.runtime.HostTaintServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostTaintBlockServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostEnchantmentEffectServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostScribingServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostItemFactoryServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostItemPropertyServices;
@@ -42,7 +43,7 @@ import java.util.Set;
 /**
  * Thaumcraft 4: Reforged implementation of the host-neutral content contract.
  */
-public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, HostMorphToolServices, HostBlockEntityServices, HostWandInspectionServices, HostWandVisServices, HostAccessoryServices, HostTaintServices, HostScribingServices, HostItemPropertyServices, HostItemFactoryServices, HostBootstrapServices, HostEntityAspectServices, HostEntityClassificationServices {
+public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, HostMorphToolServices, HostBlockEntityServices, HostWandInspectionServices, HostWandVisServices, HostAccessoryServices, HostTaintBlockServices, HostEnchantmentEffectServices, HostScribingServices, HostItemPropertyServices, HostItemFactoryServices, HostBootstrapServices, HostEntityAspectServices, HostEntityClassificationServices {
     public static final Tc4HostAdapter INSTANCE = new Tc4HostAdapter();
 
     private static final HostProfile PROFILE = new HostProfile(
@@ -68,8 +69,10 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
                 HostProfile.FeatureSupport.adapted("Adds semantic aspects to wand and real Vis stores")),
             Map.entry(HostProfile.Feature.ACCESSORY_INTEGRATION,
                 HostProfile.FeatureSupport.adapted("Reads host accessory slots through the accessory provider API")),
-            Map.entry(HostProfile.Feature.TAINT_RUNTIME,
-                HostProfile.FeatureSupport.adapted("Provides taint material rules, purification, special drops and damage semantics")),
+            Map.entry(HostProfile.Feature.TAINT_BLOCK_SERVICES,
+                HostProfile.FeatureSupport.adapted("Provides taint block classification and taint-shovel behavior")),
+            Map.entry(HostProfile.Feature.ENCHANTMENT_EFFECTS,
+                HostProfile.FeatureSupport.adapted("Provides host special-mining drops and taint damage-source classification")),
             Map.entry(HostProfile.Feature.SCRIBING_RUNTIME,
                 HostProfile.FeatureSupport.adapted("Provides research difficulty and player aspect-pool access")),
             Map.entry(HostProfile.Feature.WAND_RODS,

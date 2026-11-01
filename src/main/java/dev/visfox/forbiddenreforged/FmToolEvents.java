@@ -189,7 +189,7 @@ public final class FmToolEvents {
     }
 
     private static boolean isTaintMaterial(BlockState state) {
-        return HostAdapterRegistry.requireTaint().isTaintMaterial(state)
+        return HostAdapterRegistry.requireTaintBlocks().isTaintMaterial(state)
             || state.is(FmBlocks.TAINT_LOG.get())
             || state.is(FmBlocks.TAINT_PLANKS.get())
             || state.is(FmBlocks.TAINT_STONE_SMOOTH.get())

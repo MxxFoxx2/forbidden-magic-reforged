@@ -203,8 +203,12 @@ public final class RecipeGameTests {
             "host accessory slot access is declared by the selected adapter"
         );
         helper.assertTrue(
-            profile.supportOf(HostProfile.Feature.TAINT_RUNTIME).level() == HostProfile.SupportLevel.ADAPTED,
-            "taint runtime behavior is declared by the selected adapter"
+            profile.supportOf(HostProfile.Feature.TAINT_BLOCK_SERVICES).level() == HostProfile.SupportLevel.ADAPTED,
+            "taint block and shovel behavior is declared by the selected adapter"
+        );
+        helper.assertTrue(
+            profile.supportOf(HostProfile.Feature.ENCHANTMENT_EFFECTS).level() == HostProfile.SupportLevel.ADAPTED,
+            "host-specific enchantment effects are declared by the selected adapter"
         );
         helper.assertTrue(
             profile.supportOf(HostProfile.Feature.SCRIBING_RUNTIME).level() == HostProfile.SupportLevel.ADAPTED,
@@ -283,8 +287,12 @@ public final class RecipeGameTests {
             "the host wand rod tag is nullable for a non-wand item"
         );
         helper.assertTrue(
-            HostAdapterRegistry.requireTaint() != null,
-            "the selected host exposes taint services"
+            HostAdapterRegistry.requireTaintBlocks() != null,
+            "the selected host exposes taint block and shovel services"
+        );
+        helper.assertTrue(
+            HostAdapterRegistry.requireEnchantmentEffects() != null,
+            "the selected host exposes host-specific enchantment effects"
         );
         helper.assertTrue(
             HostAdapterRegistry.requireScribing() != null,
@@ -343,7 +351,7 @@ public final class RecipeGameTests {
             "host aspect descriptions are retrieved through runtime services"
         );
         helper.assertTrue(
-            HostAdapterRegistry.requireTaint().taintShovelMiningSpeed() > 0.0F,
+            HostAdapterRegistry.requireTaintBlocks().taintShovelMiningSpeed() > 0.0F,
             "host taint tool properties are retrieved through runtime services"
         );
         helper.assertFalse(

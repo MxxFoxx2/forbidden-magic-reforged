@@ -202,7 +202,8 @@ def main() -> int:
         "HostWandInspectionServices.java": ("boolean isWand(", "@Nullable String wandRodTag(", "int wandFocusTreasure(", "int wandFocusPotency("),
         "HostWandVisServices.java": ("void addWandVis(", "void addRealVis("),
         "HostAccessoryServices.java": ("ItemStack accessory(Player player, int slot)",),
-        "HostTaintServices.java": ("boolean isTaintMaterial(", "boolean isTaintShovelPurificationTarget(", "float taintShovelMiningSpeed()", "void playTaintShovelSound(", "ItemStack specialMiningDrop(", "boolean isTaintDamage("),
+        "HostTaintBlockServices.java": ("boolean isTaintMaterial(", "boolean isTaintShovelPurificationTarget(", "float taintShovelMiningSpeed()", "void playTaintShovelSound("),
+        "HostEnchantmentEffectServices.java": ("ItemStack specialMiningDrop(", "boolean isTaintDamage("),
         "HostScribingServices.java": ("boolean isNoResearchDifficulty()", "List<ContentId> primalAspectIds()", "boolean addAspectPool(ServerPlayer player",),
         "HostEntityAspectServices.java": ("Map<ContentId, ContentId> aspectCatalog(boolean silverfishEmeralds)",),
         "HostEntityClassificationServices.java": ("boolean isTaintedMob(LivingEntity entity)", "boolean isHostBoss(LivingEntity entity)", "boolean isHostGolem(LivingEntity entity)", "Set<ContentId> bossEntityIds()"),
@@ -235,7 +236,8 @@ def main() -> int:
         "HostWandInspectionServices requireWandInspection()",
         "HostWandVisServices requireWandVis()",
         "HostAccessoryServices requireAccessories()",
-        "HostTaintServices requireTaint()",
+        "HostTaintBlockServices requireTaintBlocks()",
+        "HostEnchantmentEffectServices requireEnchantmentEffects()",
         "HostScribingServices requireScribing()",
     )
     for lookup in capability_lookups:
@@ -246,12 +248,12 @@ def main() -> int:
         "FmSpawnerMobs.java": ("requireEntityAspects()", "requireEntityClassification()"),
         "FmDrops.java": ("requireEntityClassification()", "requireWandInspection()"),
         "RidingCropItem.java": ("requireEntityClassification()",),
-        "FmEnchantmentEffects.java": ("requireTaint()", "requireWandInspection()", "requireWandVis()"),
-        "FmToolEvents.java": ("requireWandInspection()", "requireWandVis()", "requireAccessories()", "requireTaint()"),
+        "FmEnchantmentEffects.java": ("requireEnchantmentEffects()", "requireWandInspection()", "requireWandVis()"),
+        "FmToolEvents.java": ("requireWandInspection()", "requireWandVis()", "requireAccessories()", "requireTaintBlocks()"),
         "ScribeWellEvents.java": ("requireScribing()", "requireItemFactories()"),
         "MobCrystalItem.java": ("requireAspects()",),
         "MorphToolItem.java": ("requireMorphTools()",),
-        "TaintShovelItem.java": ("requireTaint()",),
+        "TaintShovelItem.java": ("requireTaintBlocks()",),
         "FmBlockEntities.java": ("requireBlockEntities()",),
         "WrathCageBlock.java": ("requireBlockEntities()",),
     }
@@ -287,6 +289,10 @@ def main() -> int:
                 failures.append(
                     f"{source.relative_to(ROOT)} still references the removed combined wand capability"
                 )
+            if "HostTaintServices" in content or "requireTaint()" in content:
+                failures.append(
+                    f"{source.relative_to(ROOT)} still references the removed combined taint capability"
+                )
 
     old_item_contract = ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostItemServices.java"
     if old_item_contract.exists():
@@ -295,6 +301,10 @@ def main() -> int:
     old_wand_contract = ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostWandServices.java"
     if old_wand_contract.exists():
         failures.append("The combined HostWandServices contract must be removed after the wand capability split")
+
+    old_taint_contract = ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostTaintServices.java"
+    if old_taint_contract.exists():
+        failures.append("The combined HostTaintServices contract must be removed after the taint capability split")
 
     item_property_contract = ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostItemPropertyServices.java"
     item_factory_contract = ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostItemFactoryServices.java"
@@ -342,6 +352,9 @@ def main() -> int:
     for feature in ("WAND_INSPECTION", "WAND_VIS_STORAGE", "ACCESSORY_INTEGRATION"):
         if feature not in profile_content:
             failures.append(f"HostProfile is missing the wand capability feature declaration: {feature}")
+    for feature in ("TAINT_BLOCK_SERVICES", "ENCHANTMENT_EFFECTS"):
+        if feature not in profile_content:
+            failures.append(f"HostProfile is missing the taint/enchantment capability feature declaration: {feature}")
 
     items_facade = ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmItems.java"
     items_content = items_facade.read_text(encoding="utf-8")

@@ -106,7 +106,7 @@ public final class FmEnchantmentEffects {
             RandomSource random = event.getLevel().getRandom();
             float chance = clusterChance(cluster);
             for (ItemEntity drop : event.getDrops()) {
-                drop.setItem(HostAdapterRegistry.requireTaint().specialMiningDrop(event.getState(), drop.getItem(), chance, random));
+                drop.setItem(HostAdapterRegistry.requireEnchantmentEffects().specialMiningDrop(event.getState(), drop.getItem(), chance, random));
             }
         }
         int corrupting = FmEnchantments.level(player.level().registryAccess(), tool, FmEnchantments.CORRUPTING);
@@ -252,7 +252,7 @@ public final class FmEnchantmentEffects {
                     event.setCanceled(true);
                     return;
                 }
-                if (FmToolEvents.restoresTaintedVis(held, HostAdapterRegistry.requireTaint().isTaintDamage(event.getSource()))) {
+                if (FmToolEvents.restoresTaintedVis(held, HostAdapterRegistry.requireEnchantmentEffects().isTaintDamage(event.getSource()))) {
                     for (ContentId aspect : FmToolEvents.taintedVisRolls(wearer.getRandom())) {
                         HostAdapterRegistry.requireWandVis().addWandVis(held, aspect, 1, true);
                     }
