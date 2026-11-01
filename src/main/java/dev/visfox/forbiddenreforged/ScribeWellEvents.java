@@ -60,7 +60,7 @@ public final class ScribeWellEvents {
         }
 
         // The original Primewell crafting hook returns its primordial pearl.
-        Item pearl = HostAdapterRegistry.requireItems().primordialPearlItem();
+        Item pearl = HostAdapterRegistry.requireItemFactories().primordialPearlItem();
         if (pearl == Items.AIR) {
             ForbiddenMagic.LOGGER.warn("Could not refund Primewell's primordial pearl: the selected host did not register it");
             return;

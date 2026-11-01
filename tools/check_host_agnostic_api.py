@@ -241,7 +241,7 @@ def main() -> int:
         "RidingCropItem.java": ("requireEntityClassification()",),
         "FmEnchantmentEffects.java": ("requireTaint()", "requireWands()"),
         "FmToolEvents.java": ("requireWands()", "requireTaint()"),
-        "ScribeWellEvents.java": ("requireScribing()",),
+        "ScribeWellEvents.java": ("requireScribing()", "requireItemFactories()"),
         "MobCrystalItem.java": ("requireAspects()",),
         "MorphToolItem.java": ("requireMorphTools()",),
         "TaintShovelItem.java": ("requireTaint()",),
