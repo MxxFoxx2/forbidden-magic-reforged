@@ -120,20 +120,20 @@ public final class Tc4RecipeAdapter {
             if (ingredient.count() != 1) {
                 throw new IllegalArgumentException("TC4 tag ingredients do not support stack counts: " + ingredient.id());
             }
-            return TcIngredient.tag(ingredient.id().toString());
+            return TcIngredient.tag(Tc4ContentAdapter.resolveTag(ingredient.id()).toString());
         }
         if (ingredient.count() == 1) {
-            return TcIngredient.item(ingredient.id().toString());
+            return TcIngredient.item(Tc4ContentAdapter.resolveItem(ingredient.id()).toString());
         }
-        return TcIngredient.of(new TcStack(identifier(ingredient.id()), ingredient.count(), null));
+        return TcIngredient.of(new TcStack(Tc4ContentAdapter.resolveItem(ingredient.id()), ingredient.count(), null));
     }
 
     private static TcStack output(RecipeDefinition.Output output) {
-        return TcStack.of(output.item().toString(), output.count());
+        return TcStack.of(Tc4ContentAdapter.resolveItem(output.item()).toString(), output.count());
     }
 
     private static Identifier identifier(ContentId id) {
-        return Identifier.fromNamespaceAndPath(id.namespace(), id.path());
+        return Tc4ContentAdapter.resolveItem(id);
     }
 
     static String recipeKey(ContentId id) {

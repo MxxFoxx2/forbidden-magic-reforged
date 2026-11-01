@@ -46,8 +46,11 @@ import dev.visfox.forbiddenreforged.integration.tc4.Tc4ResearchAdapter;
 import dev.visfox.forbiddenreforged.core.warp.WarpKind;
 import dev.visfox.forbiddenreforged.core.warp.WarpChangeRequested;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4WarpAdapter;
+import dev.visfox.forbiddenreforged.core.model.ContentId;
+import dev.visfox.forbiddenreforged.core.model.HostContent;
 import dev.visfox.forbiddenreforged.core.recipe.ForbiddenMagicRecipeCatalog;
 import dev.visfox.forbiddenreforged.core.recipe.RecipeDefinition;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4ContentAdapter;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4RecipeAdapter;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectAdapter;
 import thaumcraft.aspect.Aspect;
@@ -92,7 +95,8 @@ public final class RecipeGameTests {
         "common_recipe_catalog_matches_tc4_registration",
         "common_research_catalog_matches_tc4_registration",
         "research_catalog_preserves_flags_pages_and_progression",
-        "tc4_warp_adapter_preserves_semantic_types_and_item_costs"
+        "tc4_warp_adapter_preserves_semantic_types_and_item_costs",
+        "host_content_identifiers_are_resolved_by_the_tc4_adapter"
     };
 
     static {
@@ -114,6 +118,7 @@ public final class RecipeGameTests {
         FUNCTIONS.register(TESTS[15], () -> RecipeGameTests::commonResearchCatalogMatchesTc4Registration);
         FUNCTIONS.register(TESTS[16], () -> RecipeGameTests::researchCatalogPreservesFlagsPagesAndProgression);
         FUNCTIONS.register(TESTS[17], () -> RecipeGameTests::tc4WarpAdapterPreservesSemanticTypesAndItemCosts);
+        FUNCTIONS.register(TESTS[18], () -> RecipeGameTests::hostContentIdentifiersAreResolvedByTc4Adapter);
     }
 
     private RecipeGameTests() {}
@@ -132,6 +137,21 @@ public final class RecipeGameTests {
         }
     }
 
+    private static void hostContentIdentifiersAreResolvedByTc4Adapter(GameTestHelper helper) {
+        helper.assertValueEqual(HostContent.item("thaumium_axe").toString(), "host:item/thaumium_axe",
+            "core item references use a host-neutral namespace");
+        helper.assertValueEqual(Tc4ContentAdapter.resolveItem(HostContent.item("thaumium_axe")),
+            Identifier.parse("thaumcraft:thaumium_axe"),
+            "TC4 adapter resolves the semantic thaumium axe key");
+        helper.assertValueEqual(Tc4ContentAdapter.resolveTag(HostContent.tag("shards")),
+            Identifier.parse("thaumcraft:shards"),
+            "TC4 adapter resolves the semantic shards tag");
+        helper.assertValueEqual(Tc4ContentAdapter.resolveItem(ContentId.parse("minecraft:diamond")),
+            Identifier.parse("minecraft:diamond"),
+            "vanilla item identifiers pass through unchanged");
+        helper.succeed();
+    }
+
     private static void commonRecipeCatalogMatchesTc4Registration(GameTestHelper helper) {
         ForbiddenMagicRecipeCatalog.Options options = new ForbiddenMagicRecipeCatalog.Options(
             FmConfig.enchantmentsEnabled(),
@@ -144,6 +164,8 @@ public final class RecipeGameTests {
         List<RecipeDefinition> definitions = ForbiddenMagicRecipeCatalog.definitions(options);
         Set<String> translatedKeys = new HashSet<>();
         for (RecipeDefinition definition : definitions) {
+            helper.assertFalse(definition.toString().contains("thaumcraft:"),
+                "core recipe definition must not contain concrete TC4 registry IDs: " + definition.id());
             TcRecipe translated = Tc4RecipeAdapter.translate(definition);
             helper.assertTrue(translatedKeys.add(translated.key()),
                 "common catalog generated duplicate TC4 recipe key: " + translated.key());

@@ -102,6 +102,15 @@ def main() -> int:
                 f"{source.relative_to(ROOT)} references TC4 directly instead of using integration/tc4"
             )
 
+    core_root = ROOT / "src/main/java/dev/visfox/forbiddenreforged/core"
+    for source in core_root.rglob("*.java"):
+        content = source.read_text(encoding="utf-8")
+        for host_namespace in ("thaumcraft:", "com.leclowndu93150.thaumaturge:"):
+            if host_namespace in content:
+                failures.append(
+                    f"{source.relative_to(ROOT)} hard-codes a host registry namespace: {host_namespace}"
+                )
+
     if failures:
         print("\n".join(failures), file=sys.stderr)
         return 1
