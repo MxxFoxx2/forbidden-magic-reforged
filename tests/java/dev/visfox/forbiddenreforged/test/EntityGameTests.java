@@ -2,6 +2,7 @@ package dev.visfox.forbiddenreforged.test;
 
 import java.util.function.Consumer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -27,6 +28,8 @@ import dev.visfox.forbiddenreforged.MobCrystalItem;
 import dev.visfox.forbiddenreforged.WrathCageBlock;
 import dev.visfox.forbiddenreforged.WrathCageBlockEntity;
 import thaumcraft.aspect.Aspect;
+import thaumcraft.aspect.AspectSource;
+import thaumcraft.essentia.EssentiaTransport;
 import thaumcraft.crafting.CrucibleRecipe;
 import thaumcraft.crafting.InfusionRecipe;
 import thaumcraft.crafting.TcRecipes;
@@ -42,7 +45,8 @@ public final class EntityGameTests {
         "mob_crystal_and_spawn_table",
         "wrath_cage_block_and_entity",
         "wrath_cage_crystal_and_spawn_rules",
-        "wrath_cage_research_and_recipes"
+        "wrath_cage_research_and_recipes",
+        "wrath_cage_essentia_uses_host_bridge"
     };
 
     static {
@@ -50,6 +54,7 @@ public final class EntityGameTests {
         FUNCTIONS.register(TESTS[1], () -> EntityGameTests::wrathCageBlockAndEntity);
         FUNCTIONS.register(TESTS[2], () -> EntityGameTests::wrathCageCrystalAndSpawnRules);
         FUNCTIONS.register(TESTS[3], () -> EntityGameTests::wrathCageResearchAndRecipes);
+        FUNCTIONS.register(TESTS[4], () -> EntityGameTests::wrathCageEssentiaUsesHostBridge);
     }
 
     private EntityGameTests() {}
@@ -118,6 +123,49 @@ public final class EntityGameTests {
         helper.assertTrue(WrathCageBlockEntity.shouldSpawn(false, true, 0, 5, 5), "enough essentia starts a fuel cycle");
         helper.assertFalse(WrathCageBlockEntity.shouldSpawn(false, false, 10, 5, 0), "an unattuned cage waits");
         helper.assertTrue(WrathCageBlockEntity.shouldSpawn(false, true, 0, 0, 0), "cost 0 needs no fuel");
+        helper.succeed();
+    }
+
+    private static void wrathCageEssentiaUsesHostBridge(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(5, 4, 5);
+        helper.setBlock(pos, FmBlocks.WRATH_CAGE.get().defaultBlockState());
+        WrathCageBlockEntity cage = helper.getBlockEntity(pos, WrathCageBlockEntity.class);
+        helper.assertTrue(cage instanceof AspectSource, "TC4 bridge exposes the aspect-container contract");
+        helper.assertTrue(cage instanceof EssentiaTransport, "TC4 bridge exposes the transport contract");
+        if (!(cage instanceof AspectSource source) || !(cage instanceof EssentiaTransport transport)) {
+            helper.fail("wrath cage was not created with the TC4 bridge");
+            return;
+        }
+
+        cage.setMobId("minecraft:zombie");
+        helper.assertTrue(transport.isConnectable(Direction.UP), "configured cage connects to essentia tubes");
+        helper.assertTrue(transport.canInputFrom(Direction.UP), "cage accepts incoming essentia");
+        helper.assertFalse(transport.canOutputTo(Direction.UP), "cage does not output essentia");
+        helper.assertValueEqual(transport.addEssentia(Aspect.FLESH, 7, Direction.UP), 7,
+            "special mob channel accepts the incoming quantity");
+        helper.assertValueEqual(source.getAspects().getAmount(Aspect.FLESH), 7,
+            "special channel is exposed through the host aspect view");
+
+        cage.cycleMode();
+        helper.assertValueEqual(transport.addEssentia(FmAspects.WRATH, 5, Direction.UP), 5,
+            "wrath channel accepts essentia");
+        helper.assertValueEqual(transport.getEssentiaType(Direction.UP), FmAspects.WRATH,
+            "mode one selects wrath for tube suction");
+        helper.assertValueEqual(source.getAspects().getAmount(FmAspects.WRATH), 5,
+            "wrath channel is exposed through the host aspect view");
+
+        cage.cycleMode();
+        helper.assertValueEqual(transport.addEssentia(FmAspects.SLOTH, 3, Direction.UP), 3,
+            "sloth channel accepts essentia");
+        helper.assertValueEqual(transport.getEssentiaType(Direction.UP), FmAspects.SLOTH,
+            "mode two selects sloth for tube suction");
+        helper.assertValueEqual(source.getAspects().getAmount(FmAspects.SLOTH), 3,
+            "sloth channel is exposed through the host aspect view");
+
+        helper.assertTrue(source.doesContainerAccept(Aspect.FLESH), "aspect container accepts the attuned mob aspect");
+        helper.assertTrue(source.doesContainerContainAmount(Aspect.FLESH, 7), "aspect container reports stored mob essentia");
+        helper.assertValueEqual(source.containerContains(Aspect.FLESH), 7, "aspect container reports exact stored amount");
+        helper.assertFalse(transport.canOutputTo(Direction.DOWN), "transport remains input-only on every side");
         helper.succeed();
     }
 
