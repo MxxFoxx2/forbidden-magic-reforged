@@ -3,22 +3,14 @@ package dev.visfox.forbiddenreforged.integration.tc4;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.core.wand.WandVisAccess;
 import java.util.List;
+import thaumcraft.aspect.Aspect;
 import net.minecraft.world.item.ItemStack;
 import thaumcraft.wand.Wands;
 
 public final class Tc4WandVisAdapter implements WandVisAccess {
-    private static final List<ContentId> PRIMAL_ASPECTS = List.of(
-        aspect("air"),
-        aspect("earth"),
-        aspect("fire"),
-        aspect("water"),
-        aspect("order"),
-        aspect("entropy")
-    );
-
     @Override
     public List<ContentId> primalAspects() {
-        return PRIMAL_ASPECTS;
+        return Aspect.getPrimalAspects().stream().map(Tc4AspectAdapter::toContentId).toList();
     }
 
     @Override
