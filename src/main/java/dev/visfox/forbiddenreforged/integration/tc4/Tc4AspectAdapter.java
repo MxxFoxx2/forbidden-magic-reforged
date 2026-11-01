@@ -51,6 +51,10 @@ public final class Tc4AspectAdapter {
         return new ContentId("thaumcraft", aspect.getTag());
     }
 
+    public static net.minecraft.network.chat.Component description(ContentId id) {
+        return resolveAspect(id).getDescription();
+    }
+
     public static Aspect resolveAspect(ContentId id) {
         Aspect addonAspect = registeredAspects.get(id);
         if (addonAspect == null && "thaumcraft".equals(id.namespace())) {

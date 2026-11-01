@@ -9,7 +9,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import org.jspecify.annotations.Nullable;
-import thaumcraft.aspect.Aspect;
+import dev.visfox.forbiddenreforged.core.model.ContentId;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectAdapter;
 
 public class MobCrystalItem extends Item {
     public MobCrystalItem(Properties properties) {
@@ -36,9 +37,9 @@ public class MobCrystalItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
-        Aspect aspect = FmSpawnerMobs.aspect(mob(stack));
+        ContentId aspect = FmSpawnerMobs.aspect(mob(stack));
         if (aspect != null) {
-            tooltip.accept(aspect.getDescription());
+            tooltip.accept(Tc4AspectAdapter.description(aspect));
         }
     }
 }

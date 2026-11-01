@@ -31,6 +31,7 @@ import dev.visfox.forbiddenreforged.MobCrystalItem;
 import dev.visfox.forbiddenreforged.WrathCageBlock;
 import dev.visfox.forbiddenreforged.WrathCageBlockEntity;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4EntityAdapter;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectAdapter;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.registry.ModEntities;
 import thaumcraft.registry.EldritchEntities;
