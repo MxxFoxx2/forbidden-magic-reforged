@@ -45,6 +45,7 @@
 ## Границы host-agnostic архитектуры
 
 - Общие модели в `core/model`, `core/aspect`, `core/recipe` и `core/research` не импортируют Minecraft, NeoForge и API хостов.
+- Общие gameplay-классы могут использовать Minecraft/NeoForge, но не API хоста и его базовые классы. Host capabilities реализуются в `integration/<host>` bridge-subclass, а данные проходят через `ContentId` и узкие callbacks.
 - Общие определения используют семантические `ContentId`; host registry IDs, legacy recipe/research keys, сериализаторы, lifecycle и преобразования аспектов находятся в `integration/<host>`.
 - Отсутствие механики у хоста отражается как PARTIAL/UNSUPPORTED. Не подменяй аспект, warp, зачарование или рецепт похожей механикой без явной фиксации отклонения.
 - Не создавай универсальные сервис-локаторы и god-интерфейсы. Добавляй узкие runtime-контракты только вместе с переносом конкретного потребителя.
