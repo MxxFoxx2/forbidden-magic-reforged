@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4WrathCageBlockEntity;
 
 public class WrathCageBlock extends Block implements EntityBlock {
     public WrathCageBlock(Properties properties) {
@@ -23,7 +24,7 @@ public class WrathCageBlock extends Block implements EntityBlock {
 
     @Override
     public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new WrathCageBlockEntity(pos, state);
+        return new Tc4WrathCageBlockEntity(pos, state);
     }
 
     @Override
