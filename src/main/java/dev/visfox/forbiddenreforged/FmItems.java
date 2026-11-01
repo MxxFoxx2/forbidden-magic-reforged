@@ -22,6 +22,7 @@ import dev.visfox.forbiddenreforged.integration.tc4.Tc4BlinkFocusItem;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4CrystalwellItem;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4PrimewellItem;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4ItemRegistrationAdapter;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4MorphToolItem;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4RingNutritionItem;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4SubCollarItem;
 import org.jspecify.annotations.Nullable;
@@ -77,13 +78,13 @@ public final class FmItems {
             Tc4ItemRegistrationAdapter::skullAxe);
         EMERALD_FRAGMENT = ITEMS.registerSimpleItem("emerald_fragment");
         TAINTED_BLOOD_SHARD = ITEMS.registerSimpleItem("tainted_blood_shard");
-        MORPH_PICKAXE = ITEMS.registerItem("morph_pickaxe", MorphToolItem::new,
+        MORPH_PICKAXE = ITEMS.registerItem("morph_pickaxe", Tc4MorphToolItem::new,
             properties -> repairable(Tc4ItemRegistrationAdapter.morphPickaxe(properties)));
-        MORPH_SWORD = ITEMS.registerItem("morph_sword", MorphToolItem::new,
+        MORPH_SWORD = ITEMS.registerItem("morph_sword", Tc4MorphToolItem::new,
             properties -> repairable(Tc4ItemRegistrationAdapter.morphSword(properties)));
-        MORPH_SHOVEL = ITEMS.registerItem("morph_shovel", MorphToolItem::new,
+        MORPH_SHOVEL = ITEMS.registerItem("morph_shovel", Tc4MorphToolItem::new,
             properties -> repairable(Tc4ItemRegistrationAdapter.morphShovel(properties)));
-        MORPH_AXE = ITEMS.registerItem("morph_axe", MorphToolItem::new,
+        MORPH_AXE = ITEMS.registerItem("morph_axe", Tc4MorphToolItem::new,
             properties -> repairable(Tc4ItemRegistrationAdapter.morphAxe(properties)));
         MOB_CRYSTAL = ITEMS.registerItem("mob_crystal", MobCrystalItem::new,
             properties -> properties.stacksTo(1).rarity(Rarity.UNCOMMON));
