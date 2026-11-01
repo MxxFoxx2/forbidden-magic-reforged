@@ -17,6 +17,7 @@ import java.util.Objects;
 public record AspectDefinition(
     ContentId id,
     int color,
+    int sortOrder,
     List<ContentId> components,
     ContentId texture
 ) {
@@ -85,7 +86,7 @@ public record AspectDefinition(
         }
 
         public int totalAmount() {
-            return amounts.stream().mapToInt(Amount::amount).sum();
+            return amounts.stream().mapToInt(Amount::amount).reduce(0, Math::addExact);
         }
 
         public Cost plus(Cost other) {
