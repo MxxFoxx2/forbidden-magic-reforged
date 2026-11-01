@@ -9,6 +9,7 @@ import dev.visfox.forbiddenreforged.CrystalwellItem;
 import dev.visfox.forbiddenreforged.PrimewellItem;
 import net.minecraft.world.item.Rarity;
 import thaumcraft.item.ScribingToolsItem;
+import thaumcraft.item.bauble.VisAmuletItem;
 import thaumcraft.crafting.TcStack;
 import thaumcraft.crafting.ShapelessArcaneRecipe;
 import thaumcraft.registry.ModBlocks;
@@ -960,6 +961,8 @@ public final class ItemGameTests {
         ServerPlayer owner = mockConnectedPlayer(helper);
         ServerPlayer target = mockConnectedPlayer(helper);
         ItemStack collar = new ItemStack(item);
+        helper.assertTrue(item instanceof VisAmuletItem, "Sub Collar is a TC4 vis amulet item");
+        helper.assertTrue(((VisAmuletItem) item).canEquip(collar, target), "Sub Collar permits equipping on another player");
         helper.assertTrue(item.interactLivingEntity(collar, owner, target, InteractionHand.MAIN_HAND).consumesAction(), "the collar can be placed on another player");
         ItemStack worn = Baubles.get(target, 0);
         helper.assertTrue(worn.is(item), "the target wears the collar in the amulet slot");

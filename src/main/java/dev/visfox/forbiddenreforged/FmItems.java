@@ -21,6 +21,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4BlinkFocusItem;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4ItemRegistrationAdapter;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4RingNutritionItem;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4SubCollarItem;
 import org.jspecify.annotations.Nullable;
 
 public final class FmItems {
@@ -130,7 +131,7 @@ public final class FmItems {
         BLINK_FOCUS = ITEMS.registerItem("blink_focus", Tc4BlinkFocusItem::new,
             Tc4BlinkFocusItem::properties);
         SUB_COLLAR = FmConfig.lustDisabled() ? null
-            : ITEMS.registerItem("sub_collar", SubCollarItem::new, properties -> properties.stacksTo(1).rarity(Rarity.RARE));
+            : ITEMS.registerItem("sub_collar", Tc4SubCollarItem::new, properties -> properties.stacksTo(1).rarity(Rarity.RARE));
     }
 
     private FmItems() {

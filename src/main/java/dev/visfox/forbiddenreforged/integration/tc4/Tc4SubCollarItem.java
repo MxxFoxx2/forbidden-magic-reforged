@@ -1,4 +1,6 @@
-package dev.visfox.forbiddenreforged;
+package dev.visfox.forbiddenreforged.integration.tc4;
+
+import dev.visfox.forbiddenreforged.FmComponents;
 
 import java.util.function.Consumer;
 import net.minecraft.network.chat.Component;
@@ -13,8 +15,8 @@ import net.minecraft.world.item.component.TooltipDisplay;
 import thaumcraft.item.bauble.VisAmuletItem;
 import thaumcraft.platform.Baubles;
 
-public class SubCollarItem extends VisAmuletItem {
-    public SubCollarItem(Properties properties) {
+public final class Tc4SubCollarItem extends VisAmuletItem {
+    public Tc4SubCollarItem(Properties properties) {
         super(properties, false);
     }
 
