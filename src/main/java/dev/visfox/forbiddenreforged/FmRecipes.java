@@ -4,12 +4,6 @@ import dev.visfox.forbiddenreforged.core.recipe.ForbiddenMagicRecipeCatalog;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4RecipeAdapter;
 import java.util.Set;
 
-/**
- * Compatibility entry point for the existing TC4 setup lifecycle.
- *
- * <p>Recipe source data lives in the host-neutral catalog. This class retains the legacy key list
- * used by research diagnostics and delegates host registration to the TC4 adapter.
- */
 public final class FmRecipes {
     public static final Set<String> OWN_KEYS = Set.of(
         "SKULLAXE", "FORK", "WRATH", "GREEDY", "CONSUMING", "EDUCATIONAL", "CORRUPTING",
