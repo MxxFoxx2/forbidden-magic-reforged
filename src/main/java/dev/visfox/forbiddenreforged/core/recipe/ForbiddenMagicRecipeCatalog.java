@@ -110,7 +110,7 @@ public final class ForbiddenMagicRecipeCatalog {
                 ? new Ingredient[] {
                     item("thaumcraft:salis_mundus"), item("forbiddenmagic:star_block"),
                     item("forbiddenmagic:star_block"), item("minecraft:egg"),
-                    item("forbiddenmagic:gluttony"), item("forbiddenmagic:gluttony")
+                    item("forbiddenmagic:gluttony_shard"), item("forbiddenmagic:gluttony_shard")
                 }
                 : new Ingredient[] {
                     item("thaumcraft:salis_mundus"), item("minecraft:egg"),
@@ -145,9 +145,9 @@ public final class ForbiddenMagicRecipeCatalog {
 
         recipes.add(shaped("taint_stone", "taintstone", "forbiddenmagic:taint_stone_smooth", 9,
             cost(a("entropy", 2), a("order", 1)), 3, 3,
-            empty(), item("minecraft:stone"), empty(),
+            item("minecraft:stone"), item("minecraft:stone"), item("minecraft:stone"),
             item("minecraft:stone"), tag("forbiddenmagic:taint_ingredients"), item("minecraft:stone"),
-            empty(), item("minecraft:stone"), empty()));
+            item("minecraft:stone"), item("minecraft:stone"), item("minecraft:stone")));
 
         recipes.add(craftingReference("taint_brick", "taintstone",
             "forbiddenmagic:taint_stone_brick", "forbiddenmagic:taint_stone_brick", 4));
@@ -219,8 +219,8 @@ public final class ForbiddenMagicRecipeCatalog {
             recipes.add(shaped("ring_food", "ringfood", "forbiddenmagic:ring_nutrition", 1,
                 cost(a("entropy", 10), a("water", 20), a("earth", 20)), 3, 3,
                 empty(), item(topIngredient), empty(),
-                item("forbiddenmagic:gluttony"), item("thaumcraft:mundane_ring"),
-                item("forbiddenmagic:gluttony"),
+                item("forbiddenmagic:gluttony_shard"), item("thaumcraft:mundane_ring"),
+                item("forbiddenmagic:gluttony_shard"),
                 empty(), item("forbiddenmagic:gluttony"), empty()));
         }
 
