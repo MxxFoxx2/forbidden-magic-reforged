@@ -33,7 +33,8 @@ public final class Tc4RecipeAdapter {
         "taint_shovel", "TAINTSHOVEL",
         "taint_pick", "TAINTPICK",
         "ring_food", "RINGFOOD",
-        "focus_blink", "FOCUSBLINK"
+        "focus_blink", "FOCUSBLINK",
+        "sub_collar", "SUBCOLLAR"
     );
 
     private Tc4RecipeAdapter() {
