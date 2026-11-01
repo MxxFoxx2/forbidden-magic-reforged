@@ -37,8 +37,4 @@ public final class Tc4WandVisAdapter implements WandVisAccess {
     public void fill(ItemStack wand) {
         Wands.fill(wand);
     }
-
-    private static ContentId aspect(String name) {
-        return new ContentId("forbiddenmagic", "concept/" + name);
-    }
 }
