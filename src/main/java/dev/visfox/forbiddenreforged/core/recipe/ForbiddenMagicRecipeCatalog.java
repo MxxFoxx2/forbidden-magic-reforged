@@ -9,13 +9,6 @@ import java.util.Optional;
 import static dev.visfox.forbiddenreforged.core.recipe.RecipeDefinition.Ingredient;
 import static dev.visfox.forbiddenreforged.core.recipe.RecipeDefinition.Output;
 
-/**
- * Source-of-truth recipe definitions for the current Forbidden Magic content.
- *
- * <p>Only Forbidden Magic configuration choices are inputs here. The selected host's recipe
- * serializers, ingredient classes, registry types and legacy research-key conventions live in
- * its adapter.
- */
 public final class ForbiddenMagicRecipeCatalog {
     public record Options(
         boolean enchantmentsEnabled,
