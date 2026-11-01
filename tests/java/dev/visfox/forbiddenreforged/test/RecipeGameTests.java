@@ -2,7 +2,9 @@ package dev.visfox.forbiddenreforged.test;
 
 import io.netty.channel.embedded.EmbeddedChannel;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -37,6 +39,9 @@ import dev.visfox.forbiddenreforged.FmConfig;
 import dev.visfox.forbiddenreforged.FmDrops;
 import dev.visfox.forbiddenreforged.FmItems;
 import dev.visfox.forbiddenreforged.FmRecipes;
+import dev.visfox.forbiddenreforged.core.recipe.ForbiddenMagicRecipeCatalog;
+import dev.visfox.forbiddenreforged.core.recipe.RecipeDefinition;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4RecipeAdapter;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.aspect.AspectList;
 import thaumcraft.aspect.AspectRegistry;
@@ -74,7 +79,8 @@ public final class RecipeGameTests {
         "ring_food_recipe_matches_original",
         "subcollar_matches_original",
         "warp_values_match_original",
-        "research_layout_matches_original"
+        "research_layout_matches_original",
+        "common_recipe_catalog_matches_tc4_registration"
     };
 
     static {
@@ -92,6 +98,7 @@ public final class RecipeGameTests {
         FUNCTIONS.register(TESTS[11], () -> RecipeGameTests::subcollarMatchesOriginal);
         FUNCTIONS.register(TESTS[12], () -> RecipeGameTests::warpValuesMatchOriginal);
         FUNCTIONS.register(TESTS[13], () -> RecipeGameTests::researchLayoutMatchesOriginal);
+        FUNCTIONS.register(TESTS[14], () -> RecipeGameTests::commonRecipeCatalogMatchesTc4Registration);
     }
 
     private RecipeGameTests() {}
@@ -108,6 +115,34 @@ public final class RecipeGameTests {
                 new FunctionGameTestInstance(function, new TestData<>(environment, Identifier.parse("thaumcraft:test/platform"), 100, 0, true))
             );
         }
+    }
+
+    private static void commonRecipeCatalogMatchesTc4Registration(GameTestHelper helper) {
+        ForbiddenMagicRecipeCatalog.Options options = new ForbiddenMagicRecipeCatalog.Options(
+            FmConfig.enchantmentsEnabled(),
+            FmConfig.greedyEnchantmentEnabled(),
+            FmConfig.emeraldTrans(),
+            FmConfig.gluttonyMode(),
+            FmConfig.lustDisabled(),
+            Tc4RecipeAdapter.crystalwellUsesShardTag()
+        );
+        List<RecipeDefinition> definitions = ForbiddenMagicRecipeCatalog.definitions(options);
+        Set<String> translatedKeys = new HashSet<>();
+        for (RecipeDefinition definition : definitions) {
+            TcRecipe translated = Tc4RecipeAdapter.translate(definition);
+            helper.assertTrue(translatedKeys.add(translated.key()),
+                "common catalog generated duplicate TC4 recipe key: " + translated.key());
+            helper.assertTrue(FmRecipes.OWN_KEYS.contains(translated.key()),
+                "translated recipe key is missing from the compatibility key set: " + translated.key());
+            TcRecipe registered = TcRecipes.get(translated.key());
+            helper.assertTrue(registered != null,
+                "common catalog recipe was not registered by TC4 adapter: " + translated.key());
+            helper.assertValueEqual(registered.getClass(), translated.getClass(),
+                "registered recipe type must match translated common definition: " + translated.key());
+        }
+        helper.assertValueEqual(translatedKeys.size(), definitions.size(),
+            "every common recipe definition must have a unique host recipe key");
+        helper.succeed();
     }
 
     private static ServerPlayer mockPlayer(GameTestHelper helper) {
