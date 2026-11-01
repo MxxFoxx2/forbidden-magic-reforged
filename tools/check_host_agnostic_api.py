@@ -292,9 +292,10 @@ def main() -> int:
             if "WarpChangeRequested" in source.read_text(encoding="utf-8"):
                 failures.append(f"{source.relative_to(ROOT)} still references the removed NeoForge warp event")
 
-    if "HostAdapterRegistry.requireWarp().changeWarp(player, 1, WarpKind.STICKY)" not in game_tests:
+    game_tests_for_warp = (ROOT / "tests/java/dev/visfox/forbiddenreforged/test/RecipeGameTests.java").read_text(encoding="utf-8")
+    if "HostAdapterRegistry.requireWarp().changeWarp(player, 1, WarpKind.STICKY)" not in game_tests_for_warp:
         failures.append("Warp GameTest must exercise the direct HostWarpServices capability")
-    if "FmWandContractAccess.INSTANCE.remaining(contractProbe)" not in game_tests:
+    if "FmWandContractAccess.INSTANCE.remaining(contractProbe)" not in game_tests_for_warp:
         failures.append("GameTests must verify Profane Contract component access outside core")
 
 
