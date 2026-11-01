@@ -157,7 +157,7 @@ public final class FmToolEvents {
 
     public static boolean restoresTaintedVis(ItemStack held, boolean taintDamage) {
         return taintDamage && held != null && !held.isEmpty()
-            && "tainted".equals(Tc4WandAdapter.rodTag(held));
+            && "tainted".equals(Tc4WandRuntimeAdapter.rodTag(held));
     }
 
     public static List<Aspect> taintedVisRolls(RandomSource random) {
