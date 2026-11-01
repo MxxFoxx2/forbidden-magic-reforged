@@ -17,6 +17,7 @@
 - [Java CI with Gradle #41311521396](https://github.com/MxxFoxx2/forbidden-magic-reforged/actions/runs/41311521396) completed successfully on 1 November 2026.
 - The branch CI passed the host-agnostic boundary check, pinned host build, mod build, artifact provenance, generated-resource freshness and both `no_lust=false` and `no_lust=true` GameTest runs.
 - This result verifies only the isolated architecture branch. It does not change or replace the latest verification of `main`.
+- Follow-up [Java CI with Gradle #41312807272](https://github.com/MxxFoxx2/forbidden-magic-reforged/actions/runs/41312807272) passed on commit [`5cbbb8f`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/5cbbb8f5331c484b639a747f43ee80d9f2c9da30), including the host-free `core/wand` boundary, the neutral wand vis/parts GameTest, and both `no_lust` configurations.
 
 ## Проверки вне CI
 
