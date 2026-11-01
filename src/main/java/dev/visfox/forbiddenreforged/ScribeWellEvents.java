@@ -11,9 +11,8 @@ import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
-import thaumcraft.Config;
-import thaumcraft.aspect.Aspect;
-import thaumcraft.research.ResearchManager;
+import dev.visfox.forbiddenreforged.core.model.ContentId;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4ScribingAdapter;
 
 /** Restores player-side behavior for the two original Forbidden Magic scribing tools. */
 public final class ScribeWellEvents {
@@ -29,13 +28,13 @@ public final class ScribeWellEvents {
 
     private static void onPlayerTick(PlayerTickEvent.Post event) {
         if (!(event.getEntity() instanceof ServerPlayer player)
-            || Config.researchDifficulty() != -1
+            || !Tc4ScribingAdapter.isNoResearchDifficulty()
             || player.tickCount % 200 != 0) {
             return;
         }
 
         var inventory = player.getInventory();
-        var primals = Aspect.getPrimalAspects();
+        var primals = Tc4ScribingAdapter.primalAspectIds();
         if (primals.isEmpty()) {
             return;
         }
@@ -46,8 +45,8 @@ public final class ScribeWellEvents {
                 continue;
             }
 
-            Aspect aspect = primals.get(player.getRandom().nextInt(primals.size()));
-            ResearchManager.addAspectPool(player, aspect, player.getRandom().nextInt(4) + 1);
+            ContentId aspect = primals.get(player.getRandom().nextInt(primals.size()));
+            Tc4ScribingAdapter.addAspectPool(player, aspect, player.getRandom().nextInt(4) + 1);
             int nextDamage = stack.getDamageValue() + 1;
             if (nextDamage >= stack.getMaxDamage()) {
                 inventory.setItem(slot, ItemStack.EMPTY);

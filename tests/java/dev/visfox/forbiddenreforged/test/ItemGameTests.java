@@ -79,6 +79,7 @@ import dev.visfox.forbiddenreforged.integration.tc4.Tc4WandPartsAdapter;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4WandVisAdapter;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4WandRuntimeAdapter;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectAdapter;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4ScribingAdapter;
 import dev.visfox.forbiddenreforged.FmAspects;
 import dev.visfox.forbiddenreforged.FmComponents;
 import dev.visfox.forbiddenreforged.FmDrops;
@@ -156,7 +157,8 @@ public final class ItemGameTests {
         "blink_focus_hellfire_applies_through_focal_manipulator",
         "blink_focus_reaches_beyond_wand_reach_and_lands_like_original",
         "wand_vis_and_parts_use_neutral_access_ports",
-        "hellfire_behavior_uses_host_neutral_access"
+        "hellfire_behavior_uses_host_neutral_access",
+        "scribe_well_aspect_ids_stay_semantic"
     };
 
     static {
@@ -199,6 +201,7 @@ public final class ItemGameTests {
         FUNCTIONS.register(TESTS[36], () -> ItemGameTests::blinkFocusReachesBeyondWandReachAndLandsLikeOriginal);
         FUNCTIONS.register(TESTS[37], () -> ItemGameTests::wandVisAndPartsUseNeutralAccessPorts);
         FUNCTIONS.register(TESTS[38], () -> ItemGameTests::hellfireBehaviorUsesHostNeutralAccess);
+        FUNCTIONS.register(TESTS[39], () -> ItemGameTests::scribeWellAspectIdsStaySemantic);
     }
 
     private ItemGameTests() {}
@@ -757,6 +760,28 @@ public final class ItemGameTests {
             "tainted wand page matches the original Russian");
         helper.assertTrue(english.keySet().equals(russian.keySet()),
             "English and Russian translation key sets must match");
+        helper.succeed();
+    }
+
+    private static void scribeWellAspectIdsStaySemantic(GameTestHelper helper) {
+        Set<ContentId> expected = Set.of(
+            ContentId.parse("thaumcraft:aer"),
+            ContentId.parse("thaumcraft:terra"),
+            ContentId.parse("thaumcraft:ignis"),
+            ContentId.parse("thaumcraft:aqua"),
+            ContentId.parse("thaumcraft:ordo"),
+            ContentId.parse("thaumcraft:perditio")
+        );
+        List<ContentId> primalIds = Tc4ScribingAdapter.primalAspectIds();
+        helper.assertValueEqual(primalIds.size(), expected.size(), "host primal aspect count is six");
+        helper.assertTrue(new HashSet<>(primalIds).equals(expected),
+            "scribe well exposes the exact primal aspect ids without leaking Aspect objects");
+        for (ContentId id : primalIds) {
+            helper.assertTrue(Tc4AspectAdapter.resolveAspect(id).isPrimal(),
+                "every semantic scribe aspect id resolves to a host primal");
+        }
+        helper.assertValueEqual(Tc4ScribingAdapter.isNoResearchDifficulty(), Config.researchDifficulty() == -1,
+            "no-research mode remains sourced from the host config");
         helper.succeed();
     }
 

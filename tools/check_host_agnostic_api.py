@@ -87,6 +87,7 @@ def main() -> int:
         ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmToolEvents.java",
         ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmEnchantmentEffects.java",
         ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmSetup.java",
+        ROOT / "src/main/java/dev/visfox/forbiddenreforged/ScribeWellEvents.java",
     )
     for source in event_boundaries:
         content = source.read_text(encoding="utf-8")
