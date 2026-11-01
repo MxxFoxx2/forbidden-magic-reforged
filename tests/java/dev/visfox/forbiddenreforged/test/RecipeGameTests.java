@@ -275,11 +275,11 @@ public final class RecipeGameTests {
             "the selected host exposes accessory slot access"
         );
         helper.assertFalse(
-            HostAdapterRegistry.requireWandInspection().isWand(Items.AIR),
+            HostAdapterRegistry.requireWandInspection().isWand(new ItemStack(Items.AIR)),
             "the host wand inspection rejects a non-wand item"
         );
         helper.assertTrue(
-            HostAdapterRegistry.requireWandInspection().wandRodTag(Items.AIR) == null,
+            HostAdapterRegistry.requireWandInspection().wandRodTag(new ItemStack(Items.AIR)) == null,
             "the host wand rod tag is nullable for a non-wand item"
         );
         helper.assertTrue(
