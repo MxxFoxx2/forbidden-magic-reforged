@@ -10,7 +10,29 @@ import thaumcraft.wand.Wands;
 public final class Tc4WandVisAdapter implements WandVisAccess {
     @Override
     public List<ContentId> primalAspects() {
-        return Aspect.getPrimalAspects().stream().map(Tc4AspectAdapter::toContentId).toList();
+        return Aspect.getPrimalAspects().stream()
+            .map(Tc4AspectAdapter::toContentId)
+            .map(Tc4WandVisAdapter::semanticAspectId)
+            .toList();
+    }
+
+    private static ContentId semanticAspectId(ContentId aspect) {
+        if (!"thaumcraft".equals(aspect.namespace())) {
+            return aspect;
+        }
+        return switch (aspect.path()) {
+            case "aer" -> concept("air");
+            case "terra" -> concept("earth");
+            case "ignis" -> concept("fire");
+            case "aqua" -> concept("water");
+            case "ordo" -> concept("order");
+            case "perditio" -> concept("entropy");
+            default -> aspect;
+        };
+    }
+
+    private static ContentId concept(String name) {
+        return new ContentId("forbiddenmagic", "concept/" + name);
     }
 
     @Override
