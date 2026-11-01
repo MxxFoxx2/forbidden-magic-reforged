@@ -19,6 +19,8 @@ import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4BlinkFocusItem;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4CrystalwellItem;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4PrimewellItem;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4ItemRegistrationAdapter;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4RingNutritionItem;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4SubCollarItem;
@@ -126,8 +128,8 @@ public final class FmItems {
             Tc4ItemRegistrationAdapter::taintShovel);
         TAINT_PICKAXE = ITEMS.registerItem("taint_pickaxe", Item::new,
             Tc4ItemRegistrationAdapter::taintPickaxe);
-        CRYSTALWELL = ITEMS.registerItem("crystalwell", CrystalwellItem::new, properties -> properties.stacksTo(1));
-        PRIMEWELL = ITEMS.registerItem("primewell", PrimewellItem::new, properties -> properties.stacksTo(1).rarity(Rarity.EPIC));
+        CRYSTALWELL = ITEMS.registerItem("crystalwell", Tc4CrystalwellItem::new, properties -> properties.stacksTo(1));
+        PRIMEWELL = ITEMS.registerItem("primewell", Tc4PrimewellItem::new, properties -> properties.stacksTo(1).rarity(Rarity.EPIC));
         BLINK_FOCUS = ITEMS.registerItem("blink_focus", Tc4BlinkFocusItem::new,
             Tc4BlinkFocusItem::properties);
         SUB_COLLAR = FmConfig.lustDisabled() ? null

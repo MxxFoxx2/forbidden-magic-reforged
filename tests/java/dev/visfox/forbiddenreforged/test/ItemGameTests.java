@@ -5,8 +5,8 @@ import dev.visfox.forbiddenreforged.core.wand.BlinkFocusBehavior;
 import dev.visfox.forbiddenreforged.core.wand.HellfireWandBehavior;
 import dev.visfox.forbiddenreforged.core.wand.WandTriggerAccess;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4BlinkFocusItem;
-import dev.visfox.forbiddenreforged.CrystalwellItem;
-import dev.visfox.forbiddenreforged.PrimewellItem;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4CrystalwellItem;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4PrimewellItem;
 import net.minecraft.world.item.Rarity;
 import thaumcraft.item.ScribingToolsItem;
 import thaumcraft.item.bauble.VisAmuletItem;
@@ -622,7 +622,7 @@ public final class ItemGameTests {
 
     private static void crystalwellIsAScribingToolWithOriginalDurability(GameTestHelper helper) {
         ItemStack stack = new ItemStack(FmItems.CRYSTALWELL.get());
-        helper.assertTrue(stack.getItem() instanceof CrystalwellItem, "crystalwell uses its behavior item");
+        helper.assertTrue(stack.getItem() instanceof Tc4CrystalwellItem, "crystalwell uses its behavior item");
         helper.assertTrue(stack.getItem() instanceof ScribingToolsItem, "crystalwell can occupy the research table scribe slot");
         int expectedMaxDamage = thaumcraft.Config.researchDifficulty() == -1 ? 50 : 100;
         helper.assertValueEqual(stack.getMaxDamage(), expectedMaxDamage, "crystalwell durability follows research difficulty");
@@ -632,7 +632,7 @@ public final class ItemGameTests {
 
     private static void primewellIsAPermanentEpicScribingTool(GameTestHelper helper) {
         ItemStack stack = new ItemStack(FmItems.PRIMEWELL.get());
-        helper.assertTrue(stack.getItem() instanceof PrimewellItem, "primewell uses its behavior item");
+        helper.assertTrue(stack.getItem() instanceof Tc4PrimewellItem, "primewell uses its behavior item");
         helper.assertTrue(stack.getItem() instanceof ScribingToolsItem, "primewell can occupy the research table scribe slot");
         helper.assertValueEqual(stack.getRarity(), Rarity.EPIC, "primewell retains epic rarity");
         helper.assertTrue(stack.getMaxDamage() > 1_000_000_000, "primewell does not wear out during research");

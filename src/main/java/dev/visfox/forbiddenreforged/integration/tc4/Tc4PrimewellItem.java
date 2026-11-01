@@ -1,4 +1,4 @@
-package dev.visfox.forbiddenreforged;
+package dev.visfox.forbiddenreforged.integration.tc4;
 
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -10,8 +10,8 @@ import thaumcraft.item.ScribingToolsItem;
  * directly, so an effectively unbounded max damage plus a hidden bar preserves
  * the original permanent-use behavior without requiring a host patch.
  */
-public final class PrimewellItem extends ScribingToolsItem {
-    public PrimewellItem(Properties properties) {
+public final class Tc4PrimewellItem extends ScribingToolsItem {
+    public Tc4PrimewellItem(Properties properties) {
         super(properties.stacksTo(1).rarity(Rarity.EPIC));
     }
 
