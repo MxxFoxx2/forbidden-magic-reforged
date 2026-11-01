@@ -15,4 +15,8 @@ public final class Tc4EntityAdapter {
     public static boolean isHostBoss(LivingEntity entity) {
         return entity instanceof ThaumcraftBoss;
     }
+
+    public static boolean isHostGolem(LivingEntity entity) {
+        return entity instanceof thaumcraft.entity.golem.GolemBase;
+    }
 }

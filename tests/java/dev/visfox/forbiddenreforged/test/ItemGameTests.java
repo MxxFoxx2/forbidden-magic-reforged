@@ -13,6 +13,7 @@ import thaumcraft.item.bauble.VisAmuletItem;
 import thaumcraft.crafting.TcStack;
 import thaumcraft.crafting.ShapelessArcaneRecipe;
 import thaumcraft.registry.ModBlocks;
+import thaumcraft.registry.ModEntities;
 import thaumcraft.registry.ModItems;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -996,6 +997,11 @@ public final class ItemGameTests {
         ServerPlayer victim = mockConnectedPlayer(helper);
         crop.getItem().hurtEnemy(crop, victim, attacker);
         helper.assertTrue(victim.hasEffect(MobEffects.SPEED) && victim.hasEffect(MobEffects.HASTE) && victim.hasEffect(MobEffects.STRENGTH), "players get speed, haste and strength");
+
+        var golem = helper.spawn(ModEntities.GOLEM.get(), new BlockPos(7, 4, 7));
+        crop.getItem().hurtEnemy(crop, golem, attacker);
+        helper.assertTrue(golem.hasEffect(MobEffects.SPEED) && golem.hasEffect(MobEffects.HASTE)
+            && golem.hasEffect(MobEffects.STRENGTH), "TC4 golems get speed, haste and strength");
 
         helper.assertTrue(RidingCropItem.dropsLustShard(1), "roll 1 drops a shard");
         helper.assertFalse(RidingCropItem.dropsLustShard(0) || RidingCropItem.dropsLustShard(2) || RidingCropItem.dropsLustShard(14), "only roll 1 of 15 drops a shard");

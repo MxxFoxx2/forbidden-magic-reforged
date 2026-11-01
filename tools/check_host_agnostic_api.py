@@ -92,6 +92,7 @@ def main() -> int:
         ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmItems.java",
         ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmCommands.java",
         ROOT / "src/main/java/dev/visfox/forbiddenreforged/TaintShovelItem.java",
+        ROOT / "src/main/java/dev/visfox/forbiddenreforged/RidingCropItem.java",
     )
     for source in event_boundaries:
         content = source.read_text(encoding="utf-8")
