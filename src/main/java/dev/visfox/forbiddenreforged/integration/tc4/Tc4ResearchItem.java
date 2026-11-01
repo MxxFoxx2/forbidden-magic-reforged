@@ -12,7 +12,7 @@ public final class Tc4ResearchItem extends ResearchItem {
         super(key, category, tags, column, row, complexity, icon);
     }
 
-    public FmResearchItem(String key, String category, AspectList tags, int column, int row, int complexity, Identifier icon) {
+    public Tc4ResearchItem(String key, String category, AspectList tags, int column, int row, int complexity, Identifier icon) {
         super(key, category, tags, column, row, complexity, icon);
     }
 
