@@ -68,6 +68,11 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
+import dev.visfox.forbiddenreforged.core.model.ContentId;
+import dev.visfox.forbiddenreforged.core.wand.WandPartsAccess;
+import dev.visfox.forbiddenreforged.core.wand.WandVisAccess;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4WandPartsAdapter;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4WandVisAdapter;
 import dev.visfox.forbiddenreforged.FmAspects;
 import dev.visfox.forbiddenreforged.FmComponents;
 import dev.visfox.forbiddenreforged.FmDrops;
@@ -143,7 +148,8 @@ public final class ItemGameTests {
         "blink_focus_upgrades_use_original_icon_assets",
         "research_icons_resolve_to_real_content",
         "blink_focus_hellfire_applies_through_focal_manipulator",
-        "blink_focus_reaches_beyond_wand_reach_and_lands_like_original"
+        "blink_focus_reaches_beyond_wand_reach_and_lands_like_original",
+        "wand_vis_and_parts_use_neutral_access_ports"
     };
 
     static {
@@ -184,6 +190,7 @@ public final class ItemGameTests {
         FUNCTIONS.register(TESTS[34], () -> ItemGameTests::researchIconsResolveToRealContent);
         FUNCTIONS.register(TESTS[35], () -> ItemGameTests::blinkFocusHellfireAppliesThroughFocalManipulator);
         FUNCTIONS.register(TESTS[36], () -> ItemGameTests::blinkFocusReachesBeyondWandReachAndLandsLikeOriginal);
+        FUNCTIONS.register(TESTS[37], () -> ItemGameTests::wandVisAndPartsUseNeutralAccessPorts);
     }
 
     private ItemGameTests() {}
@@ -1023,6 +1030,39 @@ public final class ItemGameTests {
         helper.assertTrue(Math.abs(landing.y - (py + 1.62)) < 0.01, "blink keeps the hit height on a side face");
 
         helper.getLevel().removeBlock(targetBlock, false);
+        helper.succeed();
+    }
+
+    private static void wandVisAndPartsUseNeutralAccessPorts(GameTestHelper helper) {
+        WandRod tainted = WandRegistry.findRod("tainted");
+        ItemStack wand = Wands.create(WandRegistry.CAP_THAUMIUM, tainted, false);
+        WandVisAccess vis = new Tc4WandVisAdapter();
+        WandPartsAccess parts = new Tc4WandPartsAdapter();
+        ContentId fire = ContentId.parse("forbiddenmagic:concept/fire");
+
+        helper.assertValueEqual(vis.maximumVis(wand), Wands.getMaxVis(wand),
+            "neutral vis access reports host maximum capacity");
+        helper.assertTrue(vis.primalAspects().contains(fire),
+            "neutral vis access exposes the semantic fire aspect");
+        vis.addVis(wand, fire, 2, true);
+        helper.assertValueEqual(vis.vis(wand, fire), Wands.getVis(wand, Aspect.FIRE),
+            "neutral vis access writes through to the TC4 vis store");
+        helper.assertValueEqual(vis.vis(wand, fire), 200,
+            "normal vis units retain the host's hundred-unit scale");
+        vis.addRealVis(wand, fire, 75, true);
+        helper.assertValueEqual(vis.vis(wand, fire), 275,
+            "raw vis access preserves exact internal units");
+        vis.fill(wand);
+        for (ContentId aspect : vis.primalAspects()) {
+            helper.assertValueEqual(vis.vis(wand, aspect), vis.maximumVis(wand),
+                "neutral fill populates " + aspect);
+        }
+
+        parts.setRod(wand, ContentId.parse("forbiddenmagic:profaned"));
+        helper.assertValueEqual(Wands.getRod(wand).tag(), "profaned",
+            "neutral parts access changes the rod while preserving the other wand parts");
+        helper.assertValueEqual(Wands.getCap(wand).tag(), "thaumium",
+            "rod replacement preserves the existing cap");
         helper.succeed();
     }
 
