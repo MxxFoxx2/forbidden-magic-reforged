@@ -136,12 +136,12 @@ public final class Tc4RecipeAdapter {
         return Identifier.fromNamespaceAndPath(id.namespace(), id.path());
     }
 
-    private static String recipeKey(ContentId id) {
+    static String recipeKey(ContentId id) {
         String path = definitionPath(id, "recipe/");
         return LEGACY_RECIPE_KEYS.getOrDefault(path, path.toUpperCase(Locale.ROOT));
     }
 
-    private static String researchKey(ContentId id) {
+    static String researchKey(ContentId id) {
         return definitionPath(id, "research/").toUpperCase(Locale.ROOT);
     }
 
