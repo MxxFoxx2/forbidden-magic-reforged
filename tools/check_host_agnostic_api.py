@@ -341,6 +341,44 @@ def main() -> int:
                 f"{source.relative_to(ROOT)} bypasses the host bootstrap capability contract"
             )
 
+    production_root = ROOT / "src/main/java/dev/visfox/forbiddenreforged"
+    composition_root = production_root / "ForbiddenMagic.java"
+    allowed_adapter_import = "import dev.visfox.forbiddenreforged.integration.tc4.Tc4HostAdapter;"
+    allowed_adapter_selection = "HostAdapterRegistry.install(Tc4HostAdapter.INSTANCE);"
+    composition_content = composition_root.read_text(encoding="utf-8")
+    if composition_content.count(allowed_adapter_import) != 1:
+        failures.append("ForbiddenMagic must import only the selected Tc4HostAdapter as its concrete host dependency")
+    if composition_content.count(allowed_adapter_selection) != 1:
+        failures.append("ForbiddenMagic must install exactly one concrete host adapter")
+
+    forbidden_host_markers = (
+        "import thaumcraft.",
+        "import com.leclowndu93150.thaumaturge.",
+        "integration.tc4",
+        "thaumcraft:",
+        "com.leclowndu93150.thaumaturge:",
+    )
+    for source in production_root.rglob("*.java"):
+        if "/integration/tc4/" in source.as_posix():
+            continue
+        source_content = source.read_text(encoding="utf-8")
+        if source == composition_root:
+            source_content = source_content.replace(allowed_adapter_import, "")
+            source_content = source_content.replace(allowed_adapter_selection, "")
+        for marker in forbidden_host_markers:
+            if marker in source_content:
+                failures.append(
+                    f"{source.relative_to(ROOT)} leaks a concrete host dependency outside integration/tc4: {marker}"
+                )
+        if re.search(r"\b(?:TaintedMob|ThaumcraftBoss|TcBlockEntity|AspectSource|EssentiaTransport|Wands)\b", source_content):
+            failures.append(
+                f"{source.relative_to(ROOT)} references a concrete TC4 runtime type outside integration/tc4"
+            )
+        if re.search(r"\bTc4[A-Z][A-Za-z0-9_]*\b", source_content):
+            failures.append(
+                f"{source.relative_to(ROOT)} references a concrete TC4 adapter outside the composition root"
+            )
+
     if failures:
         print("\n".join(failures), file=sys.stderr)
         return 1

@@ -70,7 +70,7 @@ The silverfish configuration is passed to the host capability as an explicit opt
 
 Every architectural slice should include all of the following:
 
-1. Extend `tools/check_host_agnostic_api.py` to guard the new boundary.
+1. Extend `tools/check_host_agnostic_api.py` to guard the new boundary. The checker scans all production Java files outside `integration/tc4`; the only allowed concrete-host selection is `Tc4HostAdapter` in `ForbiddenMagic`.
 2. Add GameTest coverage for the adapter capability and the preserved gameplay semantics.
 3. Run the pinned host preparation/build and the mod build.
 4. Run GameTests in both `no_lust`/Luxuria configurations.
