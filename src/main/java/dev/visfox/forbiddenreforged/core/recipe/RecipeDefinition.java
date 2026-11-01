@@ -7,21 +7,21 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Host-neutral recipe descriptions used by the common content model.
+ * Host-neutral descriptions of Forbidden Magic recipe content.
  *
- * <p>These are not Minecraft Recipe implementations. Adapters translate them into the recipe
- * serializers and registration mechanisms provided by the selected host.
+ * <p>These are domain data, not Minecraft Recipe implementations. A host adapter translates each
+ * variant into the recipe serializers, registries and research links provided by that host.
  */
 public sealed interface RecipeDefinition
-    permits RecipeDefinition.Infusion, RecipeDefinition.Crucible, RecipeDefinition.Arcane {
+    permits RecipeDefinition.Infusion, RecipeDefinition.InfusionEnchantment,
+        RecipeDefinition.Crucible, RecipeDefinition.ArcaneShaped,
+        RecipeDefinition.ArcaneShapeless, RecipeDefinition.CraftingReference {
 
+    /** Stable, host-independent identifier of this recipe definition. */
     ContentId id();
 
-    Output result();
-
-    AspectDefinition.Cost aspects();
-
-    Optional<ResearchGate> research();
+    /** Semantic research entry that owns this recipe, if any. */
+    Optional<ContentId> research();
 
     enum IngredientKind {
         ITEM,
@@ -41,8 +41,16 @@ public sealed interface RecipeDefinition
             return new Ingredient(id, IngredientKind.ITEM, 1);
         }
 
+        public static Ingredient item(ContentId id, int count) {
+            return new Ingredient(id, IngredientKind.ITEM, count);
+        }
+
         public static Ingredient tag(ContentId id) {
             return new Ingredient(id, IngredientKind.TAG, 1);
+        }
+
+        public static Ingredient tag(ContentId id, int count) {
+            return new Ingredient(id, IngredientKind.TAG, count);
         }
     }
 
@@ -55,31 +63,47 @@ public sealed interface RecipeDefinition
         }
     }
 
-    record ResearchGate(ContentId entry, int minimumStage) {
-        public ResearchGate {
-            Objects.requireNonNull(entry, "entry");
-            if (minimumStage < 0) {
-                throw new IllegalArgumentException("Minimum research stage cannot be negative");
+    record Infusion(
+        ContentId id,
+        Optional<ContentId> research,
+        Output result,
+        int instability,
+        AspectDefinition.Cost aspects,
+        Ingredient central,
+        List<Ingredient> components
+    ) implements RecipeDefinition {
+        public Infusion {
+            Objects.requireNonNull(id, "id");
+            Objects.requireNonNull(research, "research");
+            Objects.requireNonNull(result, "result");
+            Objects.requireNonNull(aspects, "aspects");
+            Objects.requireNonNull(central, "central");
+            Objects.requireNonNull(components, "components");
+            components = List.copyOf(components);
+            if (instability < 0) {
+                throw new IllegalArgumentException("Instability cannot be negative");
             }
         }
     }
 
-    record Infusion(
+    /**
+     * Recipe that applies a Forbidden Magic enchantment to a compatible target. The target is
+     * selected by the host's infusion-enchantment system, so this definition has no fixed output.
+     */
+    record InfusionEnchantment(
         ContentId id,
-        Output result,
-        Ingredient catalyst,
-        List<Ingredient> components,
-        AspectDefinition.Cost aspects,
+        Optional<ContentId> research,
+        ContentId enchantment,
         int instability,
-        Optional<ResearchGate> research
+        AspectDefinition.Cost aspects,
+        List<Ingredient> components
     ) implements RecipeDefinition {
-        public Infusion {
+        public InfusionEnchantment {
             Objects.requireNonNull(id, "id");
-            Objects.requireNonNull(result, "result");
-            Objects.requireNonNull(catalyst, "catalyst");
-            Objects.requireNonNull(components, "components");
-            Objects.requireNonNull(aspects, "aspects");
             Objects.requireNonNull(research, "research");
+            Objects.requireNonNull(enchantment, "enchantment");
+            Objects.requireNonNull(aspects, "aspects");
+            Objects.requireNonNull(components, "components");
             components = List.copyOf(components);
             if (instability < 0) {
                 throw new IllegalArgumentException("Instability cannot be negative");
@@ -89,17 +113,17 @@ public sealed interface RecipeDefinition
 
     record Crucible(
         ContentId id,
+        Optional<ContentId> research,
         Output result,
         Ingredient catalyst,
-        AspectDefinition.Cost aspects,
-        Optional<ResearchGate> research
+        AspectDefinition.Cost aspects
     ) implements RecipeDefinition {
         public Crucible {
             Objects.requireNonNull(id, "id");
+            Objects.requireNonNull(research, "research");
             Objects.requireNonNull(result, "result");
             Objects.requireNonNull(catalyst, "catalyst");
             Objects.requireNonNull(aspects, "aspects");
-            Objects.requireNonNull(research, "research");
         }
     }
 
@@ -107,22 +131,21 @@ public sealed interface RecipeDefinition
      * Pattern cells are row-major and have exactly width * height entries. Empty cells are
      * represented explicitly so adapters do not need to infer shape from a string format.
      */
-    record Arcane(
+    record ArcaneShaped(
         ContentId id,
+        Optional<ContentId> research,
         Output result,
         int width,
         int height,
         List<Optional<Ingredient>> pattern,
-        AspectDefinition.Cost aspects,
-        int visCost,
-        Optional<ResearchGate> research
+        AspectDefinition.Cost aspects
     ) implements RecipeDefinition {
-        public Arcane {
+        public ArcaneShaped {
             Objects.requireNonNull(id, "id");
+            Objects.requireNonNull(research, "research");
             Objects.requireNonNull(result, "result");
             Objects.requireNonNull(pattern, "pattern");
             Objects.requireNonNull(aspects, "aspects");
-            Objects.requireNonNull(research, "research");
             if (width <= 0 || width > 3 || height <= 0 || height > 3) {
                 throw new IllegalArgumentException("Arcane pattern dimensions must be between 1 and 3");
             }
@@ -133,9 +156,44 @@ public sealed interface RecipeDefinition
             if (pattern.stream().noneMatch(Optional::isPresent)) {
                 throw new IllegalArgumentException("Arcane pattern cannot be empty");
             }
-            if (visCost < 0) {
-                throw new IllegalArgumentException("Vis cost cannot be negative");
+        }
+    }
+
+    record ArcaneShapeless(
+        ContentId id,
+        Optional<ContentId> research,
+        Output result,
+        List<Ingredient> ingredients,
+        AspectDefinition.Cost aspects
+    ) implements RecipeDefinition {
+        public ArcaneShapeless {
+            Objects.requireNonNull(id, "id");
+            Objects.requireNonNull(research, "research");
+            Objects.requireNonNull(result, "result");
+            Objects.requireNonNull(ingredients, "ingredients");
+            Objects.requireNonNull(aspects, "aspects");
+            ingredients = List.copyOf(ingredients);
+            if (ingredients.isEmpty()) {
+                throw new IllegalArgumentException("Arcane shapeless recipe cannot be empty");
             }
+        }
+    }
+
+    /**
+     * Reference to a regular Minecraft crafting recipe that is displayed under a research entry.
+     * The host does not own or execute the referenced vanilla recipe.
+     */
+    record CraftingReference(
+        ContentId id,
+        Optional<ContentId> research,
+        ContentId recipe,
+        Output result
+    ) implements RecipeDefinition {
+        public CraftingReference {
+            Objects.requireNonNull(id, "id");
+            Objects.requireNonNull(research, "research");
+            Objects.requireNonNull(recipe, "recipe");
+            Objects.requireNonNull(result, "result");
         }
     }
 }
