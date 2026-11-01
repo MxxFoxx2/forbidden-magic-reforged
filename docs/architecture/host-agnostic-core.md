@@ -36,7 +36,8 @@ Runtime contracts are separated by responsibility rather than combined in one se
 
 | Contract | Responsibility |
 |---|---|
-| `HostEntityServices` | Typed entity-to-aspect catalog plus tainted-mob/boss/golem classification predicates; `HostProfile` declares `ENTITY_ASPECTS` and `ENTITY_CLASSIFICATION` separately |
+| `HostEntityAspectServices` | Typed entity-to-aspect catalog; declared by `ENTITY_ASPECTS` |
+| `HostEntityClassificationServices` | Tainted-mob/boss/golem predicates and boss IDs; declared by `ENTITY_CLASSIFICATION` |
 | `HostAspectServices` | Host-provided aspect display components |
 | `HostMorphToolServices` | Morph-tool cycle sound and area mining |
 | `HostBlockEntityServices` | Host-backed Wrath Cage block-entity factory |
@@ -48,7 +49,7 @@ Runtime contracts are separated by responsibility rather than combined in one se
 
 These ports may use Minecraft runtime types such as `ItemStack`, `LivingEntity`, `BlockState`, and `ServerPlayer`: this is a host-agnostic boundary within the current Minecraft/NeoForge target, not a cross-Minecraft-version abstraction. They must not expose TC4 or another magic-host's API types.
 
-The old aggregate `HostRuntimeServices` contract was removed. Consumers request the narrow capability they need through `HostAdapterRegistry`.
+The old aggregate `HostRuntimeServices` and mixed `HostEntityServices` contracts were removed. Consumers request the narrow capability they need through `HostAdapterRegistry`.
 
 ### 4. Concrete host integration — `integration/tc4/`
 
@@ -61,7 +62,8 @@ The one intended production composition-root reference to a concrete adapter is 
 The Mob Crystal/spawner lookup is now split:
 
 - `FmSpawnerMobs` owns the common query surface and Wrath Cage imprint rules.
-- `HostEntityServices` supplies a `Map<ContentId, ContentId>` from entity IDs to aspect IDs, plus host-specific boss/taint/golem predicates.
+- `HostEntityAspectServices` supplies the `Map<ContentId, ContentId>` from entity IDs to aspect IDs.
+- `HostEntityClassificationServices` supplies host-specific boss/taint/golem predicates and boss IDs.
 - `Tc4EntityAdapter` owns the TC4 entity taxonomy and translates both entity and aspect identifiers to semantic `ContentId` values.
 
 The silverfish configuration is passed to the host capability as an explicit option. The common mob catalog no longer hard-codes `thaumcraft:` entity or aspect identifiers.

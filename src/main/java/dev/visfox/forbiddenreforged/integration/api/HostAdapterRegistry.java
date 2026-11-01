@@ -2,7 +2,8 @@ package dev.visfox.forbiddenreforged.integration.api;
 
 import dev.visfox.forbiddenreforged.integration.runtime.HostItemServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostBootstrapServices;
-import dev.visfox.forbiddenreforged.integration.runtime.HostEntityServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostEntityAspectServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostEntityClassificationServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostAspectServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostMorphToolServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostBlockEntityServices;
@@ -44,11 +45,14 @@ public final class HostAdapterRegistry {
         return adapter;
     }
 
-    /**
-     * Returns the host's entity taxonomy, aspect catalog, and host entity predicates.
-     */
-    public static HostEntityServices requireEntities() {
-        return capability(HostEntityServices.class, "entity");
+    /** Returns the selected host's typed entity-to-aspect catalog. */
+    public static HostEntityAspectServices requireEntityAspects() {
+        return capability(HostEntityAspectServices.class, "entity aspect");
+    }
+
+    /** Returns host-specific entity classification predicates and boss identifiers. */
+    public static HostEntityClassificationServices requireEntityClassification() {
+        return capability(HostEntityClassificationServices.class, "entity classification");
     }
 
     public static HostAspectServices requireAspects() {

@@ -263,8 +263,12 @@ public final class RecipeGameTests {
             "the selected host exposes Scribing Well services"
         );
         helper.assertTrue(
-            HostAdapterRegistry.requireEntities() != null,
-            "the selected host exposes its entity service boundary"
+            HostAdapterRegistry.requireEntityAspects() != null,
+            "the selected host exposes its entity aspect catalog"
+        );
+        helper.assertTrue(
+            HostAdapterRegistry.requireEntityClassification() != null,
+            "the selected host exposes entity classification services"
         );
         helper.assertValueEqual(
             FmSpawnerMobs.aspect("thaumcraft:firebat"),
@@ -272,17 +276,17 @@ public final class RecipeGameTests {
             "host entity aspects are resolved through the selected adapter"
         );
         helper.assertValueEqual(
-            HostAdapterRegistry.requireEntities().aspectCatalog(false).get(ContentId.parse("minecraft:silverfish")),
+            HostAdapterRegistry.requireEntityAspects().aspectCatalog(false).get(ContentId.parse("minecraft:silverfish")),
             ContentId.parse("thaumcraft:bestia"),
             "the host catalog preserves the default silverfish aspect"
         );
         helper.assertValueEqual(
-            HostAdapterRegistry.requireEntities().aspectCatalog(true).get(ContentId.parse("minecraft:silverfish")),
+            HostAdapterRegistry.requireEntityAspects().aspectCatalog(true).get(ContentId.parse("minecraft:silverfish")),
             ContentId.parse("thaumcraft:lucrum"),
             "the host catalog preserves the configured silverfish aspect alternative"
         );
         helper.assertTrue(
-            HostAdapterRegistry.requireEntities().bossEntityIds().contains(ContentId.parse("thaumcraft:eldritch_warden")),
+            HostAdapterRegistry.requireEntityClassification().bossEntityIds().contains(ContentId.parse("thaumcraft:eldritch_warden")),
             "host-specific boss identifiers come from the selected adapter"
         );
         helper.assertTrue(

@@ -16,7 +16,8 @@ import dev.visfox.forbiddenreforged.integration.runtime.HostTaintServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostScribingServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostItemServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostBootstrapServices;
-import dev.visfox.forbiddenreforged.integration.runtime.HostEntityServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostEntityAspectServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostEntityClassificationServices;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
@@ -38,7 +39,7 @@ import java.util.Set;
 /**
  * Thaumcraft 4: Reforged implementation of the host-neutral content contract.
  */
-public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, HostMorphToolServices, HostBlockEntityServices, HostWandServices, HostTaintServices, HostScribingServices, HostItemServices, HostBootstrapServices, HostEntityServices {
+public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, HostMorphToolServices, HostBlockEntityServices, HostWandServices, HostTaintServices, HostScribingServices, HostItemServices, HostBootstrapServices, HostEntityAspectServices, HostEntityClassificationServices {
     public static final Tc4HostAdapter INSTANCE = new Tc4HostAdapter();
 
     private static final HostProfile PROFILE = new HostProfile(

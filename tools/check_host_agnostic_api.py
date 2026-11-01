@@ -13,7 +13,8 @@ BOUNDARIES = (
 HOST_NEUTRAL_GAMEPLAY = (
     ROOT / "src/main/java/dev/visfox/forbiddenreforged/WrathCageBlockEntity.java",
     ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmSpawnerMobs.java",
-    ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostEntityServices.java",
+    ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostEntityAspectServices.java",
+    ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostEntityClassificationServices.java",
     ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmWandTriggers.java",
     ROOT / "src/main/java/dev/visfox/forbiddenreforged/core/wand",
 )
@@ -189,8 +190,10 @@ def main() -> int:
     runtime_registry = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/api/HostAdapterRegistry.java").read_text(encoding="utf-8")
     if "HostRuntimeServices" in runtime_registry or "requireRuntime()" in runtime_registry:
         failures.append("HostAdapterRegistry must expose narrow runtime capabilities instead of a monolithic runtime accessor")
-    if "HostEntityServices requireEntities()" not in runtime_registry:
-        failures.append("HostAdapterRegistry is missing the host entity capability lookup")
+    if "HostEntityAspectServices requireEntityAspects()" not in runtime_registry:
+        failures.append("HostAdapterRegistry is missing the entity aspect catalog lookup")
+    if "HostEntityClassificationServices requireEntityClassification()" not in runtime_registry:
+        failures.append("HostAdapterRegistry is missing the entity classification lookup")
 
     service_contracts = {
         "HostAspectServices.java": ("Component aspectDescription(ContentId aspect)",),
@@ -199,6 +202,8 @@ def main() -> int:
         "HostWandServices.java": ("boolean isWand(", "String wandRodTag(", "void addWandVis(", "void addRealVis(", "ItemStack accessory("),
         "HostTaintServices.java": ("boolean isTaintMaterial(", "boolean isTaintShovelPurificationTarget(", "float taintShovelMiningSpeed()", "void playTaintShovelSound(", "ItemStack specialMiningDrop(", "boolean isTaintDamage("),
         "HostScribingServices.java": ("boolean isNoResearchDifficulty()", "List<ContentId> primalAspectIds()", "boolean addAspectPool(ServerPlayer player",),
+        "HostEntityAspectServices.java": ("Map<ContentId, ContentId> aspectCatalog(boolean silverfishEmeralds)",),
+        "HostEntityClassificationServices.java": ("boolean isTaintedMob(LivingEntity entity)", "boolean isHostBoss(LivingEntity entity)", "boolean isHostGolem(LivingEntity entity)", "Set<ContentId> bossEntityIds()"),
     }
     for filename, methods in service_contracts.items():
         contract = ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime" / filename
@@ -217,6 +222,8 @@ def main() -> int:
         failures.append("The monolithic HostRuntimeServices contract should be removed after capability splitting")
 
     capability_lookups = (
+        "HostEntityAspectServices requireEntityAspects()",
+        "HostEntityClassificationServices requireEntityClassification()",
         "HostAspectServices requireAspects()",
         "HostMorphToolServices requireMorphTools()",
         "HostBlockEntityServices requireBlockEntities()",
@@ -229,7 +236,9 @@ def main() -> int:
             failures.append(f"HostAdapterRegistry is missing a focused runtime capability lookup: {lookup}")
 
     capability_consumers = {
-        "FmDrops.java": ("requireEntities()", "requireWands()"),
+        "FmSpawnerMobs.java": ("requireEntityAspects()", "requireEntityClassification()"),
+        "FmDrops.java": ("requireEntityClassification()", "requireWands()"),
+        "RidingCropItem.java": ("requireEntityClassification()",),
         "FmEnchantmentEffects.java": ("requireTaint()", "requireWands()"),
         "FmToolEvents.java": ("requireWands()", "requireTaint()"),
         "ScribeWellEvents.java": ("requireScribing()",),
@@ -259,6 +268,10 @@ def main() -> int:
                 failures.append(
                     f"{source.relative_to(ROOT)} still references the removed monolithic runtime contract"
                 )
+            if "HostEntityServices" in content or "requireEntities()" in content:
+                failures.append(
+                    f"{source.relative_to(ROOT)} still references the removed mixed entity capability"
+                )
 
     item_contract = ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostItemServices.java"
     item_content = item_contract.read_text(encoding="utf-8")
@@ -272,37 +285,45 @@ def main() -> int:
     if "HostItemServices requireItems()" not in item_registry:
         failures.append("HostAdapterRegistry is missing the host item factory lookup")
 
-    entity_contract = ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostEntityServices.java"
-    entity_content = entity_contract.read_text(encoding="utf-8")
-    for forbidden in ("thaumcraft.", "thaumcraft:", "com.leclowndu93150.thaumaturge."):
-        if forbidden in entity_content:
-            failures.append(
-                f"{entity_contract.relative_to(ROOT)} exposes a concrete host type or namespace: {forbidden}"
-            )
-    if "HostEntityServices requireEntities()" not in runtime_registry:
-        failures.append("HostAdapterRegistry is missing the host entity capability lookup")
-    if "Map<ContentId, ContentId> aspectCatalog(boolean silverfishEmeralds)" not in entity_content:
-        failures.append("HostEntityServices is missing the host-neutral entity aspect catalog")
-    if "boolean isTaintedMob(LivingEntity entity)" not in entity_content or "boolean isHostBoss(LivingEntity entity)" not in entity_content or "boolean isHostGolem(LivingEntity entity)" not in entity_content:
-        failures.append("HostEntityServices is missing host-specific entity classification predicates")
-    if "ENTITY_CLASSIFICATION" not in (ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/api/HostProfile.java").read_text(encoding="utf-8"):
-        failures.append("HostProfile is missing the entity classification feature declaration")
-    if "Set<ContentId> bossEntityIds()" not in entity_content:
-        failures.append("HostEntityServices must expose boss entity identifiers as ContentId values")
-    entity_consumers = (
-        ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmSpawnerMobs.java",
-        ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmDrops.java",
-        ROOT / "src/main/java/dev/visfox/forbiddenreforged/RidingCropItem.java",
-    )
-    for source in entity_consumers:
-        source_content = source.read_text(encoding="utf-8")
-        if "integration.tc4" in source_content or "thaumcraft." in source_content or "thaumcraft:" in source_content:
-            failures.append(
-                f"{source.relative_to(ROOT)} references concrete host entity data instead of HostEntityServices"
-            )
-    if "HostAdapterRegistry.requireEntities()" not in (ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmSpawnerMobs.java").read_text(encoding="utf-8"):
-        failures.append("FmSpawnerMobs bypasses the host-neutral entity catalog")
+    old_entity_contract = ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostEntityServices.java"
+    if old_entity_contract.exists():
+        failures.append("The mixed HostEntityServices contract must be removed after the entity capability split")
 
+    entity_aspect_contract = ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostEntityAspectServices.java"
+    entity_classification_contract = ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostEntityClassificationServices.java"
+    for contract in (entity_aspect_contract, entity_classification_contract):
+        content = contract.read_text(encoding="utf-8")
+        for forbidden in ("thaumcraft.", "thaumcraft:", "com.leclowndu93150.thaumaturge."):
+            if forbidden in content:
+                failures.append(
+                    f"{contract.relative_to(ROOT)} exposes a concrete host type or namespace: {forbidden}"
+                )
+
+    profile_content = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/api/HostProfile.java").read_text(encoding="utf-8")
+    if "ENTITY_ASPECTS" not in profile_content:
+        failures.append("HostProfile is missing the entity aspect catalog feature declaration")
+    if "ENTITY_CLASSIFICATION" not in profile_content:
+        failures.append("HostProfile is missing the entity classification feature declaration")
+
+    entity_consumers = {
+        "FmSpawnerMobs.java": ("requireEntityAspects()", "requireEntityClassification()"),
+        "FmDrops.java": ("requireEntityClassification()",),
+        "RidingCropItem.java": ("requireEntityClassification()",),
+    }
+    for filename, lookups in entity_consumers.items():
+        source = ROOT / "src/main/java/dev/visfox/forbiddenreforged" / filename
+        source_content = source.read_text(encoding="utf-8")
+        if "requireEntities()" in source_content:
+            failures.append(f"{source.relative_to(ROOT)} still uses the removed mixed entity capability")
+        for lookup in lookups:
+            if lookup not in source_content:
+                failures.append(f"{source.relative_to(ROOT)} does not use the focused entity capability: {lookup}")
+        if "integration.tc4" in source_content or "thaumcraft." in source_content or "thaumcraft:" in source_content:
+            failures.append(f"{source.relative_to(ROOT)} references concrete host entity data outside the adapter")
+
+    spawner_content = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmSpawnerMobs.java").read_text(encoding="utf-8")
+    if "HostAdapterRegistry.requireEntityAspects()" not in spawner_content:
+        failures.append("FmSpawnerMobs bypasses the host-neutral entity aspect catalog")
     if "Item primordialPearlItem()" not in item_content:
         failures.append("HostItemServices is missing the Primewell remainder item factory")
 

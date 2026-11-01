@@ -22,7 +22,7 @@ public final class FmSpawnerMobs {
             return null;
         }
         try {
-            return HostAdapterRegistry.requireEntities()
+            return HostAdapterRegistry.requireEntityAspects()
                 .aspectCatalog(FmConfig.silverfishEmeralds())
                 .get(ContentId.parse(id));
         } catch (IllegalArgumentException invalidEntityId) {
@@ -31,7 +31,7 @@ public final class FmSpawnerMobs {
     }
 
     public static List<String> ids() {
-        return HostAdapterRegistry.requireEntities()
+        return HostAdapterRegistry.requireEntityAspects()
             .aspectCatalog(FmConfig.silverfishEmeralds())
             .keySet()
             .stream()
@@ -45,7 +45,7 @@ public final class FmSpawnerMobs {
             return false;
         }
         ContentId id = ContentId.parse(BuiltInRegistries.ENTITY_TYPE.getKey(type).toString());
-        boolean hasAspect = HostAdapterRegistry.requireEntities()
+        boolean hasAspect = HostAdapterRegistry.requireEntityAspects()
             .aspectCatalog(FmConfig.silverfishEmeralds())
             .containsKey(id);
         return hasAspect || (FmConfig.wrathCrazy() && !isBoss(type));
@@ -54,6 +54,6 @@ public final class FmSpawnerMobs {
     public static boolean isBoss(EntityType<?> type) {
         ContentId id = ContentId.parse(BuiltInRegistries.ENTITY_TYPE.getKey(type).toString());
         return VANILLA_BOSSES.contains(id)
-            || HostAdapterRegistry.requireEntities().bossEntityIds().contains(id);
+            || HostAdapterRegistry.requireEntityClassification().bossEntityIds().contains(id);
     }
 }
