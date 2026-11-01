@@ -26,6 +26,7 @@ import dev.visfox.forbiddenreforged.FmAspects;
 import dev.visfox.forbiddenreforged.FmBlocks;
 import dev.visfox.forbiddenreforged.FmItems;
 import dev.visfox.forbiddenreforged.FmSpawnerMobs;
+import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.MobCrystalItem;
 import dev.visfox.forbiddenreforged.WrathCageBlock;
 import dev.visfox.forbiddenreforged.WrathCageBlockEntity;
@@ -81,9 +82,18 @@ public final class EntityGameTests {
     }
 
     private static void mobCrystalAndSpawnTable(GameTestHelper helper) {
-        helper.assertTrue(FmSpawnerMobs.aspect("minecraft:zombie") == Aspect.FLESH, "zombie carries flesh");
-        helper.assertTrue(FmSpawnerMobs.aspect("thaumcraft:brainy_zombie") == Aspect.MIND, "brainy zombie carries mind");
-        helper.assertTrue(FmSpawnerMobs.aspect("minecraft:pig") == Aspect.BEAST, "pig carries beast");
+        helper.assertValueEqual(FmSpawnerMobs.aspect("minecraft:zombie"), ContentId.parse("thaumcraft:corpus"),
+            "zombie carries the semantic flesh aspect id");
+        helper.assertValueEqual(FmSpawnerMobs.aspect("thaumcraft:brainy_zombie"), ContentId.parse("thaumcraft:cognitio"),
+            "brainy zombie carries the semantic mind aspect id");
+        helper.assertValueEqual(FmSpawnerMobs.aspect("minecraft:pig"), ContentId.parse("thaumcraft:bestia"),
+            "pig carries the semantic beast aspect id");
+        helper.assertValueEqual(FmSpawnerMobs.aspect("minecraft:ghast"), ContentId.parse("forbiddenmagic:infernus"),
+            "ghast carries the Forbidden Magic infernus aspect id");
+        helper.assertTrue(Tc4AspectAdapter.resolveAspect(FmSpawnerMobs.aspect("minecraft:zombie")).equals(Aspect.FLESH),
+            "TC4 integration resolves the semantic flesh id");
+        helper.assertTrue(Tc4AspectAdapter.resolveAspect(FmSpawnerMobs.aspect("thaumcraft:brainy_zombie")).equals(Aspect.MIND),
+            "TC4 integration resolves the semantic mind id");
         helper.assertValueEqual(FmSpawnerMobs.ids().size(), 42, "the table keeps exactly the original 42 mobs");
         for (String id : FmSpawnerMobs.ids()) {
             helper.assertTrue(FmSpawnerMobs.aspect(id) != null, id + " must map to an aspect");

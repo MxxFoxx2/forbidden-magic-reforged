@@ -30,8 +30,8 @@ public final class Tc4WrathCageBlockEntity extends WrathCageBlockEntity implemen
 
     @Override
     protected ContentId mobEssentiaType() {
-        Aspect aspect = FmSpawnerMobs.aspect(getMobId());
-        return Tc4AspectAdapter.toContentId(aspect == null ? Aspect.GREED : aspect);
+        ContentId aspect = FmSpawnerMobs.aspect(getMobId());
+        return aspect == null ? ContentId.parse("thaumcraft:lucrum") : aspect;
     }
 
     @Override
