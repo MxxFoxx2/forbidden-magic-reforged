@@ -76,6 +76,12 @@ def main() -> int:
                     f"{source.relative_to(ROOT)} accesses the TC4 wand API outside integration/tc4"
                 )
 
+            for host_type in ("TaintedMob", "ThaumcraftBoss"):
+                if re.search(rf"\b{host_type}\b", content):
+                    failures.append(
+                        f"{source.relative_to(ROOT)} references TC4 entity type {host_type} outside integration/tc4"
+                    )
+
     if failures:
         print("\n".join(failures), file=sys.stderr)
         return 1

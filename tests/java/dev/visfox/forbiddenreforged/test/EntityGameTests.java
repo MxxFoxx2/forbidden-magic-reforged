@@ -14,6 +14,8 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -27,7 +29,10 @@ import dev.visfox.forbiddenreforged.FmSpawnerMobs;
 import dev.visfox.forbiddenreforged.MobCrystalItem;
 import dev.visfox.forbiddenreforged.WrathCageBlock;
 import dev.visfox.forbiddenreforged.WrathCageBlockEntity;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4EntityAdapter;
 import thaumcraft.aspect.Aspect;
+import thaumcraft.registry.ModEntities;
+import thaumcraft.registry.EldritchEntities;
 import thaumcraft.aspect.AspectSource;
 import thaumcraft.essentia.EssentiaTransport;
 import thaumcraft.crafting.CrucibleRecipe;
@@ -46,7 +51,8 @@ public final class EntityGameTests {
         "wrath_cage_block_and_entity",
         "wrath_cage_crystal_and_spawn_rules",
         "wrath_cage_research_and_recipes",
-        "wrath_cage_essentia_uses_host_bridge"
+        "wrath_cage_essentia_uses_host_bridge",
+        "tc4_entity_classification_is_behind_adapter"
     };
 
     static {
@@ -55,6 +61,7 @@ public final class EntityGameTests {
         FUNCTIONS.register(TESTS[2], () -> EntityGameTests::wrathCageCrystalAndSpawnRules);
         FUNCTIONS.register(TESTS[3], () -> EntityGameTests::wrathCageResearchAndRecipes);
         FUNCTIONS.register(TESTS[4], () -> EntityGameTests::wrathCageEssentiaUsesHostBridge);
+        FUNCTIONS.register(TESTS[5], () -> EntityGameTests::tc4EntityClassificationIsBehindAdapter);
     }
 
     private EntityGameTests() {}
@@ -89,6 +96,24 @@ public final class EntityGameTests {
         helper.assertValueEqual(MobCrystalItem.mob(stack), "minecraft:zombie", "the crystal keeps the mob id");
         helper.assertTrue(FmSpawnerMobs.canImprint(EntityTypes.ZOMBIE), "zombies can be imprinted");
         helper.assertFalse(FmSpawnerMobs.canImprint(EntityTypes.ENDER_DRAGON), "bosses cannot be imprinted");
+        helper.succeed();
+    }
+
+    private static void tc4EntityClassificationIsBehindAdapter(GameTestHelper helper) {
+        LivingEntity taintedMob = ModEntities.TAINTACLE.get().create(helper.getLevel(), EntitySpawnReason.TRIGGERED);
+        LivingEntity hostBoss = EldritchEntities.ELDRITCH_WARDEN.get().create(helper.getLevel(), EntitySpawnReason.TRIGGERED);
+        LivingEntity ordinaryMob = EntityTypes.ZOMBIE.create(helper.getLevel(), EntitySpawnReason.TRIGGERED);
+        helper.assertTrue(taintedMob != null, "Thaumcraft taintacle can be constructed");
+        helper.assertTrue(hostBoss != null, "Thaumcraft eldritch warden can be constructed");
+        helper.assertTrue(ordinaryMob != null, "vanilla zombie can be constructed");
+        if (taintedMob == null || hostBoss == null || ordinaryMob == null) {
+            helper.fail("entity fixtures must be available for host classification test");
+            return;
+        }
+        helper.assertTrue(Tc4EntityAdapter.isTaintedMob(taintedMob), "TC4 taint marker is recognized through the adapter");
+        helper.assertFalse(Tc4EntityAdapter.isTaintedMob(ordinaryMob), "ordinary mobs are not TC4 tainted mobs");
+        helper.assertTrue(Tc4EntityAdapter.isHostBoss(hostBoss), "TC4 boss base class is recognized through the adapter");
+        helper.assertFalse(Tc4EntityAdapter.isHostBoss(ordinaryMob), "ordinary mobs are not TC4 bosses");
         helper.succeed();
     }
 

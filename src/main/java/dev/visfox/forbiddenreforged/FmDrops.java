@@ -34,8 +34,7 @@ import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraft.world.effect.MobEffects;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
-import thaumcraft.entity.TaintedMob;
-import thaumcraft.entity.boss.ThaumcraftBoss;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4EntityAdapter;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4WandRuntimeAdapter;
 
 public final class FmDrops {
@@ -136,7 +135,7 @@ public final class FmDrops {
 
     private static void onTaintedBloodShardDrop(LivingDropsEvent event) {
         LivingEntity entity = event.getEntity();
-        if (!(entity instanceof TaintedMob)) {
+        if (!Tc4EntityAdapter.isTaintedMob(entity)) {
             return;
         }
         DamageSource source = event.getSource();
@@ -217,7 +216,7 @@ public final class FmDrops {
     }
 
     private static boolean isBoss(LivingEntity entity) {
-        return entity instanceof WitherBoss || entity instanceof EnderDragon || entity instanceof ThaumcraftBoss;
+        return entity instanceof WitherBoss || entity instanceof EnderDragon || Tc4EntityAdapter.isHostBoss(entity);
     }
 
     private static int wrathBonus(ServerPlayer player, LivingEntity target) {
