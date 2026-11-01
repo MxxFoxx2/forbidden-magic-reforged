@@ -36,7 +36,7 @@ public final class Tc4WarpAdapter {
 
     public static WarpType toHostType(WarpKind kind) {
         return switch (Objects.requireNonNull(kind, "kind")) {
-            case NORMAL -> WarpType.NORMAL;
+            case PERMANENT -> WarpType.PERMANENT;
             case STICKY -> WarpType.STICKY;
             case TEMPORARY -> WarpType.TEMPORARY;
         };
