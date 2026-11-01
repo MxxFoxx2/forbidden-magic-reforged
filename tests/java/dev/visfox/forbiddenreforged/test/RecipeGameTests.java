@@ -198,6 +198,14 @@ public final class RecipeGameTests {
             "the selected host exposes its item factory boundary"
         );
         helper.assertTrue(
+            !HostAdapterRegistry.requireRuntime().primalAspectIds().isEmpty(),
+            "scripting integrations expose primal aspects as semantic IDs"
+        );
+        helper.assertFalse(
+            HostAdapterRegistry.requireItems().primordialPearlItem().is(Items.AIR),
+            "the host provides the Primewell remainder item through item services"
+        );
+        helper.assertTrue(
             !HostAdapterRegistry.require().aspectDiagnostics().isEmpty(),
             "host diagnostics are retrieved through the shared adapter contract"
         );

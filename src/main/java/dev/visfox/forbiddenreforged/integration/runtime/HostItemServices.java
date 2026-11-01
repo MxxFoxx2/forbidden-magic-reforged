@@ -39,5 +39,7 @@ public interface HostItemServices {
 
     Item.Properties blinkFocusProperties(Item.Properties properties);
 
+    Item primordialPearlItem();
+
     Item createSubCollar(Item.Properties properties);
 }

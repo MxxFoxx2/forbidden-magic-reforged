@@ -15,9 +15,11 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.state.BlockState;
+import thaumcraft.registry.EldritchContent;
 import java.util.List;
 import java.util.Map;
 
@@ -180,6 +182,21 @@ public final class Tc4HostAdapter implements HostAdapter, HostRuntimeServices, H
     }
 
     @Override
+    public boolean isNoResearchDifficulty() {
+        return Tc4ScribingAdapter.isNoResearchDifficulty();
+    }
+
+    @Override
+    public List<ContentId> primalAspectIds() {
+        return Tc4ScribingAdapter.primalAspectIds();
+    }
+
+    @Override
+    public boolean addAspectPool(ServerPlayer player, ContentId aspect, int amount) {
+        return Tc4ScribingAdapter.addAspectPool(player, aspect, amount);
+    }
+
+    @Override
     public Item.Properties gluttonyFoodProperties(Item.Properties properties) {
         return Tc4ItemRegistrationAdapter.gluttonyFood(properties);
     }
@@ -257,5 +274,10 @@ public final class Tc4HostAdapter implements HostAdapter, HostRuntimeServices, H
     @Override
     public Item createSubCollar(Item.Properties properties) {
         return new Tc4SubCollarItem(properties);
+    }
+
+    @Override
+    public Item primordialPearlItem() {
+        return EldritchContent.PRIMORDIAL_PEARL.get();
     }
 }

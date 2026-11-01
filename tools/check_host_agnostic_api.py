@@ -191,6 +191,7 @@ def main() -> int:
         ROOT / "src/main/java/dev/visfox/forbiddenreforged/RidingCropItem.java",
         ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmBlockEntities.java",
         ROOT / "src/main/java/dev/visfox/forbiddenreforged/WrathCageBlock.java",
+        ROOT / "src/main/java/dev/visfox/forbiddenreforged/ScribeWellEvents.java",
     )
     for source in runtime_consumers:
         source_content = source.read_text(encoding="utf-8")
@@ -204,6 +205,8 @@ def main() -> int:
         failures.append("HostAdapterRegistry is missing the runtime capability lookup")
     if "HostItemServices requireItems()" not in runtime_registry:
         failures.append("HostAdapterRegistry is missing the host item factory lookup")
+    if "List<ContentId> primalAspectIds()" not in runtime_content or "boolean addAspectPool(ServerPlayer player" not in runtime_content:
+        failures.append("HostRuntimeServices is missing the host-neutral Scribing Well aspect-pool contract")
     if "WrathCageBlockEntity createWrathCageBlockEntity(" not in runtime_content:
         failures.append("HostRuntimeServices is missing the host-provided Wrath Cage block entity factory")
 
@@ -219,6 +222,8 @@ def main() -> int:
     item_registry = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/api/HostAdapterRegistry.java").read_text(encoding="utf-8")
     if "HostItemServices requireItems()" not in item_registry:
         failures.append("HostAdapterRegistry is missing the host item factory lookup")
+    if "Item primordialPearlItem()" not in item_content:
+        failures.append("HostItemServices is missing the Primewell remainder item factory")
 
     items_facade = ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmItems.java"
     items_content = items_facade.read_text(encoding="utf-8")
