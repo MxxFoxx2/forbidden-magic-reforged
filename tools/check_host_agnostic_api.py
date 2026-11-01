@@ -359,8 +359,16 @@ def main() -> int:
     for feature in ("ASPECT_RECIPE_DERIVATION", "WAND_PARTS", "ESSENTIA_STORAGE", "ESSENTIA_TRANSPORT", "WARP_POOLS", "STICKY_WARP"):
         if feature not in profile_content:
             failures.append(f"HostProfile is missing an implemented feature declaration: {feature}")
-    if "TAINT_ORIGINS" in tc4_adapter_content:
-        failures.append("Tc4HostAdapter must not claim taint-origin support without an implemented adapter")
+    if "Map.entry(HostProfile.Feature.TAINT_ORIGINS," not in tc4_adapter_content or "HostProfile.FeatureSupport.unsupported(" not in tc4_adapter_content:
+        failures.append("Tc4HostAdapter must explicitly mark TAINT_ORIGINS unsupported until a taint-origin adapter exists")
+
+    feature_enum_start = profile_content.split("public enum Feature {", 1)[1].split("\n    }", 1)[0]
+    profile_features = set(re.findall(r"^\s*([A-Z][A-Z0-9_]*)\s*,?\s*$", feature_enum_start, re.MULTILINE))
+    adapter_features = set(re.findall(r"Map\.entry\(HostProfile\.Feature\.([A-Z0-9_]+)", tc4_adapter_content))
+    if profile_features != adapter_features:
+        missing = sorted(profile_features - adapter_features)
+        unknown = sorted(adapter_features - profile_features)
+        failures.append(f"HostProfile feature coverage mismatch: missing={missing}, unknown={unknown}")
 
     aspect_adapter = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/tc4/Tc4AspectAdapter.java").read_text(encoding="utf-8")
     if "definition.components()" not in aspect_adapter or "api.register(" not in aspect_adapter:

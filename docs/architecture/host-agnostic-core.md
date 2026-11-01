@@ -74,7 +74,7 @@ The Mob Crystal/spawner lookup is now split:
 - `HostEntityClassificationServices` supplies host-specific boss/taint/golem predicates and boss IDs.
 - `Tc4EntityAdapter` owns the TC4 entity taxonomy and translates both entity and aspect identifiers to semantic `ContentId` values.
 - `Tc4WarpAdapter` maps all three semantic warp kinds directly to TC4 `WarpType` values, including distinct `STICKY`; the profile declares `WARP_POOLS` and `STICKY_WARP`. GameTests exercise all three mappings and an actual sticky-warp event.
-- Host taint-origin registration is not implemented; `TAINT_ORIGINS` therefore remains `UNSUPPORTED` by default.
+- Host taint-origin registration is not implemented; `TAINT_ORIGINS` is explicitly declared `UNSUPPORTED` by the TC4 adapter. Every `HostProfile.Feature` has one explicit support declaration.
 
 The silverfish configuration is passed to the host capability as an explicit option. The common mob catalog no longer hard-codes `thaumcraft:` entity or aspect identifiers.
 

@@ -75,6 +75,8 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
                 HostProfile.FeatureSupport.adapted("Provides taint block classification and taint-shovel behavior")),
             Map.entry(HostProfile.Feature.ENCHANTMENT_EFFECTS,
                 HostProfile.FeatureSupport.adapted("Provides host special-mining drops and taint damage-source classification")),
+            Map.entry(HostProfile.Feature.TAINT_ORIGINS,
+                HostProfile.FeatureSupport.unsupported("No host taint-origin registration or propagation adapter is implemented")),
             Map.entry(HostProfile.Feature.SCRIBING_RUNTIME,
                 HostProfile.FeatureSupport.adapted("Provides research difficulty and player aspect-pool access")),
             Map.entry(HostProfile.Feature.WARP_POOLS,
