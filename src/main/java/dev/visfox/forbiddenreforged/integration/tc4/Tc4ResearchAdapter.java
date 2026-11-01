@@ -7,7 +7,6 @@ import dev.visfox.forbiddenreforged.core.research.ResearchCategoryDefinition;
 import dev.visfox.forbiddenreforged.core.research.ResearchDefinition;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import net.minecraft.resources.Identifier;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.crafting.TcStack;
@@ -18,7 +17,11 @@ import thaumcraft.research.ResearchPage;
 public final class Tc4ResearchAdapter {
     private static final Map<String, String> LEGACY_RESEARCH_KEYS = Map.of(
         "rod_tainted", "ROD_tainted",
-        "rod_infernal", "ROD_infernal"
+        "rod_infernal", "ROD_infernal",
+        "rod_silverwood", "ROD_silverwood",
+        "rod_witchwood", "ROD_witchwood",
+        "rod_witchwood_staff", "ROD_witchwood_staff",
+        "rod_profane", "ROD_profane"
     );
 
     private Tc4ResearchAdapter() {
