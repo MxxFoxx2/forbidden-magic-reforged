@@ -10,12 +10,6 @@ import thaumcraft.aspect.AddonAspects;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.aspect.AspectList;
 
-/**
- * Thaumcraft 4: Reforged translation for common Forbidden Magic aspect definitions and costs.
- *
- * <p>All host registry objects and aspect constants stay inside this adapter. The common model
- * exposes semantic identifiers only.
- */
 public final class Tc4AspectAdapter {
     private static volatile Map<ContentId, Aspect> registeredAspects = Map.of();
 
@@ -47,7 +41,7 @@ public final class Tc4AspectAdapter {
         return registeredAspects;
     }
 
-    /** Resolves a semantic aspect identifier to this host's native Aspect object. */
+    
     public static Aspect resolveAspect(ContentId id) {
         Aspect addonAspect = registeredAspects.get(id);
         if (addonAspect != null) {
