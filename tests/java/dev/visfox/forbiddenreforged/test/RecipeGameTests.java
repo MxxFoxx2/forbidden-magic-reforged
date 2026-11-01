@@ -178,6 +178,14 @@ public final class RecipeGameTests {
             "aspect diagnostics are declared by the selected adapter"
         );
         helper.assertTrue(
+            profile.supportOf(HostProfile.Feature.RUNTIME_SERVICES).level() == HostProfile.SupportLevel.ADAPTED,
+            "runtime services are declared by the selected adapter"
+        );
+        helper.assertTrue(
+            HostAdapterRegistry.requireRuntime() != null,
+            "the selected host exposes its runtime service boundary"
+        );
+        helper.assertTrue(
             !HostAdapterRegistry.require().aspectDiagnostics().isEmpty(),
             "host diagnostics are retrieved through the shared adapter contract"
         );

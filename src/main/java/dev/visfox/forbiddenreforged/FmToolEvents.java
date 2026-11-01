@@ -20,10 +20,7 @@ import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
-import dev.visfox.forbiddenreforged.integration.tc4.Tc4AccessoryAdapter;
-import dev.visfox.forbiddenreforged.integration.tc4.Tc4TaintAdapter;
-import dev.visfox.forbiddenreforged.integration.tc4.Tc4VisAdapter;
-import dev.visfox.forbiddenreforged.integration.tc4.Tc4WandRuntimeAdapter;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 
 public final class FmToolEvents {
     private static final List<ContentId> TAINTED_PRIMALS = List.of(
@@ -67,7 +64,7 @@ public final class FmToolEvents {
         if (FmItems.SUB_COLLAR == null) {
             return;
         }
-        ItemStack collar = Tc4AccessoryAdapter.getBauble(wearer, 0);
+        ItemStack collar = HostAdapterRegistry.requireRuntime().accessory(wearer, 0);
         if (!collar.is(FmItems.SUB_COLLAR.get())) {
             return;
         }
@@ -91,12 +88,12 @@ public final class FmToolEvents {
             }
         }
         for (int dose = 0; dose < doses; dose++) {
-            Tc4VisAdapter.addRealVis(collar, TAINTED_PRIMALS.get(random.nextInt(TAINTED_PRIMALS.size())), 1, true);
+            HostAdapterRegistry.requireRuntime().addRealVis(collar, TAINTED_PRIMALS.get(random.nextInt(TAINTED_PRIMALS.size())), 1, true);
         }
     }
 
     public static String wandTooltipKind(ItemStack stack) {
-        return wandTooltipKind(Tc4WandRuntimeAdapter.rodTag(stack));
+        return wandTooltipKind(HostAdapterRegistry.requireRuntime().wandRodTag(stack));
     }
 
     public static String wandTooltipKind(String rodTag) {
@@ -149,18 +146,18 @@ public final class FmToolEvents {
     }
 
     public static boolean hasNutritionRingInRingSlot(Player player) {
-        return Tc4AccessoryAdapter.getBauble(player, 1).is(FmItems.RING_NUTRITION.get())
-            || Tc4AccessoryAdapter.getBauble(player, 2).is(FmItems.RING_NUTRITION.get());
+        return HostAdapterRegistry.requireRuntime().accessory(player, 1).is(FmItems.RING_NUTRITION.get())
+            || HostAdapterRegistry.requireRuntime().accessory(player, 2).is(FmItems.RING_NUTRITION.get());
     }
 
     public static boolean cancelsInfernalDamage(ItemStack held, boolean fireOrWither) {
         return fireOrWither && held != null && !held.isEmpty()
-            && "infernal".equals(Tc4WandRuntimeAdapter.rodTag(held));
+            && "infernal".equals(HostAdapterRegistry.requireRuntime().wandRodTag(held));
     }
 
     public static boolean restoresTaintedVis(ItemStack held, boolean taintDamage) {
         return taintDamage && held != null && !held.isEmpty()
-            && "tainted".equals(Tc4WandRuntimeAdapter.rodTag(held));
+            && "tainted".equals(HostAdapterRegistry.requireRuntime().wandRodTag(held));
     }
 
     public static List<ContentId> taintedVisRolls(RandomSource random) {
@@ -192,7 +189,7 @@ public final class FmToolEvents {
     }
 
     private static boolean isTaintMaterial(BlockState state) {
-        return Tc4TaintAdapter.isHostTaintMaterial(state)
+        return HostAdapterRegistry.requireRuntime().isTaintMaterial(state)
             || state.is(FmBlocks.TAINT_LOG.get())
             || state.is(FmBlocks.TAINT_PLANKS.get())
             || state.is(FmBlocks.TAINT_STONE_SMOOTH.get())

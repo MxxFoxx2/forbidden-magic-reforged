@@ -169,6 +169,32 @@ def main() -> int:
                 f"HostAdapter is missing the host-neutral lifecycle/diagnostic contract: {contract_method}"
             )
 
+
+    runtime_contract = ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostRuntimeServices.java"
+    runtime_content = runtime_contract.read_text(encoding="utf-8")
+    for forbidden in ("thaumcraft.", "com.leclowndu93150.thaumaturge."):
+        if forbidden in runtime_content:
+            failures.append(
+                f"{runtime_contract.relative_to(ROOT)} exposes a concrete host API type: {forbidden}"
+            )
+
+    runtime_consumers = (
+        ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmDrops.java",
+        ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmEnchantmentEffects.java",
+        ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmToolEvents.java",
+        ROOT / "src/main/java/dev/visfox/forbiddenreforged/RidingCropItem.java",
+    )
+    for source in runtime_consumers:
+        source_content = source.read_text(encoding="utf-8")
+        if "integration.tc4" in source_content or "thaumcraft." in source_content:
+            failures.append(
+                f"{source.relative_to(ROOT)} calls a concrete host adapter instead of HostRuntimeServices"
+            )
+
+    runtime_registry = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/api/HostAdapterRegistry.java").read_text(encoding="utf-8")
+    if "HostRuntimeServices requireRuntime()" not in runtime_registry:
+        failures.append("HostAdapterRegistry is missing the runtime capability lookup")
+
     if failures:
         print("\n".join(failures), file=sys.stderr)
         return 1

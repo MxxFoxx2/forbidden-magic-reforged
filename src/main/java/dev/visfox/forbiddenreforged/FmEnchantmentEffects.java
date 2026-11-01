@@ -32,8 +32,7 @@ import net.neoforged.neoforge.event.entity.living.LivingExperienceDropEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
-import dev.visfox.forbiddenreforged.integration.tc4.Tc4EnchantmentAdapter;
-import dev.visfox.forbiddenreforged.integration.tc4.Tc4WandRuntimeAdapter;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 
 public final class FmEnchantmentEffects {
     private static final TagKey<Block> INFUSED_STONES = TagKey.create(Registries.BLOCK, ForbiddenMagic.id("infused_stones"));
@@ -107,7 +106,7 @@ public final class FmEnchantmentEffects {
             RandomSource random = event.getLevel().getRandom();
             float chance = clusterChance(cluster);
             for (ItemEntity drop : event.getDrops()) {
-                drop.setItem(Tc4EnchantmentAdapter.specialMiningDrop(event.getState(), drop.getItem(), chance, random));
+                drop.setItem(HostAdapterRegistry.requireRuntime().specialMiningDrop(event.getState(), drop.getItem(), chance, random));
             }
         }
         int corrupting = FmEnchantments.level(player.level().registryAccess(), tool, FmEnchantments.CORRUPTING);
@@ -246,16 +245,16 @@ public final class FmEnchantmentEffects {
         if (event.getEntity() instanceof Player wearer && !wearer.level().isClientSide()) {
             FmToolEvents.collarDamage(wearer, event.getAmount(), event.getSource().getEntity());
             ItemStack held = wearer.getMainHandItem();
-            if (Tc4WandRuntimeAdapter.isWand(held)) {
+            if (HostAdapterRegistry.requireRuntime().isWand(held)) {
                 boolean fireOrWither = event.getSource().is(DamageTypeTags.IS_FIRE)
                     || event.getSource().is(DamageTypes.WITHER);
                 if (FmToolEvents.cancelsInfernalDamage(held, fireOrWither)) {
                     event.setCanceled(true);
                     return;
                 }
-                if (FmToolEvents.restoresTaintedVis(held, Tc4EnchantmentAdapter.isTaintDamage(event.getSource()))) {
+                if (FmToolEvents.restoresTaintedVis(held, HostAdapterRegistry.requireRuntime().isTaintDamage(event.getSource()))) {
                     for (ContentId aspect : FmToolEvents.taintedVisRolls(wearer.getRandom())) {
-                        Tc4WandRuntimeAdapter.addVis(held, aspect, 1, true);
+                        HostAdapterRegistry.requireRuntime().addWandVis(held, aspect, 1, true);
                     }
                 }
             }

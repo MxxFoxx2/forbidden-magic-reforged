@@ -1,5 +1,6 @@
 package dev.visfox.forbiddenreforged.integration.api;
 
+import dev.visfox.forbiddenreforged.integration.runtime.HostRuntimeServices;
 import java.util.Objects;
 
 /**
@@ -33,5 +34,18 @@ public final class HostAdapterRegistry {
             );
         }
         return adapter;
+    }
+
+    /**
+     * Returns the Minecraft-runtime capabilities of the selected host.
+     */
+    public static HostRuntimeServices requireRuntime() {
+        HostAdapter adapter = require();
+        if (adapter instanceof HostRuntimeServices runtime) {
+            return runtime;
+        }
+        throw new IllegalStateException(
+            "Selected host adapter does not expose runtime services: " + adapter.profile().id()
+        );
     }
 }
