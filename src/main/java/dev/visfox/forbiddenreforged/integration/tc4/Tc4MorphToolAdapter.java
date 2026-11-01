@@ -24,7 +24,7 @@ public final class Tc4MorphToolAdapter {
         ServerLevel level,
         ServerPlayer player,
         BlockPos origin,
-        Predicate<ItemStack> correctTool
+        Predicate<BlockState> correctTool
     ) {
         ToolHarvest.breakArea(tool, level, player, origin, correctTool, -1);
     }
