@@ -3,12 +3,6 @@ package dev.visfox.forbiddenreforged.core.model;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-/**
- * A namespaced content identifier independent of any mod loader or host-mod API.
- *
- * <p>Unlike Minecraft's version-specific identifier classes, this value object is usable by
- * shared model code and can be translated by a host adapter at the boundary.
- */
 public record ContentId(String namespace, String path) implements Comparable<ContentId> {
     private static final Pattern NAMESPACE = Pattern.compile("[a-z0-9_.-]+");
     private static final Pattern PATH = Pattern.compile("[a-z0-9/._-]+");
