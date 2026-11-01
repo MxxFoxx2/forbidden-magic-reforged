@@ -30,14 +30,16 @@ targets remain separate build/release tracks.
 The first implementation slice introduces:
 
 - `core/model`: host-neutral namespaced content identifiers;
-- `core/aspect`: aspect definitions and immutable aspect costs;
+- `core/aspect`: aspect definitions, semantic blend modes, costs and the current Forbidden Magic
+  aspect catalog;
 - `core/recipe`: host-neutral recipe descriptions for infusion, crucible and arcane crafting;
 - `core/research`: research entries, stages, pages and prerequisites;
-- `integration/api`: host capability profiles and the registration SPI.
+- `integration/api`: host capability profiles and the registration SPI;
+- `integration/tc4`: the first host-specific translation, currently for aspect registration.
 
-These classes are deliberately pure Java. They are currently compiled as part of the existing
-mod source set; extracting a separately published Gradle module is deferred until there is a
-real consumer and the artifact/dependency packaging strategy is settled.
+These classes are deliberately pure Java outside the adapter package. They are currently compiled
+as part of the existing mod source set; extracting a separately published Gradle module is deferred
+until there is a real consumer and the artifact/dependency packaging strategy is settled.
 
 ## Rules
 
@@ -54,9 +56,8 @@ real consumer and the artifact/dependency packaging strategy is settled.
    the corresponding adapter.
 7. Keep Minecraft-version-specific code on its existing version track. A common domain model
    does not imply binary or source compatibility across 1.21.1, 26.1.2 and 26.3.
-8. Preserve the current TC4 implementation while the new contracts are introduced. Migrate one
-   vertical slice at a time and keep the existing fidelity ledger and GameTests as regression
-   gates.
+8. Preserve the current TC4 behavior while the new contracts are introduced. Migrate one vertical
+   slice at a time and keep the existing fidelity ledger and GameTests as regression gates.
 
 ## Registration lifecycle
 
@@ -69,11 +70,29 @@ The first SPI intentionally covers declarative content registration only. Runtim
 warp, wand vis, essentia transport, focus/spell operations and taint are introduced separately
 when their first common gameplay consumers are migrated.
 
+## First migrated slice: aspects
+
+The common `ForbiddenMagicAspectCatalog` now owns the seven aspect definitions, their colors,
+semantic component references, texture identifiers and blend modes. The `concept/*` component
+IDs are Forbidden Magic concepts, not TC4 or Thaumaturge registry IDs.
+
+`Tc4AspectAdapter` translates those concepts to TC4's `Aspect` constants and translates the
+semantic blend modes to the integer values expected by `AddonAspects`. `FmAspects` remains a
+small compatibility facade because existing recipes, focus upgrades and mechanics refer to its
+static TC4 `Aspect` fields. Its initialization order has not been changed: it still runs before
+items and focus upgrades are initialized.
+
+This is a source migration, not yet a proven runtime migration. Existing aspect GameTests and
+the full host build must pass before the slice is considered complete. The Thaumaturge mapping is
+not implemented here; its missing base aspects and alternative compositions must be reported as
+adaptations rather than hidden in the common catalog.
+
 ## Migration sequence
 
-1. **Foundation (current branch):** pure-Java domain models, adapter profile and registration SPI.
-2. **Aspect vertical slice:** move Forbidden Magic aspect definitions out of host classes; implement
-   TC4 adapter and prove existing aspect IDs, composition, colors, registration order and scans.
+1. **Foundation (implemented):** pure-Java domain models, adapter profile and registration SPI.
+2. **Aspect source migration (implemented, verification pending):** move Forbidden Magic aspect
+   definitions out of `FmAspects` and translate them through the TC4 adapter. Verify IDs,
+   composition, colors, blend modes, registration order and aspect scans.
 3. **Recipe vertical slice:** move recipe definitions into the common model; translate to TC4
    recipe serializers and retain recipe/research links.
 4. **Research vertical slice:** move categories, entries, stages and page definitions; preserve
@@ -87,7 +106,11 @@ when their first common gameplay consumers are migrated.
 
 ## Current status and non-claims
 
-This branch is architecture groundwork, not a completed refactor. Existing FmAspects, FmRecipes,
-FmResearch, FmWands and gameplay classes still use TC4 directly. No runtime behavior has been
-changed and no adapter is wired into mod startup yet. Compile and regression checks are required
-before merging any migration slice.
+The pure-Java model and TC4 aspect translation are committed on this branch, but no runtime or
+GameTest result has yet been confirmed for these changes. The existing `FmRecipes`, `FmResearch`,
+`FmWands` and most gameplay classes still use TC4 types directly. The general `HostAdapter` SPI
+is not yet wired into mod startup; `Tc4AspectAdapter` is the first focused adapter slice. No
+Thaumaturge adapter is implemented.
+
+The current `main` branch is unchanged. Merge only after the branch build, both existing
+GameTest configurations, the architecture boundary check and relevant in-game aspect checks pass.
