@@ -281,8 +281,10 @@ def main() -> int:
             )
     if "HostEntityServices requireEntities()" not in runtime_registry:
         failures.append("HostAdapterRegistry is missing the host entity capability lookup")
-    if "Map<String, ContentId> aspectCatalog(boolean silverfishEmeralds)" not in entity_content:
+    if "Map<ContentId, ContentId> aspectCatalog(boolean silverfishEmeralds)" not in entity_content:
         failures.append("HostEntityServices is missing the host-neutral entity aspect catalog")
+    if "Set<ContentId> bossEntityIds()" not in entity_content:
+        failures.append("HostEntityServices must expose boss entity identifiers as ContentId values")
     entity_consumers = (
         ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmSpawnerMobs.java",
         ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmDrops.java",

@@ -61,8 +61,8 @@ The one intended production composition-root reference to a concrete adapter is 
 The Mob Crystal/spawner lookup is now split:
 
 - `FmSpawnerMobs` owns the common query surface and Wrath Cage imprint rules.
-- `HostEntityServices` supplies the entity aspect catalog and host-specific boss/taint/golem predicates.
-- `Tc4EntityAdapter` owns the TC4 entity taxonomy and translates it to semantic `ContentId` aspect IDs.
+- `HostEntityServices` supplies a `Map<ContentId, ContentId>` from entity IDs to aspect IDs, plus host-specific boss/taint/golem predicates.
+- `Tc4EntityAdapter` owns the TC4 entity taxonomy and translates both entity and aspect identifiers to semantic `ContentId` values.
 
 The silverfish configuration is passed to the host capability as an explicit option. The common mob catalog no longer hard-codes `thaumcraft:` entity or aspect identifiers.
 

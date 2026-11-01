@@ -268,18 +268,27 @@ public final class RecipeGameTests {
             "host entity aspects are resolved through the selected adapter"
         );
         helper.assertValueEqual(
-            HostAdapterRegistry.requireEntities().aspectCatalog(false).get("minecraft:silverfish"),
+            HostAdapterRegistry.requireEntities().aspectCatalog(false).get(ContentId.parse("minecraft:silverfish")),
             ContentId.parse("thaumcraft:bestia"),
             "the host catalog preserves the default silverfish aspect"
         );
         helper.assertValueEqual(
-            HostAdapterRegistry.requireEntities().aspectCatalog(true).get("minecraft:silverfish"),
+            HostAdapterRegistry.requireEntities().aspectCatalog(true).get(ContentId.parse("minecraft:silverfish")),
             ContentId.parse("thaumcraft:lucrum"),
             "the host catalog preserves the configured silverfish aspect alternative"
         );
         helper.assertTrue(
-            HostAdapterRegistry.requireEntities().bossEntityIds().contains("thaumcraft:eldritch_warden"),
+            HostAdapterRegistry.requireEntities().bossEntityIds().contains(ContentId.parse("thaumcraft:eldritch_warden")),
             "host-specific boss identifiers come from the selected adapter"
+        );
+        helper.assertTrue(
+            FmSpawnerMobs.aspect("not a valid entity id") == null,
+            "invalid persisted entity identifiers are ignored safely"
+        );
+        List<String> mobIds = FmSpawnerMobs.ids();
+        helper.assertTrue(
+            mobIds.equals(mobIds.stream().sorted().toList()),
+            "the host entity catalog produces a stable sorted Mob Crystal list"
         );
         helper.assertTrue(
             HostAdapterRegistry.requireItems() != null,

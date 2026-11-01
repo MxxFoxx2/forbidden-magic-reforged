@@ -9,9 +9,9 @@ import net.minecraft.world.entity.EntityType;
 import org.jspecify.annotations.Nullable;
 
 public final class FmSpawnerMobs {
-    private static final Set<String> VANILLA_BOSSES = Set.of(
-        "minecraft:ender_dragon",
-        "minecraft:wither"
+    private static final Set<ContentId> VANILLA_BOSSES = Set.of(
+        ContentId.parse("minecraft:ender_dragon"),
+        ContentId.parse("minecraft:wither")
     );
 
     private FmSpawnerMobs() {
@@ -21,24 +21,30 @@ public final class FmSpawnerMobs {
         if (id == null) {
             return null;
         }
-        return HostAdapterRegistry.requireEntities()
-            .aspectCatalog(FmConfig.silverfishEmeralds())
-            .get(id);
+        try {
+            return HostAdapterRegistry.requireEntities()
+                .aspectCatalog(FmConfig.silverfishEmeralds())
+                .get(ContentId.parse(id));
+        } catch (IllegalArgumentException invalidEntityId) {
+            return null;
+        }
     }
 
     public static List<String> ids() {
-        return List.copyOf(
-            HostAdapterRegistry.requireEntities()
-                .aspectCatalog(FmConfig.silverfishEmeralds())
-                .keySet()
-        );
+        return HostAdapterRegistry.requireEntities()
+            .aspectCatalog(FmConfig.silverfishEmeralds())
+            .keySet()
+            .stream()
+            .sorted()
+            .map(ContentId::toString)
+            .toList();
     }
 
     public static boolean canImprint(EntityType<?> type) {
         if (!FmConfig.wrathCage()) {
             return false;
         }
-        String id = BuiltInRegistries.ENTITY_TYPE.getKey(type).toString();
+        ContentId id = ContentId.parse(BuiltInRegistries.ENTITY_TYPE.getKey(type).toString());
         boolean hasAspect = HostAdapterRegistry.requireEntities()
             .aspectCatalog(FmConfig.silverfishEmeralds())
             .containsKey(id);
@@ -46,7 +52,7 @@ public final class FmSpawnerMobs {
     }
 
     public static boolean isBoss(EntityType<?> type) {
-        String id = BuiltInRegistries.ENTITY_TYPE.getKey(type).toString();
+        ContentId id = ContentId.parse(BuiltInRegistries.ENTITY_TYPE.getKey(type).toString());
         return VANILLA_BOSSES.contains(id)
             || HostAdapterRegistry.requireEntities().bossEntityIds().contains(id);
     }

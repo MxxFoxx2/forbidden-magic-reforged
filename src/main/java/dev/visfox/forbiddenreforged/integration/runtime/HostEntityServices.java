@@ -6,7 +6,7 @@ import java.util.Set;
 import net.minecraft.world.entity.LivingEntity;
 
 /**
- * Host-owned entity taxonomy and aspect semantics exposed using neutral IDs.
+ * Host-owned entity taxonomy and aspect semantics exposed using typed, neutral identifiers.
  */
 public interface HostEntityServices {
     boolean isTaintedMob(LivingEntity entity);
@@ -15,7 +15,7 @@ public interface HostEntityServices {
 
     boolean isHostGolem(LivingEntity entity);
 
-    Map<String, ContentId> aspectCatalog(boolean silverfishEmeralds);
+    Map<ContentId, ContentId> aspectCatalog(boolean silverfishEmeralds);
 
-    Set<String> bossEntityIds();
+    Set<ContentId> bossEntityIds();
 }
