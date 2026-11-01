@@ -2,6 +2,13 @@
 
 Основной таргет — Minecraft 26.3. `main` — каноническая ветка. Подтверждённая реализация описывается в [fidelity ledger](fidelity.md), актуальный результат CI — в [verification](verification.md). Здесь остаются только незакрытые требования и критерии завершения.
 
+## Незавершённая host-agnostic миграция
+
+- Общие модели аспектов и рецептов уже заведены, а TC4-адаптеры переводят их в API хоста. Результат архитектурной ветки `architecture/host-agnostic-core`; в `main` эти изменения не входят.
+- Следующие срезы: исследования и research pages; runtime-контракты для essentia, warp, жезлов и фокусов; затем проверка второго хоста Thaumaturge.
+- Критерии каждого среза: общая модель не импортирует хост; адаптер сохраняет существующие ключи и игровое поведение; оба режима GameTest проходят; все неполные соответствия явно документированы.
+- Не объединять версии Minecraft в один source set или бинарник. Отдельные release tracks сохраняются.
+
 ## Неразрешённый вопрос аудита (не подтверждённый parity gap)
 
 **Участие FM-taint blocks в host taint graph** пока нельзя объявлять доказанным расхождением. В оригинальном исходнике [`BlockLogTainted`](https://github.com/SpitefulFox/ForbiddenMagic/blob/master/src/main/java/fox/spiteful/forbidden/blocks/BlockLogTainted.java) получает `Config.taintMaterial`, а [`BlockLeavesTainted`](https://github.com/SpitefulFox/ForbiddenMagic/blob/master/src/main/java/fox/spiteful/forbidden/blocks/BlockLeavesTainted.java) реализует собственный decay-алгоритм, который распознаёт `taintLog` как опору; отдельной регистрации этих FM-блоков как источников скверны в исходнике не найдено. Современный `TaintSpread.isTaintBlock` действительно проверяет фиксированный список блоков Thaumcraft, но одного этого недостаточно, чтобы заключить, что оригинал ожидал иной результат. Не добавлять новый host hook, пока сравнительная проверка конкретного исходного поведения не докажет пропуск. Существующий GameTest подтверждает только то, что проверенные материалы FM не заменяются в протестированных путях.
