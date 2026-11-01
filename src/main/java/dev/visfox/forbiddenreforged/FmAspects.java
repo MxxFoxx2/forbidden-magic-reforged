@@ -1,8 +1,10 @@
 package dev.visfox.forbiddenreforged;
 
-import net.minecraft.resources.Identifier;
+import dev.visfox.forbiddenreforged.core.aspect.ForbiddenMagicAspectCatalog;
+import dev.visfox.forbiddenreforged.core.model.ContentId;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectAdapter;
+import java.util.Map;
 import org.jspecify.annotations.Nullable;
-import thaumcraft.aspect.AddonAspects;
 import thaumcraft.aspect.Aspect;
 
 public final class FmAspects {
@@ -23,19 +25,16 @@ public final class FmAspects {
 
     public static void init() {
         try {
-            AddonAspects.addRegistrar(api -> {
-                if (!FmConfig.lustDisabled()) {
-                    LUST = api.register("luxuria", 0xFFC1CE, new Aspect[]{Aspect.FLESH, Aspect.HUNGER}, 1, texture("luxuria"));
-                }
-                NETHER = api.register("infernus", 0xFF0000, new Aspect[]{Aspect.FIRE, Aspect.MAGIC}, 771, texture("infernus"));
-                PRIDE = api.register("superbia", 0x9639FF, new Aspect[]{Aspect.FLIGHT, Aspect.VOID}, 1, texture("superbia"));
-                GLUTTONY = api.register("gula", 0xD59C46, new Aspect[]{Aspect.HUNGER, Aspect.VOID}, 1, texture("gula"));
-                ENVY = api.register("invidia", 0x00BA00, new Aspect[]{Aspect.SENSES, Aspect.HUNGER}, 1, texture("invidia"));
-                SLOTH = api.register("desidia", 0x6E6E6E, new Aspect[]{Aspect.TRAP, Aspect.SOUL}, 771, texture("desidia"));
-                WRATH = api.register("ira", 0x870404, new Aspect[]{Aspect.WEAPON, Aspect.FIRE}, 771, texture("ira"));
-            });
-            // Item classes build focus upgrades in static initializers, so the aspects must exist before FmItems loads.
-            AddonAspects.init();
+            Map<ContentId, Aspect> registered = Tc4AspectAdapter.registerAspects(
+                ForbiddenMagicAspectCatalog.definitions(!FmConfig.lustDisabled())
+            );
+            LUST = registered.get(ForbiddenMagicAspectCatalog.LUXURIA);
+            NETHER = registered.get(ForbiddenMagicAspectCatalog.INFERNUS);
+            PRIDE = registered.get(ForbiddenMagicAspectCatalog.SUPERBIA);
+            GLUTTONY = registered.get(ForbiddenMagicAspectCatalog.GULA);
+            ENVY = registered.get(ForbiddenMagicAspectCatalog.INVIDIA);
+            SLOTH = registered.get(ForbiddenMagicAspectCatalog.DESIDIA);
+            WRATH = registered.get(ForbiddenMagicAspectCatalog.IRA);
         } catch (NoSuchMethodError | NoClassDefFoundError absent) {
             throw new IllegalStateException("Forbidden Magic requires Thaumcraft 4: Reforged 1.1.2 or newer with the add-on aspect API", absent);
         }
@@ -45,9 +44,5 @@ public final class FmAspects {
 
     public static int count() {
         return Aspect.values().length;
-    }
-
-    private static Identifier texture(String name) {
-        return Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, "textures/aspects/" + name + ".png");
     }
 }
