@@ -32,7 +32,7 @@ public class RidingCropItem extends Item {
     public void hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
         if (target instanceof AbstractHorse || target instanceof Pig) {
             target.addEffect(new MobEffectInstance(MobEffects.SPEED, 200, 5));
-        } else if (target instanceof Player || HostAdapterRegistry.requireRuntime().isHostGolem(target)) {
+        } else if (target instanceof Player || HostAdapterRegistry.requireEntities().isHostGolem(target)) {
             target.addEffect(new MobEffectInstance(MobEffects.SPEED, 200, 1));
             target.addEffect(new MobEffectInstance(MobEffects.HASTE, 200, 1));
             target.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 200, 1));

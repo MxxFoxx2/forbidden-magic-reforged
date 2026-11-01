@@ -8,7 +8,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -23,12 +22,6 @@ import java.util.function.Predicate;
  * deliberately does not expose any Thaumcraft or other host API types.
  */
 public interface HostRuntimeServices {
-    boolean isTaintedMob(LivingEntity entity);
-
-    boolean isHostBoss(LivingEntity entity);
-
-    boolean isHostGolem(LivingEntity entity);
-
     Component aspectDescription(ContentId aspect);
 
     void playMorphCycleSound(Level level, BlockPos pos, RandomSource random);

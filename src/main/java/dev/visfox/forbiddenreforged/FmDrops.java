@@ -134,7 +134,7 @@ public final class FmDrops {
 
     private static void onTaintedBloodShardDrop(LivingDropsEvent event) {
         LivingEntity entity = event.getEntity();
-        if (!HostAdapterRegistry.requireRuntime().isTaintedMob(entity)) {
+        if (!HostAdapterRegistry.requireEntities().isTaintedMob(entity)) {
             return;
         }
         DamageSource source = event.getSource();
@@ -215,7 +215,7 @@ public final class FmDrops {
     }
 
     private static boolean isBoss(LivingEntity entity) {
-        return entity instanceof WitherBoss || entity instanceof EnderDragon || HostAdapterRegistry.requireRuntime().isHostBoss(entity);
+        return entity instanceof WitherBoss || entity instanceof EnderDragon || HostAdapterRegistry.requireEntities().isHostBoss(entity);
     }
 
     private static int wrathBonus(ServerPlayer player, LivingEntity target) {

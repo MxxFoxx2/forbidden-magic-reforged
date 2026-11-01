@@ -11,6 +11,7 @@ import dev.visfox.forbiddenreforged.integration.api.HostProfile;
 import dev.visfox.forbiddenreforged.integration.runtime.HostRuntimeServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostItemServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostBootstrapServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostEntityServices;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
@@ -27,11 +28,12 @@ import thaumcraft.registry.EldritchContent;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Thaumcraft 4: Reforged implementation of the host-neutral content contract.
  */
-public final class Tc4HostAdapter implements HostAdapter, HostRuntimeServices, HostItemServices, HostBootstrapServices {
+public final class Tc4HostAdapter implements HostAdapter, HostRuntimeServices, HostItemServices, HostBootstrapServices, HostEntityServices {
     public static final Tc4HostAdapter INSTANCE = new Tc4HostAdapter();
 
     private static final HostProfile PROFILE = new HostProfile(
@@ -63,6 +65,8 @@ public final class Tc4HostAdapter implements HostAdapter, HostRuntimeServices, H
                 HostProfile.FeatureSupport.adapted("Creates TC4-backed items and applies TC4 tool material/food property adapters")),
             Map.entry(HostProfile.Feature.BLOCK_ENTITY_IMPLEMENTATION,
                 HostProfile.FeatureSupport.adapted("Provides the TC4 EssentiaSource/EssentiaTransport Wrath Cage bridge implementation")),
+            Map.entry(HostProfile.Feature.ENTITY_ASPECTS,
+                HostProfile.FeatureSupport.adapted("Provides vanilla and Thaumcraft entity aspect mappings plus TC4 boss and taint predicates")),
             Map.entry(HostProfile.Feature.RESEARCH_ENTRIES,
                 HostProfile.FeatureSupport.adapted("Translates common research definitions to ResearchItem")),
             Map.entry(HostProfile.Feature.RESEARCH_STAGES,
@@ -146,6 +150,16 @@ public final class Tc4HostAdapter implements HostAdapter, HostRuntimeServices, H
     @Override
     public boolean isHostGolem(LivingEntity entity) {
         return Tc4EntityAdapter.isHostGolem(entity);
+    }
+
+    @Override
+    public Map<String, ContentId> aspectCatalog(boolean silverfishEmeralds) {
+        return Tc4EntityAdapter.aspectCatalog(silverfishEmeralds);
+    }
+
+    @Override
+    public Set<String> bossEntityIds() {
+        return Tc4EntityAdapter.bossEntityIds();
     }
 
     @Override

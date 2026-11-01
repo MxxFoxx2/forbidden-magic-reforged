@@ -3,6 +3,7 @@ package dev.visfox.forbiddenreforged.integration.api;
 import dev.visfox.forbiddenreforged.integration.runtime.HostRuntimeServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostItemServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostBootstrapServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostEntityServices;
 import java.util.Objects;
 
 /**
@@ -48,6 +49,19 @@ public final class HostAdapterRegistry {
         }
         throw new IllegalStateException(
             "Selected host adapter does not expose runtime services: " + adapter.profile().id()
+        );
+    }
+
+    /**
+     * Returns the host's entity taxonomy, aspect catalog, and host entity predicates.
+     */
+    public static HostEntityServices requireEntities() {
+        HostAdapter adapter = require();
+        if (adapter instanceof HostEntityServices entities) {
+            return entities;
+        }
+        throw new IllegalStateException(
+            "Selected host adapter does not expose entity services: " + adapter.profile().id()
         );
     }
 

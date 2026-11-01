@@ -13,6 +13,7 @@ BOUNDARIES = (
 HOST_NEUTRAL_GAMEPLAY = (
     ROOT / "src/main/java/dev/visfox/forbiddenreforged/WrathCageBlockEntity.java",
     ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmSpawnerMobs.java",
+    ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostEntityServices.java",
     ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmWandTriggers.java",
     ROOT / "src/main/java/dev/visfox/forbiddenreforged/core/wand",
 )
@@ -28,6 +29,8 @@ HOST_FORBIDDEN = (
     "TcBlockEntity",
     "AspectSource",
     "EssentiaTransport",
+    "thaumcraft:",
+    "com.leclowndu93150.thaumaturge:",
 )
 
 WANDS_USAGE_BOUNDARY = (
@@ -213,6 +216,8 @@ def main() -> int:
     runtime_registry = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/api/HostAdapterRegistry.java").read_text(encoding="utf-8")
     if "HostRuntimeServices requireRuntime()" not in runtime_registry:
         failures.append("HostAdapterRegistry is missing the runtime capability lookup")
+    if "HostEntityServices requireEntities()" not in runtime_registry:
+        failures.append("HostAdapterRegistry is missing the host entity capability lookup")
     for contract_method in (
         "Component aspectDescription(ContentId aspect)",
         "void playMorphCycleSound(",
@@ -243,6 +248,32 @@ def main() -> int:
     item_registry = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/api/HostAdapterRegistry.java").read_text(encoding="utf-8")
     if "HostItemServices requireItems()" not in item_registry:
         failures.append("HostAdapterRegistry is missing the host item factory lookup")
+
+    entity_contract = ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostEntityServices.java"
+    entity_content = entity_contract.read_text(encoding="utf-8")
+    for forbidden in ("thaumcraft.", "thaumcraft:", "com.leclowndu93150.thaumaturge."):
+        if forbidden in entity_content:
+            failures.append(
+                f"{entity_contract.relative_to(ROOT)} exposes a concrete host type or namespace: {forbidden}"
+            )
+    if "HostEntityServices requireEntities()" not in runtime_registry:
+        failures.append("HostAdapterRegistry is missing the host entity capability lookup")
+    if "Map<String, ContentId> aspectCatalog(boolean silverfishEmeralds)" not in entity_content:
+        failures.append("HostEntityServices is missing the host-neutral entity aspect catalog")
+    entity_consumers = (
+        ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmSpawnerMobs.java",
+        ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmDrops.java",
+        ROOT / "src/main/java/dev/visfox/forbiddenreforged/RidingCropItem.java",
+    )
+    for source in entity_consumers:
+        source_content = source.read_text(encoding="utf-8")
+        if "integration.tc4" in source_content or "thaumcraft." in source_content or "thaumcraft:" in source_content:
+            failures.append(
+                f"{source.relative_to(ROOT)} references concrete host entity data instead of HostEntityServices"
+            )
+    if "HostAdapterRegistry.requireEntities()" not in (ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmSpawnerMobs.java").read_text(encoding="utf-8"):
+        failures.append("FmSpawnerMobs bypasses the host-neutral entity catalog")
+
     if "Item primordialPearlItem()" not in item_content:
         failures.append("HostItemServices is missing the Primewell remainder item factory")
 

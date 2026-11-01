@@ -1,0 +1,21 @@
+package dev.visfox.forbiddenreforged.integration.runtime;
+
+import dev.visfox.forbiddenreforged.core.model.ContentId;
+import java.util.Map;
+import java.util.Set;
+import net.minecraft.world.entity.LivingEntity;
+
+/**
+ * Host-owned entity taxonomy and aspect semantics exposed using neutral IDs.
+ */
+public interface HostEntityServices {
+    boolean isTaintedMob(LivingEntity entity);
+
+    boolean isHostBoss(LivingEntity entity);
+
+    boolean isHostGolem(LivingEntity entity);
+
+    Map<String, ContentId> aspectCatalog(boolean silverfishEmeralds);
+
+    Set<String> bossEntityIds();
+}

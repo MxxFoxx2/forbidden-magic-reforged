@@ -39,6 +39,7 @@ import dev.visfox.forbiddenreforged.FmConfig;
 import dev.visfox.forbiddenreforged.FmDrops;
 import dev.visfox.forbiddenreforged.FmItems;
 import dev.visfox.forbiddenreforged.FmRecipes;
+import dev.visfox.forbiddenreforged.FmSpawnerMobs;
 import dev.visfox.forbiddenreforged.core.research.ForbiddenMagicResearchCatalog;
 import dev.visfox.forbiddenreforged.core.research.ResearchDefinition;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
@@ -194,6 +195,10 @@ public final class RecipeGameTests {
             "host block entity implementation is declared by the selected adapter"
         );
         helper.assertTrue(
+            profile.supportOf(HostProfile.Feature.ENTITY_ASPECTS).level() == HostProfile.SupportLevel.ADAPTED,
+            "the selected host declares its entity aspect catalog"
+        );
+        helper.assertTrue(
             profile.supportOf(HostProfile.Feature.WAND_RODS).level() == HostProfile.SupportLevel.ADAPTED,
             "host wand rod registration is declared by the selected adapter"
         );
@@ -216,6 +221,29 @@ public final class RecipeGameTests {
         helper.assertTrue(
             HostAdapterRegistry.requireRuntime() != null,
             "the selected host exposes its runtime service boundary"
+        );
+        helper.assertTrue(
+            HostAdapterRegistry.requireEntities() != null,
+            "the selected host exposes its entity service boundary"
+        );
+        helper.assertValueEqual(
+            FmSpawnerMobs.aspect("thaumcraft:firebat"),
+            ContentId.parse("thaumcraft:ignis"),
+            "host entity aspects are resolved through the selected adapter"
+        );
+        helper.assertValueEqual(
+            HostAdapterRegistry.requireEntities().aspectCatalog(false).get("minecraft:silverfish"),
+            ContentId.parse("thaumcraft:bestia"),
+            "the host catalog preserves the default silverfish aspect"
+        );
+        helper.assertValueEqual(
+            HostAdapterRegistry.requireEntities().aspectCatalog(true).get("minecraft:silverfish"),
+            ContentId.parse("thaumcraft:lucrum"),
+            "the host catalog preserves the configured silverfish aspect alternative"
+        );
+        helper.assertTrue(
+            HostAdapterRegistry.requireEntities().bossEntityIds().contains("thaumcraft:eldritch_warden"),
+            "host-specific boss identifiers come from the selected adapter"
         );
         helper.assertTrue(
             HostAdapterRegistry.requireItems() != null,
