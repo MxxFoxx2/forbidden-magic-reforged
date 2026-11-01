@@ -8,7 +8,8 @@ import net.minecraft.world.item.Items;
 import thaumcraft.aspect.AddonAspects;
 import thaumcraft.device.SmeltingBonuses;
 import thaumcraft.aspect.Aspect;
-import thaumcraft.research.Warp;
+import dev.visfox.forbiddenreforged.core.model.ContentId;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4WarpAdapter;
 
 @EventBusSubscriber(modid = ForbiddenMagic.MODID)
 public final class FmSetup {
@@ -20,6 +21,9 @@ public final class FmSetup {
         event.enqueueWork(() -> {
             AddonAspects.init();
             logAspectRegistry();
+            Tc4WarpAdapter.register();
+            Tc4WarpAdapter.registerWarpItem(ContentId.parse("forbiddenmagic:wrath_cage"), 5);
+            Tc4WarpAdapter.registerWarpItem(ContentId.parse("forbiddenmagic:taint_sapling"), 1);
             FmWands.register();
             FmWandTriggers.register();
             FmRecipes.register();
@@ -27,8 +31,6 @@ public final class FmSetup {
             thaumcraft.device.SmeltingBonuses.register(
                 net.minecraft.world.item.Items.EMERALD,
                 FmItems.EMERALD_FRAGMENT.get());
-            Warp.registerItem(ForbiddenMagic.id("wrath_cage"), 5);
-            Warp.registerItem(ForbiddenMagic.id("taint_sapling"), 1);
             FmTinkerer.register();
         });
     }
