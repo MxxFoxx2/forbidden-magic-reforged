@@ -17,12 +17,6 @@ import thaumcraft.crafting.TcRecipe;
 import thaumcraft.crafting.TcRecipes;
 import thaumcraft.crafting.TcStack;
 
-/**
- * Translates common Forbidden Magic recipe definitions to Thaumcraft 4: Reforged recipes.
- *
- * <p>Legacy uppercase keys and host research identifiers are deliberately resolved here rather
- * than stored in the common recipe model.
- */
 public final class Tc4RecipeAdapter {
     private static final Map<String, String> LEGACY_RECIPE_KEYS = Map.of(
         "emerald_transmutation", "TRANSEMERALD",
@@ -40,10 +34,7 @@ public final class Tc4RecipeAdapter {
     private Tc4RecipeAdapter() {
     }
 
-    /**
-     * Reads the legacy host option that selects the simpler Crystalwell recipe variant.
-     * This is intentionally kept out of the common recipe catalog.
-     */
+    
     public static boolean crystalwellUsesShardTag() {
         return thaumcraft.Config.researchDifficulty() == -1;
     }
