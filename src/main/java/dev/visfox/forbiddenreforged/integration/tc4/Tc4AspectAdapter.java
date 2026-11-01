@@ -30,7 +30,7 @@ public final class Tc4AspectAdapter {
                     definition.id().path(),
                     definition.color(),
                     components,
-                    definition.sortOrder(),
+                    blendConstant(definition.blendMode()),
                     Identifier.fromNamespaceAndPath(
                         definition.texture().namespace(),
                         definition.texture().path()
@@ -41,6 +41,13 @@ public final class Tc4AspectAdapter {
         });
         AddonAspects.init();
         return Map.copyOf(registered);
+    }
+
+    private static int blendConstant(AspectDefinition.BlendMode blendMode) {
+        return switch (blendMode) {
+            case ADDITIVE -> 1;
+            case ONE_MINUS_SOURCE_COLOR -> 771;
+        };
     }
 
     private static Aspect resolveConcept(ContentId concept) {
