@@ -6,12 +6,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-/**
- * Host-neutral research entry, stages and pages.
- *
- * <p>Pages reference translation keys or common recipe identifiers. A host adapter is responsible
- * for translating page kinds, progression rules and presentation into its own research system.
- */
 public record ResearchDefinition(
     ContentId id,
     ContentId category,
@@ -64,10 +58,7 @@ public record ResearchDefinition(
         INFUSION_ENCHANTMENT
     }
 
-    /**
-     * For TEXT pages, reference is a translation key. For recipe pages, it is a namespaced
-     * ContentId string. The distinction stays explicit in pageKind.
-     */
+    
     public record Page(PageKind pageKind, String reference) {
         public Page {
             Objects.requireNonNull(pageKind, "pageKind");
