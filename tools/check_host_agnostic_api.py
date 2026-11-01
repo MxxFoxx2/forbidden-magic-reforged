@@ -141,9 +141,14 @@ def main() -> int:
     bootstrap_content = bootstrap.read_text(encoding="utf-8")
     adapter_install = bootstrap_content.find("HostAdapterRegistry.install(Tc4HostAdapter.INSTANCE)")
     aspect_init = bootstrap_content.find("FmAspects.init()")
+    aspect_tags = bootstrap_content.find("HostAdapterRegistry.require().registerAspectTags()")
     if adapter_install < 0 or aspect_init < 0 or adapter_install > aspect_init:
         failures.append(
             "ForbiddenMagic must install the host adapter before initializing aspect catalogs"
+        )
+    if aspect_tags < 0 or "Tc4AspectTagAdapter" in bootstrap_content:
+        failures.append(
+            "ForbiddenMagic must register aspect scan targets through HostAdapter rather than a concrete TC4 adapter"
         )
 
 
@@ -169,6 +174,8 @@ def main() -> int:
     host_api = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/api/HostAdapter.java").read_text(encoding="utf-8")
     if "crystalwellUsesShardTag()" not in host_api:
         failures.append("HostAdapter is missing the Crystalwell ingredient configuration query")
+    if "void registerAspectTags()" not in host_api:
+        failures.append("HostAdapter is missing the host aspect scan-target registration hook")
     for contract_method in ("initializeRuntime()", "aspectDiagnostics()"):
         if contract_method not in host_api:
             failures.append(

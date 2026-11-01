@@ -9,6 +9,9 @@ import java.util.List;
 public interface HostAdapter {
     HostProfile profile();
 
+    /** Registers host-native aspect scan targets after custom aspects exist. */
+    void registerAspectTags();
+
     /** Returns the host's configured Crystalwell ingredient mode. */
     boolean crystalwellUsesShardTag();
 

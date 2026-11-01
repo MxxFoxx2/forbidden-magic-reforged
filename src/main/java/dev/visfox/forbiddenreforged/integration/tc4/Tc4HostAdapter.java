@@ -41,6 +41,8 @@ public final class Tc4HostAdapter implements HostAdapter, HostRuntimeServices, H
         Map.ofEntries(
             Map.entry(HostProfile.Feature.ASPECT_REGISTRATION,
                 HostProfile.FeatureSupport.adapted("Uses the AddonAspects registration API")),
+            Map.entry(HostProfile.Feature.ASPECT_SCAN_TARGETS,
+                HostProfile.FeatureSupport.adapted("Registers item, block and entity scan targets through the TC4 AspectSync API")),
             Map.entry(HostProfile.Feature.ASPECT_DIAGNOSTICS,
                 HostProfile.FeatureSupport.adapted("Reports native and add-on aspects from the TC4 registry")),
             Map.entry(HostProfile.Feature.RUNTIME_BOOTSTRAP,
@@ -94,6 +96,11 @@ public final class Tc4HostAdapter implements HostAdapter, HostRuntimeServices, H
     @Override
     public List<String> aspectDiagnostics() {
         return Tc4AspectDiagnostics.registryLines();
+    }
+
+    @Override
+    public void registerAspectTags() {
+        Tc4AspectTagAdapter.register();
     }
 
     @Override

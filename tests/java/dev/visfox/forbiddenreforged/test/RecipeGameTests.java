@@ -166,6 +166,10 @@ public final class RecipeGameTests {
             "aspect registration is exposed through the adapter"
         );
         helper.assertTrue(
+            profile.supportOf(HostProfile.Feature.ASPECT_SCAN_TARGETS).level() == HostProfile.SupportLevel.ADAPTED,
+            "host aspect scan-target registration is declared by the adapter"
+        );
+        helper.assertTrue(
             profile.supportOf(HostProfile.Feature.RESEARCH_STAGES).level() == HostProfile.SupportLevel.PARTIAL,
             "multi-stage research limitations are declared by the adapter"
         );

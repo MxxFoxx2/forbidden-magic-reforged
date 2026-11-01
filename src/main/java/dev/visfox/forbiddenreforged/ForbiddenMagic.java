@@ -2,7 +2,6 @@ package dev.visfox.forbiddenreforged;
 
 import dev.visfox.forbiddenreforged.test.AspectGameTests;
 import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
-import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectTagAdapter;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4HostAdapter;
 import dev.visfox.forbiddenreforged.test.BlockGameTests;
 import dev.visfox.forbiddenreforged.test.EnchantmentGameTests;
@@ -25,7 +24,7 @@ public final class ForbiddenMagic {
         FmConfig.register(modContainer);
         HostAdapterRegistry.install(Tc4HostAdapter.INSTANCE);
         FmAspects.init();
-        Tc4AspectTagAdapter.register();
+        HostAdapterRegistry.require().registerAspectTags();
         FmComponents.register(modEventBus);
         FmBlocks.BLOCKS.register(modEventBus);
         FmBlockEntities.register(modEventBus);
