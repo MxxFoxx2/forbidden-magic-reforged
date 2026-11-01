@@ -43,6 +43,8 @@ import dev.visfox.forbiddenreforged.core.research.ForbiddenMagicResearchCatalog;
 import dev.visfox.forbiddenreforged.core.research.ResearchDefinition;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4ResearchAdapter;
+import dev.visfox.forbiddenreforged.core.warp.WarpKind;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4WarpAdapter;
 import dev.visfox.forbiddenreforged.core.recipe.ForbiddenMagicRecipeCatalog;
 import dev.visfox.forbiddenreforged.core.recipe.RecipeDefinition;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4RecipeAdapter;
@@ -64,6 +66,7 @@ import thaumcraft.research.ResearchItem;
 import thaumcraft.research.ResearchManager;
 import thaumcraft.registry.ModItems;
 import thaumcraft.research.Warp;
+import thaumcraft.research.WarpType;
 
 @EventBusSubscriber(modid = ForbiddenMagic.MODID)
 public final class RecipeGameTests {
@@ -87,7 +90,8 @@ public final class RecipeGameTests {
         "research_layout_matches_original",
         "common_recipe_catalog_matches_tc4_registration",
         "common_research_catalog_matches_tc4_registration",
-        "research_catalog_preserves_flags_pages_and_progression"
+        "research_catalog_preserves_flags_pages_and_progression",
+        "tc4_warp_adapter_preserves_semantic_types_and_item_costs"
     };
 
     static {
@@ -108,6 +112,7 @@ public final class RecipeGameTests {
         FUNCTIONS.register(TESTS[14], () -> RecipeGameTests::commonRecipeCatalogMatchesTc4Registration);
         FUNCTIONS.register(TESTS[15], () -> RecipeGameTests::commonResearchCatalogMatchesTc4Registration);
         FUNCTIONS.register(TESTS[16], () -> RecipeGameTests::researchCatalogPreservesFlagsPagesAndProgression);
+        FUNCTIONS.register(TESTS[17], () -> RecipeGameTests::tc4WarpAdapterPreservesSemanticTypesAndItemCosts);
     }
 
     private RecipeGameTests() {}
@@ -252,6 +257,20 @@ public final class RecipeGameTests {
         helper.assertTrue(infernalRod != null, "mixed-case ROD_infernal key is preserved");
         helper.assertTrue(ResearchCategories.getResearch("ROD_silverwood") != null,
             "mixed-case ROD_silverwood parent resolves");
+        helper.succeed();
+    }
+
+    private static void tc4WarpAdapterPreservesSemanticTypesAndItemCosts(GameTestHelper helper) {
+        helper.assertValueEqual(Tc4WarpAdapter.toHostType(WarpKind.NORMAL), WarpType.NORMAL,
+            "normal warp must map to TC4 normal");
+        helper.assertValueEqual(Tc4WarpAdapter.toHostType(WarpKind.STICKY), WarpType.STICKY,
+            "sticky warp must map to TC4 sticky");
+        helper.assertValueEqual(Tc4WarpAdapter.toHostType(WarpKind.TEMPORARY), WarpType.TEMPORARY,
+            "temporary warp must map to TC4 temporary");
+        helper.assertValueEqual(Warp.getItemWarp(new ItemStack(FmBlocks.WRATH_CAGE.get().asItem())), 5,
+            "Wrath Cage item must keep five warp");
+        helper.assertValueEqual(Warp.getItemWarp(new ItemStack(FmBlocks.TAINT_SAPLING.get().asItem())), 1,
+            "Tainted Sapling item must keep one warp");
         helper.succeed();
     }
 
