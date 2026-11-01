@@ -1,6 +1,8 @@
 package dev.visfox.forbiddenreforged.integration.runtime;
 
+import dev.visfox.forbiddenreforged.WrathCageBlockEntity;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
+import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -20,6 +22,8 @@ public interface HostRuntimeServices {
     boolean isHostBoss(LivingEntity entity);
 
     boolean isHostGolem(LivingEntity entity);
+
+    WrathCageBlockEntity createWrathCageBlockEntity(BlockPos pos, BlockState state);
 
     boolean isWand(ItemStack stack);
 

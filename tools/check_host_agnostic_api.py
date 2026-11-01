@@ -183,6 +183,8 @@ def main() -> int:
         ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmEnchantmentEffects.java",
         ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmToolEvents.java",
         ROOT / "src/main/java/dev/visfox/forbiddenreforged/RidingCropItem.java",
+        ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmBlockEntities.java",
+        ROOT / "src/main/java/dev/visfox/forbiddenreforged/WrathCageBlock.java",
     )
     for source in runtime_consumers:
         source_content = source.read_text(encoding="utf-8")
@@ -194,6 +196,10 @@ def main() -> int:
     runtime_registry = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/api/HostAdapterRegistry.java").read_text(encoding="utf-8")
     if "HostRuntimeServices requireRuntime()" not in runtime_registry:
         failures.append("HostAdapterRegistry is missing the runtime capability lookup")
+    if "HostItemServices requireItems()" not in runtime_registry:
+        failures.append("HostAdapterRegistry is missing the host item factory lookup")
+    if "WrathCageBlockEntity createWrathCageBlockEntity(" not in runtime_content:
+        failures.append("HostRuntimeServices is missing the host-provided Wrath Cage block entity factory")
 
 
     item_contract = ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostItemServices.java"

@@ -186,6 +186,10 @@ public final class RecipeGameTests {
             "host-specific item registration is declared by the selected adapter"
         );
         helper.assertTrue(
+            profile.supportOf(HostProfile.Feature.BLOCK_ENTITY_IMPLEMENTATION).level() == HostProfile.SupportLevel.ADAPTED,
+            "host block entity implementation is declared by the selected adapter"
+        );
+        helper.assertTrue(
             HostAdapterRegistry.requireRuntime() != null,
             "the selected host exposes its runtime service boundary"
         );

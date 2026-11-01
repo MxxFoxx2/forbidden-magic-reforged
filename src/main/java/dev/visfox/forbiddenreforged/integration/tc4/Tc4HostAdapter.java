@@ -1,5 +1,6 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
+import dev.visfox.forbiddenreforged.WrathCageBlockEntity;
 import dev.visfox.forbiddenreforged.core.aspect.AspectDefinition;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.core.recipe.RecipeDefinition;
@@ -9,6 +10,7 @@ import dev.visfox.forbiddenreforged.integration.api.HostAdapter;
 import dev.visfox.forbiddenreforged.integration.api.HostProfile;
 import dev.visfox.forbiddenreforged.integration.runtime.HostRuntimeServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostItemServices;
+import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -40,6 +42,8 @@ public final class Tc4HostAdapter implements HostAdapter, HostRuntimeServices, H
                 HostProfile.FeatureSupport.adapted("Provides entity, wand, accessory, taint, damage and special-mining runtime services")),
             Map.entry(HostProfile.Feature.ITEM_REGISTRATION,
                 HostProfile.FeatureSupport.adapted("Creates TC4-backed items and applies TC4 tool material/food property adapters")),
+            Map.entry(HostProfile.Feature.BLOCK_ENTITY_IMPLEMENTATION,
+                HostProfile.FeatureSupport.adapted("Provides the TC4 EssentiaSource/EssentiaTransport Wrath Cage bridge implementation")),
             Map.entry(HostProfile.Feature.RESEARCH_ENTRIES,
                 HostProfile.FeatureSupport.adapted("Translates common research definitions to ResearchItem")),
             Map.entry(HostProfile.Feature.RESEARCH_STAGES,
@@ -113,6 +117,11 @@ public final class Tc4HostAdapter implements HostAdapter, HostRuntimeServices, H
     @Override
     public boolean isHostGolem(LivingEntity entity) {
         return Tc4EntityAdapter.isHostGolem(entity);
+    }
+
+    @Override
+    public WrathCageBlockEntity createWrathCageBlockEntity(BlockPos pos, BlockState state) {
+        return new Tc4WrathCageBlockEntity(pos, state);
     }
 
     @Override
