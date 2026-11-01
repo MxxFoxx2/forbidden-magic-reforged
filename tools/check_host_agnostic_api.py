@@ -229,6 +229,7 @@ def main() -> int:
             failures.append(f"HostAdapterRegistry is missing a focused runtime capability lookup: {lookup}")
 
     capability_consumers = {
+        "FmDrops.java": ("requireEntities()", "requireWands()"),
         "FmEnchantmentEffects.java": ("requireTaint()", "requireWands()"),
         "FmToolEvents.java": ("requireWands()", "requireTaint()"),
         "ScribeWellEvents.java": ("requireScribing()",),
@@ -248,6 +249,16 @@ def main() -> int:
                 failures.append(f"{source.relative_to(ROOT)} does not use its focused capability: {lookup}")
         if "integration.tc4" in content or "thaumcraft." in content:
             failures.append(f"{source.relative_to(ROOT)} calls a concrete host adapter instead of a host capability")
+
+    for source_root in (ROOT / "src/main/java", ROOT / "tests/java"):
+        if not source_root.is_dir():
+            continue
+        for source in source_root.rglob("*.java"):
+            content = source.read_text(encoding="utf-8")
+            if "HostRuntimeServices" in content or "requireRuntime()" in content:
+                failures.append(
+                    f"{source.relative_to(ROOT)} still references the removed monolithic runtime contract"
+                )
 
     item_contract = ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostItemServices.java"
     item_content = item_contract.read_text(encoding="utf-8")
