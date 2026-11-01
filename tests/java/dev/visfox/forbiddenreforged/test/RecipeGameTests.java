@@ -42,6 +42,7 @@ import dev.visfox.forbiddenreforged.FmRecipes;
 import dev.visfox.forbiddenreforged.core.research.ForbiddenMagicResearchCatalog;
 import dev.visfox.forbiddenreforged.core.research.ResearchDefinition;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
+import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4ResearchAdapter;
 import dev.visfox.forbiddenreforged.core.recipe.ForbiddenMagicRecipeCatalog;
 import dev.visfox.forbiddenreforged.core.recipe.RecipeDefinition;
@@ -85,7 +86,8 @@ public final class RecipeGameTests {
         "warp_values_match_original",
         "research_layout_matches_original",
         "common_recipe_catalog_matches_tc4_registration",
-        "common_research_catalog_matches_tc4_registration"
+        "common_research_catalog_matches_tc4_registration",
+        "research_catalog_preserves_flags_pages_and_progression"
     };
 
     static {
@@ -105,6 +107,7 @@ public final class RecipeGameTests {
         FUNCTIONS.register(TESTS[13], () -> RecipeGameTests::researchLayoutMatchesOriginal);
         FUNCTIONS.register(TESTS[14], () -> RecipeGameTests::commonRecipeCatalogMatchesTc4Registration);
         FUNCTIONS.register(TESTS[15], () -> RecipeGameTests::commonResearchCatalogMatchesTc4Registration);
+        FUNCTIONS.register(TESTS[16], () -> RecipeGameTests::researchCatalogPreservesFlagsPagesAndProgression);
     }
 
     private RecipeGameTests() {}
@@ -203,6 +206,52 @@ public final class RecipeGameTests {
         }
         helper.assertValueEqual(translatedKeys.size(), definitions.size(),
             "every common research definition must have a unique TC4 key");
+        helper.succeed();
+    }
+
+    private static void researchCatalogPreservesFlagsPagesAndProgression(GameTestHelper helper) {
+        ForbiddenMagicResearchCatalog.Options options = new ForbiddenMagicResearchCatalog.Options(
+            FmConfig.enchantmentsEnabled(),
+            FmConfig.greedyEnchantmentEnabled(),
+            FmConfig.lustDisabled(),
+            FmConfig.emeraldTrans(),
+            ModList.get().isLoaded("arsmagica2"),
+            Tc4RecipeAdapter.crystalwellUsesShardTag()
+        );
+        List<ResearchDefinition> definitions = ForbiddenMagicResearchCatalog.definitions(options);
+        for (ResearchDefinition definition : definitions) {
+            ResearchItem expected = Tc4ResearchAdapter.translate(definition);
+            ResearchItem actual = ResearchCategories.getResearch(expected.key());
+            helper.assertTrue(actual != null, expected.key() + " is registered");
+            if (actual == null) {
+                continue;
+            }
+            helper.assertValueEqual(actual.pages(), expected.pages(), expected.key() + " pages");
+            helper.assertValueEqual(actual.isSpecial(), definition.flags().contains(ResearchDefinition.Flag.SPECIAL), expected.key() + " special flag");
+            helper.assertValueEqual(actual.isSecondary(), definition.flags().contains(ResearchDefinition.Flag.SECONDARY), expected.key() + " secondary flag");
+            helper.assertValueEqual(actual.isRound(), definition.flags().contains(ResearchDefinition.Flag.ROUND_ICON), expected.key() + " round flag");
+            helper.assertValueEqual(actual.isStub(), definition.flags().contains(ResearchDefinition.Flag.STUB), expected.key() + " stub flag");
+            helper.assertValueEqual(actual.isVirtual(), definition.flags().contains(ResearchDefinition.Flag.VIRTUAL), expected.key() + " virtual flag");
+            helper.assertValueEqual(actual.isConcealed(), definition.flags().contains(ResearchDefinition.Flag.CONCEALED), expected.key() + " concealed flag");
+            helper.assertValueEqual(actual.isHidden(), definition.flags().contains(ResearchDefinition.Flag.HIDDEN), expected.key() + " hidden flag");
+            helper.assertValueEqual(actual.isLost(), definition.flags().contains(ResearchDefinition.Flag.LOST), expected.key() + " lost flag");
+            helper.assertValueEqual(actual.isAutoUnlock(), definition.flags().contains(ResearchDefinition.Flag.AUTO_UNLOCK), expected.key() + " auto-unlock flag");
+            helper.assertValueEqual(actual.parents(), expected.parents(), expected.key() + " parents");
+            helper.assertValueEqual(actual.parentsHidden(), expected.parentsHidden(), expected.key() + " hidden parents");
+            helper.assertValueEqual(actual.aspectTriggers(), expected.aspectTriggers(), expected.key() + " aspect triggers");
+            helper.assertValueEqual(actual.tags(), expected.tags(), expected.key() + " note costs");
+            helper.assertValueEqual(actual.warp(), expected.warp(), expected.key() + " warp");
+            helper.assertValueEqual(actual.column(), expected.column(), expected.key() + " column");
+            helper.assertValueEqual(actual.row(), expected.row(), expected.key() + " row");
+            helper.assertValueEqual(actual.complexity(), expected.complexity(), expected.key() + " complexity");
+        }
+
+        ResearchItem taintedRod = ResearchCategories.getResearch("ROD_tainted");
+        helper.assertTrue(taintedRod != null, "mixed-case ROD_tainted key is preserved");
+        ResearchItem infernalRod = ResearchCategories.getResearch("ROD_infernal");
+        helper.assertTrue(infernalRod != null, "mixed-case ROD_infernal key is preserved");
+        helper.assertTrue(ResearchCategories.getResearch("ROD_silverwood") != null,
+            "mixed-case ROD_silverwood parent resolves");
         helper.succeed();
     }
 
