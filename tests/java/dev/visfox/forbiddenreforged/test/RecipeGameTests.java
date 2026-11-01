@@ -39,6 +39,10 @@ import dev.visfox.forbiddenreforged.FmConfig;
 import dev.visfox.forbiddenreforged.FmDrops;
 import dev.visfox.forbiddenreforged.FmItems;
 import dev.visfox.forbiddenreforged.FmRecipes;
+import dev.visfox.forbiddenreforged.core.research.ForbiddenMagicResearchCatalog;
+import dev.visfox.forbiddenreforged.core.research.ResearchDefinition;
+import dev.visfox.forbiddenreforged.core.model.ContentId;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4ResearchAdapter;
 import dev.visfox.forbiddenreforged.core.recipe.ForbiddenMagicRecipeCatalog;
 import dev.visfox.forbiddenreforged.core.recipe.RecipeDefinition;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4RecipeAdapter;
@@ -80,7 +84,8 @@ public final class RecipeGameTests {
         "subcollar_matches_original",
         "warp_values_match_original",
         "research_layout_matches_original",
-        "common_recipe_catalog_matches_tc4_registration"
+        "common_recipe_catalog_matches_tc4_registration",
+        "common_research_catalog_matches_tc4_registration"
     };
 
     static {
@@ -99,6 +104,7 @@ public final class RecipeGameTests {
         FUNCTIONS.register(TESTS[12], () -> RecipeGameTests::warpValuesMatchOriginal);
         FUNCTIONS.register(TESTS[13], () -> RecipeGameTests::researchLayoutMatchesOriginal);
         FUNCTIONS.register(TESTS[14], () -> RecipeGameTests::commonRecipeCatalogMatchesTc4Registration);
+        FUNCTIONS.register(TESTS[15], () -> RecipeGameTests::commonResearchCatalogMatchesTc4Registration);
     }
 
     private RecipeGameTests() {}
@@ -142,6 +148,61 @@ public final class RecipeGameTests {
         }
         helper.assertValueEqual(translatedKeys.size(), definitions.size(),
             "every common recipe definition must have a unique host recipe key");
+        helper.succeed();
+    }
+
+    private static void commonResearchCatalogMatchesTc4Registration(GameTestHelper helper) {
+        ForbiddenMagicResearchCatalog.Options options = new ForbiddenMagicResearchCatalog.Options(
+            FmConfig.enchantmentsEnabled(),
+            FmConfig.greedyEnchantmentEnabled(),
+            FmConfig.lustDisabled(),
+            FmConfig.emeraldTrans(),
+            ModList.get().isLoaded("arsmagica2"),
+            Tc4RecipeAdapter.crystalwellUsesShardTag()
+        );
+        List<ResearchDefinition> definitions = ForbiddenMagicResearchCatalog.definitions(options);
+        Set<String> translatedKeys = new HashSet<>();
+        for (ResearchDefinition definition : definitions) {
+            ResearchItem translated = Tc4ResearchAdapter.translate(definition);
+            helper.assertTrue(translatedKeys.add(translated.key()),
+                "common research catalog generated duplicate TC4 key: " + translated.key());
+            ResearchItem registered = ResearchCategories.getResearch(translated.key());
+            helper.assertTrue(registered != null,
+                "common research catalog entry was not registered: " + translated.key());
+            if (registered == null) {
+                continue;
+            }
+            helper.assertValueEqual(registered.category(), translated.category(),
+                translated.key() + " category");
+            helper.assertValueEqual(registered.column(), definition.column(),
+                translated.key() + " column");
+            helper.assertValueEqual(registered.row(), definition.row(),
+                translated.key() + " row");
+            helper.assertValueEqual(registered.complexity(),
+                Math.max(1, Math.min(3, definition.complexity())),
+                translated.key() + " complexity");
+            helper.assertValueEqual(registered.parents(), translated.parents(),
+                translated.key() + " visible parents");
+            helper.assertValueEqual(registered.parentsHidden(), translated.parentsHidden(),
+                translated.key() + " hidden parents");
+            helper.assertValueEqual(registered.warp(), definition.stages().get(0).warp(),
+                translated.key() + " warp");
+            helper.assertValueEqual(registered.pages().size(), definition.stages().get(0).pages().size(),
+                translated.key() + " page count");
+            for (var amount : definition.noteCost().amounts()) {
+                helper.assertValueEqual(
+                    registered.tags().getAmount(Tc4AspectAdapter.resolveAspect(amount.aspect())),
+                    amount.amount(),
+                    translated.key() + " note cost " + amount.aspect()
+                );
+            }
+            for (ContentId trigger : definition.aspectTriggers()) {
+                helper.assertTrue(registered.aspectTriggers().contains(Tc4AspectAdapter.resolveAspect(trigger)),
+                    translated.key() + " aspect trigger " + trigger);
+            }
+        }
+        helper.assertValueEqual(translatedKeys.size(), definitions.size(),
+            "every common research definition must have a unique TC4 key");
         helper.succeed();
     }
 
