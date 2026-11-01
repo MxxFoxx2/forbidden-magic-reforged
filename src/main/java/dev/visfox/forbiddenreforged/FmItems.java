@@ -18,11 +18,11 @@ import net.minecraft.world.level.storage.loot.providers.number.ints.ResolvableIn
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4BlinkFocusItem;
 import org.jspecify.annotations.Nullable;
 import thaumcraft.item.gear.TcMaterials;
 import thaumcraft.platform.Registration;
 import thaumcraft.registry.ModItems;
-import thaumcraft.wand.focus.FocusItem;
 
 public final class FmItems {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(ForbiddenMagic.MODID);
@@ -131,8 +131,8 @@ public final class FmItems {
                 .repairable(ModItems.THAUMIUM_INGOT.get()));
         CRYSTALWELL = ITEMS.registerItem("crystalwell", CrystalwellItem::new, properties -> properties.stacksTo(1));
         PRIMEWELL = ITEMS.registerItem("primewell", PrimewellItem::new, properties -> properties.stacksTo(1).rarity(Rarity.EPIC));
-        BLINK_FOCUS = ITEMS.registerItem("blink_focus", BlinkFocusItem::new,
-            properties -> FocusItem.properties(properties));
+        BLINK_FOCUS = ITEMS.registerItem("blink_focus", Tc4BlinkFocusItem::new,
+            Tc4BlinkFocusItem::properties);
         SUB_COLLAR = FmConfig.lustDisabled() ? null
             : ITEMS.registerItem("sub_collar", SubCollarItem::new, properties -> properties.stacksTo(1).rarity(Rarity.RARE));
     }
