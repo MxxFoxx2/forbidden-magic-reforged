@@ -36,7 +36,7 @@ Runtime contracts are separated by responsibility rather than combined in one se
 
 | Contract | Responsibility |
 |---|---|
-| `HostEntityServices` | Host entity predicates, boss identifiers, and entity-to-aspect catalog |
+| `HostEntityServices` | Typed entity-to-aspect catalog plus tainted-mob/boss/golem classification predicates; `HostProfile` declares `ENTITY_ASPECTS` and `ENTITY_CLASSIFICATION` separately |
 | `HostAspectServices` | Host-provided aspect display components |
 | `HostMorphToolServices` | Morph-tool cycle sound and area mining |
 | `HostBlockEntityServices` | Host-backed Wrath Cage block-entity factory |

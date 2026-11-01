@@ -58,7 +58,8 @@ public record HostProfile(
         WARP_POOLS,
         STICKY_WARP,
         TAINT_ORIGINS,
-        ENTITY_ASPECTS
+        ENTITY_ASPECTS,
+        ENTITY_CLASSIFICATION
     }
 
     public enum SupportLevel {

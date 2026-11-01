@@ -215,6 +215,10 @@ public final class RecipeGameTests {
             "the selected host declares its entity aspect catalog"
         );
         helper.assertTrue(
+            profile.supportOf(HostProfile.Feature.ENTITY_CLASSIFICATION).level() == HostProfile.SupportLevel.ADAPTED,
+            "host entity classification predicates are declared by the selected adapter"
+        );
+        helper.assertTrue(
             profile.supportOf(HostProfile.Feature.WAND_RODS).level() == HostProfile.SupportLevel.ADAPTED,
             "host wand rod registration is declared by the selected adapter"
         );

@@ -283,6 +283,10 @@ def main() -> int:
         failures.append("HostAdapterRegistry is missing the host entity capability lookup")
     if "Map<ContentId, ContentId> aspectCatalog(boolean silverfishEmeralds)" not in entity_content:
         failures.append("HostEntityServices is missing the host-neutral entity aspect catalog")
+    if "boolean isTaintedMob(LivingEntity entity)" not in entity_content or "boolean isHostBoss(LivingEntity entity)" not in entity_content or "boolean isHostGolem(LivingEntity entity)" not in entity_content:
+        failures.append("HostEntityServices is missing host-specific entity classification predicates")
+    if "ENTITY_CLASSIFICATION" not in (ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/api/HostProfile.java").read_text(encoding="utf-8"):
+        failures.append("HostProfile is missing the entity classification feature declaration")
     if "Set<ContentId> bossEntityIds()" not in entity_content:
         failures.append("HostEntityServices must expose boss entity identifiers as ContentId values")
     entity_consumers = (
