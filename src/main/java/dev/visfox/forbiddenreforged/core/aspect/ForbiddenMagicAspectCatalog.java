@@ -7,12 +7,6 @@ import java.util.List;
 import static dev.visfox.forbiddenreforged.core.aspect.AspectDefinition.BlendMode.ADDITIVE;
 import static dev.visfox.forbiddenreforged.core.aspect.AspectDefinition.BlendMode.ONE_MINUS_SOURCE_COLOR;
 
-/**
- * Source-of-truth definitions for Forbidden Magic's own thaumic aspects.
- *
- * <p>The component identifiers under {@code forbiddenmagic:concept/} are semantic concepts, not
- * host registry identifiers. Each adapter maps those concepts to its host's native aspects.
- */
 public final class ForbiddenMagicAspectCatalog {
     public static final ContentId LUXURIA = id("luxuria");
     public static final ContentId INFERNUS = id("infernus");
