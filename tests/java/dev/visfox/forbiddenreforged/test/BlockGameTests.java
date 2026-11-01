@@ -128,6 +128,16 @@ public final class BlockGameTests {
             "TC4 flux gas is recognized as host taint material");
         helper.assertFalse(Tc4TaintAdapter.isHostTaintMaterial(Blocks.STONE.defaultBlockState()),
             "ordinary stone is not host taint material");
+        helper.assertTrue(Tc4TaintAdapter.isTaintShovelPurificationTarget(ModBlocks.FLUX_GOO.get().defaultBlockState()),
+            "flux goo is a taint shovel purification target");
+        helper.assertTrue(Tc4TaintAdapter.isTaintShovelPurificationTarget(ModBlocks.FLUX_GAS.get().defaultBlockState()),
+            "flux gas is a taint shovel purification target");
+        helper.assertFalse(Tc4TaintAdapter.isTaintShovelPurificationTarget(Blocks.STONE.defaultBlockState()),
+            "ordinary stone is not a taint shovel purification target");
+        helper.assertValueEqual(FmItems.TAINT_SHOVEL.get().getDestroySpeed(
+            new net.minecraft.world.item.ItemStack(FmItems.TAINT_SHOVEL.get()),
+            ModBlocks.FLUX_GOO.get().defaultBlockState()
+        ), Tc4TaintAdapter.taintShovelMiningSpeed(), "taint shovel retains TC4 elemental tool mining speed");
         helper.succeed();
     }
 
