@@ -44,7 +44,8 @@ Runtime contracts are separated by responsibility rather than combined in one se
 | `HostWandServices` | Wand/focus queries, Vis storage, and accessory lookup |
 | `HostTaintServices` | Taint materials, purification targets, taint damage, shovel behavior, and special mining drops |
 | `HostScribingServices` | Research difficulty, primal aspect IDs, and player aspect-pool operations |
-| `HostItemServices` | Host-specific item factories and item-property adapters |
+| `HostItemPropertyServices` | Host-specific `Item.Properties` customization; declared by `ITEM_PROPERTIES` |
+| `HostItemFactoryServices` | Host-backed item implementations and remainder items; declared by `ITEM_FACTORIES` |
 | `HostBootstrapServices` | Wand/trigger/optional-enchantment registration and creative-tab entries |
 
 These ports may use Minecraft runtime types such as `ItemStack`, `LivingEntity`, `BlockState`, and `ServerPlayer`: this is a host-agnostic boundary within the current Minecraft/NeoForge target, not a cross-Minecraft-version abstraction. They must not expose TC4 or another magic-host's API types.

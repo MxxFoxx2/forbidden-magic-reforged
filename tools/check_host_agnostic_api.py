@@ -273,17 +273,63 @@ def main() -> int:
                     f"{source.relative_to(ROOT)} still references the removed mixed entity capability"
                 )
 
-    item_contract = ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostItemServices.java"
-    item_content = item_contract.read_text(encoding="utf-8")
-    for forbidden in ("thaumcraft.", "com.leclowndu93150.thaumaturge."):
-        if forbidden in item_content:
-            failures.append(
-                f"{item_contract.relative_to(ROOT)} exposes a concrete host API type: {forbidden}"
-            )
+    old_item_contract = ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostItemServices.java"
+    if old_item_contract.exists():
+        failures.append("The combined HostItemServices contract must be removed after the item capability split")
+
+    item_property_contract = ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostItemPropertyServices.java"
+    item_factory_contract = ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostItemFactoryServices.java"
+    item_contracts = {
+        item_property_contract: (
+            "Item.Properties gluttonyFoodProperties(",
+            "Item.Properties skullAxeProperties(",
+            "Item.Properties morphPickaxeProperties(",
+            "Item.Properties morphSwordProperties(",
+            "Item.Properties morphShovelProperties(",
+            "Item.Properties morphAxeProperties(",
+            "Item.Properties diabolistForkProperties(",
+            "Item.Properties taintShovelProperties(",
+            "Item.Properties taintPickaxeProperties(",
+            "Item.Properties blinkFocusProperties(",
+        ),
+        item_factory_contract: (
+            "Item createMorphTool(",
+            "Item createRingNutrition(",
+            "Item createCrystalwell(",
+            "Item createPrimewell(",
+            "Item createBlinkFocus(",
+            "Item primordialPearlItem()",
+            "Item createSubCollar(",
+        ),
+    }
+    for contract, methods in item_contracts.items():
+        content = contract.read_text(encoding="utf-8")
+        for forbidden in ("thaumcraft.", "com.leclowndu93150.thaumaturge."):
+            if forbidden in content:
+                failures.append(f"{contract.relative_to(ROOT)} exposes a concrete host API type: {forbidden}")
+        for method in methods:
+            if method not in content:
+                failures.append(f"{contract.relative_to(ROOT)} is missing the host-neutral item capability: {method}")
 
     item_registry = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/api/HostAdapterRegistry.java").read_text(encoding="utf-8")
-    if "HostItemServices requireItems()" not in item_registry:
-        failures.append("HostAdapterRegistry is missing the host item factory lookup")
+    if "HostItemPropertyServices requireItemProperties()" not in item_registry:
+        failures.append("HostAdapterRegistry is missing the host item-property capability lookup")
+    if "HostItemFactoryServices requireItemFactories()" not in item_registry:
+        failures.append("HostAdapterRegistry is missing the host item-factory capability lookup")
+    profile_content = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/api/HostProfile.java").read_text(encoding="utf-8")
+    for feature in ("ITEM_PROPERTIES", "ITEM_FACTORIES"):
+        if feature not in profile_content:
+            failures.append(f"HostProfile is missing the item capability feature declaration: {feature}")
+
+    items_facade = ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmItems.java"
+    items_content = items_facade.read_text(encoding="utf-8")
+    if "integration.tc4" in items_content or "Tc4" in items_content or "thaumcraft." in items_content:
+        failures.append(f"{items_facade.relative_to(ROOT)} references concrete host item classes")
+    for lookup in ("requireItemProperties()", "requireItemFactories()"):
+        if lookup not in items_content:
+            failures.append(f"FmItems bypasses the focused item capability: {lookup}")
+    if "requireItems()" in items_content:
+        failures.append("FmItems still uses the removed combined item capability")
 
     old_entity_contract = ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostEntityServices.java"
     if old_entity_contract.exists():
@@ -324,19 +370,6 @@ def main() -> int:
     spawner_content = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmSpawnerMobs.java").read_text(encoding="utf-8")
     if "HostAdapterRegistry.requireEntityAspects()" not in spawner_content:
         failures.append("FmSpawnerMobs bypasses the host-neutral entity aspect catalog")
-    if "Item primordialPearlItem()" not in item_content:
-        failures.append("HostItemServices is missing the Primewell remainder item factory")
-
-    items_facade = ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmItems.java"
-    items_content = items_facade.read_text(encoding="utf-8")
-    if "integration.tc4" in items_content or "Tc4" in items_content or "thaumcraft." in items_content:
-        failures.append(
-            f"{items_facade.relative_to(ROOT)} references concrete host item classes instead of HostItemServices"
-        )
-    if "HostAdapterRegistry.requireItems()" not in items_content:
-        failures.append("FmItems bypasses the host-neutral item factory contract")
-
-
     bootstrap_contract = ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostBootstrapServices.java"
     bootstrap_content = bootstrap_contract.read_text(encoding="utf-8")
     for forbidden in ("thaumcraft.", "com.leclowndu93150.thaumaturge."):

@@ -14,7 +14,8 @@ import dev.visfox.forbiddenreforged.integration.runtime.HostBlockEntityServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostTaintServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostScribingServices;
-import dev.visfox.forbiddenreforged.integration.runtime.HostItemServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostItemFactoryServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostItemPropertyServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostBootstrapServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostEntityAspectServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostEntityClassificationServices;
@@ -39,7 +40,7 @@ import java.util.Set;
 /**
  * Thaumcraft 4: Reforged implementation of the host-neutral content contract.
  */
-public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, HostMorphToolServices, HostBlockEntityServices, HostWandServices, HostTaintServices, HostScribingServices, HostItemServices, HostBootstrapServices, HostEntityAspectServices, HostEntityClassificationServices {
+public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, HostMorphToolServices, HostBlockEntityServices, HostWandServices, HostTaintServices, HostScribingServices, HostItemPropertyServices, HostItemFactoryServices, HostBootstrapServices, HostEntityAspectServices, HostEntityClassificationServices {
     public static final Tc4HostAdapter INSTANCE = new Tc4HostAdapter();
 
     private static final HostProfile PROFILE = new HostProfile(
@@ -75,8 +76,10 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
                 HostProfile.FeatureSupport.adapted("Integrates the Blink Focus with the TC4 wand/focus API")),
             Map.entry(HostProfile.Feature.OPTIONAL_ENCHANTMENT_INTEGRATION,
                 HostProfile.FeatureSupport.partial("Thaumic Tinkerer enchantment costs are registered only when the optional mod is installed")),
-            Map.entry(HostProfile.Feature.ITEM_REGISTRATION,
-                HostProfile.FeatureSupport.adapted("Creates TC4-backed items and applies TC4 tool material/food property adapters")),
+            Map.entry(HostProfile.Feature.ITEM_PROPERTIES,
+                HostProfile.FeatureSupport.adapted("Applies TC4 tool-material, food, focus, and repair Item.Properties")),
+            Map.entry(HostProfile.Feature.ITEM_FACTORIES,
+                HostProfile.FeatureSupport.adapted("Creates TC4-backed morph tools, baubles, wells, focus, collar, and primordial pearl items")),
             Map.entry(HostProfile.Feature.BLOCK_ENTITY_IMPLEMENTATION,
                 HostProfile.FeatureSupport.adapted("Provides the TC4 EssentiaSource/EssentiaTransport Wrath Cage bridge implementation")),
             Map.entry(HostProfile.Feature.ENTITY_ASPECTS,

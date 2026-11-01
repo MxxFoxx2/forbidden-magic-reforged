@@ -1,6 +1,7 @@
 package dev.visfox.forbiddenreforged.integration.api;
 
-import dev.visfox.forbiddenreforged.integration.runtime.HostItemServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostItemFactoryServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostItemPropertyServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostBootstrapServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostEntityAspectServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostEntityClassificationServices;
@@ -89,11 +90,14 @@ public final class HostAdapterRegistry {
         );
     }
 
-    /**
-     * Returns host-specific item factories and item property adapters.
-     */
-    public static HostItemServices requireItems() {
-        return capability(HostItemServices.class, "item");
+    /** Returns host-specific Item.Properties customizations. */
+    public static HostItemPropertyServices requireItemProperties() {
+        return capability(HostItemPropertyServices.class, "item properties");
+    }
+
+    /** Returns host-backed Item implementations. */
+    public static HostItemFactoryServices requireItemFactories() {
+        return capability(HostItemFactoryServices.class, "item factories");
     }
 
     /**

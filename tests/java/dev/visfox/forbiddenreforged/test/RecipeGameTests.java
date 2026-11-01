@@ -203,8 +203,12 @@ public final class RecipeGameTests {
             "Scribing Well runtime behavior is declared by the selected adapter"
         );
         helper.assertTrue(
-            profile.supportOf(HostProfile.Feature.ITEM_REGISTRATION).level() == HostProfile.SupportLevel.ADAPTED,
-            "host-specific item registration is declared by the selected adapter"
+            profile.supportOf(HostProfile.Feature.ITEM_PROPERTIES).level() == HostProfile.SupportLevel.ADAPTED,
+            "host-specific item-property customization is declared by the selected adapter"
+        );
+        helper.assertTrue(
+            profile.supportOf(HostProfile.Feature.ITEM_FACTORIES).level() == HostProfile.SupportLevel.ADAPTED,
+            "host-backed item factories are declared by the selected adapter"
         );
         helper.assertTrue(
             profile.supportOf(HostProfile.Feature.BLOCK_ENTITY_IMPLEMENTATION).level() == HostProfile.SupportLevel.ADAPTED,
@@ -299,8 +303,12 @@ public final class RecipeGameTests {
             "the host entity catalog produces a stable sorted Mob Crystal list"
         );
         helper.assertTrue(
-            HostAdapterRegistry.requireItems() != null,
-            "the selected host exposes its item factory boundary"
+            HostAdapterRegistry.requireItemProperties() != null,
+            "the selected host exposes item-property services"
+        );
+        helper.assertTrue(
+            HostAdapterRegistry.requireItemFactories() != null,
+            "the selected host exposes item-factory services"
         );
         helper.assertTrue(
             !HostAdapterRegistry.requireScribing().primalAspectIds().isEmpty(),
@@ -319,7 +327,7 @@ public final class RecipeGameTests {
             "the host area-harvest state is queried through runtime services"
         );
         helper.assertTrue(
-            HostAdapterRegistry.requireItems().primordialPearlItem() != Items.AIR,
+            HostAdapterRegistry.requireItemFactories().primordialPearlItem() != Items.AIR,
             "the host provides the Primewell remainder item through item services"
         );
         helper.assertTrue(
