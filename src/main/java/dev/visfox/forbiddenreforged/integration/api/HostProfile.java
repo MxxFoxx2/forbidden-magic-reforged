@@ -39,6 +39,8 @@ public record HostProfile(
         INFUSION_ENCHANTMENTS,
         WAND_RODS,
         WAND_CAPS,
+        WAND_VIS_STORAGE,
+        WAND_PARTS,
         FOCI_OR_SPELLS,
         ESSENTIA_STORAGE,
         ESSENTIA_TRANSPORT,
