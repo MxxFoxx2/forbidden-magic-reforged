@@ -4,6 +4,7 @@ import io.netty.channel.embedded.EmbeddedChannel;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import net.minecraft.core.Holder;
@@ -159,6 +160,7 @@ public final class RecipeGameTests {
 
     private static void hostAdapterRegistryExposesTc4Profile(GameTestHelper helper) {
         HostProfile profile = HostAdapterRegistry.require().profile();
+        assertTc4FeatureSupport(helper, profile);
         helper.assertValueEqual(profile.id(), ContentId.parse("host:tc4-reforged"), "selected host profile id");
         helper.assertValueEqual(profile.hostVersion(), "1.1.2", "selected host dependency version");
         helper.assertValueEqual(profile.minecraftVersion(), "26.3", "selected Minecraft version");
@@ -427,6 +429,56 @@ public final class RecipeGameTests {
         helper.assertValueEqual(FmAspects.NETHER, ContentId.parse("forbiddenmagic:infernus"),
             "custom aspects are exposed as host-neutral content IDs");
         helper.succeed();
+    }
+
+    private static void assertTc4FeatureSupport(GameTestHelper helper, HostProfile profile) {
+        Map<HostProfile.Feature, HostProfile.SupportLevel> expected = Map.ofEntries(
+            Map.entry(HostProfile.Feature.ASPECT_REGISTRATION, HostProfile.SupportLevel.ADAPTED),
+            Map.entry(HostProfile.Feature.ASPECT_RECIPE_DERIVATION, HostProfile.SupportLevel.ADAPTED),
+            Map.entry(HostProfile.Feature.ASPECT_SCAN_TARGETS, HostProfile.SupportLevel.ADAPTED),
+            Map.entry(HostProfile.Feature.ASPECT_DIAGNOSTICS, HostProfile.SupportLevel.ADAPTED),
+            Map.entry(HostProfile.Feature.ASPECT_PRESENTATION, HostProfile.SupportLevel.ADAPTED),
+            Map.entry(HostProfile.Feature.RUNTIME_BOOTSTRAP, HostProfile.SupportLevel.ADAPTED),
+            Map.entry(HostProfile.Feature.MORPH_TOOL_RUNTIME, HostProfile.SupportLevel.ADAPTED),
+            Map.entry(HostProfile.Feature.WAND_INSPECTION, HostProfile.SupportLevel.ADAPTED),
+            Map.entry(HostProfile.Feature.ACCESSORY_INTEGRATION, HostProfile.SupportLevel.ADAPTED),
+            Map.entry(HostProfile.Feature.TAINT_BLOCK_SERVICES, HostProfile.SupportLevel.ADAPTED),
+            Map.entry(HostProfile.Feature.ENCHANTMENT_EFFECTS, HostProfile.SupportLevel.ADAPTED),
+            Map.entry(HostProfile.Feature.SCRIBING_RUNTIME, HostProfile.SupportLevel.ADAPTED),
+            Map.entry(HostProfile.Feature.ITEM_PROPERTIES, HostProfile.SupportLevel.ADAPTED),
+            Map.entry(HostProfile.Feature.ITEM_FACTORIES, HostProfile.SupportLevel.ADAPTED),
+            Map.entry(HostProfile.Feature.BLOCK_ENTITY_IMPLEMENTATION, HostProfile.SupportLevel.ADAPTED),
+            Map.entry(HostProfile.Feature.RESEARCH_ENTRIES, HostProfile.SupportLevel.ADAPTED),
+            Map.entry(HostProfile.Feature.RESEARCH_STAGES, HostProfile.SupportLevel.PARTIAL),
+            Map.entry(HostProfile.Feature.ARCANE_RECIPES, HostProfile.SupportLevel.ADAPTED),
+            Map.entry(HostProfile.Feature.CRAFTING_RECIPE_REFERENCES, HostProfile.SupportLevel.ADAPTED),
+            Map.entry(HostProfile.Feature.CRUCIBLE_RECIPES, HostProfile.SupportLevel.ADAPTED),
+            Map.entry(HostProfile.Feature.INFUSION_RECIPES, HostProfile.SupportLevel.ADAPTED),
+            Map.entry(HostProfile.Feature.INFUSION_ENCHANTMENTS, HostProfile.SupportLevel.ADAPTED),
+            Map.entry(HostProfile.Feature.WAND_RODS, HostProfile.SupportLevel.ADAPTED),
+            Map.entry(HostProfile.Feature.WAND_CAPS, HostProfile.SupportLevel.ADAPTED),
+            Map.entry(HostProfile.Feature.WAND_TRIGGERS, HostProfile.SupportLevel.ADAPTED),
+            Map.entry(HostProfile.Feature.OPTIONAL_ENCHANTMENT_INTEGRATION, HostProfile.SupportLevel.PARTIAL),
+            Map.entry(HostProfile.Feature.WAND_VIS_STORAGE, HostProfile.SupportLevel.ADAPTED),
+            Map.entry(HostProfile.Feature.WAND_PARTS, HostProfile.SupportLevel.ADAPTED),
+            Map.entry(HostProfile.Feature.FOCI_OR_SPELLS, HostProfile.SupportLevel.ADAPTED),
+            Map.entry(HostProfile.Feature.ESSENTIA_STORAGE, HostProfile.SupportLevel.ADAPTED),
+            Map.entry(HostProfile.Feature.ESSENTIA_TRANSPORT, HostProfile.SupportLevel.ADAPTED),
+            Map.entry(HostProfile.Feature.WARP_POOLS, HostProfile.SupportLevel.ADAPTED),
+            Map.entry(HostProfile.Feature.STICKY_WARP, HostProfile.SupportLevel.ADAPTED),
+            Map.entry(HostProfile.Feature.TAINT_ORIGINS, HostProfile.SupportLevel.UNSUPPORTED),
+            Map.entry(HostProfile.Feature.ENTITY_ASPECTS, HostProfile.SupportLevel.ADAPTED),
+            Map.entry(HostProfile.Feature.ENTITY_CLASSIFICATION, HostProfile.SupportLevel.ADAPTED)
+        );
+        helper.assertValueEqual(expected.size(), HostProfile.Feature.values().length,
+            "every HostProfile feature has exactly one expected support level");
+        for (Map.Entry<HostProfile.Feature, HostProfile.SupportLevel> feature : expected.entrySet()) {
+            helper.assertValueEqual(
+                profile.supportOf(feature.getKey()).level(),
+                feature.getValue(),
+                "TC4 host feature support: " + feature.getKey()
+            );
+        }
     }
 
     private static void commonRecipeCatalogMatchesTc4Registration(GameTestHelper helper) {

@@ -26,7 +26,7 @@ The architecture checker rejects Minecraft/NeoForge/host API imports from the pu
 
 `HostAdapter` is the registration/lifecycle contract. It exposes the selected host profile, aspect-tag registration, aspect/recipe/research registration, Crystalwell mode, diagnostics, and runtime bootstrap.
 
-`HostProfile` declares feature support with explicit `NATIVE`, `ADAPTED`, `PARTIAL`, or `UNSUPPORTED` levels. A feature should be declared only when the adapter and tests support the claim.
+`HostProfile` declares feature support with explicit `NATIVE`, `ADAPTED`, `PARTIAL`, or `UNSUPPORTED` levels. Every enum feature has exactly one adapter declaration. The TC4 GameTest carries an exhaustive expected support-level matrix, and the boundary checker requires exact coverage between the enum, adapter map, and test matrix. A feature should be declared only when the adapter and tests support the claim.
 
 `HostAdapterRegistry` is the capability lookup. `ForbiddenMagic` is the composition root: it installs the selected adapter before registering shared catalogs and content. Shared feature classes must not select or import a concrete adapter.
 

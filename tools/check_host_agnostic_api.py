@@ -370,6 +370,16 @@ def main() -> int:
         unknown = sorted(adapter_features - profile_features)
         failures.append(f"HostProfile feature coverage mismatch: missing={missing}, unknown={unknown}")
 
+    game_tests_content = (ROOT / "tests/java/dev/visfox/forbiddenreforged/test/RecipeGameTests.java").read_text(encoding="utf-8")
+    tested_features = set(re.findall(r"Map\.entry\(HostProfile\.Feature\.([A-Z0-9_]+)", game_tests_content))
+    if "private static void assertTc4FeatureSupport" not in game_tests_content:
+        failures.append("RecipeGameTests is missing the complete HostProfile support-level matrix")
+    elif tested_features != profile_features:
+        missing = sorted(profile_features - tested_features)
+        unknown = sorted(tested_features - profile_features)
+        failures.append(f"HostProfile GameTest coverage mismatch: missing={missing}, unknown={unknown}")
+
+
     aspect_adapter = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/tc4/Tc4AspectAdapter.java").read_text(encoding="utf-8")
     if "definition.components()" not in aspect_adapter or "api.register(" not in aspect_adapter:
         failures.append("ASPECT_RECIPE_DERIVATION is declared without passing component recipes to the host aspect registrar")
