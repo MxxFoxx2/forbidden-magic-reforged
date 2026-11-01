@@ -44,6 +44,7 @@ import dev.visfox.forbiddenreforged.core.research.ResearchDefinition;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4ResearchAdapter;
 import dev.visfox.forbiddenreforged.core.warp.WarpKind;
+import dev.visfox.forbiddenreforged.core.warp.WarpChangeRequested;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4WarpAdapter;
 import dev.visfox.forbiddenreforged.core.recipe.ForbiddenMagicRecipeCatalog;
 import dev.visfox.forbiddenreforged.core.recipe.RecipeDefinition;
@@ -271,6 +272,11 @@ public final class RecipeGameTests {
             "Wrath Cage item must keep five warp");
         helper.assertValueEqual(Warp.getItemWarp(new ItemStack(FmBlocks.TAINT_SAPLING.get().asItem())), 1,
             "Tainted Sapling item must keep one warp");
+        ServerPlayer player = mockPlayer(helper);
+        int stickyBefore = Warp.get(player, WarpType.STICKY);
+        WarpChangeRequested.request(player, 1, WarpKind.STICKY);
+        helper.assertValueEqual(Warp.get(player, WarpType.STICKY), stickyBefore + 1,
+            "common warp request must reach the TC4 runtime adapter");
         helper.succeed();
     }
 
