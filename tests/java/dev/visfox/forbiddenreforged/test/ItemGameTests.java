@@ -396,9 +396,9 @@ public final class ItemGameTests {
     }
 
     private static void blinkFocusUpgradesUseOriginalIconAssets(GameTestHelper helper) {
-        helper.assertValueEqual(dev.visfox.forbiddenreforged.Tc4BlinkFocusItem.HELLFIRE.icon(),
+        helper.assertValueEqual(Tc4BlinkFocusItem.HELLFIRE.icon(),
             ForbiddenMagic.id("textures/misc/hellfire.png"), "Hellfire uses the bundled original icon");
-        helper.assertValueEqual(dev.visfox.forbiddenreforged.Tc4BlinkFocusItem.PANDEMONIUM.icon(),
+        helper.assertValueEqual(Tc4BlinkFocusItem.PANDEMONIUM.icon(),
             ForbiddenMagic.id("textures/misc/pandemonium.png"), "Pandemonium uses the bundled original icon");
         helper.assertTrue(ForbiddenMagic.class.getResourceAsStream("/assets/forbiddenmagic/textures/misc/hellfire.png") != null,
             "Hellfire icon asset is bundled");
