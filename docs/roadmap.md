@@ -6,8 +6,9 @@
 
 - Общие модели аспектов, рецептов и исследований заведены; TC4-адаптеры переводят их в API хоста. Warp-запросы и регистрация warp-предметов вынесены за runtime-порт.
 - Wrath Cage больше не наследуется от `TcBlockEntity` и не реализует `AspectSource`/`EssentiaTransport` в общем gameplay-классе. TC4 bridge-subclass реализует эти интерфейсы, а общая логика принимает `ContentId` и callback-источники эссенции.
+- Поведения Tainted, Infernal, Profane и creative rods используют общие `WandVisAccess`/`WandPartsAccess`; TC4-адаптер переводит их в `Wands`/`WandKeys` и сохраняет регистрацию rods/caps.
 - Реализация находится в `architecture/host-agnostic-core` и пока не входит в `main`.
-- Следующие срезы: vis/жезлы и фокусы; затем проверка второго хоста Thaumaturge.
+- Следующие срезы: отделение FocusItem/upgrade lifecycle и оставшихся `Wands`-доступов; затем проверка второго хоста Thaumaturge.
 - Критерии каждого среза: общая модель не импортирует хост; адаптер сохраняет существующие ключи и игровое поведение; оба режима GameTest проходят; все неполные соответствия явно документированы.
 - Не объединять версии Minecraft в один source set или бинарник. Отдельные release tracks сохраняются.
 
