@@ -262,8 +262,8 @@ public final class RecipeGameTests {
     }
 
     private static void tc4WarpAdapterPreservesSemanticTypesAndItemCosts(GameTestHelper helper) {
-        helper.assertValueEqual(Tc4WarpAdapter.toHostType(WarpKind.NORMAL), WarpType.NORMAL,
-            "normal warp must map to TC4 normal");
+        helper.assertValueEqual(Tc4WarpAdapter.toHostType(WarpKind.PERMANENT), WarpType.PERMANENT,
+            "permanent warp must map to TC4 permanent");
         helper.assertValueEqual(Tc4WarpAdapter.toHostType(WarpKind.STICKY), WarpType.STICKY,
             "sticky warp must map to TC4 sticky");
         helper.assertValueEqual(Tc4WarpAdapter.toHostType(WarpKind.TEMPORARY), WarpType.TEMPORARY,
