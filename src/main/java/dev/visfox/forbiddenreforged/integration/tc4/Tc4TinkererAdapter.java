@@ -13,10 +13,10 @@ import net.neoforged.fml.ModList;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.aspect.AspectList;
 
-public final class FmTinkerer {
+public final class Tc4TinkererAdapter {
     private static int registered;
 
-    private FmTinkerer() {
+    private Tc4TinkererAdapter() {
     }
 
     public static void register() {
