@@ -28,6 +28,10 @@ HOST_FORBIDDEN = (
     "EssentiaTransport",
 )
 
+WANDS_USAGE_BOUNDARY = (
+    ROOT / "src/main/java",
+)
+
 
 def main() -> int:
     failures = []
@@ -60,6 +64,16 @@ def main() -> int:
                     failures.append(
                         f"{source.relative_to(ROOT)} crosses host boundary: {forbidden}"
                     )
+
+    for source_root in WANDS_USAGE_BOUNDARY:
+        for source in source_root.rglob("*.java"):
+            if "integration/tc4" in source.as_posix():
+                continue
+            content = source.read_text(encoding="utf-8")
+            if "Wands." in content or "import thaumcraft.wand.Wands;" in content:
+                failures.append(
+                    f"{source.relative_to(ROOT)} accesses the TC4 wand API outside integration/tc4"
+                )
 
     if failures:
         print("\\n".join(failures), file=sys.stderr)

@@ -19,10 +19,10 @@ import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4WandAdapter;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.platform.Baubles;
 import thaumcraft.wand.VisStorage;
-import thaumcraft.wand.Wands;
 import thaumcraft.registry.ModBlocks;
 import thaumcraft.taint.TaintBlock;
 import thaumcraft.taint.TaintFibresBlock;
@@ -93,7 +93,7 @@ public final class FmToolEvents {
     }
 
     public static String wandTooltipKind(ItemStack stack) {
-        return Wands.isWand(stack) ? wandTooltipKind(Wands.getRod(stack).tag()) : "";
+        return wandTooltipKind(Tc4WandAdapter.rodTag(stack));
     }
 
     public static String wandTooltipKind(String rodTag) {
@@ -151,13 +151,13 @@ public final class FmToolEvents {
     }
 
     public static boolean cancelsInfernalDamage(ItemStack held, boolean fireOrWither) {
-        return fireOrWither && held != null && !held.isEmpty() && Wands.isWand(held)
-            && "infernal".equals(Wands.getRod(held).tag());
+        return fireOrWither && held != null && !held.isEmpty()
+            && "infernal".equals(Tc4WandAdapter.rodTag(held));
     }
 
     public static boolean restoresTaintedVis(ItemStack held, boolean taintDamage) {
-        return taintDamage && held != null && !held.isEmpty() && Wands.isWand(held)
-            && "tainted".equals(Wands.getRod(held).tag());
+        return taintDamage && held != null && !held.isEmpty()
+            && "tainted".equals(Tc4WandAdapter.rodTag(held));
     }
 
     public static List<Aspect> taintedVisRolls(RandomSource random) {

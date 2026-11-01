@@ -586,6 +586,21 @@ public final class ItemGameTests {
             "ordinary rods do not receive special wand tooltips");
         helper.assertValueEqual(FmToolEvents.wandTooltipKind(new ItemStack(Items.STICK)), "",
             "non-wand items do not receive wand-specific tooltips");
+
+        WandRod neutronium = WandRegistry.findRod("neutronium");
+        ItemStack neutroniumWand = Wands.create(WandRegistry.CAP_THAUMIUM, neutronium, false);
+        helper.assertValueEqual(FmToolEvents.wandTooltipKind(neutroniumWand), "creativeonly",
+            "neutronium wand stacks resolve their rod tag through the TC4 adapter");
+
+        WandRod profane = WandRegistry.findRod("profane");
+        ItemStack profaneWand = Wands.create(WandRegistry.CAP_THAUMIUM, profane, false);
+        helper.assertValueEqual(FmToolEvents.wandTooltipKind(profaneWand), "profane_contract",
+            "profane wand stacks resolve their rod tag through the TC4 adapter");
+
+        WandRod tainted = WandRegistry.findRod("tainted");
+        ItemStack taintedWand = Wands.create(WandRegistry.CAP_THAUMIUM, tainted, false);
+        helper.assertValueEqual(FmToolEvents.wandTooltipKind(taintedWand), "",
+            "ordinary registered wand stacks have no special tooltip");
         helper.succeed();
     }
 

@@ -23,6 +23,10 @@ public final class Tc4WandAdapter {
     private Tc4WandAdapter() {
     }
 
+    public static String rodTag(ItemStack wand) {
+        return Wands.isWand(wand) ? Wands.getRod(wand).tag() : null;
+    }
+
     public static void registerWands() {
         WandRegistry.registerRod("tainted", 150, ForbiddenMagic.id("tainted_rod"), 12,
             new TaintedWandUpdate(), false, false, false,
