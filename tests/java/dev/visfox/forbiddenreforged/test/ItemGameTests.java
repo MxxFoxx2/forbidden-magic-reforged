@@ -77,6 +77,7 @@ import dev.visfox.forbiddenreforged.core.wand.WandPartsAccess;
 import dev.visfox.forbiddenreforged.core.wand.WandVisAccess;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4WandPartsAdapter;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4WandVisAdapter;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4WandRuntimeAdapter;
 import dev.visfox.forbiddenreforged.FmAspects;
 import dev.visfox.forbiddenreforged.FmComponents;
 import dev.visfox.forbiddenreforged.FmDrops;
@@ -1130,6 +1131,17 @@ public final class ItemGameTests {
         WandVisAccess vis = new Tc4WandVisAdapter();
         WandPartsAccess parts = new Tc4WandPartsAdapter();
         ContentId fire = ContentId.parse("forbiddenmagic:concept/fire");
+
+        helper.assertTrue(Tc4WandRuntimeAdapter.isWand(wand),
+            "the runtime adapter recognizes registered wand stacks");
+        helper.assertFalse(Tc4WandRuntimeAdapter.isWand(new ItemStack(Items.STICK)),
+            "the runtime adapter rejects ordinary item stacks");
+        helper.assertValueEqual(Tc4WandRuntimeAdapter.rodTag(wand), "tainted",
+            "the runtime adapter exposes the registered rod tag");
+        helper.assertValueEqual(Tc4WandRuntimeAdapter.focusTreasure(wand), Wands.getFocusTreasure(wand),
+            "focus treasure reads are delegated without changing the host result");
+        helper.assertValueEqual(Tc4WandRuntimeAdapter.focusPotency(wand), Wands.getFocusPotency(wand),
+            "focus potency reads are delegated without changing the host result");
 
         helper.assertValueEqual(vis.maximumVis(wand), Wands.getMaxVis(wand),
             "neutral vis access reports host maximum capacity");

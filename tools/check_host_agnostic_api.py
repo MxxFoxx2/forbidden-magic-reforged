@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -70,7 +71,7 @@ def main() -> int:
             if "integration/tc4" in source.as_posix():
                 continue
             content = source.read_text(encoding="utf-8")
-            if "Wands." in content or "import thaumcraft.wand.Wands;" in content:
+            if re.search(r"\\bWands\\b", content):
                 failures.append(
                     f"{source.relative_to(ROOT)} accesses the TC4 wand API outside integration/tc4"
                 )

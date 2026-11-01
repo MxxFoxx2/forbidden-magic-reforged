@@ -36,7 +36,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
 import thaumcraft.entity.TaintedMob;
 import thaumcraft.entity.boss.ThaumcraftBoss;
-import thaumcraft.wand.Wands;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4WandRuntimeAdapter;
 
 public final class FmDrops {
     private FmDrops() {
@@ -124,7 +124,7 @@ public final class FmDrops {
                 int looting = enchant(player, held, Enchantments.LOOTING);
                 addDrop(event, FmItems.DEADLY_SHARDS.get("pride").get(), prideCount(looting, entity.getRandom().nextInt(1 + looting)));
             }
-            int greed = enchant(player, held, Enchantments.LOOTING) + Wands.getFocusTreasure(held);
+            int greed = enchant(player, held, Enchantments.LOOTING) + Tc4WandRuntimeAdapter.focusTreasure(held);
             if (rollGreed(greed, entity.getRandom().nextInt(20))) {
                 addDrop(event, FmItems.DEADLY_SHARDS.get("greed").get(), 1);
             }
@@ -239,7 +239,7 @@ public final class FmDrops {
         if (isTagged(target.getType(), EntityTypeTags.SENSITIVE_TO_BANE_OF_ARTHROPODS)) {
             wrath += enchant(player, held, Enchantments.BANE_OF_ARTHROPODS);
         }
-        wrath += Wands.getFocusPotency(held);
+        wrath += Tc4WandRuntimeAdapter.focusPotency(held);
         return wrath;
     }
 

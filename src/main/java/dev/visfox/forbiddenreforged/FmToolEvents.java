@@ -19,7 +19,7 @@ import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
-import dev.visfox.forbiddenreforged.integration.tc4.Tc4WandAdapter;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4WandRuntimeAdapter;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.platform.Baubles;
 import thaumcraft.wand.VisStorage;
@@ -93,7 +93,7 @@ public final class FmToolEvents {
     }
 
     public static String wandTooltipKind(ItemStack stack) {
-        return wandTooltipKind(Tc4WandAdapter.rodTag(stack));
+        return wandTooltipKind(Tc4WandRuntimeAdapter.rodTag(stack));
     }
 
     public static String wandTooltipKind(String rodTag) {
@@ -152,7 +152,7 @@ public final class FmToolEvents {
 
     public static boolean cancelsInfernalDamage(ItemStack held, boolean fireOrWither) {
         return fireOrWither && held != null && !held.isEmpty()
-            && "infernal".equals(Tc4WandAdapter.rodTag(held));
+            && "infernal".equals(Tc4WandRuntimeAdapter.rodTag(held));
     }
 
     public static boolean restoresTaintedVis(ItemStack held, boolean taintDamage) {

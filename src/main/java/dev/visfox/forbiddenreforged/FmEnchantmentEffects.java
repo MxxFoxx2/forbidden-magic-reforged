@@ -33,7 +33,7 @@ import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.damage.ModDamageTypes;
-import thaumcraft.wand.Wands;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4WandRuntimeAdapter;
 
 public final class FmEnchantmentEffects {
     private static final TagKey<Block> INFUSED_STONES = TagKey.create(Registries.BLOCK, ForbiddenMagic.id("infused_stones"));
@@ -246,7 +246,7 @@ public final class FmEnchantmentEffects {
         if (event.getEntity() instanceof Player wearer && !wearer.level().isClientSide()) {
             FmToolEvents.collarDamage(wearer, event.getAmount(), event.getSource().getEntity());
             ItemStack held = wearer.getMainHandItem();
-            if (Wands.isWand(held)) {
+            if (Tc4WandRuntimeAdapter.isWand(held)) {
                 boolean fireOrWither = event.getSource().is(DamageTypeTags.IS_FIRE)
                     || event.getSource().is(DamageTypes.WITHER);
                 if (FmToolEvents.cancelsInfernalDamage(held, fireOrWither)) {
@@ -255,7 +255,7 @@ public final class FmEnchantmentEffects {
                 }
                 if (FmToolEvents.restoresTaintedVis(held, event.getSource().is(ModDamageTypes.TAINT))) {
                     for (Aspect aspect : FmToolEvents.taintedVisRolls(wearer.getRandom())) {
-                        Wands.addVis(held, aspect, 1, true);
+                        Tc4WandRuntimeAdapter.addVis(held, aspect, 1, true);
                     }
                 }
             }
