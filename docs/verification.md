@@ -10,6 +10,14 @@
 - С `no_lust=true`: **97/97** required GameTests passed; `luxuria=null`.
 - Опубликованный релиз: rolling [`26.3`](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/26.3). Сборка и тесты headless не заменяют ручные проверки клиента и реального геймплея.
 
+## Host-agnostic architecture branch
+
+- Branch: [`architecture/host-agnostic-core`](https://github.com/MxxFoxx2/forbidden-magic-reforged/tree/architecture/host-agnostic-core).
+- Verified commit: [`ddfb1f5`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/ddfb1f51df8c5950e53c9de822d76c739603c7fb).
+- [Java CI with Gradle #41311521396](https://github.com/MxxFoxx2/forbidden-magic-reforged/actions/runs/41311521396) completed successfully on 1 November 2026.
+- The branch CI passed the host-agnostic boundary check, pinned host build, mod build, artifact provenance, generated-resource freshness and both `no_lust=false` and `no_lust=true` GameTest runs.
+- This result verifies only the isolated architecture branch. It does not change or replace the latest verification of `main`.
+
 ## Проверки вне CI
 
 - `tools/gen_resources.py` запускался дважды с чистым diff после генерации в pre-release проверке.
