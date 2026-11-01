@@ -182,8 +182,16 @@ public final class RecipeGameTests {
             "runtime services are declared by the selected adapter"
         );
         helper.assertTrue(
+            profile.supportOf(HostProfile.Feature.ITEM_REGISTRATION).level() == HostProfile.SupportLevel.ADAPTED,
+            "host-specific item registration is declared by the selected adapter"
+        );
+        helper.assertTrue(
             HostAdapterRegistry.requireRuntime() != null,
             "the selected host exposes its runtime service boundary"
+        );
+        helper.assertTrue(
+            HostAdapterRegistry.requireItems() != null,
+            "the selected host exposes its item factory boundary"
         );
         helper.assertTrue(
             !HostAdapterRegistry.require().aspectDiagnostics().isEmpty(),

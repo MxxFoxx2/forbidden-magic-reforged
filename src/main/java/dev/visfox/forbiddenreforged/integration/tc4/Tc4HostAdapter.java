@@ -8,11 +8,13 @@ import dev.visfox.forbiddenreforged.core.research.ResearchDefinition;
 import dev.visfox.forbiddenreforged.integration.api.HostAdapter;
 import dev.visfox.forbiddenreforged.integration.api.HostProfile;
 import dev.visfox.forbiddenreforged.integration.runtime.HostRuntimeServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostItemServices;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.state.BlockState;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +22,7 @@ import java.util.Map;
 /**
  * Thaumcraft 4: Reforged implementation of the host-neutral content contract.
  */
-public final class Tc4HostAdapter implements HostAdapter, HostRuntimeServices {
+public final class Tc4HostAdapter implements HostAdapter, HostRuntimeServices, HostItemServices {
     public static final Tc4HostAdapter INSTANCE = new Tc4HostAdapter();
 
     private static final HostProfile PROFILE = new HostProfile(
@@ -36,6 +38,8 @@ public final class Tc4HostAdapter implements HostAdapter, HostRuntimeServices {
                 HostProfile.FeatureSupport.adapted("Initializes TC4 warp, wand, recipe, research and add-on integrations")),
             Map.entry(HostProfile.Feature.RUNTIME_SERVICES,
                 HostProfile.FeatureSupport.adapted("Provides entity, wand, accessory, taint, damage and special-mining runtime services")),
+            Map.entry(HostProfile.Feature.ITEM_REGISTRATION,
+                HostProfile.FeatureSupport.adapted("Creates TC4-backed items and applies TC4 tool material/food property adapters")),
             Map.entry(HostProfile.Feature.RESEARCH_ENTRIES,
                 HostProfile.FeatureSupport.adapted("Translates common research definitions to ResearchItem")),
             Map.entry(HostProfile.Feature.RESEARCH_STAGES,
@@ -159,5 +163,85 @@ public final class Tc4HostAdapter implements HostAdapter, HostRuntimeServices {
     @Override
     public boolean isTaintDamage(DamageSource source) {
         return Tc4EnchantmentAdapter.isTaintDamage(source);
+    }
+
+    @Override
+    public Item.Properties gluttonyFoodProperties(Item.Properties properties) {
+        return Tc4ItemRegistrationAdapter.gluttonyFood(properties);
+    }
+
+    @Override
+    public Item.Properties skullAxeProperties(Item.Properties properties) {
+        return Tc4ItemRegistrationAdapter.skullAxe(properties);
+    }
+
+    @Override
+    public Item.Properties morphPickaxeProperties(Item.Properties properties) {
+        return Tc4ItemRegistrationAdapter.morphPickaxe(properties);
+    }
+
+    @Override
+    public Item.Properties morphSwordProperties(Item.Properties properties) {
+        return Tc4ItemRegistrationAdapter.morphSword(properties);
+    }
+
+    @Override
+    public Item.Properties morphShovelProperties(Item.Properties properties) {
+        return Tc4ItemRegistrationAdapter.morphShovel(properties);
+    }
+
+    @Override
+    public Item.Properties morphAxeProperties(Item.Properties properties) {
+        return Tc4ItemRegistrationAdapter.morphAxe(properties);
+    }
+
+    @Override
+    public Item.Properties diabolistForkProperties(Item.Properties properties) {
+        return Tc4ItemRegistrationAdapter.diabolistFork(properties);
+    }
+
+    @Override
+    public Item.Properties taintShovelProperties(Item.Properties properties) {
+        return Tc4ItemRegistrationAdapter.taintShovel(properties);
+    }
+
+    @Override
+    public Item.Properties taintPickaxeProperties(Item.Properties properties) {
+        return Tc4ItemRegistrationAdapter.taintPickaxe(properties);
+    }
+
+    @Override
+    public Item createMorphTool(Item.Properties properties) {
+        return new Tc4MorphToolItem(properties);
+    }
+
+    @Override
+    public Item createRingNutrition(Item.Properties properties) {
+        return new Tc4RingNutritionItem(properties);
+    }
+
+    @Override
+    public Item createCrystalwell(Item.Properties properties) {
+        return new Tc4CrystalwellItem(properties);
+    }
+
+    @Override
+    public Item createPrimewell(Item.Properties properties) {
+        return new Tc4PrimewellItem(properties);
+    }
+
+    @Override
+    public Item createBlinkFocus(Item.Properties properties) {
+        return new Tc4BlinkFocusItem(properties);
+    }
+
+    @Override
+    public Item.Properties blinkFocusProperties(Item.Properties properties) {
+        return Tc4BlinkFocusItem.properties(properties);
+    }
+
+    @Override
+    public Item createSubCollar(Item.Properties properties) {
+        return new Tc4SubCollarItem(properties);
     }
 }

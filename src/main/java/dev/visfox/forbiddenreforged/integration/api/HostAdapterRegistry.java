@@ -1,6 +1,7 @@
 package dev.visfox.forbiddenreforged.integration.api;
 
 import dev.visfox.forbiddenreforged.integration.runtime.HostRuntimeServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostItemServices;
 import java.util.Objects;
 
 /**
@@ -46,6 +47,19 @@ public final class HostAdapterRegistry {
         }
         throw new IllegalStateException(
             "Selected host adapter does not expose runtime services: " + adapter.profile().id()
+        );
+    }
+
+    /**
+     * Returns host-specific item factories and item property adapters.
+     */
+    public static HostItemServices requireItems() {
+        HostAdapter adapter = require();
+        if (adapter instanceof HostItemServices items) {
+            return items;
+        }
+        throw new IllegalStateException(
+            "Selected host adapter does not expose item services: " + adapter.profile().id()
         );
     }
 }

@@ -195,6 +195,28 @@ def main() -> int:
     if "HostRuntimeServices requireRuntime()" not in runtime_registry:
         failures.append("HostAdapterRegistry is missing the runtime capability lookup")
 
+
+    item_contract = ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostItemServices.java"
+    item_content = item_contract.read_text(encoding="utf-8")
+    for forbidden in ("thaumcraft.", "com.leclowndu93150.thaumaturge."):
+        if forbidden in item_content:
+            failures.append(
+                f"{item_contract.relative_to(ROOT)} exposes a concrete host API type: {forbidden}"
+            )
+
+    item_registry = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/api/HostAdapterRegistry.java").read_text(encoding="utf-8")
+    if "HostItemServices requireItems()" not in item_registry:
+        failures.append("HostAdapterRegistry is missing the host item factory lookup")
+
+    items_facade = ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmItems.java"
+    items_content = items_facade.read_text(encoding="utf-8")
+    if "integration.tc4" in items_content or "Tc4" in items_content or "thaumcraft." in items_content:
+        failures.append(
+            f"{items_facade.relative_to(ROOT)} references concrete host item classes instead of HostItemServices"
+        )
+    if "HostAdapterRegistry.requireItems()" not in items_content:
+        failures.append("FmItems bypasses the host-neutral item factory contract")
+
     if failures:
         print("\n".join(failures), file=sys.stderr)
         return 1
