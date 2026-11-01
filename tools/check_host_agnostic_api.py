@@ -82,6 +82,18 @@ def main() -> int:
                         f"{source.relative_to(ROOT)} references TC4 entity type {host_type} outside integration/tc4"
                     )
 
+    event_boundaries = (
+        ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmDrops.java",
+        ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmToolEvents.java",
+        ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmEnchantmentEffects.java",
+    )
+    for source in event_boundaries:
+        content = source.read_text(encoding="utf-8")
+        if "thaumcraft." in content:
+            failures.append(
+                f"{source.relative_to(ROOT)} references TC4 directly instead of using integration/tc4"
+            )
+
     if failures:
         print("\n".join(failures), file=sys.stderr)
         return 1

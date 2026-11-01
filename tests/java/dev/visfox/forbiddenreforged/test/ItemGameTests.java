@@ -78,6 +78,7 @@ import dev.visfox.forbiddenreforged.core.wand.WandVisAccess;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4WandPartsAdapter;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4WandVisAdapter;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4WandRuntimeAdapter;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectAdapter;
 import dev.visfox.forbiddenreforged.FmAspects;
 import dev.visfox.forbiddenreforged.FmComponents;
 import dev.visfox.forbiddenreforged.FmDrops;
@@ -796,10 +797,20 @@ public final class ItemGameTests {
         helper.assertFalse(FmToolEvents.restoresTaintedVis(infernalWand, true),
             "Infernal Wand does not use the Tainted Wand reaction");
 
-        List<Aspect> restored = FmToolEvents.taintedVisRolls(RandomSource.create(42L));
+        List<ContentId> restored = FmToolEvents.taintedVisRolls(RandomSource.create(42L));
+        Set<ContentId> primalIds = Set.of(
+            ContentId.parse("forbiddenmagic:concept/entropy"),
+            ContentId.parse("forbiddenmagic:concept/order"),
+            ContentId.parse("forbiddenmagic:concept/fire"),
+            ContentId.parse("forbiddenmagic:concept/water"),
+            ContentId.parse("forbiddenmagic:concept/earth"),
+            ContentId.parse("forbiddenmagic:concept/air")
+        );
         helper.assertValueEqual(restored.size(), 3, "taint damage makes three independent primal-aspect rolls");
-        for (Aspect aspect : restored) {
-            helper.assertTrue(aspect.isPrimal(), "every restored aspect must be primal");
+        for (ContentId aspect : restored) {
+            helper.assertTrue(primalIds.contains(aspect), "every restored aspect must use a semantic primal ID");
+            helper.assertTrue(Tc4AspectAdapter.resolveAspect(aspect).isPrimal(),
+                "the TC4 adapter must resolve every semantic ID to a primal aspect");
         }
         helper.succeed();
     }

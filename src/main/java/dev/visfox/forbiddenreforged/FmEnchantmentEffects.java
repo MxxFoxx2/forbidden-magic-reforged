@@ -31,8 +31,8 @@ import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import net.neoforged.neoforge.event.entity.living.LivingExperienceDropEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
-import thaumcraft.aspect.Aspect;
-import thaumcraft.damage.ModDamageTypes;
+import dev.visfox.forbiddenreforged.core.model.ContentId;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4EnchantmentAdapter;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4WandRuntimeAdapter;
 
 public final class FmEnchantmentEffects {
@@ -107,7 +107,7 @@ public final class FmEnchantmentEffects {
             RandomSource random = event.getLevel().getRandom();
             float chance = clusterChance(cluster);
             for (ItemEntity drop : event.getDrops()) {
-                drop.setItem(thaumcraft.item.tool.SpecialMining.find(event.getState(), drop.getItem(), chance, random));
+                drop.setItem(Tc4EnchantmentAdapter.specialMiningDrop(event.getState(), drop.getItem(), chance, random));
             }
         }
         int corrupting = FmEnchantments.level(player.level().registryAccess(), tool, FmEnchantments.CORRUPTING);
@@ -253,8 +253,8 @@ public final class FmEnchantmentEffects {
                     event.setCanceled(true);
                     return;
                 }
-                if (FmToolEvents.restoresTaintedVis(held, event.getSource().is(ModDamageTypes.TAINT))) {
-                    for (Aspect aspect : FmToolEvents.taintedVisRolls(wearer.getRandom())) {
+                if (FmToolEvents.restoresTaintedVis(held, Tc4EnchantmentAdapter.isTaintDamage(event.getSource()))) {
+                    for (ContentId aspect : FmToolEvents.taintedVisRolls(wearer.getRandom())) {
                         Tc4WandRuntimeAdapter.addVis(held, aspect, 1, true);
                     }
                 }
