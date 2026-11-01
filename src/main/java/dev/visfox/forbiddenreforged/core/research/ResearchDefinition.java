@@ -9,13 +9,15 @@ import java.util.Set;
 public record ResearchDefinition(
     ContentId id,
     ContentId category,
-    ContentId icon,
+    Icon icon,
     int column,
     int row,
     int complexity,
     AspectDefinition.Cost noteCost,
     List<ContentId> parents,
+    List<ContentId> hiddenParents,
     Set<Flag> flags,
+    List<ContentId> aspectTriggers,
     List<Stage> stages
 ) {
     public ResearchDefinition {
@@ -24,15 +26,19 @@ public record ResearchDefinition(
         Objects.requireNonNull(icon, "icon");
         Objects.requireNonNull(noteCost, "noteCost");
         Objects.requireNonNull(parents, "parents");
+        Objects.requireNonNull(hiddenParents, "hiddenParents");
         Objects.requireNonNull(flags, "flags");
+        Objects.requireNonNull(aspectTriggers, "aspectTriggers");
         Objects.requireNonNull(stages, "stages");
         parents = List.copyOf(parents);
+        hiddenParents = List.copyOf(hiddenParents);
         flags = Set.copyOf(flags);
+        aspectTriggers = List.copyOf(aspectTriggers);
         stages = List.copyOf(stages);
         if (complexity < 0) {
             throw new IllegalArgumentException("Research complexity cannot be negative");
         }
-        if (parents.contains(id)) {
+        if (parents.contains(id) || hiddenParents.contains(id)) {
             throw new IllegalArgumentException("Research cannot depend on itself");
         }
         if (stages.isEmpty()) {
@@ -41,12 +47,35 @@ public record ResearchDefinition(
     }
 
     public enum Flag {
-        STUB,
-        ROUND_ICON,
-        HIDDEN,
-        CONCEALED,
+        SPECIAL,
         SECONDARY,
+        ROUND_ICON,
+        STUB,
+        VIRTUAL,
+        CONCEALED,
+        HIDDEN,
+        LOST,
         AUTO_UNLOCK
+    }
+
+    public enum IconKind {
+        ITEM,
+        TEXTURE
+    }
+
+    public record Icon(IconKind kind, ContentId value) {
+        public Icon {
+            Objects.requireNonNull(kind, "kind");
+            Objects.requireNonNull(value, "value");
+        }
+
+        public static Icon item(ContentId item) {
+            return new Icon(IconKind.ITEM, item);
+        }
+
+        public static Icon texture(ContentId texture) {
+            return new Icon(IconKind.TEXTURE, texture);
+        }
     }
 
     public enum PageKind {
@@ -58,7 +87,6 @@ public record ResearchDefinition(
         INFUSION_ENCHANTMENT
     }
 
-    
     public record Page(PageKind pageKind, String reference) {
         public Page {
             Objects.requireNonNull(pageKind, "pageKind");
@@ -91,6 +119,9 @@ public record ResearchDefinition(
             prerequisites = List.copyOf(prerequisites);
             if (warp < 0) {
                 throw new IllegalArgumentException("Warp cannot be negative");
+            }
+            if (pages.isEmpty()) {
+                throw new IllegalArgumentException("Research stage must have at least one page");
             }
         }
     }
