@@ -202,7 +202,7 @@ public final class RecipeGameTests {
             "scripting integrations expose primal aspects as semantic IDs"
         );
         helper.assertFalse(
-            HostAdapterRegistry.requireItems().primordialPearlItem().is(Items.AIR),
+            HostAdapterRegistry.requireItems().primordialPearlItem() != Items.AIR,
             "the host provides the Primewell remainder item through item services"
         );
         helper.assertTrue(
