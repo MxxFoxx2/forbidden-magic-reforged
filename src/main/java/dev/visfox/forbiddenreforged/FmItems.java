@@ -20,6 +20,7 @@ import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4BlinkFocusItem;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4ItemRegistrationAdapter;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4RingNutritionItem;
 import org.jspecify.annotations.Nullable;
 
 public final class FmItems {
@@ -100,7 +101,7 @@ public final class FmItems {
             properties -> properties.stacksTo(64));
         TAINT_FRUIT = ITEMS.registerItem("taint_fruit", TaintFruitItem::new,
             properties -> properties.stacksTo(64));
-        RING_NUTRITION = ITEMS.registerItem("ring_nutrition", RingNutritionItem::new,
+        RING_NUTRITION = ITEMS.registerItem("ring_nutrition", Tc4RingNutritionItem::new,
             properties -> properties.stacksTo(1));
         ALCHEMICAL_CAP = ITEMS.registerSimpleItem("alchemical_cap");
         VINTEUM_CAP = ITEMS.registerSimpleItem("vinteum_cap");

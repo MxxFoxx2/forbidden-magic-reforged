@@ -102,6 +102,9 @@ import thaumcraft.research.ResearchCategories;
 import thaumcraft.research.ResearchItem;
 import thaumcraft.research.ResearchPage;
 import thaumcraft.platform.Baubles;
+import thaumcraft.platform.Bauble;
+import thaumcraft.platform.BaubleType;
+import thaumcraft.item.gear.RunicArmor;
 import thaumcraft.wand.VisStorage;
 import thaumcraft.wand.WandRegistry;
 import thaumcraft.wand.WandCap;
@@ -391,6 +394,12 @@ public final class ItemGameTests {
             Baubles.set(player, slot, ItemStack.EMPTY);
         }
         ItemStack ring = new ItemStack(FmItems.RING_NUTRITION.get());
+        helper.assertTrue(ring.getItem() instanceof Bauble, "Ring of Nutrition implements the host Bauble contract");
+        helper.assertValueEqual(((Bauble) ring.getItem()).getBaubleType(ring), BaubleType.RING,
+            "Ring of Nutrition registers as a ring, not an amulet or belt item");
+        helper.assertTrue(ring.getItem() instanceof RunicArmor, "Ring of Nutrition is recognized by TC4 runic armor");
+        helper.assertValueEqual(((RunicArmor) ring.getItem()).getRunicCharge(ring), 0,
+            "Ring of Nutrition grants no runic charge");
         Baubles.set(player, 0, ring.copy());
         helper.assertFalse(FmToolEvents.hasNutritionRingInRingSlot(player), "amulet slot does not activate Ring of Nutrition");
         Baubles.set(player, 0, ItemStack.EMPTY);
