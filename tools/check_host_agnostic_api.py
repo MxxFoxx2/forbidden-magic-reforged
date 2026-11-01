@@ -192,6 +192,9 @@ def main() -> int:
         ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmBlockEntities.java",
         ROOT / "src/main/java/dev/visfox/forbiddenreforged/WrathCageBlock.java",
         ROOT / "src/main/java/dev/visfox/forbiddenreforged/ScribeWellEvents.java",
+        ROOT / "src/main/java/dev/visfox/forbiddenreforged/MobCrystalItem.java",
+        ROOT / "src/main/java/dev/visfox/forbiddenreforged/MorphToolItem.java",
+        ROOT / "src/main/java/dev/visfox/forbiddenreforged/TaintShovelItem.java",
     )
     for source in runtime_consumers:
         source_content = source.read_text(encoding="utf-8")
@@ -203,6 +206,17 @@ def main() -> int:
     runtime_registry = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/api/HostAdapterRegistry.java").read_text(encoding="utf-8")
     if "HostRuntimeServices requireRuntime()" not in runtime_registry:
         failures.append("HostAdapterRegistry is missing the runtime capability lookup")
+    for contract_method in (
+        "Component aspectDescription(ContentId aspect)",
+        "void playMorphCycleSound(",
+        "boolean isAreaHarvesting()",
+        "void breakArea(",
+        "boolean isTaintShovelPurificationTarget(",
+        "float taintShovelMiningSpeed()",
+        "void playTaintShovelSound(",
+    ):
+        if contract_method not in runtime_content:
+            failures.append(f"HostRuntimeServices is missing a shared game-runtime capability: {contract_method}")
     if "HostItemServices requireItems()" not in runtime_registry:
         failures.append("HostAdapterRegistry is missing the host item factory lookup")
     if "List<ContentId> primalAspectIds()" not in runtime_content or "boolean addAspectPool(ServerPlayer player" not in runtime_content:

@@ -17,7 +17,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import dev.visfox.forbiddenreforged.integration.tc4.Tc4MorphToolAdapter;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 
 public class MorphToolItem extends Item {
     public MorphToolItem(Properties properties) {
@@ -45,7 +45,7 @@ public class MorphToolItem extends Item {
                 stack.set(DataComponents.CUSTOM_NAME, Component.literal(next.currentName()).withStyle(ChatFormatting.ITALIC));
             }
             stack.hurtAndBreak(5, player, EquipmentSlot.MAINHAND);
-            Tc4MorphToolAdapter.playCycleSound(level, player.blockPosition(), player.getRandom());
+            HostAdapterRegistry.requireRuntime().playMorphCycleSound(level, player.blockPosition(), player.getRandom());
         }
         player.swing(hand, net.minecraft.world.item.component.SwingAnimation.DEFAULT, true);
         return InteractionResult.SUCCESS;
@@ -63,7 +63,7 @@ public class MorphToolItem extends Item {
 
     @Override
     public boolean mineBlock(ItemStack stack, Level level, BlockState state, BlockPos pos, LivingEntity owner) {
-        if (Tc4MorphToolAdapter.isAreaHarvesting()) {
+        if (HostAdapterRegistry.requireRuntime().isAreaHarvesting()) {
             return true;
         }
         if (!level.isClientSide()
@@ -71,7 +71,7 @@ public class MorphToolItem extends Item {
             && level instanceof ServerLevel serverLevel
             && FmEnchantments.level(serverLevel.registryAccess(), stack, FmEnchantments.IMPACT) > 0
             && stack.isCorrectToolForDrops(state)) {
-            Tc4MorphToolAdapter.breakArea(stack, serverLevel, player, pos, stack::isCorrectToolForDrops);
+            HostAdapterRegistry.requireRuntime().breakArea(stack, serverLevel, player, pos, stack::isCorrectToolForDrops);
         }
         return super.mineBlock(stack, level, state, pos, owner);
     }

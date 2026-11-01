@@ -8,7 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import dev.visfox.forbiddenreforged.integration.tc4.Tc4TaintAdapter;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 
 public final class TaintShovelItem extends Item {
     public TaintShovelItem(Properties properties) {
@@ -17,8 +17,8 @@ public final class TaintShovelItem extends Item {
 
     @Override
     public float getDestroySpeed(ItemStack stack, BlockState state) {
-        if (Tc4TaintAdapter.isHostTaintMaterial(state) || state.is(FmBlocks.TAINT_LEAVES.get())) {
-            return Tc4TaintAdapter.taintShovelMiningSpeed();
+        if (HostAdapterRegistry.requireRuntime().isTaintMaterial(state) || state.is(FmBlocks.TAINT_LEAVES.get())) {
+            return HostAdapterRegistry.requireRuntime().taintShovelMiningSpeed();
         }
         return super.getDestroySpeed(stack, state);
     }
@@ -39,7 +39,7 @@ public final class TaintShovelItem extends Item {
                         continue;
                     }
                     BlockState state = level.getBlockState(target);
-                    if (!Tc4TaintAdapter.isTaintShovelPurificationTarget(state)) {
+                    if (!HostAdapterRegistry.requireRuntime().isTaintShovelPurificationTarget(state)) {
                         continue;
                     }
                     purified++;
@@ -55,7 +55,7 @@ public final class TaintShovelItem extends Item {
         }
         if (!level.isClientSide() && player != null) {
             stack.hurtAndBreak(Math.min(purified, 15), player, context.getHand());
-            Tc4TaintAdapter.playTaintShovelSound(level, center);
+            HostAdapterRegistry.requireRuntime().playTaintShovelSound(level, center);
         }
         return InteractionResult.SUCCESS;
     }

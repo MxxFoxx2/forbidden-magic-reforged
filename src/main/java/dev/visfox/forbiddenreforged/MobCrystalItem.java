@@ -10,7 +10,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import org.jspecify.annotations.Nullable;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
-import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectAdapter;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 
 public class MobCrystalItem extends Item {
     public MobCrystalItem(Properties properties) {
@@ -39,7 +39,7 @@ public class MobCrystalItem extends Item {
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
         ContentId aspect = FmSpawnerMobs.aspect(mob(stack));
         if (aspect != null) {
-            tooltip.accept(Tc4AspectAdapter.description(aspect));
+            tooltip.accept(HostAdapterRegistry.requireRuntime().aspectDescription(aspect));
         }
     }
 }

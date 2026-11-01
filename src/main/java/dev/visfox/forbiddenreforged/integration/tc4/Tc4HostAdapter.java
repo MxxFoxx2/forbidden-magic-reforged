@@ -14,6 +14,9 @@ import dev.visfox.forbiddenreforged.integration.runtime.HostBootstrapServices;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.server.level.ServerPlayer;
@@ -22,6 +25,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.state.BlockState;
 import thaumcraft.registry.EldritchContent;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.Map;
 
 /**
@@ -138,6 +142,32 @@ public final class Tc4HostAdapter implements HostAdapter, HostRuntimeServices, H
     }
 
     @Override
+    public Component aspectDescription(ContentId aspect) {
+        return Tc4AspectAdapter.description(aspect);
+    }
+
+    @Override
+    public void playMorphCycleSound(Level level, BlockPos pos, RandomSource random) {
+        Tc4MorphToolAdapter.playCycleSound(level, pos, random);
+    }
+
+    @Override
+    public boolean isAreaHarvesting() {
+        return Tc4MorphToolAdapter.isAreaHarvesting();
+    }
+
+    @Override
+    public void breakArea(
+        ItemStack tool,
+        ServerLevel level,
+        ServerPlayer player,
+        BlockPos origin,
+        Predicate<BlockState> correctTool
+    ) {
+        Tc4MorphToolAdapter.breakArea(tool, level, player, origin, correctTool);
+    }
+
+    @Override
     public WrathCageBlockEntity createWrathCageBlockEntity(BlockPos pos, BlockState state) {
         return new Tc4WrathCageBlockEntity(pos, state);
     }
@@ -180,6 +210,21 @@ public final class Tc4HostAdapter implements HostAdapter, HostRuntimeServices, H
     @Override
     public boolean isTaintMaterial(BlockState state) {
         return Tc4TaintAdapter.isHostTaintMaterial(state);
+    }
+
+    @Override
+    public boolean isTaintShovelPurificationTarget(BlockState state) {
+        return Tc4TaintAdapter.isTaintShovelPurificationTarget(state);
+    }
+
+    @Override
+    public float taintShovelMiningSpeed() {
+        return Tc4TaintAdapter.taintShovelMiningSpeed();
+    }
+
+    @Override
+    public void playTaintShovelSound(Level level, BlockPos pos) {
+        Tc4TaintAdapter.playTaintShovelSound(level, pos);
     }
 
     @Override

@@ -222,6 +222,18 @@ public final class RecipeGameTests {
             "scripting integrations expose primal aspects as semantic IDs"
         );
         helper.assertTrue(
+            HostAdapterRegistry.requireRuntime().aspectDescription(FmAspects.NETHER) != null,
+            "host aspect descriptions are retrieved through runtime services"
+        );
+        helper.assertTrue(
+            HostAdapterRegistry.requireRuntime().taintShovelMiningSpeed() > 0.0F,
+            "host taint tool properties are retrieved through runtime services"
+        );
+        helper.assertFalse(
+            HostAdapterRegistry.requireRuntime().isAreaHarvesting(),
+            "the host area-harvest state is queried through runtime services"
+        );
+        helper.assertTrue(
             HostAdapterRegistry.requireItems().primordialPearlItem() != Items.AIR,
             "the host provides the Primewell remainder item through item services"
         );
