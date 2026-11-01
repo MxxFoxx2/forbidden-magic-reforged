@@ -5,8 +5,10 @@ import dev.visfox.forbiddenreforged.core.aspect.AspectDefinition;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.core.research.ResearchCategoryDefinition;
 import dev.visfox.forbiddenreforged.core.research.ResearchDefinition;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import net.minecraft.resources.Identifier;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.crafting.TcStack;
@@ -31,16 +33,34 @@ public final class Tc4ResearchAdapter {
         ResearchCategoryDefinition category,
         List<ResearchDefinition> definitions
     ) {
-        String categoryKey = categoryKey(category.id());
-        ResearchCategories.registerCategory(
-            categoryKey,
-            identifier(category.icon()),
-            identifier(category.background())
-        );
+        register(List.of(category), definitions);
+    }
+
+    public static void register(
+        List<ResearchCategoryDefinition> categories,
+        List<ResearchDefinition> definitions
+    ) {
+        Objects.requireNonNull(categories, "categories");
+        Objects.requireNonNull(definitions, "definitions");
+
+        Map<ContentId, ResearchCategoryDefinition> categoriesById = new LinkedHashMap<>();
+        for (ResearchCategoryDefinition category : categories) {
+            Objects.requireNonNull(category, "category");
+            if (categoriesById.putIfAbsent(category.id(), category) != null) {
+                throw new IllegalArgumentException("Duplicate research category: " + category.id());
+            }
+            ResearchCategories.registerCategory(
+                categoryKey(category.id()),
+                identifier(category.icon()),
+                identifier(category.background())
+            );
+        }
+
         for (ResearchDefinition definition : definitions) {
-            if (!definition.category().equals(category.id())) {
+            Objects.requireNonNull(definition, "definition");
+            if (!categoriesById.containsKey(definition.category())) {
                 throw new IllegalArgumentException(
-                    "Research category mismatch for " + definition.id()
+                    "Unknown research category " + definition.category() + " for " + definition.id()
                 );
             }
             ResearchCategories.addResearch(translate(definition));

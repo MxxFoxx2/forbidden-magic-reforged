@@ -48,6 +48,8 @@ import dev.visfox.forbiddenreforged.core.warp.WarpChangeRequested;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4WarpAdapter;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.core.model.HostContent;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
+import dev.visfox.forbiddenreforged.integration.api.HostProfile;
 import dev.visfox.forbiddenreforged.core.recipe.ForbiddenMagicRecipeCatalog;
 import dev.visfox.forbiddenreforged.core.recipe.RecipeDefinition;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4ContentAdapter;
@@ -96,7 +98,8 @@ public final class RecipeGameTests {
         "common_research_catalog_matches_tc4_registration",
         "research_catalog_preserves_flags_pages_and_progression",
         "tc4_warp_adapter_preserves_semantic_types_and_item_costs",
-        "host_content_identifiers_are_resolved_by_the_tc4_adapter"
+        "host_content_identifiers_are_resolved_by_the_tc4_adapter",
+        "host_adapter_registry_exposes_tc4_profile"
     };
 
     static {
@@ -119,6 +122,7 @@ public final class RecipeGameTests {
         FUNCTIONS.register(TESTS[16], () -> RecipeGameTests::researchCatalogPreservesFlagsPagesAndProgression);
         FUNCTIONS.register(TESTS[17], () -> RecipeGameTests::tc4WarpAdapterPreservesSemanticTypesAndItemCosts);
         FUNCTIONS.register(TESTS[18], () -> RecipeGameTests::hostContentIdentifiersAreResolvedByTc4Adapter);
+        FUNCTIONS.register(TESTS[19], () -> RecipeGameTests::hostAdapterRegistryExposesTc4Profile);
     }
 
     private RecipeGameTests() {}
@@ -149,6 +153,22 @@ public final class RecipeGameTests {
         helper.assertValueEqual(Tc4ContentAdapter.resolveItem(ContentId.parse("minecraft:diamond")),
             Identifier.parse("minecraft:diamond"),
             "vanilla item identifiers pass through unchanged");
+        helper.succeed();
+    }
+
+    private static void hostAdapterRegistryExposesTc4Profile(GameTestHelper helper) {
+        HostProfile profile = HostAdapterRegistry.require().profile();
+        helper.assertValueEqual(profile.id(), ContentId.parse("host:tc4-reforged"), "selected host profile id");
+        helper.assertValueEqual(profile.hostVersion(), "1.1.2", "selected host dependency version");
+        helper.assertValueEqual(profile.minecraftVersion(), "26.3", "selected Minecraft version");
+        helper.assertTrue(
+            profile.supportOf(HostProfile.Feature.ASPECT_REGISTRATION).level() == HostProfile.SupportLevel.ADAPTED,
+            "aspect registration is exposed through the adapter"
+        );
+        helper.assertTrue(
+            profile.supportOf(HostProfile.Feature.RESEARCH_STAGES).level() == HostProfile.SupportLevel.PARTIAL,
+            "multi-stage research limitations are declared by the adapter"
+        );
         helper.succeed();
     }
 

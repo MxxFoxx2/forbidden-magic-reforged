@@ -2,6 +2,7 @@ package dev.visfox.forbiddenreforged;
 
 import dev.visfox.forbiddenreforged.core.aspect.ForbiddenMagicAspectCatalog;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectAdapter;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
@@ -25,9 +26,10 @@ public final class FmAspects {
 
     public static void init() {
         try {
-            Map<ContentId, Aspect> registered = Tc4AspectAdapter.registerAspects(
+            HostAdapterRegistry.require().registerAspects(
                 ForbiddenMagicAspectCatalog.definitions(!FmConfig.lustDisabled())
             );
+            Map<ContentId, Aspect> registered = Tc4AspectAdapter.registeredAspects();
             LUST = registered.get(ForbiddenMagicAspectCatalog.LUXURIA);
             NETHER = registered.get(ForbiddenMagicAspectCatalog.INFERNUS);
             PRIDE = registered.get(ForbiddenMagicAspectCatalog.SUPERBIA);

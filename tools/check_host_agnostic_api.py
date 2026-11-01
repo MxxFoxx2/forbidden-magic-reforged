@@ -111,6 +111,37 @@ def main() -> int:
                     f"{source.relative_to(ROOT)} hard-codes a host registry namespace: {host_namespace}"
                 )
 
+
+    registration_facades = (
+        ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmAspects.java",
+        ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmRecipes.java",
+        ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmResearch.java",
+    )
+    for source in registration_facades:
+        content = source.read_text(encoding="utf-8")
+        if "HostAdapterRegistry.require()" not in content:
+            failures.append(
+                f"{source.relative_to(ROOT)} bypasses the host-neutral registration contract"
+            )
+        for direct_registration in (
+            "Tc4AspectAdapter.registerAspects(",
+            "Tc4RecipeAdapter.registerRecipes(",
+            "Tc4ResearchAdapter.register(",
+        ):
+            if direct_registration in content:
+                failures.append(
+                    f"{source.relative_to(ROOT)} registers content directly through a TC4 adapter"
+                )
+
+    bootstrap = ROOT / "src/main/java/dev/visfox/forbiddenreforged/ForbiddenMagic.java"
+    bootstrap_content = bootstrap.read_text(encoding="utf-8")
+    adapter_install = bootstrap_content.find("HostAdapterRegistry.install(Tc4HostAdapter.INSTANCE)")
+    aspect_init = bootstrap_content.find("FmAspects.init()")
+    if adapter_install < 0 or aspect_init < 0 or adapter_install > aspect_init:
+        failures.append(
+            "ForbiddenMagic must install the host adapter before initializing aspect catalogs"
+        )
+
     if failures:
         print("\n".join(failures), file=sys.stderr)
         return 1

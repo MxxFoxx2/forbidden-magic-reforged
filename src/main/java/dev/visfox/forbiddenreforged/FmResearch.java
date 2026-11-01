@@ -1,8 +1,9 @@
 package dev.visfox.forbiddenreforged;
 
 import dev.visfox.forbiddenreforged.core.research.ForbiddenMagicResearchCatalog;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
+import java.util.List;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4RecipeAdapter;
-import dev.visfox.forbiddenreforged.integration.tc4.Tc4ResearchAdapter;
 import net.neoforged.fml.ModList;
 
 public final class FmResearch {
@@ -18,8 +19,8 @@ public final class FmResearch {
             ModList.get().isLoaded("arsmagica2"),
             Tc4RecipeAdapter.crystalwellUsesShardTag()
         );
-        Tc4ResearchAdapter.register(
-            ForbiddenMagicResearchCatalog.category(),
+        HostAdapterRegistry.require().registerResearch(
+            List.of(ForbiddenMagicResearchCatalog.category()),
             ForbiddenMagicResearchCatalog.definitions(options)
         );
     }
