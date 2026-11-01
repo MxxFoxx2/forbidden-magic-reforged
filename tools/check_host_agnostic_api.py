@@ -304,6 +304,18 @@ def main() -> int:
         failures.append("Warp GameTest must verify that zero-amount changes are ignored")
     if "FmWandContractAccess.INSTANCE.remaining(contractProbe)" not in game_tests_for_warp:
         failures.append("GameTests must verify Profane Contract component access outside core")
+    profane_test_requirements = (
+        "private static void profaneWandBehaviorUsesCorePorts",
+        "WandBehaviors.profane(",
+        "WandPartsAccess parts =",
+        "WarpAccess warp =",
+        "helper.assertValueEqual(restoredVis[0], 25000",
+        'ContentId.parse("forbiddenmagic:profaned")',
+        "helper.assertValueEqual(warpCalls[0], 6",
+    )
+    for requirement in profane_test_requirements:
+        if requirement not in game_tests_for_warp:
+            failures.append(f"Profane Wand core-port GameTest is missing an assertion or port: {requirement}")
 
 
     capability_consumers = {

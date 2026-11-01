@@ -47,6 +47,10 @@ import dev.visfox.forbiddenreforged.core.research.ResearchDefinition;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4ResearchAdapter;
 import dev.visfox.forbiddenreforged.core.warp.WarpKind;
+import dev.visfox.forbiddenreforged.core.warp.WarpAccess;
+import dev.visfox.forbiddenreforged.core.wand.WandBehaviors;
+import dev.visfox.forbiddenreforged.core.wand.WandPartsAccess;
+import dev.visfox.forbiddenreforged.core.wand.WandVisAccess;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4WarpAdapter;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.core.model.HostContent;
@@ -101,7 +105,8 @@ public final class RecipeGameTests {
         "research_catalog_preserves_flags_pages_and_progression",
         "tc4_warp_adapter_preserves_semantic_types_and_item_costs",
         "host_content_identifiers_are_resolved_by_the_tc4_adapter",
-        "host_adapter_registry_exposes_tc4_profile"
+        "host_adapter_registry_exposes_tc4_profile",
+        "profane_wand_behavior_uses_core_ports"
     };
 
     static {
@@ -125,6 +130,7 @@ public final class RecipeGameTests {
         FUNCTIONS.register(TESTS[17], () -> RecipeGameTests::tc4WarpAdapterPreservesSemanticTypesAndItemCosts);
         FUNCTIONS.register(TESTS[18], () -> RecipeGameTests::hostContentIdentifiersAreResolvedByTc4Adapter);
         FUNCTIONS.register(TESTS[19], () -> RecipeGameTests::hostAdapterRegistryExposesTc4Profile);
+        FUNCTIONS.register(TESTS[20], () -> RecipeGameTests::profaneWandBehaviorUsesCorePorts);
     }
 
     private RecipeGameTests() {}
@@ -499,6 +505,79 @@ public final class RecipeGameTests {
                 "TC4 host feature support: " + feature.getKey()
             );
         }
+    }
+
+    private static void profaneWandBehaviorUsesCorePorts(GameTestHelper helper) {
+        ServerPlayer player = mockPlayer(helper);
+        player.tickCount = 20;
+        ItemStack wand = new ItemStack(Items.STICK);
+        int[] restoredVis = {0};
+        int[] warpCalls = {0};
+        ContentId[] replacementRod = {null};
+        List<WarpKind> warpKinds = new ArrayList<>();
+        List<ContentId> primalAspects = List.of(
+            ContentId.parse("forbiddenmagic:concept/air"),
+            ContentId.parse("forbiddenmagic:concept/earth"),
+            ContentId.parse("forbiddenmagic:concept/fire"),
+            ContentId.parse("forbiddenmagic:concept/water"),
+            ContentId.parse("forbiddenmagic:concept/order"),
+            ContentId.parse("forbiddenmagic:concept/entropy")
+        );
+        WandVisAccess vis = new WandVisAccess() {
+            @Override
+            public List<ContentId> primalAspects() {
+                return primalAspects;
+            }
+
+            @Override
+            public int maximumVis(ItemStack stack) {
+                return 5000;
+            }
+
+            @Override
+            public int vis(ItemStack stack, ContentId aspect) {
+                return 0;
+            }
+
+            @Override
+            public void addVis(ItemStack stack, ContentId aspect, int amount, boolean apply) {
+            }
+
+            @Override
+            public void addRealVis(ItemStack stack, ContentId aspect, int amount, boolean apply) {
+                restoredVis[0] += amount;
+            }
+
+            @Override
+            public void fill(ItemStack stack) {
+            }
+        };
+        WandPartsAccess parts = (stack, rod) -> replacementRod[0] = rod;
+        WarpAccess warp = (target, amount, kind) -> {
+            warpCalls[0] += amount;
+            warpKinds.add(kind);
+        };
+
+        WandBehaviors.profane(
+            wand,
+            player,
+            vis,
+            parts,
+            FmWandContractAccess.INSTANCE,
+            warp
+        );
+
+        helper.assertValueEqual(restoredVis[0], 25000,
+            "Profane Wand restores the complete 25000-point contract through Vis access");
+        helper.assertValueEqual(replacementRod[0], ContentId.parse("forbiddenmagic:profaned"),
+            "Profane Wand replaces its rod through the wand-parts port");
+        helper.assertTrue(FmWandContractAccess.INSTANCE.remaining(wand) == null,
+            "Profane Wand clears its completed contract through component access");
+        helper.assertValueEqual(warpCalls[0], 6,
+            "Profane Wand routes five restore rolls and contract completion through warp access");
+        helper.assertTrue(warpKinds.stream().allMatch(kind -> kind == WarpKind.STICKY),
+            "Profane Wand requests sticky warp for every contract penalty");
+        helper.succeed();
     }
 
     private static void commonRecipeCatalogMatchesTc4Registration(GameTestHelper helper) {
