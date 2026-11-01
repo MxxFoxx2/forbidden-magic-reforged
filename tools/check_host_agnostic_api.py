@@ -234,6 +234,36 @@ def main() -> int:
     if "HostAdapterRegistry.requireItems()" not in items_content:
         failures.append("FmItems bypasses the host-neutral item factory contract")
 
+
+    bootstrap_contract = ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime/HostBootstrapServices.java"
+    bootstrap_content = bootstrap_contract.read_text(encoding="utf-8")
+    for forbidden in ("thaumcraft.", "com.leclowndu93150.thaumaturge."):
+        if forbidden in bootstrap_content:
+            failures.append(
+                f"{bootstrap_contract.relative_to(ROOT)} exposes a concrete host API type: {forbidden}"
+            )
+
+    bootstrap_registry = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/api/HostAdapterRegistry.java").read_text(encoding="utf-8")
+    if "HostBootstrapServices requireBootstrap()" not in bootstrap_registry:
+        failures.append("HostAdapterRegistry is missing the host bootstrap capability lookup")
+
+    bootstrap_consumers = (
+        ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmWands.java",
+        ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmWandTriggers.java",
+        ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmTinkerer.java",
+        ROOT / "src/main/java/dev/visfox/forbiddenreforged/FmCreativeTab.java",
+    )
+    for source in bootstrap_consumers:
+        source_content = source.read_text(encoding="utf-8")
+        if "integration.tc4" in source_content or "Tc4" in source_content or "thaumcraft." in source_content:
+            failures.append(
+                f"{source.relative_to(ROOT)} references a concrete host adapter instead of HostBootstrapServices"
+            )
+        if "HostAdapterRegistry.requireBootstrap()" not in source_content:
+            failures.append(
+                f"{source.relative_to(ROOT)} bypasses the host bootstrap capability contract"
+            )
+
     if failures:
         print("\n".join(failures), file=sys.stderr)
         return 1

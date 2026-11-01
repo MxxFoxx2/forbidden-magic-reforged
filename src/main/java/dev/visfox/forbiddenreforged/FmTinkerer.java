@@ -1,6 +1,6 @@
 package dev.visfox.forbiddenreforged;
 
-import dev.visfox.forbiddenreforged.integration.tc4.Tc4TinkererAdapter;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 
 /** Compatibility entry point for the optional Thaumic Tinkerer integration. */
 public final class FmTinkerer {
@@ -8,10 +8,10 @@ public final class FmTinkerer {
     }
 
     public static void register() {
-        Tc4TinkererAdapter.register();
+        HostAdapterRegistry.requireBootstrap().registerOptionalEnchantments();
     }
 
     public static int registeredCount() {
-        return Tc4TinkererAdapter.registeredCount();
+        return HostAdapterRegistry.requireBootstrap().registeredOptionalEnchantments();
     }
 }

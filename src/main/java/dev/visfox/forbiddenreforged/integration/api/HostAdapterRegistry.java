@@ -2,6 +2,7 @@ package dev.visfox.forbiddenreforged.integration.api;
 
 import dev.visfox.forbiddenreforged.integration.runtime.HostRuntimeServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostItemServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostBootstrapServices;
 import java.util.Objects;
 
 /**
@@ -60,6 +61,19 @@ public final class HostAdapterRegistry {
         }
         throw new IllegalStateException(
             "Selected host adapter does not expose item services: " + adapter.profile().id()
+        );
+    }
+
+    /**
+     * Returns host-specific startup, trigger, and creative-tab services.
+     */
+    public static HostBootstrapServices requireBootstrap() {
+        HostAdapter adapter = require();
+        if (adapter instanceof HostBootstrapServices bootstrap) {
+            return bootstrap;
+        }
+        throw new IllegalStateException(
+            "Selected host adapter does not expose bootstrap services: " + adapter.profile().id()
         );
     }
 }

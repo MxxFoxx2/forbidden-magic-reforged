@@ -1,12 +1,12 @@
 package dev.visfox.forbiddenreforged;
 
-import dev.visfox.forbiddenreforged.integration.tc4.Tc4WandAdapter;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 
 public final class FmWands {
     private FmWands() {
     }
 
     public static void register() {
-        Tc4WandAdapter.registerWands();
+        HostAdapterRegistry.requireBootstrap().registerWands();
     }
 }

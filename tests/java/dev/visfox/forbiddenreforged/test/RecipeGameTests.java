@@ -190,6 +190,26 @@ public final class RecipeGameTests {
             "host block entity implementation is declared by the selected adapter"
         );
         helper.assertTrue(
+            profile.supportOf(HostProfile.Feature.WAND_RODS).level() == HostProfile.SupportLevel.ADAPTED,
+            "host wand rod registration is declared by the selected adapter"
+        );
+        helper.assertTrue(
+            profile.supportOf(HostProfile.Feature.WAND_CAPS).level() == HostProfile.SupportLevel.ADAPTED,
+            "host wand cap registration is declared by the selected adapter"
+        );
+        helper.assertTrue(
+            profile.supportOf(HostProfile.Feature.WAND_TRIGGERS).level() == HostProfile.SupportLevel.ADAPTED,
+            "host wand triggers are declared by the selected adapter"
+        );
+        helper.assertTrue(
+            profile.supportOf(HostProfile.Feature.OPTIONAL_ENCHANTMENT_INTEGRATION).level() == HostProfile.SupportLevel.PARTIAL,
+            "optional enchantment integration declares its conditional availability"
+        );
+        helper.assertTrue(
+            HostAdapterRegistry.requireBootstrap() != null,
+            "the selected host exposes its bootstrap and creative-tab services"
+        );
+        helper.assertTrue(
             HostAdapterRegistry.requireRuntime() != null,
             "the selected host exposes its runtime service boundary"
         );

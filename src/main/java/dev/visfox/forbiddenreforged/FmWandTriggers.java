@@ -1,12 +1,12 @@
 package dev.visfox.forbiddenreforged;
 
-import dev.visfox.forbiddenreforged.integration.tc4.Tc4WandTriggerAdapter;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 
 public final class FmWandTriggers {
     private FmWandTriggers() {
     }
 
     public static void register() {
-        Tc4WandTriggerAdapter.register();
+        HostAdapterRegistry.requireBootstrap().registerWandTriggers();
     }
 }

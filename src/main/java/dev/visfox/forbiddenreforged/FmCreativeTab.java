@@ -11,7 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import dev.visfox.forbiddenreforged.integration.tc4.Tc4WandAdapter;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 
 public final class FmCreativeTab {
     private static final DeferredRegister<CreativeModeTab> TABS =
@@ -62,6 +62,6 @@ public final class FmCreativeTab {
     }
 
     private static void addCreativeWands(List<ItemStack> stacks) {
-        Tc4WandAdapter.addCreativeWands(stacks);
+        HostAdapterRegistry.requireBootstrap().addCreativeWands(stacks);
     }
 }

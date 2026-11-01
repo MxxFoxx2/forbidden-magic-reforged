@@ -10,6 +10,7 @@ import dev.visfox.forbiddenreforged.integration.api.HostAdapter;
 import dev.visfox.forbiddenreforged.integration.api.HostProfile;
 import dev.visfox.forbiddenreforged.integration.runtime.HostRuntimeServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostItemServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostBootstrapServices;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
@@ -26,7 +27,7 @@ import java.util.Map;
 /**
  * Thaumcraft 4: Reforged implementation of the host-neutral content contract.
  */
-public final class Tc4HostAdapter implements HostAdapter, HostRuntimeServices, HostItemServices {
+public final class Tc4HostAdapter implements HostAdapter, HostRuntimeServices, HostItemServices, HostBootstrapServices {
     public static final Tc4HostAdapter INSTANCE = new Tc4HostAdapter();
 
     private static final HostProfile PROFILE = new HostProfile(
@@ -40,6 +41,16 @@ public final class Tc4HostAdapter implements HostAdapter, HostRuntimeServices, H
                 HostProfile.FeatureSupport.adapted("Reports native and add-on aspects from the TC4 registry")),
             Map.entry(HostProfile.Feature.RUNTIME_BOOTSTRAP,
                 HostProfile.FeatureSupport.adapted("Initializes TC4 warp, wand, recipe, research and add-on integrations")),
+            Map.entry(HostProfile.Feature.WAND_RODS,
+                HostProfile.FeatureSupport.adapted("Registers TC4 wand rods and their update behaviors")),
+            Map.entry(HostProfile.Feature.WAND_CAPS,
+                HostProfile.FeatureSupport.adapted("Registers TC4 wand caps and material properties")),
+            Map.entry(HostProfile.Feature.WAND_TRIGGERS,
+                HostProfile.FeatureSupport.adapted("Registers TC4 wand block triggers")),
+            Map.entry(HostProfile.Feature.FOCI_OR_SPELLS,
+                HostProfile.FeatureSupport.adapted("Integrates the Blink Focus with the TC4 wand/focus API")),
+            Map.entry(HostProfile.Feature.OPTIONAL_ENCHANTMENT_INTEGRATION,
+                HostProfile.FeatureSupport.partial("Thaumic Tinkerer enchantment costs are registered only when the optional mod is installed")),
             Map.entry(HostProfile.Feature.RUNTIME_SERVICES,
                 HostProfile.FeatureSupport.adapted("Provides entity, wand, accessory, taint, damage and special-mining runtime services")),
             Map.entry(HostProfile.Feature.ITEM_REGISTRATION,
@@ -279,5 +290,30 @@ public final class Tc4HostAdapter implements HostAdapter, HostRuntimeServices, H
     @Override
     public Item primordialPearlItem() {
         return EldritchContent.PRIMORDIAL_PEARL.get();
+    }
+
+    @Override
+    public void registerWands() {
+        Tc4WandAdapter.registerWands();
+    }
+
+    @Override
+    public void registerWandTriggers() {
+        Tc4WandTriggerAdapter.register();
+    }
+
+    @Override
+    public void registerOptionalEnchantments() {
+        Tc4TinkererAdapter.register();
+    }
+
+    @Override
+    public int registeredOptionalEnchantments() {
+        return Tc4TinkererAdapter.registeredCount();
+    }
+
+    @Override
+    public void addCreativeWands(List<ItemStack> stacks) {
+        Tc4WandAdapter.addCreativeWands(stacks);
     }
 }
