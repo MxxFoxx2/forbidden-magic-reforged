@@ -2,6 +2,8 @@ package dev.visfox.forbiddenreforged.test;
 
 import com.google.gson.JsonArray;
 import dev.visfox.forbiddenreforged.core.wand.BlinkFocusBehavior;
+import dev.visfox.forbiddenreforged.core.wand.HellfireWandBehavior;
+import dev.visfox.forbiddenreforged.core.wand.WandTriggerAccess;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4BlinkFocusItem;
 import dev.visfox.forbiddenreforged.CrystalwellItem;
 import dev.visfox.forbiddenreforged.PrimewellItem;
@@ -25,6 +27,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -150,7 +153,8 @@ public final class ItemGameTests {
         "research_icons_resolve_to_real_content",
         "blink_focus_hellfire_applies_through_focal_manipulator",
         "blink_focus_reaches_beyond_wand_reach_and_lands_like_original",
-        "wand_vis_and_parts_use_neutral_access_ports"
+        "wand_vis_and_parts_use_neutral_access_ports",
+        "hellfire_behavior_uses_host_neutral_access"
     };
 
     static {
@@ -192,6 +196,7 @@ public final class ItemGameTests {
         FUNCTIONS.register(TESTS[35], () -> ItemGameTests::blinkFocusHellfireAppliesThroughFocalManipulator);
         FUNCTIONS.register(TESTS[36], () -> ItemGameTests::blinkFocusReachesBeyondWandReachAndLandsLikeOriginal);
         FUNCTIONS.register(TESTS[37], () -> ItemGameTests::wandVisAndPartsUseNeutralAccessPorts);
+        FUNCTIONS.register(TESTS[38], () -> ItemGameTests::hellfireBehaviorUsesHostNeutralAccess);
     }
 
     private ItemGameTests() {}
@@ -790,6 +795,76 @@ public final class ItemGameTests {
             "Hellfire trigger must be registered for obsidian");
         helper.assertTrue(ResearchCategories.getResearch("HELLFIRE") != null,
             "the trigger's HELLFIRE research gate must exist");
+        helper.succeed();
+    }
+
+    private static void hellfireBehaviorUsesHostNeutralAccess(GameTestHelper helper) {
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        BlockPos position = new BlockPos(2, 3, 2);
+        helper.setBlock(position, Blocks.OBSIDIAN);
+        BlockPos absolutePosition = helper.absolutePos(position);
+        ItemStack wand = new ItemStack(Items.STICK);
+        boolean[] wandState = {true};
+        boolean[] focusedState = {false};
+        boolean[] researchState = {true};
+        int[] consumed = {0};
+        ContentId fire = ContentId.parse("forbiddenmagic:concept/fire");
+        ContentId hellfire = ContentId.parse("forbiddenmagic:research/hellfire");
+        WandTriggerAccess access = new WandTriggerAccess() {
+            @Override
+            public boolean isWand(ItemStack stack) {
+                return wandState[0];
+            }
+
+            @Override
+            public boolean hasFocus(ItemStack stack) {
+                return focusedState[0];
+            }
+
+            @Override
+            public boolean researchComplete(Player caster, ContentId research) {
+                return researchState[0] && hellfire.equals(research);
+            }
+
+            @Override
+            public boolean consumeVis(ItemStack stack, Player caster, ContentId aspect, int amount) {
+                consumed[0]++;
+                return fire.equals(aspect) && amount == 2;
+            }
+        };
+
+        helper.assertFalse(HellfireWandBehavior.ignite(
+            helper.getLevel(), wand, player, absolutePosition, Direction.NORTH, access
+        ), "a side hit cannot trigger Hellfire");
+        helper.assertValueEqual(consumed[0], 0, "an invalid side does not consume vis");
+
+        wandState[0] = false;
+        helper.assertFalse(HellfireWandBehavior.ignite(
+            helper.getLevel(), wand, player, absolutePosition, Direction.UP, access
+        ), "a non-wand item cannot trigger Hellfire");
+        helper.assertValueEqual(consumed[0], 0, "a non-wand item does not consume vis");
+
+        wandState[0] = true;
+        focusedState[0] = true;
+        helper.assertFalse(HellfireWandBehavior.ignite(
+            helper.getLevel(), wand, player, absolutePosition, Direction.UP, access
+        ), "a focused wand cannot trigger Hellfire");
+        helper.assertValueEqual(consumed[0], 0, "a focused wand does not consume vis");
+
+        focusedState[0] = false;
+        researchState[0] = false;
+        helper.assertFalse(HellfireWandBehavior.ignite(
+            helper.getLevel(), wand, player, absolutePosition, Direction.UP, access
+        ), "Hellfire research is required");
+        helper.assertValueEqual(consumed[0], 0, "missing research does not consume vis");
+
+        researchState[0] = true;
+        helper.assertTrue(HellfireWandBehavior.ignite(
+            helper.getLevel(), wand, player, absolutePosition, Direction.UP, access
+        ), "an eligible wand can ignite fire");
+        helper.assertValueEqual(consumed[0], 1, "successful Hellfire consumes vis exactly once");
+        helper.assertTrue(helper.getLevel().getBlockState(absolutePosition.above()).is(Blocks.FIRE),
+            "Hellfire places fire above the clicked block");
         helper.succeed();
     }
 
