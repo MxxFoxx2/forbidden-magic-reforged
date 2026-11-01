@@ -16,7 +16,7 @@ This work does **not** claim that the current JAR supports multiple magic hosts 
 The shared layer owns semantic values and definitions:
 
 - `ContentId` identifies content without resolving it to a host registry object.
-- `HostContent` describes host-owned item/tag references symbolically.
+- `HostContent` describes selected-host item/tag references symbolically using the internal `host:item/...` and `host:tag/...` keys; no concrete host namespace is embedded in the model.
 - Aspect, recipe, and research catalogs describe Forbidden Magic content as data.
 - Shared wand behaviors use narrow access contracts rather than importing TC4 wand classes.
 

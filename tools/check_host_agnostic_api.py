@@ -276,6 +276,11 @@ def main() -> int:
     tc4_warp_adapter = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/tc4/Tc4WarpAdapter.java").read_text(encoding="utf-8")
     if "Warp.add(player, amount, toHostType(kind))" not in tc4_warp_adapter:
         failures.append("Tc4WarpAdapter does not apply semantic warp changes through the host API")
+    if "if (amount != 0)" not in tc4_warp_adapter:
+        failures.append("Tc4WarpAdapter must ignore zero-amount warp requests")
+    host_content = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/core/model/HostContent.java").read_text(encoding="utf-8")
+    if "Thaumcraft" in host_content or "thaumcraft" in host_content:
+        failures.append("HostContent must not name a concrete host in the shared model")
     if "NeoForge.EVENT_BUS" in tc4_warp_adapter or "WarpChangeRequested" in tc4_warp_adapter:
         failures.append("Tc4WarpAdapter must implement the direct warp capability instead of an event-bus bridge")
     tc4_host_adapter = (ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/tc4/Tc4HostAdapter.java").read_text(encoding="utf-8")
@@ -295,6 +300,8 @@ def main() -> int:
     game_tests_for_warp = (ROOT / "tests/java/dev/visfox/forbiddenreforged/test/RecipeGameTests.java").read_text(encoding="utf-8")
     if "HostAdapterRegistry.requireWarp().changeWarp(player, 1, WarpKind.STICKY)" not in game_tests_for_warp:
         failures.append("Warp GameTest must exercise the direct HostWarpServices capability")
+    if "changeWarp(player, 0, WarpKind.STICKY)" not in game_tests_for_warp:
+        failures.append("Warp GameTest must verify that zero-amount changes are ignored")
     if "FmWandContractAccess.INSTANCE.remaining(contractProbe)" not in game_tests_for_warp:
         failures.append("GameTests must verify Profane Contract component access outside core")
 

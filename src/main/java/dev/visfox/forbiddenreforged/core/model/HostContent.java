@@ -3,7 +3,7 @@ package dev.visfox.forbiddenreforged.core.model;
 import java.util.Objects;
 
 /**
- * Creates semantic references to content supplied by the active Thaumcraft host.
+ * Creates semantic references to content supplied by the selected magic host.
  *
  * These identifiers are internal core keys, not Minecraft registry identifiers.
  * A host adapter must resolve them before passing them to the game or host API.

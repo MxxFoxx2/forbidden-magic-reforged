@@ -645,6 +645,9 @@ public final class RecipeGameTests {
             "Tainted Sapling item must keep one warp");
         ServerPlayer player = mockPlayer(helper);
         int stickyBefore = Warp.get(player, WarpType.STICKY);
+        HostAdapterRegistry.requireWarp().changeWarp(player, 0, WarpKind.STICKY);
+        helper.assertValueEqual(Warp.get(player, WarpType.STICKY), stickyBefore,
+            "zero warp changes must be ignored");
         HostAdapterRegistry.requireWarp().changeWarp(player, 1, WarpKind.STICKY);
         helper.assertValueEqual(Warp.get(player, WarpType.STICKY), stickyBefore + 1,
             "common warp request must reach the TC4 runtime adapter");
