@@ -115,7 +115,7 @@ public final class ForbiddenMagicRecipeCatalog {
                 : new Ingredient[] {
                     item("thaumcraft:salis_mundus"), item("minecraft:egg"),
                     item("minecraft:milk_bucket"), item("minecraft:egg"),
-                    item("forbiddenmagic:gluttony"), item("forbiddenmagic:gluttony")
+                    item("forbiddenmagic:gluttony_shard"), item("forbiddenmagic:gluttony_shard")
                 };
             recipes.add(infusion("arcanecake", "arcanecake", "forbiddenmagic:arcane_cake", 3,
                 cost(custom("gula", 12), a("hunger", 24), a("craft", 24)),
@@ -221,7 +221,7 @@ public final class ForbiddenMagicRecipeCatalog {
                 empty(), item(topIngredient), empty(),
                 item("forbiddenmagic:gluttony_shard"), item("thaumcraft:mundane_ring"),
                 item("forbiddenmagic:gluttony_shard"),
-                empty(), item("forbiddenmagic:gluttony"), empty()));
+                empty(), item("forbiddenmagic:gluttony_shard"), empty()));
         }
 
         recipes.add(infusion("focus_blink", "focusblink", "forbiddenmagic:blink_focus", 3,
@@ -263,7 +263,7 @@ public final class ForbiddenMagicRecipeCatalog {
                                                                       int instability, AspectDefinition.Cost aspects,
                                                                       Ingredient... components) {
         return new RecipeDefinition.InfusionEnchantment(recipeId(key), researchId(key),
-            id(enchantment), instability, aspects, List.of(components));
+            new ContentId("forbiddenmagic", enchantment), instability, aspects, List.of(components));
     }
 
     private static RecipeDefinition.Crucible crucible(String key, String research, String output,
@@ -322,7 +322,7 @@ public final class ForbiddenMagicRecipeCatalog {
     }
 
     private static AspectDefinition.Amount custom(String aspect, int amount) {
-        return new AspectDefinition.Amount(id(aspect), amount);
+        return new AspectDefinition.Amount(new ContentId("forbiddenmagic", aspect), amount);
     }
 
     private static ContentId recipeId(String key) {
