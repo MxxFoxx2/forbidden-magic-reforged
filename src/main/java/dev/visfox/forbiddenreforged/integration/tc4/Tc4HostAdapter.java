@@ -46,7 +46,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -56,7 +55,6 @@ import thaumcraft.item.gear.TcMaterials;
 import thaumcraft.platform.Registration;
 import net.neoforged.fml.ModList;
 import thaumcraft.wand.focus.FocusItem;
-import net.minecraft.server.level.ServerPlayer;
 
 /**
  * Thaumcraft 4: Reforged adapter for the Minecraft 1.21.1 release track.
