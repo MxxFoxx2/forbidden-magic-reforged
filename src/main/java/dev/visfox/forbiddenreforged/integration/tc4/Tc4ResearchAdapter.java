@@ -120,6 +120,16 @@ public final class Tc4ResearchAdapter {
                 .map(Tc4ResearchAdapter::researchKey)
                 .toArray(String[]::new));
         }
+        if (!definition.itemTriggers().isEmpty()) {
+            item.setItemTriggers(definition.itemTriggers().stream()
+                .map(ContentId::toString)
+                .toArray(String[]::new));
+        }
+        if (!definition.entityTriggers().isEmpty()) {
+            item.setEntityTriggers(definition.entityTriggers().stream()
+                .map(ContentId::toString)
+                .toArray(String[]::new));
+        }
         if (!definition.aspectTriggers().isEmpty()) {
             Aspect[] triggers = definition.aspectTriggers().stream()
                 .map(Tc4AspectAdapter::resolveAspect)
