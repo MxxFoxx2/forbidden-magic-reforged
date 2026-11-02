@@ -104,20 +104,22 @@ public final class FmGameTests {
         helper.assertValueEqual(storage.selectedChannel(), WrathCageStorage.Channel.SLOTH,
             "third display mode selects Sloth");
         helper.assertValueEqual(storage.cycleMode(), 0, "third cycle returns to mob");
-        helper.assertValueEqual(storage.extractionOrder(12),
+
+        WrathCageStorage extractionStorage = new WrathCageStorage();
+        helper.assertValueEqual(extractionStorage.extractionOrder(12),
             List.of(WrathCageStorage.Channel.MOB, WrathCageStorage.Channel.WRATH,
                 WrathCageStorage.Channel.SLOTH),
             "empty channels request essentia in mob, Wrath, Sloth order");
-        storage.setAmount(WrathCageStorage.Channel.MOB, 12);
-        helper.assertValueEqual(storage.extractionOrder(12),
+        extractionStorage.setAmount(WrathCageStorage.Channel.MOB, 12);
+        helper.assertValueEqual(extractionStorage.extractionOrder(12),
             List.of(WrathCageStorage.Channel.MOB),
             "Wrath and Sloth extraction pause when mob essentia reaches the fuel threshold");
-        storage.setAmount(WrathCageStorage.Channel.MOB, 0);
-        storage.setAmount(WrathCageStorage.Channel.WRATH, 12);
-        helper.assertValueEqual(storage.extractionOrder(12),
+        extractionStorage.setAmount(WrathCageStorage.Channel.MOB, 0);
+        extractionStorage.setAmount(WrathCageStorage.Channel.WRATH, 12);
+        helper.assertValueEqual(extractionStorage.extractionOrder(12),
             List.of(WrathCageStorage.Channel.MOB, WrathCageStorage.Channel.WRATH),
             "Sloth extraction pauses when Wrath reaches the fuel threshold");
-        helper.assertTrue(storage.extractionOrder(0).isEmpty(),
+        helper.assertTrue(extractionStorage.extractionOrder(0).isEmpty(),
             "disabled essentia cost requests no transport");
         helper.succeed();
     }
