@@ -28,6 +28,7 @@ import dev.visfox.forbiddenreforged.integration.api.HostProfile;
 import dev.visfox.forbiddenreforged.FmAspects;
 import dev.visfox.forbiddenreforged.FmConfig;
 import dev.visfox.forbiddenreforged.FmItems;
+import dev.visfox.forbiddenreforged.FmCreativeTab;
 import dev.visfox.forbiddenreforged.FmToolEvents;
 import dev.visfox.forbiddenreforged.FmWands;
 import dev.visfox.forbiddenreforged.FmComponents;
@@ -50,6 +51,7 @@ import thaumcraft.crafting.TcRecipes;
 import thaumcraft.crafting.TcIngredient;
 import thaumcraft.research.ResearchCategories;
 import thaumcraft.wand.WandRegistry;
+import thaumcraft.wand.Wands;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -87,8 +89,15 @@ public final class FmGameTests {
             HostProfile.SupportLevel.PARTIAL, "remaining direct wand registration is not overstated as migrated");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.RUNTIME_BOOTSTRAP).level(),
             HostProfile.SupportLevel.ADAPTED, "host bootstrap capability is implemented");
-        helper.assertTrue(HostAdapterRegistry.requireBootstrap().registeredOptionalEnchantments() >= 0,
-            "optional enchantment registration count is exposed by the host bootstrap");
+        int optionalEnchantments = HostAdapterRegistry.requireBootstrap().registeredOptionalEnchantments();
+        int expectedOptionalEnchantments = FmConfig.enchantmentsEnabled()
+            && ModList.get().isLoaded("thaumictinkerer") ? 8 : 0;
+        helper.assertValueEqual(optionalEnchantments, expectedOptionalEnchantments,
+            "the host bootstrap registers the complete optional Thaumic Tinkerer cost set or none");
+        boolean hasTaintedCreativeWand = FmCreativeTab.stacks().stream()
+            .anyMatch(stack -> Wands.isWand(stack) && "tainted".equals(Wands.getRod(stack).tag()));
+        helper.assertTrue(hasTaintedCreativeWand,
+            "the host bootstrap contributes a Tainted Wand to the shared creative tab");
         helper.succeed();
     }
 
