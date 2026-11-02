@@ -173,7 +173,7 @@ public final class AspectGameTests {
     }
 
     private static void addonAspectSurvivesClientSync(GameTestHelper helper) {
-        Aspect nether = Tc4AspectAdapter.resolveAspect(FmAspects.NETHER);
+        Aspect nether = Tc4AspectAdapter.resolveAspect(FmAspects.NETHER_ID);
         helper.assertTrue(nether != null && nether.ordinal() >= Tc4AspectDiagnostics.BUILTIN_ASPECT_COUNT, "infernus must be an add-on aspect");
         helper.assertValueEqual(Aspect.getAspect("infernus"), nether, "by-tag lookup must find the add-on aspect");
         AspectList list = new AspectList().add(nether, 3);
@@ -187,14 +187,14 @@ public final class AspectGameTests {
 
     private static void sinAspectsRegisteredWithOwnTextures(GameTestHelper helper) {
         helper.assertTrue(FmAspects.available(), "add-on aspect API missing: host too old");
-        Aspect[] sins = {Tc4AspectAdapter.resolveAspect(FmAspects.NETHER), Tc4AspectAdapter.resolveAspect(FmAspects.WRATH), Tc4AspectAdapter.resolveAspect(FmAspects.ENVY), Tc4AspectAdapter.resolveAspect(FmAspects.GLUTTONY), Tc4AspectAdapter.resolveAspect(FmAspects.PRIDE), Tc4AspectAdapter.resolveAspect(FmAspects.SLOTH)};
+        Aspect[] sins = {Tc4AspectAdapter.resolveAspect(FmAspects.NETHER_ID), Tc4AspectAdapter.resolveAspect(FmAspects.WRATH_ID), Tc4AspectAdapter.resolveAspect(FmAspects.ENVY_ID), Tc4AspectAdapter.resolveAspect(FmAspects.GLUTTONY_ID), Tc4AspectAdapter.resolveAspect(FmAspects.PRIDE_ID), Tc4AspectAdapter.resolveAspect(FmAspects.SLOTH_ID)};
         for (Aspect aspect : sins) {
             helper.assertTrue(aspect != null, "sin aspect must be registered");
             helper.assertTrue(aspect.ordinal() >= Tc4AspectDiagnostics.BUILTIN_ASPECT_COUNT, aspect.getSerializedName() + " must be an add-on aspect");
             helper.assertTrue(aspect.getImage().getNamespace().equals(ForbiddenMagic.MODID), aspect.getSerializedName() + " texture must live in the add-on namespace");
         }
         Aspect ira = Aspect.combine(Aspect.WEAPON, Aspect.FIRE);
-        helper.assertTrue(ira == Tc4AspectAdapter.resolveAspect(FmAspects.WRATH), "combine(WEAPON, FIRE) must resolve to the add-on ira");
+        helper.assertTrue(ira == Tc4AspectAdapter.resolveAspect(FmAspects.WRATH_ID), "combine(WEAPON, FIRE) must resolve to the add-on ira");
         helper.assertTrue(Aspect.combine(Aspect.AIR, Aspect.FIRE) == Aspect.LIGHT, "adding ira must not disturb builtin combine");
         int expected = FmConfig.lustDisabled() ? 6 : 7;
         helper.assertValueEqual(Tc4AspectDiagnostics.totalCount(), Tc4AspectDiagnostics.BUILTIN_ASPECT_COUNT + expected, FmConfig.lustDisabled() ? "six add-on aspects: luxuria is switched off" : "exactly seven add-on aspects");
@@ -204,10 +204,10 @@ public final class AspectGameTests {
     private static void sinAspectTagsMergeWithExisting(GameTestHelper helper) {
         AspectRegistry active = AspectRegistry.active();
         AspectList netherrack = active.getObjectTags(Items.NETHERRACK);
-        helper.assertTrue(netherrack != null && netherrack.getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER)) >= 1, "netherrack must carry infernus");
+        helper.assertTrue(netherrack != null && netherrack.getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER_ID)) >= 1, "netherrack must carry infernus");
         helper.assertTrue(netherrack.getAmount(Aspect.FIRE) >= 1, "netherrack must keep its built-in fire aspect");
         AspectList star = active.getObjectTags(Items.NETHER_STAR);
-        helper.assertTrue(star != null && star.getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER)) >= 8 && star.getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.PRIDE)) >= 8, "nether star must carry infernus 8 and superbia 8");
+        helper.assertTrue(star != null && star.getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER_ID)) >= 8 && star.getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.PRIDE_ID)) >= 8, "nether star must carry infernus 8 and superbia 8");
         helper.succeed();
     }
 
@@ -218,7 +218,7 @@ public final class AspectGameTests {
         helper.assertTrue(entity != null, "brainy zombie must be creatable");
         AspectList tags = AspectRegistry.active().getEntityTags(entity);
         helper.assertTrue(tags != null && tags.getAmount(Aspect.UNDEAD) >= 3, "brainy zombie keeps its base undead tag");
-        helper.assertTrue(tags.getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.WRATH)) >= 3, "brainy zombie gains wrath from the FM table");
+        helper.assertTrue(tags.getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.WRATH_ID)) >= 3, "brainy zombie gains wrath from the FM table");
         helper.succeed();
     }
 
@@ -329,7 +329,7 @@ public final class AspectGameTests {
                     && crop.getAmount(Aspect.TREE) == 2
                     && crop.getAmount(Aspect.CLOTH) == 2
                     && crop.getAmount(Aspect.BEAST) == 1
-                    && crop.getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.LUST)) == 1
+                    && crop.getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.LUST_ID)) == 1
                     && crop.getAmount(Aspect.WEAPON) == 1,
                 "riding crop keeps the original aspect list when lust is enabled");
         }
@@ -347,7 +347,7 @@ public final class AspectGameTests {
             helper.assertValueEqual(portal.key(), "block:minecraft:nether_portal", "the portal scan target must use its block identity");
             helper.assertTrue(portal.aspects() != null, "the portal must have registered aspects");
             if (portal.aspects() != null) {
-                helper.assertValueEqual(portal.aspects().getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER)), 4,
+                helper.assertValueEqual(portal.aspects().getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER_ID)), 4,
                     "the original NETHER 4 aspect assignment belongs to the portal block, not obsidian");
             }
         }
