@@ -43,7 +43,7 @@ public final class Tc4BootstrapAdapter {
                     FmConfig.greedyEnchantmentEnabled(),
                     FmConfig.lustDisabled(),
                     FmConfig.emeraldTrans(),
-                    FmWands.isArsMagicaLoaded(),
+                    bootstrap.isArsMagicaLoaded(),
                     crystalwellUsesShardTag
                 )
             )
