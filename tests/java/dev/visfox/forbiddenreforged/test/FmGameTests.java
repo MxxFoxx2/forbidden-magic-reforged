@@ -42,6 +42,7 @@ import dev.visfox.forbiddenreforged.core.block.WrathCageState;
 import dev.visfox.forbiddenreforged.core.block.WrathCageSpawnBehavior;
 import net.minecraft.world.phys.AABB;
 import dev.visfox.forbiddenreforged.core.wand.WitchwoodManaBehavior;
+import dev.visfox.forbiddenreforged.core.wand.WandCapKind;
 import dev.visfox.forbiddenreforged.core.wand.BlinkFocusRules;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4BlinkFocusItem;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4FocusAdapter;
@@ -730,29 +731,67 @@ public final class FmGameTests {
             "shared Witchwood wand interval remains 100 ticks");
         helper.assertValueEqual(WitchwoodManaBehavior.rechargeInterval(true), 40,
             "shared Witchwood staff interval remains 40 ticks");
-        helper.assertTrue(Math.abs(WitchwoodManaBehavior.manaCost(false, "iron", 20) - 28.0F) < 0.01F,
+        helper.assertTrue(Math.abs(WitchwoodManaBehavior.manaCost(false, WandCapKind.IRON, 20) - 28.0F) < 0.01F,
             "shared core scales partial wand deficits correctly");
-        helper.assertTrue(Math.abs(WitchwoodManaBehavior.manaCost(true, "vinteum", 20) - 10.0F) < 0.01F,
+        helper.assertTrue(Math.abs(WitchwoodManaBehavior.manaCost(true, WandCapKind.VINTEUM, 20) - 10.0F) < 0.01F,
             "shared core scales partial Vinteum staff deficits correctly");
+        var exactMana = WitchwoodManaBehavior.planRecharge(
+            false, WandCapKind.IRON, 28.0D,
+            List.of(new WitchwoodManaBehavior.VisDeficit(
+                ContentId.parse("forbiddenmagic:concept/fire"), 20))
+        );
+        helper.assertTrue(exactMana.aspects().isEmpty(),
+            "Witchwood does not recharge when mana exactly equals the required cost");
+        helper.assertTrue(Math.abs(exactMana.remainingMana() - 28.0D) < 0.001D,
+            "an exact-cost failed recharge does not debit mana");
+
+        var aboveExactMana = WitchwoodManaBehavior.planRecharge(
+            false, WandCapKind.IRON, 28.01D,
+            List.of(new WitchwoodManaBehavior.VisDeficit(
+                ContentId.parse("forbiddenmagic:concept/fire"), 20))
+        );
+        helper.assertValueEqual(aboveExactMana.aspects(),
+            List.of(ContentId.parse("forbiddenmagic:concept/fire")),
+            "one small unit above the strict mana threshold permits recharge");
+        helper.assertTrue(Math.abs(aboveExactMana.remainingMana() - 0.01D) < 0.001D,
+            "the recharge plan subtracts the original partial-deficit cost");
+
+        var multiAspect = WitchwoodManaBehavior.planRecharge(
+            true, WandCapKind.VINTEUM, 21.0D,
+            List.of(
+                new WitchwoodManaBehavior.VisDeficit(
+                    ContentId.parse("forbiddenmagic:concept/fire"), 20),
+                new WitchwoodManaBehavior.VisDeficit(
+                    ContentId.parse("forbiddenmagic:concept/earth"), 20),
+                new WitchwoodManaBehavior.VisDeficit(
+                    ContentId.parse("forbiddenmagic:concept/water"), 0)
+            )
+        );
+        helper.assertValueEqual(multiAspect.aspects(),
+            List.of(ContentId.parse("forbiddenmagic:concept/fire"),
+                ContentId.parse("forbiddenmagic:concept/earth")),
+            "Witchwood recharge plan preserves primal order and skips full aspects");
+        helper.assertTrue(Math.abs(multiAspect.remainingMana() - 1.0D) < 0.001D,
+            "Witchwood recharge plan reserves each one-point mana cost");
         helper.assertValueEqual(FmWands.witchwoodRechargeInterval(false), 100,
             "Witchwood wand recharges on the original 100-tick interval");
         helper.assertValueEqual(FmWands.witchwoodRechargeInterval(true), 40,
             "Witchwood staff recharges faster on the original 40-tick interval");
-        helper.assertTrue(Math.abs(FmWands.witchwoodManaCost(false, "iron") - 140.0F) < 0.01F,
+        helper.assertTrue(Math.abs(FmWands.witchwoodManaCost(false, WandCapKind.IRON) - 140.0F) < 0.01F,
             "ordinary wand cap costs 140 mana per vis point");
-        helper.assertTrue(Math.abs(FmWands.witchwoodManaCost(true, "iron") - 100.0F) < 0.01F,
+        helper.assertTrue(Math.abs(FmWands.witchwoodManaCost(true, WandCapKind.IRON) - 100.0F) < 0.01F,
             "ordinary staff cap costs 100 mana per vis point");
-        helper.assertTrue(Math.abs(FmWands.witchwoodManaCost(false, "vinteum") - 80.0F) < 0.01F,
+        helper.assertTrue(Math.abs(FmWands.witchwoodManaCost(false, WandCapKind.VINTEUM) - 80.0F) < 0.01F,
             "Vinteum reduces wand recharge cost");
-        helper.assertTrue(Math.abs(FmWands.witchwoodManaCost(true, "vinteum") - 50.0F) < 0.01F,
+        helper.assertTrue(Math.abs(FmWands.witchwoodManaCost(true, WandCapKind.VINTEUM) - 50.0F) < 0.01F,
             "Vinteum reduces staff recharge cost");
-        helper.assertTrue(Math.abs(FmWands.witchwoodManaCost(false, "iron", 20) - 28.0F) < 0.01F,
+        helper.assertTrue(Math.abs(FmWands.witchwoodManaCost(false, WandCapKind.IRON, 20) - 28.0F) < 0.01F,
             "partially depleted wand aspect only charges for missing vis units");
-        helper.assertTrue(Math.abs(FmWands.witchwoodManaCost(true, "vinteum", 20) - 10.0F) < 0.01F,
+        helper.assertTrue(Math.abs(FmWands.witchwoodManaCost(true, WandCapKind.VINTEUM, 20) - 10.0F) < 0.01F,
             "partial staff recharge applies the cap modifier to missing vis units");
-        helper.assertTrue(Math.abs(FmWands.witchwoodManaCost(false, "iron", 150) - 140.0F) < 0.01F,
+        helper.assertTrue(Math.abs(FmWands.witchwoodManaCost(false, WandCapKind.IRON, 150) - 140.0F) < 0.01F,
             "one update never recharges more than one vis point per aspect");
-        helper.assertTrue(FmWands.witchwoodManaCost(false, "iron", 0) == 0.0F,
+        helper.assertTrue(FmWands.witchwoodManaCost(false, WandCapKind.IRON, 0) == 0.0F,
             "a full aspect costs no mana to recharge");
         helper.assertTrue(FmWands.supportsArsMagicaModId("arsmagicalegacy"),
             "modern Ars Magica: Legacy mod id is recognized");
