@@ -5,7 +5,6 @@ import dev.visfox.forbiddenreforged.FmConfig;
 import dev.visfox.forbiddenreforged.FmSpawnerMobs;
 import dev.visfox.forbiddenreforged.WrathCageBlock;
 import dev.visfox.forbiddenreforged.core.block.WrathCageStorage;
-import dev.visfox.forbiddenreforged.core.block.WrathCageStorage;
 import dev.visfox.forbiddenreforged.core.block.WrathCageState;
 import dev.visfox.forbiddenreforged.core.block.WrathCageSpawnBehavior;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
