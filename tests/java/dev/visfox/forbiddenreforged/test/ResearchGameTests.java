@@ -31,6 +31,7 @@ public final class ResearchGameTests {
             AspectDefinition.Cost.EMPTY,
             List.of(),
             List.of(),
+            List.of(ContentId.parse("forbiddenmagic:research/adapter_trigger_sibling")),
             Set.of(),
             List.of(ContentId.parse("minecraft:diamond")),
             List.of(ContentId.parse("minecraft:zombie")),
@@ -43,6 +44,11 @@ public final class ResearchGameTests {
         );
 
         ResearchItem translated = Tc4ResearchAdapter.translate(definition);
+        helper.assertValueEqual(
+            translated.siblings(),
+            List.of("ADAPTER_TRIGGER_SIBLING"),
+            "research sibling identifiers are translated to TC4 research keys"
+        );
         helper.assertValueEqual(
             translated.itemTriggers(),
             List.of(ResourceLocation.parse("minecraft:diamond")),
