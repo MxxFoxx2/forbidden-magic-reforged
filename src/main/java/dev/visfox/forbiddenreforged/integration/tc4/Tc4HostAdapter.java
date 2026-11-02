@@ -1,6 +1,7 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
 import dev.visfox.forbiddenreforged.FmAspectTags;
+import dev.visfox.forbiddenreforged.WrathCageBlockEntity;
 import dev.visfox.forbiddenreforged.core.aspect.AspectDefinition;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.core.recipe.RecipeDefinition;
@@ -10,11 +11,33 @@ import dev.visfox.forbiddenreforged.core.warp.WarpKind;
 import dev.visfox.forbiddenreforged.integration.api.HostAdapter;
 import dev.visfox.forbiddenreforged.integration.api.HostProfile;
 import dev.visfox.forbiddenreforged.integration.runtime.HostAspectServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostAccessoryServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostBlockEntityServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostEnchantmentEffectServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostEntityAspectServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostEntityClassificationServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostMorphToolServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostScribingServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostTaintBlockServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostWandInspectionServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostWandVisServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWarpServices;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import java.util.Set;
+import java.util.function.Predicate;
 import net.minecraft.server.level.ServerPlayer;
 
 /**
@@ -24,7 +47,7 @@ import net.minecraft.server.level.ServerPlayer;
  * 1.21.1 gameplay integrations remain intact while their extraction into
  * focused host capabilities proceeds incrementally.
  */
-public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, HostWarpServices {
+public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, HostWarpServices, HostMorphToolServices, HostBlockEntityServices, HostWandInspectionServices, HostWandVisServices, HostAccessoryServices, HostTaintBlockServices, HostEnchantmentEffectServices, HostScribingServices, HostEntityAspectServices, HostEntityClassificationServices {
     public static final Tc4HostAdapter INSTANCE = new Tc4HostAdapter();
 
     private static final String LEGACY_RUNTIME_NOTE =
@@ -68,6 +91,26 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
         adapted(support, HostProfile.Feature.WARP_POOLS,
             "Maps semantic warp kinds to the three TC4 warp pools");
         adapted(support, HostProfile.Feature.STICKY_WARP, "Preserves sticky warp as WarpType.STICKY");
+        adapted(support, HostProfile.Feature.MORPH_TOOL_RUNTIME,
+            "Uses the TC4 ToolHarvest API for morph-tool area harvesting and cycle sounds");
+        adapted(support, HostProfile.Feature.WAND_INSPECTION,
+            "Reads wand, rod and focus properties through the TC4 wand API");
+        adapted(support, HostProfile.Feature.ACCESSORY_INTEGRATION,
+            "Reads accessory slots through the TC4 Baubles bridge");
+        adapted(support, HostProfile.Feature.TAINT_BLOCK_SERVICES,
+            "Uses TC4 taint material and flux purification APIs");
+        adapted(support, HostProfile.Feature.ENCHANTMENT_EFFECTS,
+            "Delegates special mining drops and taint damage classification to TC4");
+        adapted(support, HostProfile.Feature.SCRIBING_RUNTIME,
+            "Reads TC4 research difficulty, primal aspects and player aspect pools");
+        adapted(support, HostProfile.Feature.BLOCK_ENTITY_IMPLEMENTATION,
+            "Creates the 1.21.1 TC4 EssentiaSource/EssentiaTransport Wrath Cage");
+        adapted(support, HostProfile.Feature.WAND_VIS_STORAGE,
+            "Adds semantic aspects to TC4 wand and real Vis stores");
+        adapted(support, HostProfile.Feature.ENTITY_ASPECTS,
+            "Provides entity-to-aspect mappings using semantic identifiers");
+        adapted(support, HostProfile.Feature.ENTITY_CLASSIFICATION,
+            "Delegates tainted-mob, TC4 boss and golem classification to TC4");
         support.put(HostProfile.Feature.TAINT_ORIGINS,
             HostProfile.FeatureSupport.unsupported("No TC4 taint-origin registration or propagation adapter exists"));
 
@@ -138,5 +181,131 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
     @Override
     public void changeWarp(ServerPlayer player, int amount, WarpKind kind) {
         Tc4WarpAdapter.changeWarp(player, amount, kind);
+    }
+
+    @Override
+    public void playMorphCycleSound(Level level, BlockPos pos, RandomSource random) {
+        Tc4MorphToolAdapter.playCycleSound(level, pos, random);
+    }
+
+    @Override
+    public boolean isAreaHarvesting() {
+        return Tc4MorphToolAdapter.isAreaHarvesting();
+    }
+
+    @Override
+    public void breakArea(ItemStack tool, ServerLevel level, ServerPlayer player, BlockPos origin,
+                          Predicate<BlockState> correctTool) {
+        Tc4MorphToolAdapter.breakArea(tool, level, player, origin, correctTool);
+    }
+
+    @Override
+    public WrathCageBlockEntity createWrathCageBlockEntity(BlockPos pos, BlockState state) {
+        return new WrathCageBlockEntity(pos, state);
+    }
+
+    @Override
+    public boolean isWand(ItemStack stack) {
+        return Tc4WandRuntimeAdapter.isWand(stack);
+    }
+
+    @Override
+    public @org.jetbrains.annotations.Nullable String wandRodTag(ItemStack stack) {
+        return Tc4WandRuntimeAdapter.rodTag(stack);
+    }
+
+    @Override
+    public int wandFocusTreasure(ItemStack stack) {
+        return Tc4WandRuntimeAdapter.focusTreasure(stack);
+    }
+
+    @Override
+    public int wandFocusPotency(ItemStack stack) {
+        return Tc4WandRuntimeAdapter.focusPotency(stack);
+    }
+
+    @Override
+    public void addWandVis(ItemStack stack, ContentId aspect, int amount, boolean apply) {
+        Tc4WandRuntimeAdapter.addVis(stack, aspect, amount, apply);
+    }
+
+    @Override
+    public void addRealVis(ItemStack stack, ContentId aspect, int amount, boolean apply) {
+        Tc4VisAdapter.addRealVis(stack, aspect, amount, apply);
+    }
+
+    @Override
+    public ItemStack accessory(Player player, int slot) {
+        return Tc4AccessoryAdapter.getBauble(player, slot);
+    }
+
+    @Override
+    public boolean isTaintMaterial(BlockState state) {
+        return Tc4TaintAdapter.isHostTaintMaterial(state);
+    }
+
+    @Override
+    public boolean isTaintShovelPurificationTarget(BlockState state) {
+        return Tc4TaintAdapter.isTaintShovelPurificationTarget(state);
+    }
+
+    @Override
+    public float taintShovelMiningSpeed() {
+        return Tc4TaintAdapter.taintShovelMiningSpeed();
+    }
+
+    @Override
+    public void playTaintShovelSound(Level level, BlockPos pos) {
+        Tc4TaintAdapter.playTaintShovelSound(level, pos);
+    }
+
+    @Override
+    public ItemStack specialMiningDrop(BlockState state, ItemStack drop, float chance, RandomSource random) {
+        return Tc4EnchantmentAdapter.specialMiningDrop(state, drop, chance, random);
+    }
+
+    @Override
+    public boolean isTaintDamage(DamageSource source) {
+        return Tc4EnchantmentAdapter.isTaintDamage(source);
+    }
+
+    @Override
+    public boolean isNoResearchDifficulty() {
+        return Tc4ScribingAdapter.isNoResearchDifficulty();
+    }
+
+    @Override
+    public List<ContentId> primalAspectIds() {
+        return Tc4ScribingAdapter.primalAspectIds();
+    }
+
+    @Override
+    public boolean addAspectPool(ServerPlayer player, ContentId aspect, int amount) {
+        return Tc4ScribingAdapter.addAspectPool(player, aspect, amount);
+    }
+
+    @Override
+    public Map<ContentId, ContentId> aspectCatalog(boolean silverfishEmeralds) {
+        return Tc4EntityAdapter.aspectCatalog(silverfishEmeralds);
+    }
+
+    @Override
+    public boolean isTaintedMob(LivingEntity entity) {
+        return Tc4EntityAdapter.isTaintedMob(entity);
+    }
+
+    @Override
+    public boolean isHostBoss(LivingEntity entity) {
+        return Tc4EntityAdapter.isHostBoss(entity);
+    }
+
+    @Override
+    public boolean isHostGolem(LivingEntity entity) {
+        return Tc4EntityAdapter.isHostGolem(entity);
+    }
+
+    @Override
+    public Set<ContentId> bossEntityIds() {
+        return Tc4EntityAdapter.bossEntityIds();
     }
 }

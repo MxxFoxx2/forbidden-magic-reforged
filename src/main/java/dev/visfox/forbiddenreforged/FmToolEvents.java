@@ -1,6 +1,8 @@
 package dev.visfox.forbiddenreforged;
 
 import java.util.List;
+import dev.visfox.forbiddenreforged.core.model.ContentId;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.core.registries.Registries;
@@ -19,17 +21,15 @@ import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
-import thaumcraft.aspect.Aspect;
-import thaumcraft.platform.Baubles;
-import thaumcraft.wand.VisStorage;
-import thaumcraft.wand.Wands;
-import thaumcraft.registry.ModBlocks;
-import thaumcraft.taint.TaintBlock;
-import thaumcraft.taint.TaintFibresBlock;
 
 public final class FmToolEvents {
-    private static final Aspect[] TAINTED_PRIMALS = {
-        Aspect.ENTROPY, Aspect.ORDER, Aspect.FIRE, Aspect.WATER, Aspect.EARTH, Aspect.AIR
+    private static final ContentId[] TAINTED_PRIMALS = {
+        new ContentId("thaumcraft", "perditio"),
+        new ContentId("thaumcraft", "ordo"),
+        new ContentId("thaumcraft", "ignis"),
+        new ContentId("thaumcraft", "aqua"),
+        new ContentId("thaumcraft", "terra"),
+        new ContentId("thaumcraft", "aer")
     };
 
     private FmToolEvents() {
@@ -64,7 +64,7 @@ public final class FmToolEvents {
         if (FmItems.SUB_COLLAR == null) {
             return;
         }
-        ItemStack collar = Baubles.get(wearer, 0);
+        ItemStack collar = HostAdapterRegistry.requireAccessories().accessory(wearer, 0);
         if (!collar.is(FmItems.SUB_COLLAR.get())) {
             return;
         }
@@ -93,7 +93,8 @@ public final class FmToolEvents {
     }
 
     public static String wandTooltipKind(ItemStack stack) {
-        return Wands.isWand(stack) ? wandTooltipKind(Wands.getRod(stack).tag()) : "";
+        var host = HostAdapterRegistry.requireWandInspection();
+        return host.isWand(stack) ? wandTooltipKind(host.wandRodTag(stack)) : "";
     }
 
     public static String wandTooltipKind(String rodTag) {
@@ -155,16 +156,18 @@ public final class FmToolEvents {
     }
 
     public static boolean cancelsInfernalDamage(ItemStack held, boolean fireOrWither) {
-        return fireOrWither && held != null && !held.isEmpty() && Wands.isWand(held)
-            && "infernal".equals(Wands.getRod(held).tag());
+        var host = HostAdapterRegistry.requireWandInspection();
+        return fireOrWither && held != null && !held.isEmpty() && host.isWand(held)
+            && "infernal".equals(host.wandRodTag(held));
     }
 
     public static boolean restoresTaintedVis(ItemStack held, boolean taintDamage) {
-        return taintDamage && held != null && !held.isEmpty() && Wands.isWand(held)
-            && "tainted".equals(Wands.getRod(held).tag());
+        var host = HostAdapterRegistry.requireWandInspection();
+        return taintDamage && held != null && !held.isEmpty() && host.isWand(held)
+            && "tainted".equals(host.wandRodTag(held));
     }
 
-    public static List<Aspect> taintedVisRolls(RandomSource random) {
+    public static List<ContentId> taintedVisRolls(RandomSource random) {
         return List.of(
             TAINTED_PRIMALS[random.nextInt(TAINTED_PRIMALS.length)],
             TAINTED_PRIMALS[random.nextInt(TAINTED_PRIMALS.length)],
@@ -193,10 +196,7 @@ public final class FmToolEvents {
     }
 
     private static boolean isTaintMaterial(BlockState state) {
-        return state.getBlock() instanceof TaintBlock
-            || state.getBlock() instanceof TaintFibresBlock
-            || state.is(ModBlocks.FLUX_GOO.get())
-            || state.is(ModBlocks.FLUX_GAS.get())
+        return HostAdapterRegistry.requireTaintBlocks().isTaintMaterial(state)
             || state.is(FmBlocks.TAINT_LOG.get())
             || state.is(FmBlocks.TAINT_PLANKS.get())
             || state.is(FmBlocks.TAINT_STONE_SMOOTH.get())

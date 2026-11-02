@@ -1,19 +1,15 @@
 package dev.visfox.forbiddenreforged;
 
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 import net.minecraft.core.BlockPos;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import thaumcraft.item.gear.TcMaterials;
-import thaumcraft.registry.ModBlocks;
-import thaumcraft.registry.ModSounds;
-import thaumcraft.taint.TaintBlock;
-import thaumcraft.taint.TaintFibresBlock;
 
 public final class TaintShovelItem extends Item {
     public TaintShovelItem(Properties properties) {
@@ -22,8 +18,9 @@ public final class TaintShovelItem extends Item {
 
     @Override
     public float getDestroySpeed(ItemStack stack, BlockState state) {
-        if (isTaintMaterial(state)) {
-            return TcMaterials.ELEMENTAL_TOOL.miningSpeed();
+        var host = HostAdapterRegistry.requireTaintBlocks();
+        if (host.isTaintMaterial(state)) {
+            return host.taintShovelMiningSpeed();
         }
         return super.getDestroySpeed(stack, state);
     }
@@ -34,6 +31,7 @@ public final class TaintShovelItem extends Item {
         BlockPos center = context.getClickedPos();
         ItemStack stack = context.getItemInHand();
         Player player = context.getPlayer();
+        var host = HostAdapterRegistry.requireTaintBlocks();
         int purified = 0;
 
         for (int x = center.getX() - 5; x <= center.getX() + 5; x++) {
@@ -44,7 +42,7 @@ public final class TaintShovelItem extends Item {
                         continue;
                     }
                     BlockState state = level.getBlockState(target);
-                    if (!state.is(ModBlocks.FLUX_GOO.get()) && !state.is(ModBlocks.FLUX_GAS.get())) {
+                    if (!host.isTaintShovelPurificationTarget(state)) {
                         continue;
                     }
                     purified++;
@@ -59,18 +57,11 @@ public final class TaintShovelItem extends Item {
             return InteractionResult.PASS;
         }
         if (!level.isClientSide() && player != null) {
-            stack.hurtAndBreak(Math.min(purified, 15), player, context.getHand() == net.minecraft.world.InteractionHand.MAIN_HAND ? net.minecraft.world.entity.EquipmentSlot.MAINHAND : net.minecraft.world.entity.EquipmentSlot.OFFHAND);
-            level.playSound(null, center, ModSounds.WANDFAIL.get(), SoundSource.PLAYERS,
-                0.2F, 0.2F + level.getRandom().nextFloat() * 0.2F);
+            stack.hurtAndBreak(Math.min(purified, 15), player,
+                context.getHand() == net.minecraft.world.InteractionHand.MAIN_HAND
+                    ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
+            host.playTaintShovelSound(level, center);
         }
         return InteractionResult.SUCCESS;
-    }
-
-    private static boolean isTaintMaterial(BlockState state) {
-        return state.getBlock() instanceof TaintBlock
-            || state.getBlock() instanceof TaintFibresBlock
-            || state.is(ModBlocks.FLUX_GOO.get())
-            || state.is(ModBlocks.FLUX_GAS.get())
-            || state.is(FmBlocks.TAINT_LEAVES.get());
     }
 }

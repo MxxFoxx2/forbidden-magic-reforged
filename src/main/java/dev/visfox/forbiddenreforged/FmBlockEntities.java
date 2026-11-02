@@ -1,6 +1,7 @@
 package dev.visfox.forbiddenreforged;
 
 import java.util.function.Supplier;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;
@@ -12,7 +13,7 @@ public final class FmBlockEntities {
 
     public static final Supplier<BlockEntityType<WrathCageBlockEntity>> WRATH_CAGE =
         BLOCK_ENTITIES.register("wrath_cage", () ->
-            BlockEntityType.Builder.of(WrathCageBlockEntity::new, FmBlocks.WRATH_CAGE.get()).build(null));
+            BlockEntityType.Builder.of((pos, state) -> HostAdapterRegistry.requireBlockEntities().createWrathCageBlockEntity(pos, state), FmBlocks.WRATH_CAGE.get()).build(null));
 
     private FmBlockEntities() {
     }

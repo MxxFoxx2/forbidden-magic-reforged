@@ -1,5 +1,7 @@
 package dev.visfox.forbiddenreforged;
 
+import dev.visfox.forbiddenreforged.core.model.ContentId;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -9,9 +11,6 @@ import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
-import thaumcraft.research.ResearchConfig;
-import thaumcraft.aspect.Aspect;
-import thaumcraft.research.ResearchManager;
 
 /** Restores player-side behavior for the two original Forbidden Magic scribing tools. */
 public final class ScribeWellEvents {
@@ -26,14 +25,15 @@ public final class ScribeWellEvents {
     }
 
     private static void onPlayerTick(PlayerTickEvent.Post event) {
+        var scribing = HostAdapterRegistry.requireScribing();
         if (!(event.getEntity() instanceof ServerPlayer player)
-            || ResearchConfig.RESEARCH_DIFFICULTY != -1
+            || !scribing.isNoResearchDifficulty()
             || player.tickCount % 200 != 0) {
             return;
         }
 
         var inventory = player.getInventory();
-        var primals = Aspect.getPrimalAspects();
+        var primals = scribing.primalAspectIds();
         if (primals.isEmpty()) {
             return;
         }
@@ -44,8 +44,8 @@ public final class ScribeWellEvents {
                 continue;
             }
 
-            Aspect aspect = primals.get(player.getRandom().nextInt(primals.size()));
-            ResearchManager.addAspectPool(player, aspect, player.getRandom().nextInt(4) + 1);
+            ContentId aspect = primals.get(player.getRandom().nextInt(primals.size()));
+            scribing.addAspectPool(player, aspect, player.getRandom().nextInt(4) + 1);
             int nextDamage = stack.getDamageValue() + 1;
             if (nextDamage >= stack.getMaxDamage()) {
                 inventory.setItem(slot, ItemStack.EMPTY);
@@ -62,15 +62,12 @@ public final class ScribeWellEvents {
             return;
         }
 
-        // The original Primewell crafting hook returns its primordial pearl.
         Item pearl = BuiltInRegistries.ITEM.get(PRIMORDIAL_PEARL_ID);
         if (pearl == Items.AIR) {
             ForbiddenMagic.LOGGER.warn("Could not refund Primewell's primordial pearl: {} is not registered", PRIMORDIAL_PEARL_ID);
             return;
         }
 
-        // Match the original crafting hook: restore the pearl in the crafting matrix
-        // so it is not consumed by the Primewell recipe.
         var matrix = event.getInventory();
         for (int slot = 0; slot < matrix.getContainerSize(); slot++) {
             ItemStack ingredient = matrix.getItem(slot);
@@ -81,8 +78,6 @@ public final class ScribeWellEvents {
             }
         }
 
-        // Some modern crafting paths may have already removed the matrix entry;
-        // retain the item for the player in that case.
         ItemStack returnedPearl = new ItemStack(pearl);
         player.getInventory().add(returnedPearl);
         if (!returnedPearl.isEmpty()) {
