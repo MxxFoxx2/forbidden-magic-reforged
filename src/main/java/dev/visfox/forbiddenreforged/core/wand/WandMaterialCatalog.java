@@ -82,7 +82,7 @@ public final class WandMaterialCatalog {
             new CapDefinition("orichalcum", 0.0F, List.of(), 0.0F,
                 id("minecraft", "command_block"), 1000,
                 id(MOD, "textures/model/wand_cap_orichalcum.png")),
-            new CapDefinition("alchemical", 0.9F, List.of(id("thaumcraft", "aqua")), 0.8F,
+            new CapDefinition("alchemical", 0.9F, List.of(id(MOD, "concept/water")), 0.8F,
                 id(MOD, "alchemical_cap"), 7,
                 id(MOD, "textures/model/wand_cap_alchemical.png"))
         );
