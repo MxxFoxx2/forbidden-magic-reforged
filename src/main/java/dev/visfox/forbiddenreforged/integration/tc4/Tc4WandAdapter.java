@@ -9,7 +9,6 @@ import dev.visfox.forbiddenreforged.core.wand.WandMaterialCatalog;
 import dev.visfox.forbiddenreforged.core.wand.WandMaterialCatalog.RodDefinition;
 import dev.visfox.forbiddenreforged.core.wand.WandMaterialCatalog.RodUpdateKind;
 import dev.visfox.forbiddenreforged.core.wand.WitchwoodManaBehavior;
-import dev.visfox.forbiddenreforged.core.wand.WandPartsAccess;
 import dev.visfox.forbiddenreforged.core.wand.WandVisAccess;
 import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 import java.lang.reflect.Method;
@@ -31,7 +30,6 @@ import thaumcraft.wand.Wands;
 
 public final class Tc4WandAdapter {
     private static final WandVisAccess VIS = new Tc4WandVisAdapter();
-    private static final WandPartsAccess PARTS = new Tc4WandPartsAdapter();
 
     private Tc4WandAdapter() {
     }
@@ -145,7 +143,7 @@ public final class Tc4WandAdapter {
     private static final class ProfaneWandUpdate implements RodUpdate {
         @Override
         public void onUpdate(ItemStack stack, Player entity) {
-            WandBehaviors.profane(stack, entity, VIS, PARTS, FmWandContractAccess.INSTANCE,
+            WandBehaviors.profane(stack, entity, VIS, HostAdapterRegistry.requireWandParts(), FmWandContractAccess.INSTANCE,
                 HostAdapterRegistry.requireWarp());
         }
 
