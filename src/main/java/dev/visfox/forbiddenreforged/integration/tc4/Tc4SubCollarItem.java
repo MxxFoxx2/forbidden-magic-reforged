@@ -1,5 +1,7 @@
-package dev.visfox.forbiddenreforged;
+package dev.visfox.forbiddenreforged.integration.tc4;
 
+import dev.visfox.forbiddenreforged.FmComponents;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 import java.util.List;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -10,10 +12,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import thaumcraft.item.bauble.VisAmuletItem;
-import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
-
-public final class SubCollarItem extends VisAmuletItem {
-    public SubCollarItem(Properties properties) {
+public final class Tc4SubCollarItem extends VisAmuletItem {
+    public Tc4SubCollarItem(Properties properties) {
         super(properties, false);
     }
 

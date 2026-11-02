@@ -60,7 +60,7 @@ The 1.21.1 `Tc4HostAdapter` declares every `HostProfile.Feature`. The currently 
 - Scribing research difficulty, primal-aspect selection, aspect-pool updates, and spent scribing-tool creation.
 - Wrath Cage block-entity construction.
 - Entity-to-aspect catalog and host entity classification; Wrath Cage aspect lookup and mob-imprint boss checks consume semantic IDs from these services instead of duplicating TC4 Aspect and boss registries.
-- Host-specific item properties and factories. TC4 item shells that implement `ScribingToolsItem`, `Bauble`, or `RunicArmor` live in `integration/tc4`; the shared registration API receives only Minecraft `Item` instances.
+- Host-specific item properties and factories. TC4 item shells that implement `ScribingToolsItem`, `Bauble`, `RunicArmor`, `VisAmuletItem`, or `WarpingGear` live in `integration/tc4`; the shared registration API receives only Minecraft `Item` instances.
 
 Known limits remain explicit:
 

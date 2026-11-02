@@ -493,6 +493,12 @@ public final class FmGameTests {
             "Crystalwell is registered as a host scribing tool");
         helper.assertTrue(FmItems.PRIMEWELL.get() instanceof thaumcraft.item.ScribingToolsItem,
             "Primewell is registered as a host scribing tool");
+        helper.assertTrue(FmItems.MORPH_PICKAXE.get() instanceof thaumcraft.item.gear.WarpingGear,
+            "Morph Tools are registered with the host warp contract");
+        if (FmItems.SUB_COLLAR != null) {
+            helper.assertTrue(FmItems.SUB_COLLAR.get() instanceof thaumcraft.item.bauble.VisAmuletItem,
+                "Sub Collar is registered as a host Vis Amulet");
+        }
         var entityAspects = HostAdapterRegistry.requireEntityAspects()
             .aspectCatalog(FmConfig.silverfishEmeralds());
         helper.assertValueEqual(entityAspects.get(ContentId.parse("minecraft:zombie")),

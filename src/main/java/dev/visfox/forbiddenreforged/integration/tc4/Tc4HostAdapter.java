@@ -1,9 +1,7 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
 import dev.visfox.forbiddenreforged.FmAspectTags;
-import dev.visfox.forbiddenreforged.MorphToolItem;
 import dev.visfox.forbiddenreforged.BlinkFocusItem;
-import dev.visfox.forbiddenreforged.SubCollarItem;
 import dev.visfox.forbiddenreforged.WrathCageBlockEntity;
 import dev.visfox.forbiddenreforged.core.aspect.AspectDefinition;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
@@ -443,7 +441,7 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
 
     @Override
     public Item createMorphTool(Item.Properties properties) {
-        return new MorphToolItem(properties);
+        return new Tc4MorphToolItem(properties);
     }
 
     @Override
@@ -473,7 +471,7 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
 
     @Override
     public Item createSubCollar(Item.Properties properties) {
-        return new SubCollarItem(properties);
+        return new Tc4SubCollarItem(properties);
     }
 
     @Override
