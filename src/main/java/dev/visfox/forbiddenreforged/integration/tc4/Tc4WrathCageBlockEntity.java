@@ -2,12 +2,9 @@ package dev.visfox.forbiddenreforged.integration.tc4;
 
 import dev.visfox.forbiddenreforged.FmBlockEntities;
 import dev.visfox.forbiddenreforged.FmConfig;
-import dev.visfox.forbiddenreforged.FmItems;
 import dev.visfox.forbiddenreforged.FmSpawnerMobs;
-import dev.visfox.forbiddenreforged.MobCrystalItem;
 import dev.visfox.forbiddenreforged.WrathCageBlock;
-
-import dev.visfox.forbiddenreforged.core.block.WrathCageBehavior;
+import dev.visfox.forbiddenreforged.core.block.WrathCageStorage;
 import dev.visfox.forbiddenreforged.core.block.WrathCageStorage;
 import dev.visfox.forbiddenreforged.core.block.WrathCageState;
 import dev.visfox.forbiddenreforged.core.block.WrathCageSpawnBehavior;
@@ -17,7 +14,6 @@ import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -32,7 +28,7 @@ import thaumcraft.aspect.AspectSource;
 import thaumcraft.blockentity.TcBlockEntity;
 import thaumcraft.essentia.EssentiaTransport;
 
-public class Tc4WrathCageBlockEntity extends TcBlockEntity implements AspectSource, EssentiaTransport {
+public final class Tc4WrathCageBlockEntity extends TcBlockEntity implements AspectSource, EssentiaTransport {
     private static final int SUCTION = 128;
 
     private final WrathCageState cageState = new WrathCageState();
@@ -57,14 +53,6 @@ public class Tc4WrathCageBlockEntity extends TcBlockEntity implements AspectSour
     public void setMobId(@Nullable String mobId) {
         cageState.setMobId(mobId);
         sync();
-    }
-
-    public static boolean shouldSpawn(boolean powered, boolean mobSet, int fuel, int cost, int availableEssentia) {
-        return WrathCageBehavior.shouldSpawn(powered, mobSet, fuel, cost, availableEssentia);
-    }
-
-    public static int nextDelay(RandomSource random, boolean slothful) {
-        return WrathCageBehavior.nextDelay(random.nextInt(100), slothful);
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, Tc4WrathCageBlockEntity cage) {
@@ -161,14 +149,6 @@ public class Tc4WrathCageBlockEntity extends TcBlockEntity implements AspectSour
         }
     }
 
-
-    public static ItemStack crystalForBreak(Tc4WrathCageBlockEntity cage) {
-        ItemStack stack = new ItemStack(FmItems.MOB_CRYSTAL.get());
-        if (cage.cageState.mobId() != null) {
-            MobCrystalItem.setMob(stack, cage.cageState.mobId());
-        }
-        return stack;
-    }
 
     @Override
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {
