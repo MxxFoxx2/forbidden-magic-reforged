@@ -22,8 +22,6 @@ public final class CreativeWandCatalog {
         }
     }
 
-    private static final String MOD = "forbiddenmagic";
-
     private static final List<Definition> DEFINITIONS = List.of(
         definition("thaumium", "tainted", 0),
         definition("thaumium", "infernal", 0),
@@ -42,8 +40,8 @@ public final class CreativeWandCatalog {
 
     private static Definition definition(String cap, String rod, int visPerPrimal) {
         return new Definition(
-            new ContentId(MOD, "wand_cap/" + cap),
-            new ContentId(MOD, "wand_rod/" + rod),
+            WandMaterialCatalog.capId(cap),
+            WandMaterialCatalog.rodId(rod),
             visPerPrimal
         );
     }
