@@ -487,6 +487,19 @@ public final class FmGameTests {
         helper.assertTrue(HostAdapterRegistry.requireFocus() != null,
             "focus upgrade inspection and Vis payment are routed through a typed host capability");
         var scribing = HostAdapterRegistry.requireScribing();
+        var entityAspects = HostAdapterRegistry.requireEntityAspects()
+            .aspectCatalog(FmConfig.silverfishEmeralds());
+        helper.assertValueEqual(entityAspects.get(ContentId.parse("minecraft:zombie")),
+            ContentId.parse("thaumcraft:corpus"),
+            "vanilla mob aspects are exposed using semantic identifiers");
+        helper.assertValueEqual(FmSpawnerMobs.aspectId("minecraft:zombie"),
+            ContentId.parse("thaumcraft:corpus"),
+            "Wrath Cage mob aspect lookup delegates to the host catalog");
+        helper.assertTrue(FmSpawnerMobs.aspectId(null) == null,
+            "missing mob IDs do not resolve an aspect");
+        var hostBosses = HostAdapterRegistry.requireEntityClassification().bossEntityIds();
+        helper.assertTrue(hostBosses.contains(ContentId.parse("thaumcraft:cultist_leader")),
+            "Thaumcraft boss identifiers are supplied by the selected host");
         helper.assertTrue(!scribing.primalAspectIds().isEmpty(),
             "the host exposes primal research aspects through semantic identifiers");
         ItemStack spentScribingTools = scribing.createSpentScribingToolsStack();

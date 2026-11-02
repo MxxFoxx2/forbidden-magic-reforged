@@ -92,7 +92,8 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
     }
 
     private ContentId mobAspectId() {
-        return Tc4AspectAdapter.toContentId(mobAspect());
+        ContentId aspect = FmSpawnerMobs.aspectId(cageState.mobId());
+        return aspect == null ? ContentId.parse("thaumcraft:lucrum") : aspect;
     }
 
     private @Nullable ContentId wrathAspectId() {
@@ -153,11 +154,6 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
         }
     }
 
-
-    private Aspect mobAspect() {
-        Aspect aspect = FmSpawnerMobs.aspect(cageState.mobId());
-        return aspect == null ? Aspect.GREED : aspect;
-    }
 
     public static ItemStack crystalForBreak(WrathCageBlockEntity cage) {
         ItemStack stack = new ItemStack(FmItems.MOB_CRYSTAL.get());
