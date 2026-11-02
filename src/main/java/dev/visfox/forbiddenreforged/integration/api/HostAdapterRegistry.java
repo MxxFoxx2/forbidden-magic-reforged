@@ -10,6 +10,7 @@ import dev.visfox.forbiddenreforged.integration.runtime.HostMorphToolServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostBlockEntityServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandInspectionServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandVisServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostWandPartsServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostAccessoryServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostTaintBlockServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostEnchantmentEffectServices;
@@ -79,6 +80,10 @@ public final class HostAdapterRegistry {
 
     public static HostWandVisServices requireWandVis() {
         return capability(HostWandVisServices.class, "wand Vis");
+    }
+
+    public static HostWandPartsServices requireWandParts() {
+        return capability(HostWandPartsServices.class, "wand parts");
     }
 
     public static HostAccessoryServices requireAccessories() {
