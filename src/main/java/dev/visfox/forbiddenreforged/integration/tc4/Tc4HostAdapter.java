@@ -1,6 +1,9 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
 import dev.visfox.forbiddenreforged.FmAspectTags;
+import dev.visfox.forbiddenreforged.FmWands;
+import dev.visfox.forbiddenreforged.FmWandTriggers;
+import dev.visfox.forbiddenreforged.FmTinkerer;
 import dev.visfox.forbiddenreforged.MorphToolItem;
 import dev.visfox.forbiddenreforged.RingNutritionItem;
 import dev.visfox.forbiddenreforged.CrystalwellItem;
@@ -17,6 +20,7 @@ import dev.visfox.forbiddenreforged.core.warp.WarpKind;
 import dev.visfox.forbiddenreforged.integration.api.HostAdapter;
 import dev.visfox.forbiddenreforged.integration.api.HostProfile;
 import dev.visfox.forbiddenreforged.integration.runtime.HostAspectServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostBootstrapServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostAccessoryServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostBlockEntityServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostEnchantmentEffectServices;
@@ -32,6 +36,7 @@ import dev.visfox.forbiddenreforged.integration.runtime.HostWandVisServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWarpServices;
 import java.util.EnumMap;
 import java.util.List;
+import net.minecraft.world.item.ItemStack;
 import java.util.Map;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -62,7 +67,7 @@ import net.minecraft.server.level.ServerPlayer;
  * 1.21.1 gameplay integrations remain intact while their extraction into
  * focused host capabilities proceeds incrementally.
  */
-public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, HostWarpServices, HostMorphToolServices, HostBlockEntityServices, HostWandInspectionServices, HostWandVisServices, HostAccessoryServices, HostTaintBlockServices, HostEnchantmentEffectServices, HostScribingServices, HostEntityAspectServices, HostEntityClassificationServices, HostItemFactoryServices, HostItemPropertyServices {
+public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, HostWarpServices, HostMorphToolServices, HostBlockEntityServices, HostWandInspectionServices, HostWandVisServices, HostAccessoryServices, HostTaintBlockServices, HostEnchantmentEffectServices, HostScribingServices, HostEntityAspectServices, HostEntityClassificationServices, HostItemFactoryServices, HostItemPropertyServices, HostBootstrapServices {
     public static final Tc4HostAdapter INSTANCE = new Tc4HostAdapter();
 
     private static final String LEGACY_RUNTIME_NOTE =
@@ -87,7 +92,7 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
         adapted(support, HostProfile.Feature.ASPECT_PRESENTATION,
             "Resolves semantic aspect identifiers to TC4 display components");
         adapted(support, HostProfile.Feature.RUNTIME_BOOTSTRAP,
-            "Bootstraps shared recipe and research catalogs and preserves 1.21.1 wand registration");
+            "Registers TC4 wand rods, caps, triggers, optional enchantment costs, creative host wands, and shared catalogs");
         adapted(support, HostProfile.Feature.ASPECT_RECIPE_DERIVATION,
             "Uses semantic aspect definitions and component identifiers");
         adapted(support, HostProfile.Feature.ASPECT_SCAN_TARGETS,
@@ -411,5 +416,30 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
     @Override
     public Item createSubCollar(Item.Properties properties) {
         return new SubCollarItem(properties);
+    }
+
+    @Override
+    public void registerWands() {
+        FmWands.register();
+    }
+
+    @Override
+    public void registerWandTriggers() {
+        FmWandTriggers.register();
+    }
+
+    @Override
+    public void registerOptionalEnchantments() {
+        FmTinkerer.register();
+    }
+
+    @Override
+    public int registeredOptionalEnchantments() {
+        return FmTinkerer.registeredCount();
+    }
+
+    @Override
+    public void addCreativeWands(List<ItemStack> stacks) {
+        Tc4BootstrapAdapter.addCreativeWands(stacks);
     }
 }

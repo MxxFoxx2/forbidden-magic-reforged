@@ -85,6 +85,10 @@ public final class FmGameTests {
             HostProfile.SupportLevel.UNSUPPORTED, "taint origins are explicitly declared unsupported");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.WAND_CAPS).level(),
             HostProfile.SupportLevel.PARTIAL, "remaining direct wand registration is not overstated as migrated");
+        helper.assertValueEqual(profile.supportOf(HostProfile.Feature.RUNTIME_BOOTSTRAP).level(),
+            HostProfile.SupportLevel.ADAPTED, "host bootstrap capability is implemented");
+        helper.assertTrue(HostAdapterRegistry.requireBootstrap().registeredOptionalEnchantments() >= 0,
+            "optional enchantment registration count is exposed by the host bootstrap");
         helper.succeed();
     }
 
