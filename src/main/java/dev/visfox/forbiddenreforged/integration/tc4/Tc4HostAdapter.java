@@ -24,6 +24,7 @@ import dev.visfox.forbiddenreforged.integration.runtime.HostTaintBlockServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandInspectionServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandVisServices;
 import dev.visfox.forbiddenreforged.core.wand.WandVisAccess;
+import dev.visfox.forbiddenreforged.core.wand.WandPartsAccess;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandPartsServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostFocusServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostEssentiaTransportServices;
@@ -65,6 +66,7 @@ import thaumcraft.wand.focus.FocusItem;
  */
 public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, HostWarpServices, HostMorphToolServices, HostBlockEntityServices, HostWandInspectionServices, HostWandVisServices, HostWandPartsServices, HostFocusServices, HostEssentiaTransportServices, HostAccessoryServices, HostTaintBlockServices, HostEnchantmentEffectServices, HostScribingServices, HostEntityAspectServices, HostEntityClassificationServices, HostItemFactoryServices, HostItemPropertyServices, HostBootstrapServices, HostVillagerTradeServices {
     private static final WandVisAccess WAND_VIS = new Tc4WandVisAdapter();
+    private static final WandPartsAccess WAND_PARTS = new Tc4WandPartsAdapter();
 
     public static final Tc4HostAdapter INSTANCE = new Tc4HostAdapter();
 
@@ -359,7 +361,7 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
 
     @Override
     public void setRod(ItemStack wand, ContentId rod) {
-        new Tc4WandPartsAdapter().setRod(wand, rod);
+        WAND_PARTS.setRod(wand, rod);
     }
 
     @Override
