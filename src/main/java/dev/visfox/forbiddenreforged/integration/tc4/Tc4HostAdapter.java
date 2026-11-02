@@ -118,15 +118,15 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
         adapted(support, HostProfile.Feature.WAND_INSPECTION,
             "Reads wand, rod and focus properties through the TC4 wand API");
         support.put(HostProfile.Feature.WAND_RODS, HostProfile.FeatureSupport.partial(
-            "Rod definitions are shared; TC4 registry registration and RodUpdate callbacks remain host-specific"));
+            "Rod definitions, update policy, and creative wand selection are shared; TC4 registry registration, callback construction, and native stack assembly remain host-specific"));
         support.put(HostProfile.Feature.WAND_CAPS, HostProfile.FeatureSupport.partial(
-            "Cap definitions are shared; TC4 registry registration and host material resolution remain host-specific"));
+            "Cap definitions and creative wand selection are shared; TC4 registry registration and native material resolution remain host-specific"));
         support.put(HostProfile.Feature.WAND_PARTS, HostProfile.FeatureSupport.partial(
             "Core exposes a typed parts access contract; mutation still uses TC4 WandParts and WandKeys"));
         support.put(HostProfile.Feature.WAND_TRIGGERS, HostProfile.FeatureSupport.partial(
             "Hellfire trigger rules are shared; TC4 trigger registration and runtime callbacks remain host-specific"));
         support.put(HostProfile.Feature.FOCI_OR_SPELLS, HostProfile.FeatureSupport.partial(
-            "Blink Focus upgrade rules and Vis costs are shared; FocusItem registration and runtime remain TC4-bound"));
+            "Blink Focus progression, upgrade metadata, and semantic Vis costs are shared; FocusItem and FocusUpgradeType construction and runtime remain TC4-bound"));
         adapted(support, HostProfile.Feature.ACCESSORY_INTEGRATION,
             "Reads accessory slots through the TC4 Baubles bridge");
         adapted(support, HostProfile.Feature.TAINT_BLOCK_SERVICES,
