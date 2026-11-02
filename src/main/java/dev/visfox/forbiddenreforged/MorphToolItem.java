@@ -6,7 +6,6 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -18,11 +17,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import thaumcraft.item.gear.WarpingGear;
-import thaumcraft.item.tool.ToolHarvest;
-import thaumcraft.registry.ModSounds;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 
-public class MorphToolItem extends Item implements WarpingGear {
+public class MorphToolItem extends Item {
     public MorphToolItem(Properties properties) {
         super(properties);
     }
@@ -48,7 +45,7 @@ public class MorphToolItem extends Item implements WarpingGear {
                 stack.set(DataComponents.CUSTOM_NAME, Component.literal(next.currentName()).withStyle(ChatFormatting.ITALIC));
             }
             stack.hurtAndBreak(5, player, EquipmentSlot.MAINHAND);
-            level.playSound(null, player.blockPosition(), ModSounds.WANDFAIL.get(), SoundSource.PLAYERS, 0.2F, 0.2F + player.getRandom().nextFloat() * 0.2F);
+            HostAdapterRegistry.requireMorphTools().playMorphCycleSound(level, player.blockPosition(), player.getRandom());
         }
         player.swing(hand, net.minecraft.world.item.component.SwingAnimation.DEFAULT, true);
         return InteractionResult.SUCCESS;
@@ -65,13 +62,8 @@ public class MorphToolItem extends Item implements WarpingGear {
     }
 
     @Override
-    public int getWarp(ItemStack stack, Player player) {
-        return FmEnchantments.level(player.level().registryAccess(), stack, FmEnchantments.VOIDTOUCHED) > 0 ? 1 : 0;
-    }
-
-    @Override
     public boolean mineBlock(ItemStack stack, Level level, BlockState state, BlockPos pos, LivingEntity owner) {
-        if (ToolHarvest.isHarvesting()) {
+        if (HostAdapterRegistry.requireMorphTools().isAreaHarvesting()) {
             return true;
         }
         if (!level.isClientSide()
@@ -79,7 +71,7 @@ public class MorphToolItem extends Item implements WarpingGear {
             && level instanceof ServerLevel serverLevel
             && FmEnchantments.level(serverLevel.registryAccess(), stack, FmEnchantments.IMPACT) > 0
             && stack.isCorrectToolForDrops(state)) {
-            ToolHarvest.breakArea(stack, serverLevel, player, pos, stack::isCorrectToolForDrops, -1);
+            HostAdapterRegistry.requireMorphTools().breakArea(stack, serverLevel, player, pos, stack::isCorrectToolForDrops);
         }
         return super.mineBlock(stack, level, state, pos, owner);
     }

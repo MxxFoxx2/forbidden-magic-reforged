@@ -1,4 +1,6 @@
-package dev.visfox.forbiddenreforged;
+package dev.visfox.forbiddenreforged.integration.tc4;
+
+import dev.visfox.forbiddenreforged.FmItems;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -17,8 +19,8 @@ import thaumcraft.research.ResearchManager;
  * generates a small amount of primal research knowledge in easy mode or
  * converts into a spent inkwell after yielding a full set of primal aspects.
  */
-public final class CrystalwellItem extends ScribingToolsItem {
-    public CrystalwellItem(Properties properties) {
+public final class Tc4CrystalwellItem extends ScribingToolsItem {
+    public Tc4CrystalwellItem(Properties properties) {
         super(properties.stacksTo(1));
     }
 

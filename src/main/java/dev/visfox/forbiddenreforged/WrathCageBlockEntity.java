@@ -1,10 +1,16 @@
 package dev.visfox.forbiddenreforged;
 
+import dev.visfox.forbiddenreforged.core.model.ContentId;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
@@ -13,25 +19,24 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import org.jspecify.annotations.Nullable;
-import thaumcraft.aspect.Aspect;
-import thaumcraft.aspect.AspectList;
-import thaumcraft.aspect.AspectSource;
-import thaumcraft.blockentity.TcBlockEntity;
-import thaumcraft.essentia.EssentiaTransport;
 
-public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource, EssentiaTransport {
+public abstract class WrathCageBlockEntity extends BlockEntity {
     private static final int MAX_STORED = 64;
     private static final int MAX_NEARBY = 6;
     private static final int SPAWN_RANGE = 4;
     private static final int SPAWN_COUNT = 3;
     private static final int PLAYER_RANGE = 16;
     private static final int SUCTION = 128;
+    private static final ContentId WRATH_ASPECT = ContentId.parse("forbiddenmagic:ira");
+    private static final ContentId SLOTH_ASPECT = ContentId.parse("forbiddenmagic:desidia");
 
     private @Nullable String mobId;
     private int special;
@@ -41,10 +46,6 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
     private int spawnDelay = 20;
     private boolean slothful;
     private int mode;
-
-    public WrathCageBlockEntity(BlockPos pos, BlockState state) {
-        this(FmBlockEntities.WRATH_CAGE.get(), pos, state);
-    }
 
     protected WrathCageBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -82,7 +83,7 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
         }
         int cost = FmConfig.wrathCost();
         if (cost > 0 && cage.mobId != null && cage.hasRoom()) {
-            cage.drawEssentia(level, pos);
+            cage.drawEssentia(cost);
         }
         boolean powered = level.hasNeighborSignal(pos);
         if (!shouldSpawn(powered, cage.mobId != null, cage.fuel, cost, cage.special + cage.wrath + cage.sloth)) {
@@ -122,30 +123,21 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
         return special < MAX_STORED || wrath < MAX_STORED || sloth < MAX_STORED;
     }
 
-    private void drawEssentia(Level level, BlockPos pos) {
-        Aspect mobAspect = mobAspect();
-        int cost = FmConfig.wrathCost();
-        for (Direction direction : Direction.values()) {
-            if (!(level.getBlockEntity(pos.relative(direction)) instanceof EssentiaTransport transport)) {
-                continue;
-            }
-            Direction side = direction.getOpposite();
-            if (!transport.canOutputTo(side)) {
-                continue;
-            }
-            if (special < MAX_STORED && transport.takeEssentia(mobAspect, 1, side) == 1) {
+    private void drawEssentia(int cost) {
+        ContentId mobAspect = mobEssentiaType();
+        for (EssentiaInput input : adjacentEssentiaInputs()) {
+            if (special < MAX_STORED && input.take(mobAspect, 1) == 1) {
                 special++;
                 sync();
                 return;
             }
-            if (FmAspects.WRATH != null && wrath < MAX_STORED && special < cost
-                && transport.takeEssentia(FmAspects.WRATH, 1, side) == 1) {
+            if (wrath < MAX_STORED && special < cost && input.take(WRATH_ASPECT, 1) == 1) {
                 wrath++;
                 sync();
                 return;
             }
-            if (FmAspects.SLOTH != null && sloth < MAX_STORED && special < cost && wrath < cost
-                && transport.takeEssentia(FmAspects.SLOTH, 1, side) == 1) {
+            if (sloth < MAX_STORED && special < cost && wrath < cost
+                && input.take(SLOTH_ASPECT, 1) == 1) {
                 sloth++;
                 sync();
                 return;
@@ -153,11 +145,115 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
         }
     }
 
+    protected abstract ContentId mobEssentiaType();
+
+    protected abstract List<EssentiaInput> adjacentEssentiaInputs();
+
+    public interface EssentiaInput {
+        int take(ContentId aspect, int amount);
+    }
+
+    public Map<ContentId, Integer> visibleEssentia() {
+        if (FmConfig.wrathCost() <= 0 || mobId == null) {
+            return Map.of();
+        }
+        return switch (mode) {
+            case 0 -> Map.of(mobEssentiaType(), special);
+            case 1 -> Map.of(WRATH_ASPECT, wrath);
+            default -> Map.of(SLOTH_ASPECT, sloth);
+        };
+    }
+
+    public boolean acceptsEssentia(ContentId aspect) {
+        return FmConfig.wrathCost() > 0
+            && (WRATH_ASPECT.equals(aspect) || SLOTH_ASPECT.equals(aspect) || mobEssentiaType().equals(aspect));
+    }
+
+    public int addEssentiaToContainer(ContentId aspect, int amount) {
+        if (FmConfig.wrathCost() <= 0) {
+            return amount;
+        }
+        if (WRATH_ASPECT.equals(aspect)) {
+            wrath += amount;
+            return 0;
+        }
+        if (SLOTH_ASPECT.equals(aspect)) {
+            sloth += amount;
+            return 0;
+        }
+        if (mobEssentiaType().equals(aspect)) {
+            special += amount;
+            return 0;
+        }
+        return amount;
+    }
+
+    public boolean containsEssentia(ContentId aspect, int amount) {
+        return essentiaAmount(aspect) >= amount;
+    }
+
+    public int essentiaAmount(ContentId aspect) {
+        if (WRATH_ASPECT.equals(aspect)) {
+            return wrath;
+        }
+        if (SLOTH_ASPECT.equals(aspect)) {
+            return sloth;
+        }
+        if (mobEssentiaType().equals(aspect)) {
+            return special;
+        }
+        return 0;
+    }
+
+    public int addTransportEssentia(ContentId aspect, int amount) {
+        int accepted = Math.min(amount, MAX_STORED);
+        if (mobEssentiaType().equals(aspect)) {
+            special += accepted;
+            return accepted;
+        }
+        if (WRATH_ASPECT.equals(aspect)) {
+            wrath += accepted;
+            return accepted;
+        }
+        if (SLOTH_ASPECT.equals(aspect)) {
+            sloth += accepted;
+            return accepted;
+        }
+        return amount;
+    }
+
+    public boolean canConnectEssentia() {
+        return FmConfig.wrathCost() > 0;
+    }
+
+    public ContentId suctionEssentiaType() {
+        if (FmConfig.wrathCost() <= 0) {
+            return null;
+        }
+        return switch (mode) {
+            case 0 -> mobEssentiaType();
+            case 1 -> WRATH_ASPECT;
+            default -> SLOTH_ASPECT;
+        };
+    }
+
+    public int suctionEssentiaAmount() {
+        return FmConfig.wrathCost() > 0 ? SUCTION : 0;
+    }
+
+    public int transportEssentiaAmount() {
+        return switch (mode) {
+            case 0 -> special;
+            case 1 -> wrath;
+            default -> sloth;
+        };
+    }
+
     private void spawnRound(ServerLevel level, BlockPos pos) {
         if (level.getNearestPlayer(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, PLAYER_RANGE, false) == null) {
             return;
         }
-        Identifier id = mobId == null ? null : Identifier.tryParse(mobId);
+        net.minecraft.resources.Identifier id = mobId == null ? null : net.minecraft.resources.Identifier.tryParse(mobId);
         if (id == null || !BuiltInRegistries.ENTITY_TYPE.containsKey(id)) {
             spawnDelay = nextDelay(level.getRandom(), slothful);
             return;
@@ -187,11 +283,6 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
         spawnDelay = nextDelay(level.getRandom(), slothful);
     }
 
-    private Aspect mobAspect() {
-        Aspect aspect = FmSpawnerMobs.aspect(mobId);
-        return aspect == null ? Aspect.GREED : aspect;
-    }
-
     public static ItemStack crystalForBreak(WrathCageBlockEntity cage) {
         ItemStack stack = new ItemStack(FmItems.MOB_CRYSTAL.get());
         if (cage.mobId != null) {
@@ -209,164 +300,21 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
         }
     }
 
-    @Override
-    public AspectList getAspects() {
-        AspectList aspects = new AspectList();
-        if (FmConfig.wrathCost() > 0 && mobId != null) {
-            if (mode == 0) {
-                aspects.add(mobAspect(), special);
-            } else if (mode == 1) {
-                if (FmAspects.WRATH != null) {
-                    aspects.add(FmAspects.WRATH, wrath);
-                }
-            } else if (FmAspects.SLOTH != null) {
-                aspects.add(FmAspects.SLOTH, sloth);
-            }
+    public void sync() {
+        setChanged();
+        if (level != null) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
         }
-        return aspects;
     }
 
     @Override
-    public void setAspects(AspectList aspects) {
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
     @Override
-    public boolean doesContainerAccept(Aspect aspect) {
-        return FmConfig.wrathCost() > 0 && (aspect == FmAspects.WRATH || aspect == FmAspects.SLOTH || aspect == mobAspect());
-    }
-
-    @Override
-    public int addToContainer(Aspect aspect, int amount) {
-        if (FmConfig.wrathCost() <= 0) {
-            return amount;
-        }
-        if (aspect == FmAspects.WRATH) {
-            wrath += amount;
-            return 0;
-        }
-        if (aspect == FmAspects.SLOTH) {
-            sloth += amount;
-            return 0;
-        }
-        if (aspect == mobAspect()) {
-            special += amount;
-            return 0;
-        }
-        return amount;
-    }
-
-    @Override
-    public boolean takeFromContainer(Aspect aspect, int amount) {
-        return false;
-    }
-
-    @Override
-    public boolean doesContainerContainAmount(Aspect aspect, int amount) {
-        if (aspect == FmAspects.WRATH) {
-            return wrath >= amount;
-        }
-        if (aspect == FmAspects.SLOTH) {
-            return sloth >= amount;
-        }
-        if (aspect == mobAspect()) {
-            return special >= amount;
-        }
-        return false;
-    }
-
-    @Override
-    public int containerContains(Aspect aspect) {
-        if (aspect == FmAspects.WRATH) {
-            return wrath;
-        }
-        if (aspect == FmAspects.SLOTH) {
-            return sloth;
-        }
-        if (aspect == mobAspect()) {
-            return special;
-        }
-        return 0;
-    }
-
-    @Override
-    public boolean isConnectable(Direction face) {
-        return FmConfig.wrathCost() > 0;
-    }
-
-    @Override
-    public boolean canInputFrom(Direction face) {
-        return true;
-    }
-
-    @Override
-    public boolean canOutputTo(Direction face) {
-        return false;
-    }
-
-    @Override
-    public void setSuction(@Nullable Aspect aspect, int amount) {
-    }
-
-    @Override
-    public @Nullable Aspect getSuctionType(Direction face) {
-        if (FmConfig.wrathCost() <= 0) {
-            return null;
-        }
-        if (mode == 0) {
-            return mobAspect();
-        }
-        return mode == 1 ? FmAspects.WRATH : FmAspects.SLOTH;
-    }
-
-    @Override
-    public int getSuctionAmount(Direction face) {
-        return FmConfig.wrathCost() > 0 ? SUCTION : 0;
-    }
-
-    @Override
-    public int takeEssentia(Aspect aspect, int amount, Direction face) {
-        return 0;
-    }
-
-    @Override
-    public int addEssentia(Aspect aspect, int amount, Direction face) {
-        int accepted = Math.min(amount, MAX_STORED);
-        if (aspect == mobAspect()) {
-            special += accepted;
-            return accepted;
-        }
-        if (aspect == FmAspects.WRATH) {
-            wrath += accepted;
-            return accepted;
-        }
-        if (aspect == FmAspects.SLOTH) {
-            sloth += accepted;
-            return accepted;
-        }
-        return amount;
-    }
-
-    @Override
-    public @Nullable Aspect getEssentiaType(Direction face) {
-        return getSuctionType(face);
-    }
-
-    @Override
-    public int getEssentiaAmount(Direction face) {
-        if (mode == 0) {
-            return special;
-        }
-        return mode == 1 ? wrath : sloth;
-    }
-
-    @Override
-    public int getMinimumSuction() {
-        return 0;
-    }
-
-    @Override
-    public boolean renderExtendedTube() {
-        return false;
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return saveCustomOnly(registries);
     }
 
     @Override

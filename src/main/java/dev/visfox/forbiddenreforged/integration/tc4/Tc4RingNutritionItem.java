@@ -1,4 +1,4 @@
-package dev.visfox.forbiddenreforged;
+package dev.visfox.forbiddenreforged.integration.tc4;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
@@ -7,8 +7,8 @@ import thaumcraft.item.gear.RunicArmor;
 import thaumcraft.platform.Bauble;
 import thaumcraft.platform.BaubleType;
 
-public class RingNutritionItem extends Item implements Bauble, RunicArmor {
-    public RingNutritionItem(Properties properties) {
+public final class Tc4RingNutritionItem extends Item implements Bauble, RunicArmor {
+    public Tc4RingNutritionItem(Properties properties) {
         super(properties.stacksTo(1));
     }
 

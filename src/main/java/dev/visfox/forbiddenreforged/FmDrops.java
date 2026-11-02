@@ -34,9 +34,7 @@ import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraft.world.effect.MobEffects;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
-import thaumcraft.entity.TaintedMob;
-import thaumcraft.entity.boss.ThaumcraftBoss;
-import thaumcraft.wand.Wands;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 
 public final class FmDrops {
     private FmDrops() {
@@ -124,7 +122,7 @@ public final class FmDrops {
                 int looting = enchant(player, held, Enchantments.LOOTING);
                 addDrop(event, FmItems.DEADLY_SHARDS.get("pride").get(), prideCount(looting, entity.getRandom().nextInt(1 + looting)));
             }
-            int greed = enchant(player, held, Enchantments.LOOTING) + Wands.getFocusTreasure(held);
+            int greed = enchant(player, held, Enchantments.LOOTING) + HostAdapterRegistry.requireWandInspection().wandFocusTreasure(held);
             if (rollGreed(greed, entity.getRandom().nextInt(20))) {
                 addDrop(event, FmItems.DEADLY_SHARDS.get("greed").get(), 1);
             }
@@ -136,7 +134,7 @@ public final class FmDrops {
 
     private static void onTaintedBloodShardDrop(LivingDropsEvent event) {
         LivingEntity entity = event.getEntity();
-        if (!(entity instanceof TaintedMob)) {
+        if (!HostAdapterRegistry.requireEntityClassification().isTaintedMob(entity)) {
             return;
         }
         DamageSource source = event.getSource();
@@ -217,7 +215,7 @@ public final class FmDrops {
     }
 
     private static boolean isBoss(LivingEntity entity) {
-        return entity instanceof WitherBoss || entity instanceof EnderDragon || entity instanceof ThaumcraftBoss;
+        return entity instanceof WitherBoss || entity instanceof EnderDragon || HostAdapterRegistry.requireEntityClassification().isHostBoss(entity);
     }
 
     private static int wrathBonus(ServerPlayer player, LivingEntity target) {
@@ -239,7 +237,7 @@ public final class FmDrops {
         if (isTagged(target.getType(), EntityTypeTags.SENSITIVE_TO_BANE_OF_ARTHROPODS)) {
             wrath += enchant(player, held, Enchantments.BANE_OF_ARTHROPODS);
         }
-        wrath += Wands.getFocusPotency(held);
+        wrath += HostAdapterRegistry.requireWandInspection().wandFocusPotency(held);
         return wrath;
     }
 

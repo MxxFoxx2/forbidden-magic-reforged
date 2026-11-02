@@ -42,6 +42,16 @@
 - Добавляй только явно выбранные пути; не коммить `host/`, `reference/`, `run/`, журналы сессий и локальные конфиги.
 - Не добавляй разовые планы, design-документы и дневники сессий в репозиторий. Долговечные результаты держи в `docs/fidelity.md`, `docs/roadmap.md` и `docs/verification.md`.
 
+## Границы host-agnostic архитектуры
+
+- Общие модели в `core/model`, `core/aspect`, `core/recipe` и `core/research` не импортируют Minecraft, NeoForge и API хостов.
+- Общие gameplay-классы могут использовать Minecraft/NeoForge, но не API хоста и его базовые классы. Host capabilities реализуются в `integration/<host>` bridge-subclass, а данные проходят через `ContentId` и узкие callbacks.
+- Общие определения используют семантические `ContentId`; host registry IDs, legacy recipe/research keys, сериализаторы, lifecycle и преобразования аспектов находятся в `integration/<host>`.
+- Отсутствие механики у хоста отражается как PARTIAL/UNSUPPORTED. Не подменяй аспект, warp, зачарование или рецепт похожей механикой без явной фиксации отклонения.
+- Не создавай универсальные сервис-локаторы и god-интерфейсы. Добавляй узкие runtime-контракты только вместе с переносом конкретного потребителя.
+- Minecraft-версии остаются отдельными build/release tracks. Общие модели не означают единый бинарник для разных версий.
+- Перенос выполняй вертикальными срезами, сохраняя текущие TC4 GameTests и fidelity ledger. Старую `port/thaumaturge` ветку не использовать как архитектурную основу.
+
 ## Порт и зависимости
 
 - modId `forbiddenmagic`, пакет `dev.visfox.forbiddenreforged`, версия из `gradle.properties`.

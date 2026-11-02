@@ -19,18 +19,19 @@ import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
-import thaumcraft.aspect.Aspect;
-import thaumcraft.platform.Baubles;
-import thaumcraft.wand.VisStorage;
-import thaumcraft.wand.Wands;
-import thaumcraft.registry.ModBlocks;
-import thaumcraft.taint.TaintBlock;
-import thaumcraft.taint.TaintFibresBlock;
+import dev.visfox.forbiddenreforged.core.model.ContentId;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
+import org.jspecify.annotations.Nullable;
 
 public final class FmToolEvents {
-    private static final Aspect[] TAINTED_PRIMALS = {
-        Aspect.ENTROPY, Aspect.ORDER, Aspect.FIRE, Aspect.WATER, Aspect.EARTH, Aspect.AIR
-    };
+    private static final List<ContentId> TAINTED_PRIMALS = List.of(
+        new ContentId("forbiddenmagic", "concept/entropy"),
+        new ContentId("forbiddenmagic", "concept/order"),
+        new ContentId("forbiddenmagic", "concept/fire"),
+        new ContentId("forbiddenmagic", "concept/water"),
+        new ContentId("forbiddenmagic", "concept/earth"),
+        new ContentId("forbiddenmagic", "concept/air")
+    );
 
     private FmToolEvents() {
     }
@@ -64,7 +65,7 @@ public final class FmToolEvents {
         if (FmItems.SUB_COLLAR == null) {
             return;
         }
-        ItemStack collar = Baubles.get(wearer, 0);
+        ItemStack collar = HostAdapterRegistry.requireAccessories().accessory(wearer, 0);
         if (!collar.is(FmItems.SUB_COLLAR.get())) {
             return;
         }
@@ -88,15 +89,15 @@ public final class FmToolEvents {
             }
         }
         for (int dose = 0; dose < doses; dose++) {
-            VisStorage.addRealVis(collar, TAINTED_PRIMALS[random.nextInt(TAINTED_PRIMALS.length)], 1, true);
+            HostAdapterRegistry.requireWandVis().addRealVis(collar, TAINTED_PRIMALS.get(random.nextInt(TAINTED_PRIMALS.size())), 1, true);
         }
     }
 
     public static String wandTooltipKind(ItemStack stack) {
-        return Wands.isWand(stack) ? wandTooltipKind(Wands.getRod(stack).tag()) : "";
+        return wandTooltipKind(HostAdapterRegistry.requireWandInspection().wandRodTag(stack));
     }
 
-    public static String wandTooltipKind(String rodTag) {
+    public static String wandTooltipKind(@Nullable String rodTag) {
         if (rodTag == null) {
             return "";
         }
@@ -146,25 +147,25 @@ public final class FmToolEvents {
     }
 
     public static boolean hasNutritionRingInRingSlot(Player player) {
-        return Baubles.get(player, 1).is(FmItems.RING_NUTRITION.get())
-            || Baubles.get(player, 2).is(FmItems.RING_NUTRITION.get());
+        return HostAdapterRegistry.requireAccessories().accessory(player, 1).is(FmItems.RING_NUTRITION.get())
+            || HostAdapterRegistry.requireAccessories().accessory(player, 2).is(FmItems.RING_NUTRITION.get());
     }
 
     public static boolean cancelsInfernalDamage(ItemStack held, boolean fireOrWither) {
-        return fireOrWither && held != null && !held.isEmpty() && Wands.isWand(held)
-            && "infernal".equals(Wands.getRod(held).tag());
+        return fireOrWither && held != null && !held.isEmpty()
+            && "infernal".equals(HostAdapterRegistry.requireWandInspection().wandRodTag(held));
     }
 
     public static boolean restoresTaintedVis(ItemStack held, boolean taintDamage) {
-        return taintDamage && held != null && !held.isEmpty() && Wands.isWand(held)
-            && "tainted".equals(Wands.getRod(held).tag());
+        return taintDamage && held != null && !held.isEmpty()
+            && "tainted".equals(HostAdapterRegistry.requireWandInspection().wandRodTag(held));
     }
 
-    public static List<Aspect> taintedVisRolls(RandomSource random) {
+    public static List<ContentId> taintedVisRolls(RandomSource random) {
         return List.of(
-            TAINTED_PRIMALS[random.nextInt(TAINTED_PRIMALS.length)],
-            TAINTED_PRIMALS[random.nextInt(TAINTED_PRIMALS.length)],
-            TAINTED_PRIMALS[random.nextInt(TAINTED_PRIMALS.length)]
+            TAINTED_PRIMALS.get(random.nextInt(TAINTED_PRIMALS.size())),
+            TAINTED_PRIMALS.get(random.nextInt(TAINTED_PRIMALS.size())),
+            TAINTED_PRIMALS.get(random.nextInt(TAINTED_PRIMALS.size()))
         );
     }
 
@@ -189,10 +190,7 @@ public final class FmToolEvents {
     }
 
     private static boolean isTaintMaterial(BlockState state) {
-        return state.getBlock() instanceof TaintBlock
-            || state.getBlock() instanceof TaintFibresBlock
-            || state.is(ModBlocks.FLUX_GOO.get())
-            || state.is(ModBlocks.FLUX_GAS.get())
+        return HostAdapterRegistry.requireTaintBlocks().isTaintMaterial(state)
             || state.is(FmBlocks.TAINT_LOG.get())
             || state.is(FmBlocks.TAINT_PLANKS.get())
             || state.is(FmBlocks.TAINT_STONE_SMOOTH.get())

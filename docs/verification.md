@@ -10,6 +10,17 @@
 - С `no_lust=true`: **97/97** required GameTests passed; `luxuria=null`.
 - Опубликованный релиз: rolling [`26.3`](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/26.3). Сборка и тесты headless не заменяют ручные проверки клиента и реального геймплея.
 
+## Host-agnostic architecture
+
+- Implemented in [`architecture/host-agnostic-core`](https://github.com/MxxFoxx2/forbidden-magic-reforged/tree/architecture/host-agnostic-core), proposed for `main` in [PR #63](https://github.com/MxxFoxx2/forbidden-magic-reforged/pull/63).
+- Architecture baseline: [`d072f3b`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/d072f3b97e780bff88a08104e36671af529ab454). [Java CI with Gradle #405](https://github.com/MxxFoxx2/forbidden-magic-reforged/actions/runs/41346637813) completed successfully on 1 November 2026.
+- Latest PR-head verification: [`9716602`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/97166021366155c7cae628b5e2a7da8c8d9157eb); [Java CI with Gradle #409](https://github.com/MxxFoxx2/forbidden-magic-reforged/actions/runs/41369081761) completed successfully on 2 November 2026.
+- The exact PR-head run passed the host-agnostic boundary check, pinned host preparation and build, mod build, artifact provenance, and generated-resource freshness.
+- With `no_lust=false`: **111/111** required GameTests passed (`luxuria=luxuria`).
+- With `no_lust=true`: **111/111** required GameTests passed (`luxuria=null`).
+- The architecture refactor is complete within its declared scope: shared content models/catalogs and extracted gameplay rules do not depend on TC4 APIs; host-specific behavior is behind the adapter and capability contracts.
+- This does not claim a second implemented host adapter or cross-Minecraft-version compatibility. Thaumaturge remains an API audit, not a production adapter; manual client and gameplay checks are tracked separately.
+
 ## Проверки вне CI
 
 - `tools/gen_resources.py` запускался дважды с чистым diff после генерации в pre-release проверке.

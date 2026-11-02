@@ -405,6 +405,14 @@ jobs:
           ]
           if compare_url:
               lines += ["", f"[Changes since previous build]({compare_url})"]
+
+          major_notes_path = os.path.join(repo_dir, "docs", "releases", f"{release_version}.md")
+          if os.path.isfile(major_notes_path):
+              with open(major_notes_path, encoding="utf-8") as major_notes_file:
+                  major_notes = major_notes_file.read().strip()
+              if major_notes:
+                  lines += ["", major_notes]
+
           lines += ["", f"<!-- release-source-sha: {source_sha} -->"]
           lines += [f"<!-- release-version: {release_version} -->"]
 
