@@ -290,8 +290,8 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
     }
 
     @Override
-    public @org.jetbrains.annotations.Nullable String wandRodTag(ItemStack stack) {
-        return Tc4WandRuntimeAdapter.rodTag(stack);
+    public dev.visfox.forbiddenreforged.core.wand.WandRodKind wandRodKind(ItemStack stack) {
+        return Tc4WandRuntimeAdapter.rodKind(stack);
     }
 
     @Override
