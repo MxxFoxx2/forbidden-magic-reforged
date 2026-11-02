@@ -11,6 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
 import javax.annotation.Nullable;
+import thaumcraft.aspect.AspectList;
 import thaumcraft.wand.focus.FocusItem;
 import thaumcraft.wand.focus.FocusUpgradeType;
 
