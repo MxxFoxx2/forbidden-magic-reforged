@@ -407,7 +407,7 @@ public final class FmGameTests {
 
         ItemStack wand = Wands.create(WandRegistry.CAP_THAUMIUM, WandRegistry.findRod("tainted"), false);
         ContentId fire = ContentId.parse("forbiddenmagic:concept/fire");
-        vis.addWandVis(wand, fire, 200, true);
+        vis.addWandVis(wand, fire, 2, true);
         helper.assertValueEqual(vis.vis(wand, fire), 200,
             "compatibility wand writes use the inherited typed wand Vis capability");
         vis.addRealVis(wand, fire, 75, true);
