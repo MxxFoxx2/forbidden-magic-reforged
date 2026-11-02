@@ -2,14 +2,14 @@ package dev.visfox.forbiddenreforged.integration.tc4;
 
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
 import dev.visfox.forbiddenreforged.core.wand.WitchwoodManaBehavior;
+import dev.visfox.forbiddenreforged.core.wand.WandCapKind;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.fml.ModList;
-import thaumcraft.aspect.Aspect;
 import thaumcraft.wand.RodUpdate;
 import thaumcraft.wand.Wands;
 
@@ -39,24 +39,18 @@ public final class Tc4ArsMagicaManaUpdate implements RodUpdate {
             if (current <= 0.0D) {
                 return;
             }
-            double remaining = current;
-            String cap = Wands.getCap(stack).tag();
-            List<Aspect> toRecharge = new ArrayList<>();
-            for (Aspect aspect : Aspect.getPrimalAspects()) {
-                int deficit = Wands.getMaxVis(stack) - Wands.getVis(stack, aspect);
-                if (deficit <= 0) {
-                    continue;
-                }
-                double cost = WitchwoodManaBehavior.manaCost(staff, cap, deficit);
-                if (remaining > cost) {
-                    remaining -= cost;
-                    toRecharge.add(aspect);
-                }
-            }
+            var wandVis = HostAdapterRegistry.requireWandVis();
+            int maximum = wandVis.maximumVis(stack);
+            List<WitchwoodManaBehavior.VisDeficit> deficits = wandVis.primalAspects().stream()
+                .map(aspect -> new WitchwoodManaBehavior.VisDeficit(
+                    aspect, maximum - wandVis.vis(stack, aspect)))
+                .toList();
+            WitchwoodManaBehavior.RechargePlan plan = WitchwoodManaBehavior.planRecharge(
+                staff, capKind(Wands.getCap(stack).tag()), current, deficits);
             // Debit mana first. If the optional API rejects it, the wand gets no free Vis.
-            if (!toRecharge.isEmpty() && access.setMana(remaining)) {
-                for (Aspect aspect : toRecharge) {
-                    Wands.addVis(stack, aspect, 1, true);
+            if (!plan.aspects().isEmpty() && access.setMana(plan.remainingMana())) {
+                for (var aspect : plan.aspects()) {
+                    wandVis.addVis(stack, aspect, 1, true);
                 }
             }
         } catch (ReflectiveOperationException | LinkageError | RuntimeException error) {
@@ -69,6 +63,14 @@ public final class Tc4ArsMagicaManaUpdate implements RodUpdate {
 
     private static boolean isArsMagicaLoaded() {
         return ModList.get().isLoaded("arsmagicalegacy") || ModList.get().isLoaded("arsmagica2");
+    }
+
+    private static WandCapKind capKind(String tag) {
+        return switch (tag) {
+            case "iron" -> WandCapKind.IRON;
+            case "vinteum" -> WandCapKind.VINTEUM;
+            default -> WandCapKind.OTHER;
+        };
     }
 
     private static ManaAccess manaAccess(Player player) throws ReflectiveOperationException {
