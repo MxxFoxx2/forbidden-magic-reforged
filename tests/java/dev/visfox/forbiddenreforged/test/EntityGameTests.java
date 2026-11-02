@@ -21,7 +21,8 @@ import dev.visfox.forbiddenreforged.FmSpawnerMobs;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.MobCrystalItem;
 import dev.visfox.forbiddenreforged.WrathCageBlock;
-import dev.visfox.forbiddenreforged.WrathCageBlockEntity;
+import dev.visfox.forbiddenreforged.core.block.WrathCageBehavior;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.crafting.CrucibleRecipe;
 import thaumcraft.crafting.InfusionRecipe;
@@ -65,20 +66,21 @@ public final class EntityGameTests {
     public static void wrathCageBlockAndEntity(GameTestHelper helper) {
         BlockPos pos = new BlockPos(5, 4, 5);
         helper.setBlock(pos, FmBlocks.WRATH_CAGE.get().defaultBlockState());
-        WrathCageBlockEntity cage = (WrathCageBlockEntity) helper.getBlockEntity(pos);
+        var cage = helper.getBlockEntity(pos);
         helper.assertTrue(cage != null, "cage creates its block entity");
-        helper.assertTrue(cage != null && cage.getMobId() == null, "a fresh cage is unattuned");
+        var host = HostAdapterRegistry.requireBlockEntities();
+        helper.assertTrue(host.wrathCageMobId(cage) == null, "a fresh cage is unattuned");
         ItemStack zombieCrystal = new ItemStack(FmItems.MOB_CRYSTAL.get());
         MobCrystalItem.setMob(zombieCrystal, "minecraft:zombie");
         helper.assertTrue(WrathCageBlock.attune(cage, zombieCrystal), "a zombie crystal attunes the cage");
-        helper.assertValueEqual(cage.getMobId(), "minecraft:zombie", "the cage keeps the mob id");
+        helper.assertValueEqual(host.wrathCageMobId(cage), "minecraft:zombie", "the cage keeps the mob id");
         helper.assertTrue(MobCrystalItem.mob(zombieCrystal) == null, "attuning an empty cage blanks the crystal");
         ItemStack skeletonCrystal = new ItemStack(FmItems.MOB_CRYSTAL.get());
         MobCrystalItem.setMob(skeletonCrystal, "minecraft:skeleton");
         helper.assertTrue(WrathCageBlock.attune(cage, skeletonCrystal), "a skeleton crystal re-attunes the cage");
-        helper.assertValueEqual(cage.getMobId(), "minecraft:skeleton", "the cage swaps to the new mob");
+        helper.assertValueEqual(host.wrathCageMobId(cage), "minecraft:skeleton", "the cage swaps to the new mob");
         helper.assertValueEqual(MobCrystalItem.mob(skeletonCrystal), "minecraft:zombie", "the held crystal gets the previous mob");
-        ItemStack crystal = WrathCageBlockEntity.crystalForBreak(cage);
+        ItemStack crystal = WrathCageBlock.crystalForBreak(cage);
         helper.assertValueEqual(MobCrystalItem.mob(crystal), "minecraft:skeleton", "breaking the cage yields the attuned crystal");
         helper.destroyBlock(pos);
         ItemEntity dropped = helper.getEntities(EntityType.ITEM, pos, 1.0).stream().findFirst().orElse(null);
@@ -88,12 +90,12 @@ public final class EntityGameTests {
 
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void wrathCageCrystalAndSpawnRules(GameTestHelper helper) {
-        helper.assertFalse(WrathCageBlockEntity.shouldSpawn(true, true, 10, 5, 0), "a powered cage waits");
-        helper.assertTrue(WrathCageBlockEntity.shouldSpawn(false, true, 10, 5, 0), "an attuned fuelled cage spawns");
-        helper.assertFalse(WrathCageBlockEntity.shouldSpawn(false, true, 0, 5, 4), "no fuel and too little essentia waits");
-        helper.assertTrue(WrathCageBlockEntity.shouldSpawn(false, true, 0, 5, 5), "enough essentia starts a fuel cycle");
-        helper.assertFalse(WrathCageBlockEntity.shouldSpawn(false, false, 10, 5, 0), "an unattuned cage waits");
-        helper.assertTrue(WrathCageBlockEntity.shouldSpawn(false, true, 0, 0, 0), "cost 0 needs no fuel");
+        helper.assertFalse(WrathCageBehavior.shouldSpawn(true, true, 10, 5, 0), "a powered cage waits");
+        helper.assertTrue(WrathCageBehavior.shouldSpawn(false, true, 10, 5, 0), "an attuned fuelled cage spawns");
+        helper.assertFalse(WrathCageBehavior.shouldSpawn(false, true, 0, 5, 4), "no fuel and too little essentia waits");
+        helper.assertTrue(WrathCageBehavior.shouldSpawn(false, true, 0, 5, 5), "enough essentia starts a fuel cycle");
+        helper.assertFalse(WrathCageBehavior.shouldSpawn(false, false, 10, 5, 0), "an unattuned cage waits");
+        helper.assertTrue(WrathCageBehavior.shouldSpawn(false, true, 0, 0, 0), "cost 0 needs no fuel");
         helper.succeed();
     }
 
