@@ -34,8 +34,6 @@ import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
-import thaumcraft.entity.boss.ThaumcraftBoss;
-import thaumcraft.wand.Wands;
 
 public final class FmDrops {
     private FmDrops() {

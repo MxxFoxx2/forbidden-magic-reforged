@@ -32,9 +32,6 @@ import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import net.neoforged.neoforge.event.entity.living.LivingExperienceDropEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
-import thaumcraft.aspect.Aspect;
-import thaumcraft.damage.ModDamageTypes;
-import thaumcraft.wand.Wands;
 
 public final class FmEnchantmentEffects {
     private static final TagKey<Block> INFUSED_STONES = TagKey.create(Registries.BLOCK, ForbiddenMagic.id("infused_stones"));
