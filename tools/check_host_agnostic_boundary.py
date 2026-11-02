@@ -11,12 +11,12 @@ NEUTRAL_SCOPES = (
     ROOT / "src/main/java/dev/visfox/forbiddenreforged/integration/runtime",
 )
 FORBIDDEN = (
-    (re.compile(r"\\bimport\\s+(?:static\\s+)?thaumcraft\\."), "Thaumcraft import"),
-    (re.compile(r"\\bthaumcraft\\.[A-Za-z_]"), "fully-qualified Thaumcraft reference"),
-    (re.compile(r"\\bimport\\s+(?:static\\s+)?net\\.neoforged\\."), "NeoForge import"),
-    (re.compile(r"\\bnet\\.neoforged\\.[A-Za-z_]"), "fully-qualified NeoForge reference"),
-    (re.compile(r"dev\\.visfox\\.forbiddenreforged\\.integration\\.tc4"), "concrete TC4 adapter reference"),
-    (re.compile(r"\\bTc4[A-Z][A-Za-z0-9_]*\\b"), "concrete TC4 adapter type"),
+    (re.compile(r"\bimport\s+(?:static\s+)?thaumcraft\."), "Thaumcraft import"),
+    (re.compile(r"\bthaumcraft\.[A-Za-z_]"), "fully-qualified Thaumcraft reference"),
+    (re.compile(r"\bimport\s+(?:static\s+)?net\.neoforged\."), "NeoForge import"),
+    (re.compile(r"\bnet\.neoforged\.[A-Za-z_]"), "fully-qualified NeoForge reference"),
+    (re.compile(r"dev\.visfox\.forbiddenreforged\.integration\.tc4"), "concrete TC4 adapter reference"),
+    (re.compile(r"\bTc4[A-Z][A-Za-z0-9_]*\b"), "concrete TC4 adapter type"),
 )
 
 
