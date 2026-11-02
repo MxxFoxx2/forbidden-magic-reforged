@@ -8,13 +8,15 @@ import thaumcraft.wand.WandKeys;
 import thaumcraft.wand.WandParts;
 import thaumcraft.wand.Wands;
 
+/** Writes canonical semantic rod identifiers into the native TC4 WandParts value. */
 public final class Tc4WandPartsAdapter implements WandPartsAccess {
     public Tc4WandPartsAdapter() {
     }
 
     @Override
     public void setRod(ItemStack wand, ContentId rod) {
+        String rodTag = WandMaterialCatalog.rodTag(rod);
         WandParts parts = Wands.getParts(wand);
-        WandKeys.PARTS.set(wand, new WandParts(parts.cap(), WandMaterialCatalog.rodTag(rod), parts.sceptre()));
+        WandKeys.PARTS.set(wand, new WandParts(parts.cap(), rodTag, parts.sceptre()));
     }
 }
