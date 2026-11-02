@@ -35,20 +35,18 @@ public final class WrathCageBlock extends Block implements EntityBlock {
             return null;
         }
         return (tickLevel, pos, tickState, entity) ->
-            WrathCageBlockEntity.tick(tickLevel, pos, tickState, (WrathCageBlockEntity) entity);
+            HostAdapterRegistry.requireBlockEntities().tickWrathCage(tickLevel, pos, tickState, entity);
     }
 
     @Override
     protected InteractionResult useWithoutItem(
         BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit
     ) {
-        if (!(level.getBlockEntity(pos) instanceof WrathCageBlockEntity cage)) {
+        BlockEntity cage = level.getBlockEntity(pos);
+        if (cage == null || !attune(cage, player.getMainHandItem())) {
             return InteractionResult.PASS;
         }
-        if (attune(cage, player.getMainHandItem())) {
-            return InteractionResult.sidedSuccess(level.isClientSide());
-        }
-        return InteractionResult.PASS;
+        return InteractionResult.sidedSuccess(level.isClientSide());
     }
 
     @Override
@@ -56,7 +54,8 @@ public final class WrathCageBlock extends Block implements EntityBlock {
         ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
         InteractionHand hand, BlockHitResult hit
     ) {
-        if (!(level.getBlockEntity(pos) instanceof WrathCageBlockEntity cage)) {
+        BlockEntity cage = level.getBlockEntity(pos);
+        if (cage == null) {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
         if (attune(cage, stack)) {
@@ -66,7 +65,7 @@ public final class WrathCageBlock extends Block implements EntityBlock {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
         if (!level.isClientSide()) {
-            cage.cycleMode();
+            HostAdapterRegistry.requireBlockEntities().cycleWrathCageMode(cage);
         }
         player.swing(hand);
         return ItemInteractionResult.sidedSuccess(level.isClientSide());
@@ -78,18 +77,28 @@ public final class WrathCageBlock extends Block implements EntityBlock {
         super.onRemove(state, level, pos, newState, isMoving);
     }
 
-    public static boolean attune(WrathCageBlockEntity cage, ItemStack held) {
+    public static boolean attune(BlockEntity cage, ItemStack held) {
         String incoming = MobCrystalItem.mob(held);
         if (incoming == null || !FmSpawnerMobs.ids().contains(incoming)) {
             return false;
         }
-        String previous = cage.getMobId();
-        cage.setMobId(incoming);
+        var host = HostAdapterRegistry.requireBlockEntities();
+        String previous = host.wrathCageMobId(cage);
+        host.setWrathCageMobId(cage, incoming);
         if (previous == null) {
             held.remove(FmComponents.MOB_ID.get());
         } else {
             MobCrystalItem.setMob(held, previous);
         }
         return true;
+    }
+
+    public static ItemStack crystalForBreak(BlockEntity cage) {
+        ItemStack stack = new ItemStack(FmItems.MOB_CRYSTAL.get());
+        String mobId = HostAdapterRegistry.requireBlockEntities().wrathCageMobId(cage);
+        if (mobId != null) {
+            MobCrystalItem.setMob(stack, mobId);
+        }
+        return stack;
     }
 }
