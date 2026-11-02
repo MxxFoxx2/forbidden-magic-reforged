@@ -12,6 +12,7 @@ import dev.visfox.forbiddenreforged.integration.runtime.HostWandInspectionServic
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandVisServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandPartsServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostFocusServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostEssentiaTransportServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostAccessoryServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostTaintBlockServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostEnchantmentEffectServices;
@@ -89,6 +90,10 @@ public final class HostAdapterRegistry {
 
     public static HostFocusServices requireFocus() {
         return capability(HostFocusServices.class, "focus");
+    }
+
+    public static HostEssentiaTransportServices requireEssentiaTransport() {
+        return capability(HostEssentiaTransportServices.class, "essentia transport");
     }
 
     public static HostAccessoryServices requireAccessories() {

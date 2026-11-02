@@ -3,6 +3,9 @@ package dev.visfox.forbiddenreforged;
 import java.util.Objects;
 import dev.visfox.forbiddenreforged.core.block.WrathCageBehavior;
 import dev.visfox.forbiddenreforged.core.block.WrathCageStorage;
+import dev.visfox.forbiddenreforged.core.model.ContentId;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectAdapter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -128,39 +131,36 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
     }
 
     private void drawEssentia(Level level, BlockPos pos) {
-        Aspect mobAspect = mobAspect();
         int cost = FmConfig.wrathCost();
+        var extractionOrder = storage.extractionOrder(cost);
+        if (extractionOrder.isEmpty()) {
+            return;
+        }
+
+        ContentId mobAspectId = Tc4AspectAdapter.toContentId(mobAspect());
+        ContentId wrathAspectId = FmAspects.WRATH == null
+            ? null : Tc4AspectAdapter.toContentId(FmAspects.WRATH);
+        ContentId slothAspectId = FmAspects.SLOTH == null
+            ? null : Tc4AspectAdapter.toContentId(FmAspects.SLOTH);
+        var transport = HostAdapterRegistry.requireEssentiaTransport();
+
         for (Direction direction : Direction.values()) {
-            if (!(level.getBlockEntity(pos.relative(direction)) instanceof EssentiaTransport transport)) {
+            var source = level.getBlockEntity(pos.relative(direction));
+            if (source == null) {
                 continue;
             }
-            Direction side = direction.getOpposite();
-            if (!transport.canOutputTo(side)) {
-                continue;
-            }
-            int mobStored = storage.amount(WrathCageStorage.Channel.MOB);
-            int wrathStored = storage.amount(WrathCageStorage.Channel.WRATH);
-            int slothStored = storage.amount(WrathCageStorage.Channel.SLOTH);
-            if (WrathCageBehavior.canDrawMobEssentia(mobStored, WrathCageStorage.CAPACITY)
-                && transport.takeEssentia(mobAspect, 1, side) == 1) {
-                storage.add(WrathCageStorage.Channel.MOB, 1);
-                sync();
-                return;
-            }
-            if (FmAspects.WRATH != null
-                && WrathCageBehavior.canDrawWrathEssentia(mobStored, wrathStored, WrathCageStorage.CAPACITY, cost)
-                && transport.takeEssentia(FmAspects.WRATH, 1, side) == 1) {
-                storage.add(WrathCageStorage.Channel.WRATH, 1);
-                sync();
-                return;
-            }
-            if (FmAspects.SLOTH != null
-                && WrathCageBehavior.canDrawSlothEssentia(mobStored, wrathStored, slothStored,
-                    WrathCageStorage.CAPACITY, cost)
-                && transport.takeEssentia(FmAspects.SLOTH, 1, side) == 1) {
-                storage.add(WrathCageStorage.Channel.SLOTH, 1);
-                sync();
-                return;
+            Direction outputSide = direction.getOpposite();
+            for (WrathCageStorage.Channel channel : extractionOrder) {
+                ContentId aspect = switch (channel) {
+                    case MOB -> mobAspectId;
+                    case WRATH -> wrathAspectId;
+                    case SLOTH -> slothAspectId;
+                };
+                if (aspect != null && transport.takeOneFromOutput(source, outputSide, aspect)) {
+                    storage.add(channel, 1);
+                    sync();
+                    return;
+                }
             }
         }
     }

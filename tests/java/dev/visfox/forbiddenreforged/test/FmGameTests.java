@@ -104,6 +104,21 @@ public final class FmGameTests {
         helper.assertValueEqual(storage.selectedChannel(), WrathCageStorage.Channel.SLOTH,
             "third display mode selects Sloth");
         helper.assertValueEqual(storage.cycleMode(), 0, "third cycle returns to mob");
+        helper.assertValueEqual(storage.extractionOrder(12),
+            List.of(WrathCageStorage.Channel.MOB, WrathCageStorage.Channel.WRATH,
+                WrathCageStorage.Channel.SLOTH),
+            "empty channels request essentia in mob, Wrath, Sloth order");
+        storage.setAmount(WrathCageStorage.Channel.MOB, 12);
+        helper.assertValueEqual(storage.extractionOrder(12),
+            List.of(WrathCageStorage.Channel.MOB),
+            "Wrath and Sloth extraction pause when mob essentia reaches the fuel threshold");
+        storage.setAmount(WrathCageStorage.Channel.MOB, 0);
+        storage.setAmount(WrathCageStorage.Channel.WRATH, 12);
+        helper.assertValueEqual(storage.extractionOrder(12),
+            List.of(WrathCageStorage.Channel.MOB, WrathCageStorage.Channel.WRATH),
+            "Sloth extraction pauses when Wrath reaches the fuel threshold");
+        helper.assertTrue(storage.extractionOrder(0).isEmpty(),
+            "disabled essentia cost requests no transport");
         helper.succeed();
     }
 
@@ -233,6 +248,12 @@ public final class FmGameTests {
             HostProfile.SupportLevel.PARTIAL, "Hellfire trigger rules are shared but registration remains TC4-specific");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.FOCI_OR_SPELLS).level(),
             HostProfile.SupportLevel.PARTIAL, "Blink Focus lifecycle and rendering remain TC4-bound");
+        helper.assertValueEqual(profile.supportOf(HostProfile.Feature.ESSENTIA_STORAGE).level(),
+            HostProfile.SupportLevel.PARTIAL, "shared storage still relies on TC4 persistence callbacks");
+        helper.assertValueEqual(profile.supportOf(HostProfile.Feature.ESSENTIA_TRANSPORT).level(),
+            HostProfile.SupportLevel.PARTIAL, "transport policy is shared but EssentiaTransport remains host-bound");
+        helper.assertTrue(HostAdapterRegistry.requireEssentiaTransport() != null,
+            "physical essentia pulls use a typed host capability");
         helper.assertTrue(HostAdapterRegistry.requireFocus() != null,
             "focus upgrade inspection and Vis payment are routed through a typed host capability");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.VILLAGER_TRADES).level(),

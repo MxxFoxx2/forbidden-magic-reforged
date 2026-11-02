@@ -1,5 +1,8 @@
 package dev.visfox.forbiddenreforged.core.block;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Host-independent three-channel storage and display selection for the Wrath Cage.
  * Physical Essentia transport and persistence remain in the host block entity.
@@ -54,6 +57,30 @@ public final class WrathCageStorage {
 
     public boolean hasRoom() {
         return mob < CAPACITY || wrath < CAPACITY || sloth < CAPACITY;
+    }
+
+    /**
+     * Returns eligible extraction channels in the legacy mob, Wrath, Sloth order.
+     * The host performs each physical request until one source yields an aspect.
+     */
+    public List<Channel> extractionOrder(int cost) {
+        if (cost <= 0) {
+            return List.of();
+        }
+        List<Channel> order = new ArrayList<>(3);
+        int mobStored = amount(Channel.MOB);
+        int wrathStored = amount(Channel.WRATH);
+        int slothStored = amount(Channel.SLOTH);
+        if (WrathCageBehavior.canDrawMobEssentia(mobStored, CAPACITY)) {
+            order.add(Channel.MOB);
+        }
+        if (WrathCageBehavior.canDrawWrathEssentia(mobStored, wrathStored, CAPACITY, cost)) {
+            order.add(Channel.WRATH);
+        }
+        if (WrathCageBehavior.canDrawSlothEssentia(mobStored, wrathStored, slothStored, CAPACITY, cost)) {
+            order.add(Channel.SLOTH);
+        }
+        return List.copyOf(order);
     }
 
     public int total() {

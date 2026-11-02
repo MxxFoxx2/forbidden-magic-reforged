@@ -33,6 +33,7 @@ import dev.visfox.forbiddenreforged.integration.runtime.HostWandInspectionServic
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandVisServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandPartsServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostFocusServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostEssentiaTransportServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWarpServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostVillagerTradeServices;
 import java.util.EnumMap;
@@ -70,7 +71,7 @@ import net.minecraft.server.level.ServerPlayer;
  * 1.21.1 gameplay integrations remain intact while their extraction into
  * focused host capabilities proceeds incrementally.
  */
-public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, HostWarpServices, HostMorphToolServices, HostBlockEntityServices, HostWandInspectionServices, HostWandVisServices, HostWandPartsServices, HostFocusServices, HostAccessoryServices, HostTaintBlockServices, HostEnchantmentEffectServices, HostScribingServices, HostEntityAspectServices, HostEntityClassificationServices, HostItemFactoryServices, HostItemPropertyServices, HostBootstrapServices, HostVillagerTradeServices {
+public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, HostWarpServices, HostMorphToolServices, HostBlockEntityServices, HostWandInspectionServices, HostWandVisServices, HostWandPartsServices, HostFocusServices, HostEssentiaTransportServices, HostAccessoryServices, HostTaintBlockServices, HostEnchantmentEffectServices, HostScribingServices, HostEntityAspectServices, HostEntityClassificationServices, HostItemFactoryServices, HostItemPropertyServices, HostBootstrapServices, HostVillagerTradeServices {
     public static final Tc4HostAdapter INSTANCE = new Tc4HostAdapter();
 
     private static final String LEGACY_RUNTIME_NOTE =
@@ -140,6 +141,10 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
             "Reads TC4 research difficulty, primal aspects and player aspect pools");
         adapted(support, HostProfile.Feature.BLOCK_ENTITY_IMPLEMENTATION,
             "Creates the 1.21.1 TC4 EssentiaSource/EssentiaTransport Wrath Cage");
+        support.put(HostProfile.Feature.ESSENTIA_STORAGE, HostProfile.FeatureSupport.partial(
+            "Three-channel storage policy is shared; the TC4 block entity still owns persistence and EssentiaSource callbacks"));
+        support.put(HostProfile.Feature.ESSENTIA_TRANSPORT, HostProfile.FeatureSupport.partial(
+            "Extraction priority is shared and physical neighbor pulls use a typed host capability; TC4 EssentiaTransport remains the runtime implementation"));
         adapted(support, HostProfile.Feature.WAND_VIS_STORAGE,
             "Adds semantic aspects to TC4 wand and real Vis stores");
         adapted(support, HostProfile.Feature.ENTITY_ASPECTS,
@@ -241,6 +246,12 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
     @Override
     public WrathCageBlockEntity createWrathCageBlockEntity(BlockPos pos, BlockState state) {
         return new WrathCageBlockEntity(pos, state);
+    }
+
+    @Override
+    public boolean takeOneFromOutput(net.minecraft.world.level.block.entity.BlockEntity source,
+                                     net.minecraft.core.Direction outputSide, ContentId aspect) {
+        return Tc4EssentiaTransportAdapter.takeOneFromOutput(source, outputSide, aspect);
     }
 
     @Override
