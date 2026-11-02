@@ -267,6 +267,34 @@ public final class FmGameTests {
     }
 
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void wrathCageStateAdvancesSpawnDelayInCore(GameTestHelper helper) {
+        WrathCageState state = new WrathCageState();
+        helper.assertValueEqual(state.spawnDelay(), 20,
+            "new cage state retains the legacy initial delay");
+        helper.assertTrue(state.advanceSpawnDelay(),
+            "a positive delay consumes one wait tick");
+        helper.assertValueEqual(state.spawnDelay(), 19,
+            "advancing a wait tick decrements the delay once");
+
+        state.setSpawnDelay(1);
+        helper.assertTrue(state.advanceSpawnDelay(),
+            "the final positive delay tick still defers spawning");
+        helper.assertValueEqual(state.spawnDelay(), 0,
+            "the final wait tick reaches zero");
+        helper.assertTrue(!state.advanceSpawnDelay(),
+            "spawning may proceed on the tick after delay reaches zero");
+        helper.assertValueEqual(state.spawnDelay(), 0,
+            "an elapsed delay stays at zero");
+
+        state.setSpawnDelay(-4);
+        helper.assertTrue(!state.advanceSpawnDelay(),
+            "legacy negative delay values do not create an additional wait");
+        helper.assertValueEqual(state.spawnDelay(), -4,
+            "negative delay values are preserved without normalization");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void wandTriggerCatalogPreservesHellfireDefinition(GameTestHelper helper) {
         var trigger = WandTriggerCatalog.hellfire();
         helper.assertValueEqual(trigger.id(), ContentId.parse("forbiddenmagic:wand_trigger/hellfire"),

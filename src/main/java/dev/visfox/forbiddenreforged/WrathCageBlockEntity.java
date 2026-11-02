@@ -88,8 +88,7 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
         if (cage.cageState.fuel() <= 0 && cost > 0) {
             return;
         }
-        if (cage.cageState.spawnDelay() > 0) {
-            cage.cageState.decrementSpawnDelay();
+        if (cage.cageState.advanceSpawnDelay()) {
             return;
         }
         if (level instanceof ServerLevel serverLevel) {

@@ -65,10 +65,16 @@ public final class WrathCageState {
         this.spawnDelay = spawnDelay;
     }
 
-    public void decrementSpawnDelay() {
-        if (spawnDelay > 0) {
-            spawnDelay--;
+    /**
+     * Advances one active wait tick. Returns true when the caller must defer
+     * spawning for this tick, preserving the legacy one-tick-at-zero boundary.
+     */
+    public boolean advanceSpawnDelay() {
+        if (spawnDelay <= 0) {
+            return false;
         }
+        spawnDelay--;
+        return true;
     }
 
     public boolean slothful() {
