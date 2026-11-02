@@ -2,6 +2,7 @@ package dev.visfox.forbiddenreforged.test;
 
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.core.wand.BlinkFocusCatalog;
+import dev.visfox.forbiddenreforged.core.wand.BlinkFocusCatalog.Presentation;
 import dev.visfox.forbiddenreforged.core.wand.BlinkFocusCatalog.Definition;
 import dev.visfox.forbiddenreforged.core.wand.BlinkFocusRules.Upgrade;
 import dev.visfox.forbiddenreforged.core.wand.BlinkFocusRules.VisCost;
@@ -36,6 +37,14 @@ public final class BlinkFocusCatalogGameTests {
 
         helper.assertValueEqual(BlinkFocusCatalog.definitions(), expected,
             "Blink Focus catalog preserves upgrade identity, texture and Vis aspect costs");
+        helper.assertValueEqual(BlinkFocusCatalog.presentation(),
+            new Presentation(
+                "BL",
+                0x909090,
+                ContentId.parse("forbiddenmagic:item/blink_focus"),
+                ContentId.parse("forbiddenmagic:item/blink_focus_ornament")
+            ),
+            "Blink Focus presentation metadata stays independent of the TC4 item subclass");
         helper.succeed();
     }
 }
