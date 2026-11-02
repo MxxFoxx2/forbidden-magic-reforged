@@ -5,6 +5,7 @@ import dev.visfox.forbiddenreforged.FmWands;
 import dev.visfox.forbiddenreforged.FmWandContractAccess;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
 import dev.visfox.forbiddenreforged.core.wand.WandBehaviors;
+import dev.visfox.forbiddenreforged.core.wand.WitchwoodManaBehavior;
 import dev.visfox.forbiddenreforged.core.wand.WandPartsAccess;
 import dev.visfox.forbiddenreforged.core.wand.WandVisAccess;
 import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
@@ -147,7 +148,7 @@ public final class Tc4WandAdapter {
 
         @Override
         public void onUpdate(ItemStack stack, Player player) {
-            if (player.tickCount % witchwoodRechargeInterval(staff) != 0 || !isArsMagicaLoaded()) return;
+            if (player.tickCount % WitchwoodManaBehavior.rechargeInterval(staff) != 0 || !isArsMagicaLoaded()) return;
             try {
                 ManaAccess access = manaAccess(player);
                 if (access == null) return;
@@ -159,7 +160,7 @@ public final class Tc4WandAdapter {
                 for (Aspect aspect : Aspect.getPrimalAspects()) {
                     int deficit = Wands.getMaxVis(stack) - Wands.getVis(stack, aspect);
                     if (deficit <= 0) continue;
-                    double cost = witchwoodManaCost(staff, cap, deficit);
+                    double cost = WitchwoodManaBehavior.manaCost(staff, cap, deficit);
                     if (remaining > cost) {
                         remaining -= cost;
                         toRecharge.add(aspect);
@@ -229,18 +230,17 @@ public final class Tc4WandAdapter {
         private ManaStaffUpdate() { super(true); }
     }
     public static boolean supportsArsMagicaModId(String modId) {
-        return "arsmagicalegacy".equals(modId) || "arsmagica2".equals(modId);
+        return WitchwoodManaBehavior.supportsArsMagicaModId(modId);
     }
 
     public static boolean isArsMagicaLoaded() {
         return (ModList.get().isLoaded("arsmagicalegacy") || ModList.get().isLoaded("arsmagica2"));
     }
 
-    public static int witchwoodRechargeInterval(boolean staff) { return staff ? 40 : 100; }
+    public static int witchwoodRechargeInterval(boolean staff) { return WitchwoodManaBehavior.rechargeInterval(staff); }
     /** Cost for a full vis point, before partial-deficit scaling. */
     public static float witchwoodManaCost(boolean staff, String capTag) {
-        if (staff) return "vinteum".equals(capTag) ? 50.0F : 100.0F;
-        return "vinteum".equals(capTag) ? 80.0F : 140.0F;
+        return WitchwoodManaBehavior.manaCost(staff, capTag);
     }
 
     /**
@@ -248,8 +248,7 @@ public final class Tc4WandAdapter {
      * point. A nearly full aspect therefore costs less to top up than an empty one.
      */
     public static float witchwoodManaCost(boolean staff, String capTag, int deficit) {
-        if (deficit <= 0) return 0.0F;
-        return witchwoodManaCost(staff, capTag) * Math.min(deficit, 100) / 100.0F;
+        return WitchwoodManaBehavior.manaCost(staff, capTag, deficit);
     }
 
 }
