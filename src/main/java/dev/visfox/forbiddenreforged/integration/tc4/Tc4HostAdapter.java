@@ -95,7 +95,7 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
         adapted(support, HostProfile.Feature.ASPECT_SCAN_TARGETS,
             "Registers scan targets through the existing 1.21.1 AspectSync implementation");
         adapted(support, HostProfile.Feature.RESEARCH_ENTRIES,
-            "Translates shared research definitions to TC4 ResearchItem entries");
+            "Translates shared research definitions, including item/entity/aspect unlock triggers, to TC4 ResearchItem entries");
         support.put(HostProfile.Feature.RESEARCH_STAGES,
             HostProfile.FeatureSupport.partial("The TC4 adapter accepts one page group; multi-stage definitions are rejected"));
         adapted(support, HostProfile.Feature.ARCANE_RECIPES, "Translates shared arcane recipe definitions");
