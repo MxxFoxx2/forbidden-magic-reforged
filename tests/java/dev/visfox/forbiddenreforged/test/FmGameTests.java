@@ -534,25 +534,37 @@ public final class FmGameTests {
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.TAINT_ORIGINS).level(),
             HostProfile.SupportLevel.UNSUPPORTED, "taint origins are explicitly declared unsupported");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.WAND_CAPS).level(),
-            HostProfile.SupportLevel.PARTIAL, "wand cap definitions are shared but registration remains TC4-specific");
+            HostProfile.SupportLevel.ADAPTED, "semantic cap definitions are materialized by the TC4 adapter");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.WAND_RODS).level(),
-            HostProfile.SupportLevel.PARTIAL, "wand rod definitions are shared but callbacks remain TC4-specific");
+            HostProfile.SupportLevel.ADAPTED, "semantic rod definitions and update behavior are wired by the TC4 adapter");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.WAND_PARTS).level(),
-            HostProfile.SupportLevel.PARTIAL, "Profane Wand part mutation still uses TC4 WandParts and WandKeys");
+            HostProfile.SupportLevel.ADAPTED, "the required rod-part mutation is exposed and preserves native cap/sceptre data");
         helper.assertTrue(HostAdapterRegistry.requireWandParts() != null,
             "wand part mutation is exposed through the selected host capability");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.WAND_TRIGGERS).level(),
-            HostProfile.SupportLevel.PARTIAL, "Hellfire trigger rules are shared but registration remains TC4-specific");
+            HostProfile.SupportLevel.ADAPTED, "Hellfire trigger definitions and callbacks are wired by the TC4 adapter");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.FOCI_OR_SPELLS).level(),
-            HostProfile.SupportLevel.PARTIAL, "Blink Focus lifecycle and rendering remain TC4-bound");
+            HostProfile.SupportLevel.ADAPTED, "Blink Focus rules and costs are wired through the native FocusItem lifecycle");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.ESSENTIA_STORAGE).level(),
-            HostProfile.SupportLevel.PARTIAL, "shared storage still relies on TC4 persistence callbacks");
+            HostProfile.SupportLevel.ADAPTED, "shared storage state is persisted by the TC4 block-entity adapter");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.ESSENTIA_TRANSPORT).level(),
-            HostProfile.SupportLevel.PARTIAL, "transport policy is shared but EssentiaTransport remains host-bound");
+            HostProfile.SupportLevel.ADAPTED, "shared extraction policy uses the typed TC4 transport capability");
         helper.assertTrue(HostAdapterRegistry.requireEssentiaTransport() != null,
             "physical essentia pulls use a typed host capability");
         helper.assertTrue(HostAdapterRegistry.requireFocus() != null,
             "focus upgrade inspection and Vis payment are routed through a typed host capability");
+        helper.assertValueEqual(profile.supportOf(HostProfile.Feature.RESEARCH_STAGES).level(),
+            HostProfile.SupportLevel.PARTIAL, "multi-stage research remains explicitly unsupported by this adapter");
+        helper.assertValueEqual(profile.supportOf(HostProfile.Feature.OPTIONAL_ENCHANTMENT_INTEGRATION).level(),
+            HostProfile.SupportLevel.PARTIAL, "the optional Thaumic Tinkerer bridge remains reflective and best-effort");
+        helper.assertValueEqual(profile.supportOf(HostProfile.Feature.CREATIVE_CONTENT).level(),
+            HostProfile.SupportLevel.ADAPTED, "native wand samples are contributed through the creative-content capability");
+        helper.assertTrue(HostAdapterRegistry.requireWandRegistration() != null,
+            "wand and trigger registration are exposed through a dedicated capability");
+        helper.assertTrue(HostAdapterRegistry.requireOptionalEnchantments() != null,
+            "optional enchantment registration is exposed through a dedicated capability");
+        helper.assertTrue(HostAdapterRegistry.requireCreativeContent() != null,
+            "host creative content is exposed through a dedicated capability");
         var scribing = HostAdapterRegistry.requireScribing();
         helper.assertTrue(FmItems.RING_NUTRITION.get() instanceof thaumcraft.platform.Bauble,
             "Ring Nutrition is registered with the host Bauble contract");
