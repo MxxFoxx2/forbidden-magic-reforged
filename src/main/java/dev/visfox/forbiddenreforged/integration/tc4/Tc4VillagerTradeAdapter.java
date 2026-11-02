@@ -1,5 +1,6 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
+import dev.visfox.forbiddenreforged.core.wand.CreativeWandCatalog;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -11,11 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.trading.ItemCost;
 import net.minecraft.world.item.trading.MerchantOffer;
-import thaumcraft.aspect.Aspect;
 import thaumcraft.registry.ModItems;
-import thaumcraft.wand.WandRegistry;
-import thaumcraft.wand.WandRod;
-import thaumcraft.wand.Wands;
 
 /** Owns the Thaumcraft-specific items in the heretic novice trade pool. */
 public final class Tc4VillagerTradeAdapter {
@@ -24,13 +21,9 @@ public final class Tc4VillagerTradeAdapter {
 
     public static void addNoviceTrades(List<VillagerTrades.ItemListing> trades) {
         trades.add(listing(random -> {
-            WandRod rod = WandRegistry.findRod("profane");
-            if (rod == null) {
+            ItemStack wand = Tc4WandAdapter.createCreativeWand(CreativeWandCatalog.profane());
+            if (wand == null) {
                 return null;
-            }
-            ItemStack wand = Wands.create(WandRegistry.CAP_IRON, rod, false);
-            for (Aspect aspect : Aspect.getPrimalAspects()) {
-                Wands.addVis(wand, aspect, 5000, true);
             }
             return offer(Items.EMERALD, randomCount(random, 8, 12), Items.STICK, 1, wand, 1);
         }));
