@@ -1,6 +1,7 @@
 package dev.visfox.forbiddenreforged;
 
 import dev.visfox.forbiddenreforged.core.wand.BlinkFocusBehavior;
+import dev.visfox.forbiddenreforged.core.wand.BlinkFocusRules;
 import java.util.List;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionResult;
@@ -51,29 +52,34 @@ public class BlinkFocusItem extends FocusItem {
 
     @Override
     public AspectList getVisCost(ItemStack focus) {
-        return this.isUpgradedWith(focus, HELLFIRE) ? COST_HELLFIRE : this.isUpgradedWith(focus, PANDEMONIUM) ? COST_PANDEMONIUM : COST_BASE;
+        return switch (BlinkFocusRules.costProfile(
+            this.isUpgradedWith(focus, HELLFIRE), this.isUpgradedWith(focus, PANDEMONIUM))) {
+            case HELLFIRE -> COST_HELLFIRE;
+            case PANDEMONIUM -> COST_PANDEMONIUM;
+            case BASE -> COST_BASE;
+        };
     }
 
     @Override
     public @Nullable FocusUpgradeType[] getPossibleUpgradesByRank(ItemStack focus, int rank) {
-        switch (rank) {
-            case 1:
-                return new FocusUpgradeType[]{FocusUpgradeType.FRUGAL};
-            case 2:
-                return new FocusUpgradeType[]{HELLFIRE, PANDEMONIUM, FocusUpgradeType.FRUGAL};
-            case 3:
-            case 4:
-            case 5:
-                if (this.isUpgradedWith(focus, HELLFIRE)) {
-                    return new FocusUpgradeType[]{FocusUpgradeType.POTENCY, FocusUpgradeType.FRUGAL, FocusUpgradeType.ENLARGE};
-                } else if (this.isUpgradedWith(focus, PANDEMONIUM)) {
-                    return new FocusUpgradeType[]{FocusUpgradeType.FRUGAL, FocusUpgradeType.ENLARGE};
-                } else {
-                    return new FocusUpgradeType[]{FocusUpgradeType.FRUGAL};
-                }
-            default:
-                return null;
+        if (rank < 1 || rank > 5) {
+            return null;
         }
+        boolean hellfire = this.isUpgradedWith(focus, HELLFIRE);
+        boolean pandemonium = this.isUpgradedWith(focus, PANDEMONIUM);
+        return BlinkFocusRules.possibleUpgradesByRank(rank, hellfire, pandemonium).stream()
+            .map(BlinkFocusItem::hostUpgrade)
+            .toArray(FocusUpgradeType[]::new);
+    }
+
+    private static FocusUpgradeType hostUpgrade(BlinkFocusRules.Upgrade upgrade) {
+        return switch (upgrade) {
+            case FRUGAL -> FocusUpgradeType.FRUGAL;
+            case HELLFIRE -> HELLFIRE;
+            case PANDEMONIUM -> PANDEMONIUM;
+            case POTENCY -> FocusUpgradeType.POTENCY;
+            case ENLARGE -> FocusUpgradeType.ENLARGE;
+        };
     }
 
     public static HitResult target(net.minecraft.world.entity.player.Player player) {
