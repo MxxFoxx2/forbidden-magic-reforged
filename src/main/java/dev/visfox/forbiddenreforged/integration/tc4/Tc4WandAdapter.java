@@ -75,7 +75,7 @@ public final class Tc4WandAdapter {
     }
 
     private static WandCap resolveCap(ContentId capId) {
-        String tag = registryKey(capId, "wand_cap/");
+        String tag = WandMaterialCatalog.capTag(capId);
         return switch (tag) {
             case "thaumium" -> WandRegistry.CAP_THAUMIUM;
             case "void" -> WandRegistry.CAP_VOID;
@@ -85,15 +85,7 @@ public final class Tc4WandAdapter {
     }
 
     private static WandRod resolveRod(ContentId rodId) {
-        return WandRegistry.findRod(registryKey(rodId, "wand_rod/"));
-    }
-
-    private static String registryKey(ContentId id, String prefix) {
-        if (!"forbiddenmagic".equals(id.namespace()) || !id.path().startsWith(prefix)
-            || id.path().length() == prefix.length()) {
-            throw new IllegalArgumentException("Unsupported creative wand identifier: " + id);
-        }
-        return id.path().substring(prefix.length());
+        return WandRegistry.findRod(WandMaterialCatalog.rodTag(rodId));
     }
 
     private static ResourceLocation hostId(ContentId id) {
