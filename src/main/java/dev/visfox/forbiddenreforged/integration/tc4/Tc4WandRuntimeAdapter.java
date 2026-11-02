@@ -8,10 +8,6 @@ public final class Tc4WandRuntimeAdapter {
     private Tc4WandRuntimeAdapter() {
     }
 
-    public static boolean isWand(ItemStack wand) {
-        return Wands.isWand(wand);
-    }
-
     public static WandRodKind rodKind(ItemStack wand) {
         if (!Wands.isWand(wand)) {
             return WandRodKind.NONE;
