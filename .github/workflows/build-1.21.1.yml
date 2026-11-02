@@ -48,6 +48,10 @@ jobs:
             forbidden-magic-reforged/gradle/wrapper/gradle-wrapper.properties
             thaumcraft-4-reforged/gradle/wrapper/gradle-wrapper.properties
 
+      - name: Check host-agnostic architecture boundary
+        working-directory: forbidden-magic-reforged
+        run: python tools/check_host_agnostic_boundary.py
+
       - name: Prepare pinned host and apply local patches
         working-directory: forbidden-magic-reforged
         run: python tools/prepare_host.py
