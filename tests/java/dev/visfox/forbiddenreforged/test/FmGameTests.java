@@ -38,6 +38,8 @@ import dev.visfox.forbiddenreforged.WrathCageBlockEntity;
 import dev.visfox.forbiddenreforged.core.block.WrathCageBehavior;
 import dev.visfox.forbiddenreforged.core.block.WrathCageStorage;
 import dev.visfox.forbiddenreforged.core.block.WrathCageState;
+import dev.visfox.forbiddenreforged.core.block.WrathCageSpawnBehavior;
+import net.minecraft.world.phys.AABB;
 import dev.visfox.forbiddenreforged.core.wand.WitchwoodManaBehavior;
 import dev.visfox.forbiddenreforged.core.wand.BlinkFocusRules;
 import dev.visfox.forbiddenreforged.core.wand.WandMaterialCatalog;
@@ -291,6 +293,38 @@ public final class FmGameTests {
             "legacy negative delay values do not create an additional wait");
         helper.assertValueEqual(state.spawnDelay(), -4,
             "negative delay values are preserved without normalization");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void wrathCageSpawnBehaviorPreservesRuntimeLimitsAndBounds(GameTestHelper helper) {
+        helper.assertTrue(WrathCageSpawnBehavior.shouldAttemptSpawn(0, 0, 0),
+            "free-spawn mode permits the first attempt without fuel");
+        helper.assertTrue(WrathCageSpawnBehavior.shouldAttemptSpawn(2, 0, 0),
+            "free-spawn mode permits all three configured attempts");
+        helper.assertTrue(!WrathCageSpawnBehavior.shouldAttemptSpawn(3, 0, 0),
+            "a spawn round is limited to three attempts");
+        helper.assertTrue(!WrathCageSpawnBehavior.shouldAttemptSpawn(0, 0, 12),
+            "paid spawning requires loaded fuel");
+        helper.assertTrue(WrathCageSpawnBehavior.shouldAttemptSpawn(0, 1, 12),
+            "loaded fuel permits a paid spawn attempt");
+        helper.assertTrue(!WrathCageSpawnBehavior.shouldAttemptSpawn(3, 1, 12),
+            "fuel does not bypass the per-round attempt limit");
+
+        helper.assertTrue(!WrathCageSpawnBehavior.hasReachedEntityLimit(5),
+            "five matching nearby entities remain below the cap");
+        helper.assertTrue(WrathCageSpawnBehavior.hasReachedEntityLimit(6),
+            "six matching nearby entities reach the cap");
+        helper.assertTrue(WrathCageSpawnBehavior.hasReachedEntityLimit(7),
+            "an already exceeded entity cap still blocks further spawns");
+
+        AABB bounds = WrathCageSpawnBehavior.nearbyBounds(new BlockPos(10, 20, 30));
+        helper.assertValueEqual(bounds.minX, 6.0, "nearby bounds extend four blocks west");
+        helper.assertValueEqual(bounds.minY, 19.0, "nearby bounds extend one block down");
+        helper.assertValueEqual(bounds.minZ, 26.0, "nearby bounds extend four blocks north");
+        helper.assertValueEqual(bounds.maxX, 15.0, "nearby bounds extend five blocks east");
+        helper.assertValueEqual(bounds.maxY, 22.0, "nearby bounds extend two blocks up");
+        helper.assertValueEqual(bounds.maxZ, 35.0, "nearby bounds extend five blocks south");
         helper.succeed();
     }
 
