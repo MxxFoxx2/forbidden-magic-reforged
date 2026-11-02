@@ -1,8 +1,8 @@
-package dev.visfox.forbiddenreforged;
+package dev.visfox.forbiddenreforged.integration.tc4;
 
-import net.minecraft.server.level.ServerPlayer;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -11,12 +11,11 @@ import net.minecraft.world.level.Level;
 import thaumcraft.item.ScribingToolsItem;
 
 /**
- * Original Forbidden Magic Crystalwell: a finite scribing tool that either
- * generates a small amount of primal research knowledge in easy mode or
- * converts into a spent inkwell after yielding a full set of primal aspects.
+ * TC4 scribing-table item shell for the Crystalwell.
+ * Research rules and semantic aspect-pool updates are delegated to host services.
  */
-public final class CrystalwellItem extends ScribingToolsItem {
-    public CrystalwellItem(Properties properties) {
+public final class Tc4CrystalwellItem extends ScribingToolsItem {
+    public Tc4CrystalwellItem(Properties properties) {
         super(properties.stacksTo(1));
     }
 

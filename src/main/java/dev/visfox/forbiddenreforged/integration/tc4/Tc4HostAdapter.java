@@ -2,9 +2,6 @@ package dev.visfox.forbiddenreforged.integration.tc4;
 
 import dev.visfox.forbiddenreforged.FmAspectTags;
 import dev.visfox.forbiddenreforged.MorphToolItem;
-import dev.visfox.forbiddenreforged.RingNutritionItem;
-import dev.visfox.forbiddenreforged.CrystalwellItem;
-import dev.visfox.forbiddenreforged.PrimewellItem;
 import dev.visfox.forbiddenreforged.BlinkFocusItem;
 import dev.visfox.forbiddenreforged.SubCollarItem;
 import dev.visfox.forbiddenreforged.WrathCageBlockEntity;
@@ -451,17 +448,17 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
 
     @Override
     public Item createRingNutrition(Item.Properties properties) {
-        return new RingNutritionItem(properties);
+        return new Tc4RingNutritionItem(properties);
     }
 
     @Override
     public Item createCrystalwell(Item.Properties properties) {
-        return new CrystalwellItem(properties);
+        return new Tc4CrystalwellItem(properties);
     }
 
     @Override
     public Item createPrimewell(Item.Properties properties) {
-        return new PrimewellItem(properties);
+        return new Tc4PrimewellItem(properties);
     }
 
     @Override

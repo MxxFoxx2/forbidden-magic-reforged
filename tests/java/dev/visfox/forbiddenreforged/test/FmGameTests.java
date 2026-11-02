@@ -487,6 +487,12 @@ public final class FmGameTests {
         helper.assertTrue(HostAdapterRegistry.requireFocus() != null,
             "focus upgrade inspection and Vis payment are routed through a typed host capability");
         var scribing = HostAdapterRegistry.requireScribing();
+        helper.assertTrue(FmItems.RING_NUTRITION.get() instanceof thaumcraft.platform.Bauble,
+            "Ring Nutrition is registered with the host Bauble contract");
+        helper.assertTrue(FmItems.CRYSTALWELL.get() instanceof thaumcraft.item.ScribingToolsItem,
+            "Crystalwell is registered as a host scribing tool");
+        helper.assertTrue(FmItems.PRIMEWELL.get() instanceof thaumcraft.item.ScribingToolsItem,
+            "Primewell is registered as a host scribing tool");
         var entityAspects = HostAdapterRegistry.requireEntityAspects()
             .aspectCatalog(FmConfig.silverfishEmeralds());
         helper.assertValueEqual(entityAspects.get(ContentId.parse("minecraft:zombie")),
