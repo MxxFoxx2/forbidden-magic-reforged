@@ -28,7 +28,8 @@ public final class Tc4WandTriggerAdapter {
 
         @Override
         public boolean researchComplete(Player player, ContentId research) {
-            return ResearchManager.isComplete(player, research.path().toUpperCase(java.util.Locale.ROOT));
+            return ResearchManager.isComplete(player, research.path()
+                .substring(research.path().lastIndexOf('/') + 1).toUpperCase(java.util.Locale.ROOT));
         }
 
         @Override
@@ -50,7 +51,7 @@ public final class Tc4WandTriggerAdapter {
         WandTriggers.register(
             state -> blocks.contains(state.getBlock()),
             (level, wand, player, position, side) ->
-                HellfireWandBehavior.ignite(level, wand, player, position, side, ACCESS)
+                HellfireWandBehavior.ignite(level, wand, player, position, side, definition, ACCESS)
         );
     }
 }
