@@ -2,13 +2,13 @@
 
 ## Последний успешный runtime CI
 
-- Проверенный коммит: [`74a6dcd`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/74a6dcd0e31d7c222ce2198475658e997d295e6e).
-- [Java CI with Gradle #40566141998](https://github.com/MxxFoxx2/forbidden-magic-reforged/actions/runs/40566141998) завершился успешно 27 октября 2026 года.
+- Проверенный коммит: [`24684ce`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/24684ce2770cf3d62a7a2f76ea75929485b6f29b).
+- [Java CI with Gradle #419](https://github.com/MxxFoxx2/forbidden-magic-reforged/actions/runs/41369810689) завершился успешно 2 ноября 2026 года.
 - Хост закреплён на upstream `604767636dc318a6d81f1abb8a8a2d3e5ec3298a` (1.1.2); host patch подготовлен через `tools/prepare_host.py`, сборка использует Gradle composite build вместо локального Maven publish.
-- Сборка хоста, сборка аддона и проверка provenance завершились успешно.
-- С `no_lust=false`: **97/97** required GameTests passed; `luxuria=luxuria`.
-- С `no_lust=true`: **97/97** required GameTests passed; `luxuria=null`.
-- Опубликованный релиз: rolling [`26.3`](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/26.3). Сборка и тесты headless не заменяют ручные проверки клиента и реального геймплея.
+- Сборка хоста, сборка аддона, проверка provenance и generated-resource freshness завершились успешно.
+- С `no_lust=false`: **111/111** required GameTests passed; `luxuria=luxuria`.
+- С `no_lust=true`: **111/111** required GameTests passed; `luxuria=null`.
+- Опубликован мажорный релиз [`2.0.0 (NeoForge 26.3)`](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/release/26.3); JAR: [`forbidden-magic-2.0.0-26.3.jar`](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/download/release/26.3/forbidden-magic-2.0.0-26.3.jar). Сборка и тесты headless не заменяют ручные проверки клиента и реального геймплея.
 
 ## Host-agnostic architecture — 2.0.0
 
