@@ -178,6 +178,8 @@ public final class FmGameTests {
             HostProfile.SupportLevel.PARTIAL, "wand rod definitions are shared but callbacks remain TC4-specific");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.WAND_PARTS).level(),
             HostProfile.SupportLevel.PARTIAL, "Profane Wand part mutation still uses TC4 WandParts and WandKeys");
+        helper.assertTrue(HostAdapterRegistry.requireWandParts() != null,
+            "wand part mutation is exposed through the selected host capability");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.WAND_TRIGGERS).level(),
             HostProfile.SupportLevel.PARTIAL, "Hellfire trigger rules are shared but registration remains TC4-specific");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.VILLAGER_TRADES).level(),
