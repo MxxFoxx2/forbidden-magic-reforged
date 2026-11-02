@@ -88,7 +88,7 @@ public final class FmToolEvents {
             }
         }
         for (int dose = 0; dose < doses; dose++) {
-            VisStorage.addRealVis(collar, TAINTED_PRIMALS[random.nextInt(TAINTED_PRIMALS.length)], 1, true);
+            HostAdapterRegistry.requireWandVis().addRealVis(collar, TAINTED_PRIMALS[random.nextInt(TAINTED_PRIMALS.length)], 1, true);
         }
     }
 
@@ -147,7 +147,8 @@ public final class FmToolEvents {
     }
 
     public static boolean hasNutritionRingInRingSlot(Player player) {
-        return hasNutritionRingInRingSlots(Baubles.get(player, 1), Baubles.get(player, 2));
+        return hasNutritionRingInRingSlots(HostAdapterRegistry.requireAccessories().accessory(player, 1),
+            HostAdapterRegistry.requireAccessories().accessory(player, 2));
     }
 
     public static boolean hasNutritionRingInRingSlots(ItemStack firstRingSlot, ItemStack secondRingSlot) {

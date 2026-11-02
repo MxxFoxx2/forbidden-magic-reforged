@@ -19,7 +19,7 @@ public final class TaintShovelItem extends Item {
     @Override
     public float getDestroySpeed(ItemStack stack, BlockState state) {
         var host = HostAdapterRegistry.requireTaintBlocks();
-        if (host.isTaintMaterial(state)) {
+        if (host.isTaintMaterial(state) || state.is(FmBlocks.TAINT_LEAVES.get())) {
             return host.taintShovelMiningSpeed();
         }
         return super.getDestroySpeed(stack, state);

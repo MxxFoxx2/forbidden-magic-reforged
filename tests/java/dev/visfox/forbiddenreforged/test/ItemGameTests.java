@@ -691,10 +691,13 @@ public final class ItemGameTests {
         helper.assertFalse(FmToolEvents.restoresTaintedVis(infernalWand, true),
             "Infernal Wand does not use the Tainted Wand reaction");
 
-        List<Aspect> restored = FmToolEvents.taintedVisRolls(RandomSource.create(42L));
+        List<dev.visfox.forbiddenreforged.core.model.ContentId> restored =
+            FmToolEvents.taintedVisRolls(RandomSource.create(42L));
         helper.assertValueEqual(restored.size(), 3, "taint damage makes three independent primal-aspect rolls");
-        for (Aspect aspect : restored) {
-            helper.assertTrue(aspect.isPrimal(), "every restored aspect must be primal");
+        for (var aspect : restored) {
+            helper.assertTrue(aspect.namespace().equals("thaumcraft")
+                    && List.of("perditio", "ordo", "ignis", "aqua", "terra", "aer").contains(aspect.path()),
+                "every restored semantic aspect must identify a TC4 primal aspect");
         }
         helper.succeed();
     }
