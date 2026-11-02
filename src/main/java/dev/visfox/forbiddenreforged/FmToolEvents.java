@@ -88,7 +88,7 @@ public final class FmToolEvents {
             }
         }
         for (int dose = 0; dose < doses; dose++) {
-            HostAdapterRegistry.requireWandVis().addRealVis(collar, TAINTED_PRIMALS[random.nextInt(TAINTED_PRIMALS.length)], 1, true);
+            HostAdapterRegistry.requireWandVis().addItemRealVis(collar, TAINTED_PRIMALS[random.nextInt(TAINTED_PRIMALS.length)], 1, true);
         }
     }
 
