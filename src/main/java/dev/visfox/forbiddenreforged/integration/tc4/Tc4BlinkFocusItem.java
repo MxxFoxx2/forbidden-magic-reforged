@@ -1,6 +1,7 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
-import dev.visfox.forbiddenreforged.ForbiddenMagic;
+import dev.visfox.forbiddenreforged.core.model.ContentId;
+import dev.visfox.forbiddenreforged.core.wand.BlinkFocusCatalog;
 import dev.visfox.forbiddenreforged.core.wand.BlinkFocusBehavior;
 import dev.visfox.forbiddenreforged.core.wand.BlinkFocusRules;
 import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
@@ -16,6 +17,8 @@ import thaumcraft.wand.focus.FocusItem;
 import thaumcraft.wand.focus.FocusUpgradeType;
 
 public final class Tc4BlinkFocusItem extends FocusItem {
+    private static final BlinkFocusCatalog.Presentation PRESENTATION = BlinkFocusCatalog.presentation();
+
     public static final FocusUpgradeType HELLFIRE = Tc4FocusUpgradeTypes.HELLFIRE;
     public static final FocusUpgradeType PANDEMONIUM = Tc4FocusUpgradeTypes.PANDEMONIUM;
 
@@ -25,22 +28,26 @@ public final class Tc4BlinkFocusItem extends FocusItem {
 
     @Override
     public String getSortingHelper(ItemStack focus) {
-        return "BL" + super.getSortingHelper(focus);
+        return PRESENTATION.sortingPrefix() + super.getSortingHelper(focus);
     }
 
     @Override
     public int getFocusColor(ItemStack focus) {
-        return 0x909090;
+        return PRESENTATION.color();
     }
 
     @Override
     public @Nullable ResourceLocation getFocusTexture(ItemStack focus) {
-        return ForbiddenMagic.id("item/blink_focus");
+        return hostLocation(PRESENTATION.focusTexture());
     }
 
     @Override
     public @Nullable ResourceLocation getOrnamentTexture(ItemStack focus) {
-        return ForbiddenMagic.id("item/blink_focus_ornament");
+        return hostLocation(PRESENTATION.ornamentTexture());
+    }
+
+    private static ResourceLocation hostLocation(ContentId id) {
+        return ResourceLocation.fromNamespaceAndPath(id.namespace(), id.path());
     }
 
     @Override
