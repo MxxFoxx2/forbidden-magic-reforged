@@ -2,9 +2,7 @@ package dev.visfox.forbiddenreforged.test;
 
 import com.google.gson.JsonArray;
 import dev.visfox.forbiddenreforged.BlinkFocusItem;
-import dev.visfox.forbiddenreforged.CrystalwellItem;
 import dev.visfox.forbiddenreforged.FmVillagers;
-import dev.visfox.forbiddenreforged.PrimewellItem;
 import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.item.Rarity;
@@ -68,6 +66,8 @@ import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.neoforged.fml.ModList;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4CrystalwellItem;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4PrimewellItem;
 import dev.visfox.forbiddenreforged.FmAspects;
 import dev.visfox.forbiddenreforged.FmComponents;
 import dev.visfox.forbiddenreforged.FmDrops;
@@ -496,7 +496,7 @@ public final class ItemGameTests {
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void crystalwellIsAScribingToolWithOriginalDurability(GameTestHelper helper) {
         ItemStack stack = new ItemStack(FmItems.CRYSTALWELL.get());
-        helper.assertTrue(stack.getItem() instanceof CrystalwellItem, "crystalwell uses its behavior item");
+        helper.assertTrue(stack.getItem() instanceof Tc4CrystalwellItem, "crystalwell uses its behavior item");
         helper.assertTrue(stack.getItem() instanceof ScribingToolsItem, "crystalwell can occupy the research table scribe slot");
         int expectedMaxDamage = ResearchConfig.RESEARCH_DIFFICULTY == -1 ? 50 : 100;
         helper.assertValueEqual(stack.getMaxDamage(), expectedMaxDamage, "crystalwell durability follows research difficulty");
@@ -507,7 +507,7 @@ public final class ItemGameTests {
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void primewellIsAPermanentEpicScribingTool(GameTestHelper helper) {
         ItemStack stack = new ItemStack(FmItems.PRIMEWELL.get());
-        helper.assertTrue(stack.getItem() instanceof PrimewellItem, "primewell uses its behavior item");
+        helper.assertTrue(stack.getItem() instanceof Tc4PrimewellItem, "primewell uses its behavior item");
         helper.assertTrue(stack.getItem() instanceof ScribingToolsItem, "primewell can occupy the research table scribe slot");
         helper.assertValueEqual(stack.getRarity(), Rarity.EPIC, "primewell retains epic rarity");
         helper.assertTrue(stack.getMaxDamage() > 1_000_000_000, "primewell does not wear out during research");
