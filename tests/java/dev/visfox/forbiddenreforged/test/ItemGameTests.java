@@ -2,6 +2,7 @@ package dev.visfox.forbiddenreforged.test;
 
 import com.google.gson.JsonArray;
 import dev.visfox.forbiddenreforged.core.wand.BlinkFocusBehavior;
+import dev.visfox.forbiddenreforged.core.wand.WandRodKind;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4BlinkFocusItem;
 import dev.visfox.forbiddenreforged.FmVillagers;
 import net.minecraft.world.entity.npc.VillagerTrades;
@@ -482,15 +483,15 @@ public final class ItemGameTests {
 
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void wandTooltipKindsPreserveOriginalHints(GameTestHelper helper) {
-        helper.assertValueEqual(FmToolEvents.wandTooltipKind("neutronium"), "creativeonly",
+        helper.assertValueEqual(FmToolEvents.wandTooltipKind(WandRodKind.NEUTRONIUM), "creativeonly",
             "neutronium wand exposes the creative-only tooltip");
-        helper.assertValueEqual(FmToolEvents.wandTooltipKind("neutronium_staff"), "creativeonly",
+        helper.assertValueEqual(FmToolEvents.wandTooltipKind(WandRodKind.NEUTRONIUM), "creativeonly",
             "neutronium staff exposes the creative-only tooltip");
-        helper.assertValueEqual(FmToolEvents.wandTooltipKind("profane"), "profane_contract",
+        helper.assertValueEqual(FmToolEvents.wandTooltipKind(WandRodKind.PROFANE), "profane_contract",
             "profane wand exposes its contract tooltip");
-        helper.assertValueEqual(FmToolEvents.wandTooltipKind("profaned"), "profane_contract",
+        helper.assertValueEqual(FmToolEvents.wandTooltipKind(WandRodKind.PROFANE), "profane_contract",
             "profaned wand exposes the contract tooltip");
-        helper.assertValueEqual(FmToolEvents.wandTooltipKind("greatwood"), "",
+        helper.assertValueEqual(FmToolEvents.wandTooltipKind(WandRodKind.OTHER), "",
             "ordinary rods do not receive special wand tooltips");
         helper.assertValueEqual(FmToolEvents.wandTooltipKind(new ItemStack(Items.STICK)), "",
             "non-wand items do not receive wand-specific tooltips");
