@@ -26,7 +26,7 @@ public final class BlinkFocusCatalog {
             Upgrade.HELLFIRE,
             "hellfire",
             ContentId.parse("forbiddenmagic:textures/misc/hellfire.png"),
-            List.of(new VisCost(ContentId.parse("forbiddenmagic:concept/infernus"), 1))
+            List.of(new VisCost(ContentId.parse("forbiddenmagic:infernus"), 1))
         ),
         new Definition(
             Upgrade.PANDEMONIUM,
