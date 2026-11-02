@@ -1,6 +1,5 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
-import dev.visfox.forbiddenreforged.WrathCageBlockEntity;
 import dev.visfox.forbiddenreforged.core.aspect.AspectDefinition;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.core.wand.BlinkFocusRules;
@@ -35,6 +34,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.npc.VillagerTrades;
 import java.util.Map;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
@@ -237,8 +237,37 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
     }
 
     @Override
-    public WrathCageBlockEntity createWrathCageBlockEntity(BlockPos pos, BlockState state) {
-        return new WrathCageBlockEntity(pos, state);
+    public BlockEntity createWrathCageBlockEntity(BlockPos pos, BlockState state) {
+        return new Tc4WrathCageBlockEntity(pos, state);
+    }
+
+    @Override
+    public String wrathCageMobId(BlockEntity cage) {
+        return requireWrathCage(cage).getMobId();
+    }
+
+    @Override
+    public void setWrathCageMobId(BlockEntity cage, String mobId) {
+        requireWrathCage(cage).setMobId(mobId);
+    }
+
+    @Override
+    public void cycleWrathCageMode(BlockEntity cage) {
+        requireWrathCage(cage).cycleMode();
+    }
+
+    @Override
+    public void tickWrathCage(Level level, BlockPos pos, BlockState state, BlockEntity cage) {
+        Tc4WrathCageBlockEntity.tick(level, pos, state, requireWrathCage(cage));
+    }
+
+    private static Tc4WrathCageBlockEntity requireWrathCage(BlockEntity cage) {
+        if (cage instanceof Tc4WrathCageBlockEntity tc4Cage) {
+            return tc4Cage;
+        }
+        throw new IllegalArgumentException(
+            "Expected a Thaumcraft-backed Wrath Cage block entity, got " + cage.getClass().getName()
+        );
     }
 
     @Override
