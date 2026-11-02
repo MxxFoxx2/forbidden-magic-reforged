@@ -114,10 +114,10 @@ public final class FmGameTests {
             WrathCageStorage.Channel.WRATH, "Wrath aspect maps to the Wrath storage channel");
         helper.assertValueEqual(storage.channelFor(slothAspect, mobAspect, wrathAspect, slothAspect),
             WrathCageStorage.Channel.SLOTH, "Sloth aspect maps to the Sloth storage channel");
-        helper.assertValueEqual(storage.channelFor(ContentId.parse("minecraft:stone"), mobAspect, wrathAspect, slothAspect),
-            null, "unrelated semantic aspects do not map to cage storage");
-        helper.assertValueEqual(storage.channelFor(wrathAspect, mobAspect, null, null),
-            null, "unavailable optional aspects are not accepted");
+        helper.assertTrue(storage.channelFor(ContentId.parse("minecraft:stone"), mobAspect, wrathAspect, slothAspect) == null,
+            "unrelated semantic aspects do not map to cage storage");
+        helper.assertTrue(storage.channelFor(wrathAspect, mobAspect, null, null) == null,
+            "unavailable optional aspects are not accepted");
 
         WrathCageStorage extractionStorage = new WrathCageStorage();
         helper.assertValueEqual(extractionStorage.extractionOrder(12),
