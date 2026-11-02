@@ -2,7 +2,9 @@ package dev.visfox.forbiddenreforged.integration.api;
 
 import dev.visfox.forbiddenreforged.integration.runtime.HostItemFactoryServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostItemPropertyServices;
-import dev.visfox.forbiddenreforged.integration.runtime.HostBootstrapServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostWandRegistrationServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostOptionalEnchantmentServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostCreativeContentServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostEntityAspectServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostEntityClassificationServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostAspectServices;
@@ -136,11 +138,19 @@ public final class HostAdapterRegistry {
         return capability(HostItemFactoryServices.class, "item factories");
     }
 
-    /**
-     * Returns host-specific startup, trigger, and creative-tab services.
-     */
-    public static HostBootstrapServices requireBootstrap() {
-        return capability(HostBootstrapServices.class, "bootstrap");
+    /** Returns host-specific wand material and trigger registration. */
+    public static HostWandRegistrationServices requireWandRegistration() {
+        return capability(HostWandRegistrationServices.class, "wand registration");
+    }
+
+    /** Returns the optional enchantment bridge when the selected host supports it. */
+    public static HostOptionalEnchantmentServices requireOptionalEnchantments() {
+        return capability(HostOptionalEnchantmentServices.class, "optional enchantments");
+    }
+
+    /** Returns host-backed content contributed to the shared creative tab. */
+    public static HostCreativeContentServices requireCreativeContent() {
+        return capability(HostCreativeContentServices.class, "creative content");
     }
 
     /** Returns host-specific trades for the Forbidden Magic heretic profession. */
