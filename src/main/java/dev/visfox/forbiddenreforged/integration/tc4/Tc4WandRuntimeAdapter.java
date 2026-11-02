@@ -3,7 +3,6 @@ package dev.visfox.forbiddenreforged.integration.tc4;
 import dev.visfox.forbiddenreforged.core.wand.WandRodKind;
 import net.minecraft.world.item.ItemStack;
 import thaumcraft.wand.Wands;
-import org.jetbrains.annotations.Nullable;
 
 public final class Tc4WandRuntimeAdapter {
     private Tc4WandRuntimeAdapter() {
