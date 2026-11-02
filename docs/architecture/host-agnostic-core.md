@@ -20,7 +20,7 @@ The shared core owns:
 
 - `ContentId` and symbolic host content references.
 - Aspect, recipe, and research definitions/catalogs.
-- Shared wand behavior rules and narrow access contracts.
+- Shared wand behavior rules and narrow access contracts, including Blink Focus targeting, teleport effects, and upgrade behavior.
 - Semantic warp kinds and access contracts.
 
 The core may use Minecraft runtime types where behavior necessarily operates on Minecraft objects, such as `ItemStack`, entities, and levels. It must not import Thaumcraft or NeoForge implementation APIs, or refer to the concrete TC4 adapter.
@@ -43,7 +43,7 @@ These contracts may expose Minecraft/NeoForge runtime types required by the 1.21
 
 The concrete layer owns conversions between semantic identifiers and TC4 values, TC4 aspect/recipe/research registration, wand and Vis calls, Baubles, taint damage, special mining, Thaumcraft entity classification, TC4 item properties/factories, and warp-pool mapping.
 
-The original 1.21.1 gameplay implementation is retained for legacy features that are not fully migrated yet. Existing compatibility facades such as `FmAspects` remain transitional; they are not part of the semantic core.
+The original 1.21.1 gameplay implementation is retained for legacy features that are not fully migrated yet. `BlinkFocusItem` remains the TC4 `FocusItem` integration wrapper, while targeting, destination calculation, teleport effects, and upgrade-specific combat behavior are delegated to the shared `core/wand/BlinkFocusBehavior`. Existing compatibility facades such as `FmAspects` remain transitional; they are not part of the semantic core.
 
 ## Current capability status
 
