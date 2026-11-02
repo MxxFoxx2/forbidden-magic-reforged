@@ -5,6 +5,7 @@ import dev.visfox.forbiddenreforged.ForbiddenMagic;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.core.recipe.ForbiddenMagicRecipeCatalog;
 import dev.visfox.forbiddenreforged.core.research.ForbiddenMagicResearchCatalog;
+import java.util.List;
 import thaumcraft.aspect.Aspect;
 
 public final class Tc4BootstrapAdapter {

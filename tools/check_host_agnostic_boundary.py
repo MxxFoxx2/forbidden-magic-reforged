@@ -28,7 +28,8 @@ FORBIDDEN_HOST = (
     (re.compile(r"\bTc4[A-Z][A-Za-z0-9_]*\b"), "concrete TC4 adapter type"),
 )
 COMPOSITION_ROOT_ALLOWLIST = {
-    "import dev.visfox.forbiddenreforged.integration.tc4.Tc4HostAdapter;"
+    "import dev.visfox.forbiddenreforged.integration.tc4.Tc4HostAdapter;",
+    "HostAdapterRegistry.install(Tc4HostAdapter.INSTANCE);"
 }
 
 
