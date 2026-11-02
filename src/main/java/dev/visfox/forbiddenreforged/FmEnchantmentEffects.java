@@ -256,7 +256,7 @@ public final class FmEnchantmentEffects {
                     .isTaintDamage(event.getSource());
                 if (FmToolEvents.restoresTaintedVis(held, taintDamage)) {
                     for (var aspect : FmToolEvents.taintedVisRolls(wearer.getRandom())) {
-                        HostAdapterRegistry.requireWandVis().addWandVis(held, aspect, 1, true);
+                        HostAdapterRegistry.requireWandVis().addVis(held, aspect, 1, true);
                     }
                 }
             }
