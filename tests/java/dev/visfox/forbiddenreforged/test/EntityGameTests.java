@@ -17,6 +17,7 @@ import dev.visfox.forbiddenreforged.FmAspects;
 import dev.visfox.forbiddenreforged.FmBlocks;
 import dev.visfox.forbiddenreforged.FmItems;
 import dev.visfox.forbiddenreforged.FmSpawnerMobs;
+import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.MobCrystalItem;
 import dev.visfox.forbiddenreforged.WrathCageBlock;
 import dev.visfox.forbiddenreforged.WrathCageBlockEntity;
@@ -38,12 +39,15 @@ public final class EntityGameTests {
 
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void mobCrystalAndSpawnTable(GameTestHelper helper) {
-        helper.assertTrue(FmSpawnerMobs.aspect("minecraft:zombie") == Aspect.FLESH, "zombie carries flesh");
-        helper.assertTrue(FmSpawnerMobs.aspect("thaumcraft:brainy_zombie") == Aspect.MIND, "brainy zombie carries mind");
-        helper.assertTrue(FmSpawnerMobs.aspect("minecraft:pig") == Aspect.BEAST, "pig carries beast");
+        helper.assertValueEqual(FmSpawnerMobs.aspectId("minecraft:zombie"),
+            ContentId.parse("thaumcraft:corpus"), "zombie carries the semantic flesh aspect");
+        helper.assertValueEqual(FmSpawnerMobs.aspectId("thaumcraft:brainy_zombie"),
+            ContentId.parse("thaumcraft:cognitio"), "brainy zombie carries the semantic mind aspect");
+        helper.assertValueEqual(FmSpawnerMobs.aspectId("minecraft:pig"),
+            ContentId.parse("thaumcraft:bestia"), "pig carries the semantic beast aspect");
         helper.assertValueEqual(FmSpawnerMobs.ids().size(), 42, "the table keeps exactly the original 42 mobs");
         for (String id : FmSpawnerMobs.ids()) {
-            helper.assertTrue(FmSpawnerMobs.aspect(id) != null, id + " must map to an aspect");
+            helper.assertTrue(FmSpawnerMobs.aspectId(id) != null, id + " must map to a semantic aspect ID");
         }
         helper.assertTrue(FmSpawnerMobs.isBoss(EntityType.ENDER_DRAGON), "the ender dragon is a boss");
         helper.assertFalse(FmSpawnerMobs.isBoss(EntityType.ZOMBIE), "a zombie is not a boss");
