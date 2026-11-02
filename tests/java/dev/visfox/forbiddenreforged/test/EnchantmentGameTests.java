@@ -1,6 +1,5 @@
 package dev.visfox.forbiddenreforged.test;
 
-import com.mojang.authlib.GameProfile;
 import io.netty.channel.embedded.EmbeddedChannel;
 import net.minecraft.util.RandomSource;
 import java.util.List;
@@ -47,9 +46,9 @@ import dev.visfox.forbiddenreforged.FmConfig;
 import dev.visfox.forbiddenreforged.FmEnchantmentEffects;
 import dev.visfox.forbiddenreforged.FmEnchantments;
 import dev.visfox.forbiddenreforged.FmItems;
-import dev.visfox.forbiddenreforged.FmTinkerer;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4TinkererAdapter;
 import dev.visfox.forbiddenreforged.MorphState;
-import dev.visfox.forbiddenreforged.MorphToolItem;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4MorphToolItem;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.research.ResearchCategories;
 import thaumcraft.research.ResearchItem;
@@ -112,13 +111,8 @@ public final class EnchantmentGameTests {
     }
 
     private static ServerPlayer mockPlayer(GameTestHelper helper) {
-        CommonListenerCookie cookie = CommonListenerCookie.createInitial(new GameProfile(java.util.UUID.randomUUID(), "test-mock-player"), false);
-        ServerPlayer player = new ServerPlayer(helper.getLevel().getServer(), helper.getLevel(), cookie.gameProfile(), cookie.clientInformation()) {
-            @Override
-            public GameType gameMode() {
-                return GameType.SURVIVAL;
-            }
-        };
+        ServerPlayer player = (ServerPlayer) helper.makeMockServerPlayer(GameType.SURVIVAL);
+        CommonListenerCookie cookie = CommonListenerCookie.createInitial(player.getGameProfile(), false);
         Connection connection = new Connection(PacketFlow.SERVERBOUND);
         new EmbeddedChannel(connection);
         new ServerGamePacketListenerImpl(helper.getLevel().getServer(), connection, player, cookie) {
@@ -127,7 +121,6 @@ public final class EnchantmentGameTests {
             }
         };
         player.connection.markClientLoaded();
-        player.gameMode.changeGameModeForPlayer(GameType.SURVIVAL);
         return player;
     }
 
@@ -220,9 +213,9 @@ public final class EnchantmentGameTests {
     private static void tinkererIntegrationIsOptional(GameTestHelper helper) {
         boolean loaded = ModList.get().isLoaded("thaumictinkerer");
         if (!loaded) {
-            helper.assertValueEqual(FmTinkerer.registeredCount(), 0, "no TT means no registered costs");
+            helper.assertValueEqual(Tc4TinkererAdapter.registeredCount(), 0, "no TT means no registered costs");
         } else {
-            helper.assertValueEqual(FmTinkerer.registeredCount(), 8, "TT receives eight enchantment costs");
+            helper.assertValueEqual(Tc4TinkererAdapter.registeredCount(), 8, "TT receives eight enchantment costs");
         }
         helper.succeed();
     }
@@ -300,7 +293,7 @@ public final class EnchantmentGameTests {
     private static void voidtouchedRepairsAndWarps(GameTestHelper helper) {
         ItemStack stack = new ItemStack(FmItems.MORPH_PICKAXE.get());
         ServerPlayer player = mockPlayer(helper);
-        MorphToolItem item = (MorphToolItem) stack.getItem();
+        Tc4MorphToolItem item = (Tc4MorphToolItem) stack.getItem();
         helper.assertValueEqual(item.getWarp(stack, player), 0, "plain morph tool carries no warp");
         stack.enchant(helper.getLevel().registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(FmEnchantments.VOIDTOUCHED), 1);
         helper.assertValueEqual(item.getWarp(stack, player), 1, "voidtouched morph tool carries warp 1");

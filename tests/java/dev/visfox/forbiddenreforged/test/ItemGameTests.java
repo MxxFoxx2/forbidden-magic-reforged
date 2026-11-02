@@ -1,14 +1,19 @@
 package dev.visfox.forbiddenreforged.test;
 
 import com.google.gson.JsonArray;
-import dev.visfox.forbiddenreforged.BlinkFocusItem;
-import dev.visfox.forbiddenreforged.CrystalwellItem;
-import dev.visfox.forbiddenreforged.PrimewellItem;
+import dev.visfox.forbiddenreforged.core.wand.BlinkFocusBehavior;
+import dev.visfox.forbiddenreforged.core.wand.HellfireWandBehavior;
+import dev.visfox.forbiddenreforged.core.wand.WandTriggerAccess;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4BlinkFocusItem;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4CrystalwellItem;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4PrimewellItem;
 import net.minecraft.world.item.Rarity;
 import thaumcraft.item.ScribingToolsItem;
+import thaumcraft.item.bauble.VisAmuletItem;
 import thaumcraft.crafting.TcStack;
 import thaumcraft.crafting.ShapelessArcaneRecipe;
 import thaumcraft.registry.ModBlocks;
+import thaumcraft.registry.ModEntities;
 import thaumcraft.registry.ModItems;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -20,12 +25,13 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.function.Consumer;
-import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.NbtOps;
@@ -45,7 +51,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.animal.equine.Horse;
 import net.minecraft.world.entity.animal.pig.Pig;
 import net.minecraft.world.entity.player.Player;
@@ -53,26 +59,36 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.component.CookingFuel;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.FuelValues;
+import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
+import dev.visfox.forbiddenreforged.core.model.ContentId;
+import dev.visfox.forbiddenreforged.core.wand.WandPartsAccess;
+import dev.visfox.forbiddenreforged.core.wand.WandVisAccess;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4WandPartsAdapter;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4WandVisAdapter;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4WandRuntimeAdapter;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectAdapter;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4ScribingAdapter;
 import dev.visfox.forbiddenreforged.FmAspects;
 import dev.visfox.forbiddenreforged.FmComponents;
 import dev.visfox.forbiddenreforged.FmDrops;
 import dev.visfox.forbiddenreforged.FmItems;
 import dev.visfox.forbiddenreforged.FmCreativeTab;
 import dev.visfox.forbiddenreforged.FmConfig;
-import dev.visfox.forbiddenreforged.FmResearchItem;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4ResearchItem;
 import dev.visfox.forbiddenreforged.MorphState;
 import dev.visfox.forbiddenreforged.FmEnchantmentEffects;
 import dev.visfox.forbiddenreforged.FmToolEvents;
@@ -88,6 +104,9 @@ import thaumcraft.research.ResearchCategories;
 import thaumcraft.research.ResearchItem;
 import thaumcraft.research.ResearchPage;
 import thaumcraft.platform.Baubles;
+import thaumcraft.platform.Bauble;
+import thaumcraft.platform.BaubleType;
+import thaumcraft.item.gear.RunicArmor;
 import thaumcraft.wand.VisStorage;
 import thaumcraft.wand.WandRegistry;
 import thaumcraft.wand.WandCap;
@@ -141,7 +160,10 @@ public final class ItemGameTests {
         "blink_focus_upgrades_use_original_icon_assets",
         "research_icons_resolve_to_real_content",
         "blink_focus_hellfire_applies_through_focal_manipulator",
-        "blink_focus_reaches_beyond_wand_reach_and_lands_like_original"
+        "blink_focus_reaches_beyond_wand_reach_and_lands_like_original",
+        "wand_vis_and_parts_use_neutral_access_ports",
+        "hellfire_behavior_uses_host_neutral_access",
+        "scribe_well_aspect_ids_stay_semantic"
     };
 
     static {
@@ -182,6 +204,9 @@ public final class ItemGameTests {
         FUNCTIONS.register(TESTS[34], () -> ItemGameTests::researchIconsResolveToRealContent);
         FUNCTIONS.register(TESTS[35], () -> ItemGameTests::blinkFocusHellfireAppliesThroughFocalManipulator);
         FUNCTIONS.register(TESTS[36], () -> ItemGameTests::blinkFocusReachesBeyondWandReachAndLandsLikeOriginal);
+        FUNCTIONS.register(TESTS[37], () -> ItemGameTests::wandVisAndPartsUseNeutralAccessPorts);
+        FUNCTIONS.register(TESTS[38], () -> ItemGameTests::hellfireBehaviorUsesHostNeutralAccess);
+        FUNCTIONS.register(TESTS[39], () -> ItemGameTests::scribeWellAspectIdsStaySemantic);
     }
 
     private ItemGameTests() {}
@@ -204,9 +229,9 @@ public final class ItemGameTests {
         InfusionRecipe recipe = (InfusionRecipe) TcRecipes.get("SKULLAXE");
         helper.assertTrue(recipe != null, "skull axe recipe must be registered");
         helper.assertValueEqual(recipe.instability(), 1, "instability");
-        helper.assertValueEqual(recipe.aspects().getAmount(FmAspects.WRATH), 8, "wrath cost");
+        helper.assertValueEqual(recipe.aspects().getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.WRATH)), 8, "wrath cost");
         helper.assertValueEqual(recipe.aspects().getAmount(Aspect.WEAPON), 8, "weapon cost");
-        helper.assertValueEqual(recipe.aspects().getAmount(FmAspects.NETHER), 8, "nether cost");
+        helper.assertValueEqual(recipe.aspects().getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER)), 8, "nether cost");
         helper.assertValueEqual(recipe.components().size(), 4, "four components");
         helper.succeed();
     }
@@ -217,7 +242,7 @@ public final class ItemGameTests {
         helper.assertTrue(fork.isSecondary(), "FORK is secondary");
         helper.assertTrue(fork.isConcealed(), "FORK is concealed");
         helper.assertValueEqual(fork.warp(), 0, "FORK has no warp");
-        helper.assertValueEqual(fork.tags().getAmount(FmAspects.NETHER), 3, "FORK research NETHER cost");
+        helper.assertValueEqual(fork.tags().getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER)), 3, "FORK research NETHER cost");
         helper.assertValueEqual(fork.tags().getAmount(Aspect.MECHANISM), 1, "FORK research MECHANISM cost");
         helper.assertValueEqual(fork.tags().getAmount(Aspect.TOOL), 1, "FORK research TOOL cost");
         helper.assertValueEqual(fork.tags().getAmount(Aspect.FIRE), 0, "FORK research has no FIRE cost");
@@ -225,7 +250,7 @@ public final class ItemGameTests {
         InfusionRecipe recipe = (InfusionRecipe) TcRecipes.get("FORK");
         helper.assertTrue(recipe != null, "FORK infusion recipe exists");
         helper.assertValueEqual(recipe.instability(), 1, "FORK instability");
-        helper.assertValueEqual(recipe.aspects().getAmount(FmAspects.NETHER), 8, "FORK NETHER cost");
+        helper.assertValueEqual(recipe.aspects().getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER)), 8, "FORK NETHER cost");
         helper.assertValueEqual(recipe.aspects().getAmount(Aspect.FIRE), 0, "FORK has no FIRE cost");
         helper.assertValueEqual(recipe.aspects().getAmount(Aspect.MECHANISM), 8, "FORK mechanism cost");
         helper.assertValueEqual(recipe.aspects().getAmount(Aspect.ENERGY), 8, "FORK energy cost");
@@ -239,20 +264,25 @@ public final class ItemGameTests {
         ItemStack stack = new ItemStack(FmItems.TAINT_COAL.get());
         helper.assertFalse(stack.isEmpty(), "taint coal must exist");
         helper.assertValueEqual(BuiltInRegistries.ITEM.getKey(stack.getItem()), Identifier.parse("forbiddenmagic:taint_coal"), "taint coal id");
-        helper.assertTrue(stack.getBurnTime(RecipeType.SMELTING, helper.getLevel().fuelValues()) > 0, "taint coal is a fuel");
+        helper.assertTrue(stack.has(DataComponents.COOKING_FUEL), "taint coal is a fuel");
         helper.succeed();
     }
 
     private static void taintCoalBurnTimeVariesWithinOriginalRange(GameTestHelper helper) {
         ItemStack stack = new ItemStack(FmItems.TAINT_COAL.get());
-        FuelValues fuelValues = helper.getLevel().fuelValues();
+        CookingFuel fuel = stack.get(DataComponents.COOKING_FUEL);
+        helper.assertTrue(fuel != null, "taint coal carries a cooking fuel component");
+        LootContext context = new LootContext.Builder(
+            new LootParams.Builder(helper.getLevel()).create(LootContextParamSets.EMPTY)
+        ).create(Optional.empty());
         Set<Integer> drawn = new HashSet<>();
         for (int i = 0; i < 40; i++) {
-            int burn = stack.getBurnTime(RecipeType.SMELTING, fuelValues);
+            int burn = fuel.burnTime().get(context, 0);
             helper.assertTrue(burn >= 1 && burn <= 2400, "burn time " + burn + " must stay within 1..2400");
             drawn.add(burn);
         }
         helper.assertTrue(drawn.size() > 1, "burn time must be drawn per use, not a constant");
+        helper.assertTrue(ItemStack.CODEC.encodeStart(NbtOps.INSTANCE, stack).result().isPresent(), "taint coal must serialize its fuel component");
         helper.succeed();
     }
 
@@ -366,6 +396,12 @@ public final class ItemGameTests {
             Baubles.set(player, slot, ItemStack.EMPTY);
         }
         ItemStack ring = new ItemStack(FmItems.RING_NUTRITION.get());
+        helper.assertTrue(ring.getItem() instanceof Bauble, "Ring of Nutrition implements the host Bauble contract");
+        helper.assertValueEqual(((Bauble) ring.getItem()).getBaubleType(ring), BaubleType.RING,
+            "Ring of Nutrition registers as a ring, not an amulet or belt item");
+        helper.assertTrue(ring.getItem() instanceof RunicArmor, "Ring of Nutrition is recognized by TC4 runic armor");
+        helper.assertValueEqual(((RunicArmor) ring.getItem()).getRunicCharge(ring), 0,
+            "Ring of Nutrition grants no runic charge");
         Baubles.set(player, 0, ring.copy());
         helper.assertFalse(FmToolEvents.hasNutritionRingInRingSlot(player), "amulet slot does not activate Ring of Nutrition");
         Baubles.set(player, 0, ItemStack.EMPTY);
@@ -381,9 +417,9 @@ public final class ItemGameTests {
     }
 
     private static void blinkFocusUpgradesUseOriginalIconAssets(GameTestHelper helper) {
-        helper.assertValueEqual(dev.visfox.forbiddenreforged.BlinkFocusItem.HELLFIRE.icon(),
+        helper.assertValueEqual(Tc4BlinkFocusItem.HELLFIRE.icon(),
             ForbiddenMagic.id("textures/misc/hellfire.png"), "Hellfire uses the bundled original icon");
-        helper.assertValueEqual(dev.visfox.forbiddenreforged.BlinkFocusItem.PANDEMONIUM.icon(),
+        helper.assertValueEqual(Tc4BlinkFocusItem.PANDEMONIUM.icon(),
             ForbiddenMagic.id("textures/misc/pandemonium.png"), "Pandemonium uses the bundled original icon");
         helper.assertTrue(ForbiddenMagic.class.getResourceAsStream("/assets/forbiddenmagic/textures/misc/hellfire.png") != null,
             "Hellfire icon asset is bundled");
@@ -466,7 +502,7 @@ public final class ItemGameTests {
             .findFirst().orElse(ItemStack.EMPTY);
         helper.assertFalse(neutroniumWand.isEmpty(), "creative neutronium wand can be located");
         helper.assertFalse(staffWand.isEmpty(), "creative neutronium staff can be located");
-        var creativePlayer = mockPlayer(helper, GameType.CREATIVE);
+        var creativePlayer = helper.makeMockServerPlayer(net.minecraft.world.level.GameType.CREATIVE);
         Wands.getRod(neutroniumWand).onUpdate().onUpdate(neutroniumWand, creativePlayer);
         Wands.getRod(staffWand).onUpdate().onUpdate(staffWand, creativePlayer);
         for (Aspect aspect : Aspect.getPrimalAspects()) {
@@ -566,12 +602,27 @@ public final class ItemGameTests {
             "ordinary rods do not receive special wand tooltips");
         helper.assertValueEqual(FmToolEvents.wandTooltipKind(new ItemStack(Items.STICK)), "",
             "non-wand items do not receive wand-specific tooltips");
+
+        WandRod neutronium = WandRegistry.findRod("neutronium");
+        ItemStack neutroniumWand = Wands.create(WandRegistry.CAP_THAUMIUM, neutronium, false);
+        helper.assertValueEqual(FmToolEvents.wandTooltipKind(neutroniumWand), "creativeonly",
+            "neutronium wand stacks resolve their rod tag through the TC4 adapter");
+
+        WandRod profane = WandRegistry.findRod("profane");
+        ItemStack profaneWand = Wands.create(WandRegistry.CAP_THAUMIUM, profane, false);
+        helper.assertValueEqual(FmToolEvents.wandTooltipKind(profaneWand), "profane_contract",
+            "profane wand stacks resolve their rod tag through the TC4 adapter");
+
+        WandRod tainted = WandRegistry.findRod("tainted");
+        ItemStack taintedWand = Wands.create(WandRegistry.CAP_THAUMIUM, tainted, false);
+        helper.assertValueEqual(FmToolEvents.wandTooltipKind(taintedWand), "",
+            "ordinary registered wand stacks have no special tooltip");
         helper.succeed();
     }
 
     private static void crystalwellIsAScribingToolWithOriginalDurability(GameTestHelper helper) {
         ItemStack stack = new ItemStack(FmItems.CRYSTALWELL.get());
-        helper.assertTrue(stack.getItem() instanceof CrystalwellItem, "crystalwell uses its behavior item");
+        helper.assertTrue(stack.getItem() instanceof Tc4CrystalwellItem, "crystalwell uses its behavior item");
         helper.assertTrue(stack.getItem() instanceof ScribingToolsItem, "crystalwell can occupy the research table scribe slot");
         int expectedMaxDamage = thaumcraft.Config.researchDifficulty() == -1 ? 50 : 100;
         helper.assertValueEqual(stack.getMaxDamage(), expectedMaxDamage, "crystalwell durability follows research difficulty");
@@ -581,7 +632,7 @@ public final class ItemGameTests {
 
     private static void primewellIsAPermanentEpicScribingTool(GameTestHelper helper) {
         ItemStack stack = new ItemStack(FmItems.PRIMEWELL.get());
-        helper.assertTrue(stack.getItem() instanceof PrimewellItem, "primewell uses its behavior item");
+        helper.assertTrue(stack.getItem() instanceof Tc4PrimewellItem, "primewell uses its behavior item");
         helper.assertTrue(stack.getItem() instanceof ScribingToolsItem, "primewell can occupy the research table scribe slot");
         helper.assertValueEqual(stack.getRarity(), Rarity.EPIC, "primewell retains epic rarity");
         helper.assertTrue(stack.getMaxDamage() > 1_000_000_000, "primewell does not wear out during research");
@@ -723,6 +774,28 @@ public final class ItemGameTests {
         helper.succeed();
     }
 
+    private static void scribeWellAspectIdsStaySemantic(GameTestHelper helper) {
+        Set<ContentId> expected = Set.of(
+            ContentId.parse("thaumcraft:aer"),
+            ContentId.parse("thaumcraft:terra"),
+            ContentId.parse("thaumcraft:ignis"),
+            ContentId.parse("thaumcraft:aqua"),
+            ContentId.parse("thaumcraft:ordo"),
+            ContentId.parse("thaumcraft:perditio")
+        );
+        List<ContentId> primalIds = Tc4ScribingAdapter.primalAspectIds();
+        helper.assertValueEqual(primalIds.size(), expected.size(), "host primal aspect count is six");
+        helper.assertTrue(new HashSet<>(primalIds).equals(expected),
+            "scribe well exposes the exact primal aspect ids without leaking Aspect objects");
+        for (ContentId id : primalIds) {
+            helper.assertTrue(Tc4AspectAdapter.resolveAspect(id).isPrimal(),
+                "every semantic scribe aspect id resolves to a host primal");
+        }
+        helper.assertValueEqual(Tc4ScribingAdapter.isNoResearchDifficulty(), Config.researchDifficulty() == -1,
+            "no-research mode remains sourced from the host config");
+        helper.succeed();
+    }
+
     private static void crystalwellResearchPageMatchesDifficulty(GameTestHelper helper) {
         ResearchItem item = ResearchCategories.getResearch("CRYSTALWELL");
         helper.assertTrue(item != null, "crystalwell research is registered");
@@ -760,10 +833,20 @@ public final class ItemGameTests {
         helper.assertFalse(FmToolEvents.restoresTaintedVis(infernalWand, true),
             "Infernal Wand does not use the Tainted Wand reaction");
 
-        List<Aspect> restored = FmToolEvents.taintedVisRolls(RandomSource.create(42L));
+        List<ContentId> restored = FmToolEvents.taintedVisRolls(RandomSource.create(42L));
+        Set<ContentId> primalIds = Set.of(
+            ContentId.parse("forbiddenmagic:concept/entropy"),
+            ContentId.parse("forbiddenmagic:concept/order"),
+            ContentId.parse("forbiddenmagic:concept/fire"),
+            ContentId.parse("forbiddenmagic:concept/water"),
+            ContentId.parse("forbiddenmagic:concept/earth"),
+            ContentId.parse("forbiddenmagic:concept/air")
+        );
         helper.assertValueEqual(restored.size(), 3, "taint damage makes three independent primal-aspect rolls");
-        for (Aspect aspect : restored) {
-            helper.assertTrue(aspect.isPrimal(), "every restored aspect must be primal");
+        for (ContentId aspect : restored) {
+            helper.assertTrue(primalIds.contains(aspect), "every restored aspect must use a semantic primal ID");
+            helper.assertTrue(Tc4AspectAdapter.resolveAspect(aspect).isPrimal(),
+                "the TC4 adapter must resolve every semantic ID to a primal aspect");
         }
         helper.succeed();
     }
@@ -775,6 +858,76 @@ public final class ItemGameTests {
             "Hellfire trigger must be registered for obsidian");
         helper.assertTrue(ResearchCategories.getResearch("HELLFIRE") != null,
             "the trigger's HELLFIRE research gate must exist");
+        helper.succeed();
+    }
+
+    private static void hellfireBehaviorUsesHostNeutralAccess(GameTestHelper helper) {
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        BlockPos position = new BlockPos(2, 3, 2);
+        helper.setBlock(position, Blocks.OBSIDIAN);
+        BlockPos absolutePosition = helper.absolutePos(position);
+        ItemStack wand = new ItemStack(Items.STICK);
+        boolean[] wandState = {true};
+        boolean[] focusedState = {false};
+        boolean[] researchState = {true};
+        int[] consumed = {0};
+        ContentId fire = ContentId.parse("forbiddenmagic:concept/fire");
+        ContentId hellfire = ContentId.parse("forbiddenmagic:research/hellfire");
+        WandTriggerAccess access = new WandTriggerAccess() {
+            @Override
+            public boolean isWand(ItemStack stack) {
+                return wandState[0];
+            }
+
+            @Override
+            public boolean hasFocus(ItemStack stack) {
+                return focusedState[0];
+            }
+
+            @Override
+            public boolean researchComplete(Player caster, ContentId research) {
+                return researchState[0] && hellfire.equals(research);
+            }
+
+            @Override
+            public boolean consumeVis(ItemStack stack, Player caster, ContentId aspect, int amount) {
+                consumed[0]++;
+                return fire.equals(aspect) && amount == 2;
+            }
+        };
+
+        helper.assertFalse(HellfireWandBehavior.ignite(
+            helper.getLevel(), wand, player, absolutePosition, Direction.NORTH, access
+        ), "a side hit cannot trigger Hellfire");
+        helper.assertValueEqual(consumed[0], 0, "an invalid side does not consume vis");
+
+        wandState[0] = false;
+        helper.assertFalse(HellfireWandBehavior.ignite(
+            helper.getLevel(), wand, player, absolutePosition, Direction.UP, access
+        ), "a non-wand item cannot trigger Hellfire");
+        helper.assertValueEqual(consumed[0], 0, "a non-wand item does not consume vis");
+
+        wandState[0] = true;
+        focusedState[0] = true;
+        helper.assertFalse(HellfireWandBehavior.ignite(
+            helper.getLevel(), wand, player, absolutePosition, Direction.UP, access
+        ), "a focused wand cannot trigger Hellfire");
+        helper.assertValueEqual(consumed[0], 0, "a focused wand does not consume vis");
+
+        focusedState[0] = false;
+        researchState[0] = false;
+        helper.assertFalse(HellfireWandBehavior.ignite(
+            helper.getLevel(), wand, player, absolutePosition, Direction.UP, access
+        ), "Hellfire research is required");
+        helper.assertValueEqual(consumed[0], 0, "missing research does not consume vis");
+
+        researchState[0] = true;
+        helper.assertTrue(HellfireWandBehavior.ignite(
+            helper.getLevel(), wand, player, absolutePosition, Direction.UP, access
+        ), "an eligible wand can ignite fire");
+        helper.assertValueEqual(consumed[0], 1, "successful Hellfire consumes vis exactly once");
+        helper.assertTrue(helper.getLevel().getBlockState(absolutePosition.above()).is(Blocks.FIRE),
+            "Hellfire places fire above the clicked block");
         helper.succeed();
     }
 
@@ -790,7 +943,7 @@ public final class ItemGameTests {
     }
     
     private static void researchPrefixRespectsTagResearch(GameTestHelper helper) {
-        ResearchItem item = new FmResearchItem("TEST", "FORBIDDEN", new AspectList(), 0, 0, 1,
+        ResearchItem item = new Tc4ResearchItem("TEST", "FORBIDDEN", new AspectList(), 0, 0, 1,
             ForbiddenMagic.id("textures/misc/forbidden.png"));
         String expected = FmConfig.tagResearchEnabled()
             ? "forbiddenmagic.research_text.TEST"
@@ -809,6 +962,8 @@ public final class ItemGameTests {
         ServerPlayer owner = mockConnectedPlayer(helper);
         ServerPlayer target = mockConnectedPlayer(helper);
         ItemStack collar = new ItemStack(item);
+        helper.assertTrue(item instanceof VisAmuletItem, "Sub Collar is a TC4 vis amulet item");
+        helper.assertTrue(((VisAmuletItem) item).canEquip(collar, target), "Sub Collar permits equipping on another player");
         helper.assertTrue(item.interactLivingEntity(collar, owner, target, InteractionHand.MAIN_HAND).consumesAction(), "the collar can be placed on another player");
         ItemStack worn = Baubles.get(target, 0);
         helper.assertTrue(worn.is(item), "the target wears the collar in the amulet slot");
@@ -829,12 +984,12 @@ public final class ItemGameTests {
         ItemStack crop = new ItemStack(FmItems.RIDING_CROP.get());
         ServerPlayer attacker = mockConnectedPlayer(helper);
 
-        Horse horse = helper.spawn(EntityType.HORSE, new BlockPos(2, 4, 2));
+        Horse horse = helper.spawn(EntityTypes.HORSE, new BlockPos(2, 4, 2));
         crop.getItem().hurtEnemy(crop, horse, attacker);
         MobEffectInstance horseSpeed = horse.getEffect(MobEffects.SPEED);
         helper.assertTrue(horseSpeed != null && horseSpeed.getDuration() == 200 && horseSpeed.getAmplifier() == 5, "a horse gets speed 200 at amplifier 5");
 
-        Pig pig = helper.spawn(EntityType.PIG, new BlockPos(4, 4, 4));
+        Pig pig = helper.spawn(EntityTypes.PIG, new BlockPos(4, 4, 4));
         crop.getItem().hurtEnemy(crop, pig, attacker);
         MobEffectInstance pigSpeed = pig.getEffect(MobEffects.SPEED);
         helper.assertTrue(pigSpeed != null && pigSpeed.getDuration() == 200 && pigSpeed.getAmplifier() == 5, "a pig gets speed 200 at amplifier 5");
@@ -842,6 +997,11 @@ public final class ItemGameTests {
         ServerPlayer victim = mockConnectedPlayer(helper);
         crop.getItem().hurtEnemy(crop, victim, attacker);
         helper.assertTrue(victim.hasEffect(MobEffects.SPEED) && victim.hasEffect(MobEffects.HASTE) && victim.hasEffect(MobEffects.STRENGTH), "players get speed, haste and strength");
+
+        var golem = helper.spawn(ModEntities.GOLEM.get(), new BlockPos(7, 4, 7));
+        crop.getItem().hurtEnemy(crop, golem, attacker);
+        helper.assertTrue(golem.hasEffect(MobEffects.SPEED) && golem.hasEffect(MobEffects.HASTE)
+            && golem.hasEffect(MobEffects.STRENGTH), "TC4 golems get speed, haste and strength");
 
         helper.assertTrue(RidingCropItem.dropsLustShard(1), "roll 1 drops a shard");
         helper.assertFalse(RidingCropItem.dropsLustShard(0) || RidingCropItem.dropsLustShard(2) || RidingCropItem.dropsLustShard(14), "only roll 1 of 15 drops a shard");
@@ -853,7 +1013,7 @@ public final class ItemGameTests {
         helper.assertValueEqual(crop.getRarity(), Rarity.COMMON, "the crop keeps the original common rarity");
         helper.assertValueEqual(crop.getItem().getDestroySpeed(crop, Blocks.STONE.defaultBlockState()), 1.0F, "the crop always digs at speed 1");
 
-        Horse mount = helper.spawn(EntityType.HORSE, new BlockPos(6, 4, 6));
+        Horse mount = helper.spawn(EntityTypes.HORSE, new BlockPos(6, 4, 6));
         float health = mount.getHealth();
         attacker.startRiding(mount);
         crop.getItem().use(helper.getLevel(), attacker, InteractionHand.MAIN_HAND);
@@ -914,8 +1074,8 @@ public final class ItemGameTests {
         helper.assertValueEqual(FmDrops.heldWrathDamage(new ItemStack(FmItems.SKULL_AXE.get())), 7, "the skull axe counts as elemental sword damage");
         helper.assertValueEqual(FmDrops.heldWrathDamage(new ItemStack(FmItems.MORPH_SWORD.get())), 7, "the morph sword counts as elemental sword damage");
         helper.assertValueEqual(FmDrops.heldWrathDamage(new ItemStack(FmItems.RIDING_CROP.get())), 4, "the riding crop counts as wooden sword damage");
-        helper.assertTrue(FmDrops.wrathEligible(helper.spawn(EntityType.ZOMBIE, new BlockPos(2, 4, 2))), "hostile mobs are eligible");
-        helper.assertFalse(FmDrops.wrathEligible(helper.spawn(EntityType.PIG, new BlockPos(4, 4, 4))), "passive animals are not eligible");
+        helper.assertTrue(FmDrops.wrathEligible(helper.spawn(EntityTypes.ZOMBIE, new BlockPos(2, 4, 2))), "hostile mobs are eligible");
+        helper.assertFalse(FmDrops.wrathEligible(helper.spawn(EntityTypes.PIG, new BlockPos(4, 4, 4))), "passive animals are not eligible");
         helper.succeed();
     }
 
@@ -971,7 +1131,7 @@ public final class ItemGameTests {
         ServerPlayer player = mockConnectedPlayer(helper);
         player.experienceLevel = 100;
 
-        helper.assertTrue(table.startCraft(BlinkFocusItem.HELLFIRE.id(), player), "the manipulator refused the Hellfire upgrade");
+        helper.assertTrue(table.startCraft(Tc4BlinkFocusItem.HELLFIRE.id(), player), "the manipulator refused the Hellfire upgrade");
         helper.assertValueEqual(table.getSize(), 2000, "Hellfire rank 2 pending vis");
         helper.assertValueEqual(table.getAspects().getAmount(Aspect.FIRE), 800, "Hellfire FIRE cost");
         helper.assertValueEqual(table.getAspects().getAmount(Aspect.AIR), 400, "Hellfire AIR cost");
@@ -984,12 +1144,12 @@ public final class ItemGameTests {
 
         helper.assertValueEqual(table.getSize(), 0, "Hellfire craft never finished");
         FocusItem focusItem = (FocusItem) focus.getItem();
-        helper.assertTrue(focusItem.isUpgradedWith(focus, BlinkFocusItem.HELLFIRE), "Hellfire was not stored on the focus");
+        helper.assertTrue(focusItem.isUpgradedWith(focus, Tc4BlinkFocusItem.HELLFIRE), "Hellfire was not stored on the focus");
         helper.succeed();
     }
 
     private static void blinkFocusReachesBeyondWandReachAndLandsLikeOriginal(GameTestHelper helper) {
-        Player player = mockConnectedPlayer(helper);
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
         BlockPos base = helper.absolutePos(new BlockPos(2, 3, 2));
         double px = base.getX() + 0.5;
         double py = 40.0;
@@ -1004,13 +1164,13 @@ public final class ItemGameTests {
         helper.assertTrue(player.pick(4.5, 1.0F, false).getType() != HitResult.Type.BLOCK,
             "the test target must sit beyond the vanilla wand reach");
 
-        HitResult hit = BlinkFocusItem.target(player);
+        HitResult hit = BlinkFocusBehavior.target(player);
         helper.assertTrue(hit instanceof BlockHitResult blockHit && blockHit.getType() == HitResult.Type.BLOCK,
             "the blink focus must reach a block beyond the wand's own reach");
         BlockHitResult blockHit = (BlockHitResult) hit;
         helper.assertValueEqual(blockHit.getBlockPos(), targetBlock, "blink target block");
 
-        Vec3 landing = BlinkFocusItem.destination(blockHit);
+        Vec3 landing = BlinkFocusBehavior.destination(blockHit);
         helper.assertTrue(Math.abs(landing.x - (targetBlock.getX() - 0.5)) < 0.001, "blink lands half a block outside the west face");
         helper.assertTrue(Math.abs(landing.z - pz) < 0.001, "blink keeps the hit depth on Z");
         helper.assertTrue(Math.abs(landing.y - (py + 1.62)) < 0.01, "blink keeps the hit height on a side face");
@@ -1019,14 +1179,52 @@ public final class ItemGameTests {
         helper.succeed();
     }
 
-    private static ServerPlayer mockPlayer(GameTestHelper helper, GameType type) {
-        CommonListenerCookie cookie = CommonListenerCookie.createInitial(new GameProfile(UUID.randomUUID(), "test-mock-player"), false);
-        ServerPlayer player = new ServerPlayer(helper.getLevel().getServer(), helper.getLevel(), cookie.gameProfile(), cookie.clientInformation()) {
-            @Override
-            public GameType gameMode() {
-                return type;
-            }
-        };
+    private static void wandVisAndPartsUseNeutralAccessPorts(GameTestHelper helper) {
+        WandRod tainted = WandRegistry.findRod("tainted");
+        ItemStack wand = Wands.create(WandRegistry.CAP_THAUMIUM, tainted, false);
+        WandVisAccess vis = new Tc4WandVisAdapter();
+        WandPartsAccess parts = new Tc4WandPartsAdapter();
+        ContentId fire = ContentId.parse("forbiddenmagic:concept/fire");
+
+        helper.assertTrue(Tc4WandRuntimeAdapter.isWand(wand),
+            "the runtime adapter recognizes registered wand stacks");
+        helper.assertFalse(Tc4WandRuntimeAdapter.isWand(new ItemStack(Items.STICK)),
+            "the runtime adapter rejects ordinary item stacks");
+        helper.assertValueEqual(Tc4WandRuntimeAdapter.rodTag(wand), "tainted",
+            "the runtime adapter exposes the registered rod tag");
+        helper.assertValueEqual(Tc4WandRuntimeAdapter.focusTreasure(wand), Wands.getFocusTreasure(wand),
+            "focus treasure reads are delegated without changing the host result");
+        helper.assertValueEqual(Tc4WandRuntimeAdapter.focusPotency(wand), Wands.getFocusPotency(wand),
+            "focus potency reads are delegated without changing the host result");
+
+        helper.assertValueEqual(vis.maximumVis(wand), Wands.getMaxVis(wand),
+            "neutral vis access reports host maximum capacity");
+        helper.assertTrue(vis.primalAspects().contains(fire),
+            "neutral vis access exposes the semantic fire aspect");
+        vis.addVis(wand, fire, 2, true);
+        helper.assertValueEqual(vis.vis(wand, fire), Wands.getVis(wand, Aspect.FIRE),
+            "neutral vis access writes through to the TC4 vis store");
+        helper.assertValueEqual(vis.vis(wand, fire), 200,
+            "normal vis units retain the host's hundred-unit scale");
+        vis.addRealVis(wand, fire, 75, true);
+        helper.assertValueEqual(vis.vis(wand, fire), 275,
+            "raw vis access preserves exact internal units");
+        vis.fill(wand);
+        for (ContentId aspect : vis.primalAspects()) {
+            helper.assertValueEqual(vis.vis(wand, aspect), vis.maximumVis(wand),
+                "neutral fill populates " + aspect);
+        }
+
+        parts.setRod(wand, ContentId.parse("forbiddenmagic:profaned"));
+        helper.assertValueEqual(Wands.getRod(wand).tag(), "profaned",
+            "neutral parts access changes the rod while preserving the other wand parts");
+        helper.assertValueEqual(Wands.getCap(wand).tag(), "thaumium",
+            "rod replacement preserves the existing cap");
+        helper.succeed();
+    }
+
+    private static ServerPlayer mockConnectedPlayer(GameTestHelper helper) {        ServerPlayer player = (ServerPlayer) helper.makeMockServerPlayer(GameType.SURVIVAL);
+        CommonListenerCookie cookie = CommonListenerCookie.createInitial(player.getGameProfile(), false);
         Connection connection = new Connection(PacketFlow.SERVERBOUND);
         new EmbeddedChannel(connection);
         new ServerGamePacketListenerImpl(helper.getLevel().getServer(), connection, player, cookie) {
@@ -1035,12 +1233,7 @@ public final class ItemGameTests {
             }
         };
         player.connection.markClientLoaded();
-        player.gameMode.changeGameModeForPlayer(type);
         return player;
-    }
-
-    private static ServerPlayer mockConnectedPlayer(GameTestHelper helper) {
-        return mockPlayer(helper, GameType.SURVIVAL);
     }
 
 }

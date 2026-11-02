@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.mojang.authlib.GameProfile;
 import io.netty.channel.embedded.EmbeddedChannel;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,10 +44,12 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
+import dev.visfox.forbiddenreforged.FmItems;
 import dev.visfox.forbiddenreforged.ArcaneCakeBlock;
 import dev.visfox.forbiddenreforged.FmBlocks;
 import dev.visfox.forbiddenreforged.TaintTree;
 import dev.visfox.forbiddenreforged.TaintLogTextureVariant;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4TaintAdapter;
 import thaumcraft.crafting.CrucibleRecipe;
 import thaumcraft.crafting.InfusionRecipe;
 import thaumcraft.crafting.TcRecipes;
@@ -56,6 +57,7 @@ import thaumcraft.aspect.Aspect;
 import thaumcraft.research.ResearchCategories;
 import thaumcraft.research.ResearchItem;
 import thaumcraft.taint.TaintSpread;
+import thaumcraft.registry.ModBlocks;
 
 @EventBusSubscriber(modid = ForbiddenMagic.MODID)
 public final class BlockGameTests {
@@ -72,7 +74,8 @@ public final class BlockGameTests {
         "taint_sapling_grows_a_tree",
         "umbral_plants_are_registered",
         "arcane_cake_feeds_and_keeps_slices",
-        "taint_log_selects_side_textures_deterministically"
+        "taint_log_selects_side_textures_deterministically",
+        "tc4_taint_material_classification_is_behind_adapter"
     };
 
     static {
@@ -86,6 +89,7 @@ public final class BlockGameTests {
         FUNCTIONS.register(TESTS[7], () -> BlockGameTests::umbralPlantsAreRegistered);
         FUNCTIONS.register(TESTS[8], () -> BlockGameTests::arcaneCakeFeedsAndKeepsSlices);
         FUNCTIONS.register(TESTS[9], () -> BlockGameTests::taintLogSelectsSideTexturesDeterministically);
+        FUNCTIONS.register(TESTS[10], () -> BlockGameTests::tc4TaintMaterialClassificationIsBehindAdapter);
     }
 
     private BlockGameTests() {}
@@ -105,13 +109,8 @@ public final class BlockGameTests {
     }
 
     private static ServerPlayer mockPlayer(GameTestHelper helper) {
-        CommonListenerCookie cookie = CommonListenerCookie.createInitial(new GameProfile(java.util.UUID.randomUUID(), "test-mock-player"), false);
-        ServerPlayer player = new ServerPlayer(helper.getLevel().getServer(), helper.getLevel(), cookie.gameProfile(), cookie.clientInformation()) {
-            @Override
-            public GameType gameMode() {
-                return GameType.SURVIVAL;
-            }
-        };
+        ServerPlayer player = (ServerPlayer) helper.makeMockServerPlayer(GameType.SURVIVAL);
+        CommonListenerCookie cookie = CommonListenerCookie.createInitial(player.getGameProfile(), false);
         Connection connection = new Connection(PacketFlow.SERVERBOUND);
         new EmbeddedChannel(connection);
         new ServerGamePacketListenerImpl(helper.getLevel().getServer(), connection, player, cookie) {
@@ -120,8 +119,27 @@ public final class BlockGameTests {
             }
         };
         player.connection.markClientLoaded();
-        player.gameMode.changeGameModeForPlayer(GameType.SURVIVAL);
         return player;
+    }
+
+    private static void tc4TaintMaterialClassificationIsBehindAdapter(GameTestHelper helper) {
+        helper.assertTrue(Tc4TaintAdapter.isHostTaintMaterial(ModBlocks.FLUX_GOO.get().defaultBlockState()),
+            "TC4 flux goo is recognized as host taint material");
+        helper.assertTrue(Tc4TaintAdapter.isHostTaintMaterial(ModBlocks.FLUX_GAS.get().defaultBlockState()),
+            "TC4 flux gas is recognized as host taint material");
+        helper.assertFalse(Tc4TaintAdapter.isHostTaintMaterial(Blocks.STONE.defaultBlockState()),
+            "ordinary stone is not host taint material");
+        helper.assertTrue(Tc4TaintAdapter.isTaintShovelPurificationTarget(ModBlocks.FLUX_GOO.get().defaultBlockState()),
+            "flux goo is a taint shovel purification target");
+        helper.assertTrue(Tc4TaintAdapter.isTaintShovelPurificationTarget(ModBlocks.FLUX_GAS.get().defaultBlockState()),
+            "flux gas is a taint shovel purification target");
+        helper.assertFalse(Tc4TaintAdapter.isTaintShovelPurificationTarget(Blocks.STONE.defaultBlockState()),
+            "ordinary stone is not a taint shovel purification target");
+        helper.assertValueEqual(FmItems.TAINT_SHOVEL.get().getDestroySpeed(
+            new net.minecraft.world.item.ItemStack(FmItems.TAINT_SHOVEL.get()),
+            ModBlocks.FLUX_GOO.get().defaultBlockState()
+        ), Tc4TaintAdapter.taintShovelMiningSpeed(), "taint shovel retains TC4 elemental tool mining speed");
+        helper.succeed();
     }
 
     private static void taintMaterialBlocksAreRegistered(GameTestHelper helper) {
