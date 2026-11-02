@@ -5,7 +5,6 @@ import dev.visfox.forbiddenreforged.ForbiddenMagic;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.core.recipe.ForbiddenMagicRecipeCatalog;
 import dev.visfox.forbiddenreforged.core.research.ForbiddenMagicResearchCatalog;
-import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 import java.util.List;
 import net.minecraft.world.item.ItemStack;
 import thaumcraft.aspect.Aspect;
@@ -19,9 +18,8 @@ public final class Tc4BootstrapAdapter {
         Tc4WarpAdapter.registerWarpItem(ContentId.parse("forbiddenmagic:wrath_cage"), 5);
         Tc4WarpAdapter.registerWarpItem(ContentId.parse("forbiddenmagic:taint_sapling"), 1);
 
-        var bootstrap = HostAdapterRegistry.requireBootstrap();
-        bootstrap.registerWands();
-        bootstrap.registerWandTriggers();
+        Tc4WandAdapter.registerWands();
+        Tc4WandTriggerAdapter.register();
 
         var host = HostAdapterRegistry.require();
         boolean crystalwellUsesShardTag = host.crystalwellUsesShardTag();
@@ -43,7 +41,7 @@ public final class Tc4BootstrapAdapter {
                     FmConfig.greedyEnchantmentEnabled(),
                     FmConfig.lustDisabled(),
                     FmConfig.emeraldTrans(),
-                    bootstrap.isArsMagicaLoaded(),
+                    Tc4HostAdapter.INSTANCE.isArsMagicaLoaded(),
                     crystalwellUsesShardTag
                 )
             )
@@ -51,7 +49,7 @@ public final class Tc4BootstrapAdapter {
 
         // Optional integration remains on its original supported 1.21.1 API,
         // but registration is owned by the selected host adapter.
-        bootstrap.registerOptionalEnchantments();
+        Tc4TinkererAdapter.register();
     }
 
     /**
