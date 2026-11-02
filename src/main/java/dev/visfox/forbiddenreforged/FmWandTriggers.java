@@ -8,6 +8,6 @@ public final class FmWandTriggers {
     }
 
     public static void register() {
-        HostAdapterRegistry.requireBootstrap().registerWandTriggers();
+        HostAdapterRegistry.requireWandRegistration().registerWandTriggers();
     }
 }
