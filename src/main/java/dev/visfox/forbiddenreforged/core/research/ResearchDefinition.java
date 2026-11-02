@@ -17,9 +17,32 @@ public record ResearchDefinition(
     List<ContentId> parents,
     List<ContentId> hiddenParents,
     Set<Flag> flags,
+    List<ContentId> itemTriggers,
+    List<ContentId> entityTriggers,
     List<ContentId> aspectTriggers,
     List<Stage> stages
 ) {
+    /**
+     * Compatibility constructor for catalog definitions without item/entity triggers.
+     */
+    public ResearchDefinition(
+        ContentId id,
+        ContentId category,
+        Icon icon,
+        int column,
+        int row,
+        int complexity,
+        AspectDefinition.Cost noteCost,
+        List<ContentId> parents,
+        List<ContentId> hiddenParents,
+        Set<Flag> flags,
+        List<ContentId> aspectTriggers,
+        List<Stage> stages
+    ) {
+        this(id, category, icon, column, row, complexity, noteCost,
+            parents, hiddenParents, flags, List.of(), List.of(), aspectTriggers, stages);
+    }
+
     public ResearchDefinition {
         Objects.requireNonNull(id, "id");
         Objects.requireNonNull(category, "category");
@@ -28,11 +51,15 @@ public record ResearchDefinition(
         Objects.requireNonNull(parents, "parents");
         Objects.requireNonNull(hiddenParents, "hiddenParents");
         Objects.requireNonNull(flags, "flags");
+        Objects.requireNonNull(itemTriggers, "itemTriggers");
+        Objects.requireNonNull(entityTriggers, "entityTriggers");
         Objects.requireNonNull(aspectTriggers, "aspectTriggers");
         Objects.requireNonNull(stages, "stages");
         parents = List.copyOf(parents);
         hiddenParents = List.copyOf(hiddenParents);
         flags = Set.copyOf(flags);
+        itemTriggers = List.copyOf(itemTriggers);
+        entityTriggers = List.copyOf(entityTriggers);
         aspectTriggers = List.copyOf(aspectTriggers);
         stages = List.copyOf(stages);
         if (complexity < 0) {
