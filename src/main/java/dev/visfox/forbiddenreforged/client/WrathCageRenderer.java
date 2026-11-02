@@ -2,7 +2,7 @@ package dev.visfox.forbiddenreforged.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import dev.visfox.forbiddenreforged.WrathCageBlockEntity;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -13,8 +13,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
-public final class WrathCageRenderer implements BlockEntityRenderer<WrathCageBlockEntity> {
+public final class WrathCageRenderer implements BlockEntityRenderer<BlockEntity> {
     private final EntityRenderDispatcher dispatcher;
 
     public WrathCageRenderer(BlockEntityRendererProvider.Context context) {
@@ -22,10 +23,10 @@ public final class WrathCageRenderer implements BlockEntityRenderer<WrathCageBlo
     }
 
     @Override
-    public void render(WrathCageBlockEntity cage, float partialTick, PoseStack poseStack,
+    public void render(BlockEntity cage, float partialTick, PoseStack poseStack,
         MultiBufferSource buffers, int packedLight, int packedOverlay) {
         Level level = cage.getLevel();
-        String mobId = cage.getMobId();
+        String mobId = HostAdapterRegistry.requireBlockEntities().wrathCageMobId(cage);
         if (level == null || mobId == null || mobId.isBlank()) {
             return;
         }
