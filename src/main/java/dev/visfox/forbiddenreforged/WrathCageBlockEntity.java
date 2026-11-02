@@ -130,6 +130,35 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
         return storage.hasRoom();
     }
 
+    private ContentId mobAspectId() {
+        return Tc4AspectAdapter.toContentId(mobAspect());
+    }
+
+    private @Nullable ContentId wrathAspectId() {
+        return FmAspects.WRATH == null ? null : Tc4AspectAdapter.toContentId(FmAspects.WRATH);
+    }
+
+    private @Nullable ContentId slothAspectId() {
+        return FmAspects.SLOTH == null ? null : Tc4AspectAdapter.toContentId(FmAspects.SLOTH);
+    }
+
+    private @Nullable WrathCageStorage.Channel channelFor(Aspect aspect) {
+        return storage.channelFor(
+            Tc4AspectAdapter.toContentId(aspect),
+            mobAspectId(),
+            wrathAspectId(),
+            slothAspectId()
+        );
+    }
+
+    private @Nullable ContentId selectedAspectId() {
+        return switch (storage.selectedChannel()) {
+            case MOB -> mobAspectId();
+            case WRATH -> wrathAspectId();
+            case SLOTH -> slothAspectId();
+        };
+    }
+
     private void drawEssentia(Level level, BlockPos pos) {
         int cost = FmConfig.wrathCost();
         var extractionOrder = storage.extractionOrder(cost);
@@ -137,11 +166,9 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
             return;
         }
 
-        ContentId mobAspectId = Tc4AspectAdapter.toContentId(mobAspect());
-        ContentId wrathAspectId = FmAspects.WRATH == null
-            ? null : Tc4AspectAdapter.toContentId(FmAspects.WRATH);
-        ContentId slothAspectId = FmAspects.SLOTH == null
-            ? null : Tc4AspectAdapter.toContentId(FmAspects.SLOTH);
+        ContentId mobAspectId = mobAspectId();
+        ContentId wrathAspectId = wrathAspectId();
+        ContentId slothAspectId = slothAspectId();
         var transport = HostAdapterRegistry.requireEssentiaTransport();
 
         for (Direction direction : Direction.values()) {
@@ -230,18 +257,9 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
     public AspectList getAspects() {
         AspectList aspects = new AspectList();
         if (FmConfig.wrathCost() > 0 && mobId != null) {
-            switch (storage.selectedChannel()) {
-                case MOB -> aspects.add(mobAspect(), storage.amount(WrathCageStorage.Channel.MOB));
-                case WRATH -> {
-                    if (FmAspects.WRATH != null) {
-                        aspects.add(FmAspects.WRATH, storage.amount(WrathCageStorage.Channel.WRATH));
-                    }
-                }
-                case SLOTH -> {
-                    if (FmAspects.SLOTH != null) {
-                        aspects.add(FmAspects.SLOTH, storage.amount(WrathCageStorage.Channel.SLOTH));
-                    }
-                }
+            ContentId selectedAspect = selectedAspectId();
+            if (selectedAspect != null) {
+                aspects.add(Tc4AspectAdapter.resolveAspect(selectedAspect), storage.selectedAmount());
             }
         }
         return aspects;
@@ -253,7 +271,7 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
 
     @Override
     public boolean doesContainerAccept(Aspect aspect) {
-        return FmConfig.wrathCost() > 0 && (aspect == FmAspects.WRATH || aspect == FmAspects.SLOTH || aspect == mobAspect());
+        return FmConfig.wrathCost() > 0 && channelFor(aspect) != null;
     }
 
     @Override
@@ -261,16 +279,8 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
         if (FmConfig.wrathCost() <= 0) {
             return amount;
         }
-        if (aspect == FmAspects.WRATH) {
-            return amount - storage.add(WrathCageStorage.Channel.WRATH, amount);
-        }
-        if (aspect == FmAspects.SLOTH) {
-            return amount - storage.add(WrathCageStorage.Channel.SLOTH, amount);
-        }
-        if (aspect == mobAspect()) {
-            return amount - storage.add(WrathCageStorage.Channel.MOB, amount);
-        }
-        return amount;
+        WrathCageStorage.Channel channel = channelFor(aspect);
+        return channel == null ? amount : amount - storage.add(channel, amount);
     }
 
     @Override
@@ -280,30 +290,14 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
 
     @Override
     public boolean doesContainerContainAmount(Aspect aspect, int amount) {
-        if (aspect == FmAspects.WRATH) {
-            return storage.contains(WrathCageStorage.Channel.WRATH, amount);
-        }
-        if (aspect == FmAspects.SLOTH) {
-            return storage.contains(WrathCageStorage.Channel.SLOTH, amount);
-        }
-        if (aspect == mobAspect()) {
-            return storage.contains(WrathCageStorage.Channel.MOB, amount);
-        }
-        return false;
+        WrathCageStorage.Channel channel = channelFor(aspect);
+        return channel != null && storage.contains(channel, amount);
     }
 
     @Override
     public int containerContains(Aspect aspect) {
-        if (aspect == FmAspects.WRATH) {
-            return storage.amount(WrathCageStorage.Channel.WRATH);
-        }
-        if (aspect == FmAspects.SLOTH) {
-            return storage.amount(WrathCageStorage.Channel.SLOTH);
-        }
-        if (aspect == mobAspect()) {
-            return storage.amount(WrathCageStorage.Channel.MOB);
-        }
-        return 0;
+        WrathCageStorage.Channel channel = channelFor(aspect);
+        return channel == null ? 0 : storage.amount(channel);
     }
 
     @Override
@@ -330,11 +324,8 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
         if (FmConfig.wrathCost() <= 0) {
             return null;
         }
-        return switch (storage.selectedChannel()) {
-            case MOB -> mobAspect();
-            case WRATH -> FmAspects.WRATH;
-            case SLOTH -> FmAspects.SLOTH;
-        };
+        ContentId selectedAspect = selectedAspectId();
+        return selectedAspect == null ? null : Tc4AspectAdapter.resolveAspect(selectedAspect);
     }
 
     @Override
@@ -349,16 +340,8 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
 
     @Override
     public int addEssentia(Aspect aspect, int amount, Direction face) {
-        if (aspect == mobAspect()) {
-            return storage.add(WrathCageStorage.Channel.MOB, amount);
-        }
-        if (aspect == FmAspects.WRATH) {
-            return storage.add(WrathCageStorage.Channel.WRATH, amount);
-        }
-        if (aspect == FmAspects.SLOTH) {
-            return storage.add(WrathCageStorage.Channel.SLOTH, amount);
-        }
-        return amount;
+        WrathCageStorage.Channel channel = channelFor(aspect);
+        return channel == null ? amount : storage.add(channel, amount);
     }
 
     @Override

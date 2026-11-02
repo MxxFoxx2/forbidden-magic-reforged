@@ -105,6 +105,20 @@ public final class FmGameTests {
             "third display mode selects Sloth");
         helper.assertValueEqual(storage.cycleMode(), 0, "third cycle returns to mob");
 
+        ContentId mobAspect = ContentId.parse("thaumcraft:greed");
+        ContentId wrathAspect = ContentId.parse("forbiddenmagic:ira");
+        ContentId slothAspect = ContentId.parse("forbiddenmagic:desidia");
+        helper.assertValueEqual(storage.channelFor(mobAspect, mobAspect, wrathAspect, slothAspect),
+            WrathCageStorage.Channel.MOB, "mob aspect maps to the mob storage channel");
+        helper.assertValueEqual(storage.channelFor(wrathAspect, mobAspect, wrathAspect, slothAspect),
+            WrathCageStorage.Channel.WRATH, "Wrath aspect maps to the Wrath storage channel");
+        helper.assertValueEqual(storage.channelFor(slothAspect, mobAspect, wrathAspect, slothAspect),
+            WrathCageStorage.Channel.SLOTH, "Sloth aspect maps to the Sloth storage channel");
+        helper.assertValueEqual(storage.channelFor(ContentId.parse("minecraft:stone"), mobAspect, wrathAspect, slothAspect),
+            null, "unrelated semantic aspects do not map to cage storage");
+        helper.assertValueEqual(storage.channelFor(wrathAspect, mobAspect, null, null),
+            null, "unavailable optional aspects are not accepted");
+
         WrathCageStorage extractionStorage = new WrathCageStorage();
         helper.assertValueEqual(extractionStorage.extractionOrder(12),
             List.of(WrathCageStorage.Channel.MOB, WrathCageStorage.Channel.WRATH,

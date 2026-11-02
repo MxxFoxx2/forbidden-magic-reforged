@@ -2,6 +2,7 @@ package dev.visfox.forbiddenreforged.core.block;
 
 import java.util.ArrayList;
 import java.util.List;
+import dev.visfox.forbiddenreforged.core.model.ContentId;
 
 /**
  * Host-independent three-channel storage and display selection for the Wrath Cage.
@@ -27,6 +28,31 @@ public final class WrathCageStorage {
             case WRATH -> wrath;
             case SLOTH -> sloth;
         };
+    }
+
+    /**
+     * Maps a semantic aspect identifier to its storage channel.
+     * Optional Wrath/Sloth aspect IDs may be null when those aspects are unavailable.
+     */
+    public Channel channelFor(
+        ContentId aspect,
+        ContentId mobAspect,
+        ContentId wrathAspect,
+        ContentId slothAspect
+    ) {
+        if (aspect == null) {
+            return null;
+        }
+        if (aspect.equals(mobAspect)) {
+            return Channel.MOB;
+        }
+        if (wrathAspect != null && aspect.equals(wrathAspect)) {
+            return Channel.WRATH;
+        }
+        if (slothAspect != null && aspect.equals(slothAspect)) {
+            return Channel.SLOTH;
+        }
+        return null;
     }
 
     public void setAmount(Channel channel, int amount) {
