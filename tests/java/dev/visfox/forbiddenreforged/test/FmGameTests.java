@@ -378,7 +378,7 @@ public final class FmGameTests {
         helper.assertTrue(caps.stream().anyMatch(cap ->
                 cap.tag().equals("alchemical") && cap.multiplier() == 0.9F
                     && cap.discount() == 0.8F && cap.cost() == 7
-                    && cap.aspects().equals(List.of(ContentId.parse("thaumcraft:aqua")))),
+                    && cap.aspects().equals(List.of(ContentId.parse("forbiddenmagic:concept/water")))),
             "Alchemical cap retains its water aspect and original tuning");
         helper.assertTrue(caps.stream().anyMatch(cap ->
                 cap.tag().equals("orichalcum") && cap.multiplier() == 0.0F
