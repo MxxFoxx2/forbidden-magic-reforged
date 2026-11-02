@@ -275,8 +275,29 @@ jobs:
 
           if [[ "$CHANNEL" == "26.3" ]]; then
             ARCHIVE_TAG="archive/releases/$CHANNEL/$SOURCE_SHA"
+            ARCHIVE_TARGET="$SOURCE_SHA"
+
+            # GITHUB_TOKEN cannot create a tag on a commit that changes workflow
+            # files unless it has the separate workflows permission. Keep the
+            # tested source tree intact, but inherit the previous workflow tree
+            # for the release/rollback snapshot.
+            if git -C "$REPO_DIR" diff-tree --no-commit-id --name-only -r "$SOURCE_SHA" -- .github/workflows | grep -q .; then
+              SOURCE_PARENT="$(git -C "$REPO_DIR" rev-parse "$SOURCE_SHA^")"
+              TREE_WORKDIR="$RUNNER_TEMP/release-source-tree-main"
+              git -C "$REPO_DIR" worktree add --detach "$TREE_WORKDIR" "$SOURCE_PARENT"
+              git -C "$TREE_WORKDIR" rm -r --cached -f .
+              git -C "$TREE_WORKDIR" clean -fdx
+              git -C "$REPO_DIR" archive "$SOURCE_SHA" | tar -xf - -C "$TREE_WORKDIR"
+              git -C "$TREE_WORKDIR" checkout --force "$SOURCE_PARENT" -- .github/workflows
+              git -C "$TREE_WORKDIR" add -A
+              TREE_SHA="$(git -C "$TREE_WORKDIR" write-tree)"
+              ARCHIVE_TARGET="$(printf 'Release snapshot for Minecraft %s; source %s\n' "$CHANNEL" "$SOURCE_SHA" | git -C "$TREE_WORKDIR" commit-tree "$TREE_SHA" -p "$SOURCE_PARENT")"
+              git -C "$REPO_DIR" worktree remove "$TREE_WORKDIR" --force
+              echo "Created release snapshot without workflow-file changes: $ARCHIVE_TARGET"
+            fi
+
             if ! git -C "$REPO_DIR" ls-remote --exit-code --tags origin "refs/tags/$ARCHIVE_TAG" >/dev/null 2>&1; then
-              git -C "$REPO_DIR" tag -a "$ARCHIVE_TAG" "$SOURCE_SHA" -m "Rollback point for Minecraft $CHANNEL ($SOURCE_SHA)"
+              git -C "$REPO_DIR" tag -a "$ARCHIVE_TAG" "$ARCHIVE_TARGET" -m "Rollback point for Minecraft $CHANNEL ($SOURCE_SHA)"
               git -C "$REPO_DIR" push origin "refs/tags/$ARCHIVE_TAG"
             fi
             # Keep only the newest rollback points; older ones are dropped so the
@@ -287,7 +308,7 @@ jobs:
               git -C "$REPO_DIR" push origin ":refs/tags/$stale_tag" >/dev/null 2>&1 || true
               echo "Pruned old rollback tag: $stale_tag"
             done < <(git -C "$REPO_DIR" for-each-ref --sort=taggerdate --format='%(refname:short)' "refs/tags/archive/releases/$CHANNEL" | head -n -5)
-            TAG_TARGET="$SOURCE_SHA"
+            TAG_TARGET="$ARCHIVE_TARGET"
           else
             # GitHub's built-in GITHUB_TOKEN cannot create a release tag directly on a
             # commit that changes .github/workflows relative to main. Build a snapshot
