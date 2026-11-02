@@ -51,7 +51,7 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
     private static final HostProfile PROFILE = new HostProfile(
         ContentId.parse("host:tc4-reforged"),
         "1.1.2",
-        "26.1.2",
+        "1.21.1,
         Map.ofEntries(
             Map.entry(HostProfile.Feature.ASPECT_REGISTRATION,
                 HostProfile.FeatureSupport.adapted("Uses the AddonAspects registration API")),

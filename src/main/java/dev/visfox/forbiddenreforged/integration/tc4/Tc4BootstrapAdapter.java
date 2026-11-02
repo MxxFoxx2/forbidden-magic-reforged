@@ -1,14 +1,15 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
-import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectDiagnostics;
 import dev.visfox.forbiddenreforged.FmConfig;
 import dev.visfox.forbiddenreforged.FmItems;
-import dev.visfox.forbiddenreforged.FmRecipes;
-import dev.visfox.forbiddenreforged.FmResearch;
 import dev.visfox.forbiddenreforged.FmWandTriggers;
 import dev.visfox.forbiddenreforged.FmWands;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
+import dev.visfox.forbiddenreforged.core.recipe.ForbiddenMagicRecipeCatalog;
+import dev.visfox.forbiddenreforged.core.research.ForbiddenMagicResearchCatalog;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
+import java.util.List;
 import net.minecraft.world.item.Items;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.device.SmeltingBonuses;
@@ -23,10 +24,35 @@ public final class Tc4BootstrapAdapter {
         Tc4WarpAdapter.registerWarpItem(ContentId.parse("forbiddenmagic:taint_sapling"), 1);
         FmWands.register();
         FmWandTriggers.register();
-        FmRecipes.register();
-        FmResearch.register();
+
+        var host = HostAdapterRegistry.require();
+        boolean crystalwellUsesShardTag = host.crystalwellUsesShardTag();
+        host.registerRecipes(ForbiddenMagicRecipeCatalog.definitions(
+            new ForbiddenMagicRecipeCatalog.Options(
+                FmConfig.enchantmentsEnabled(),
+                FmConfig.greedyEnchantmentEnabled(),
+                FmConfig.emeraldTrans(),
+                FmConfig.gluttonyMode(),
+                FmConfig.lustDisabled(),
+                crystalwellUsesShardTag
+            )
+        ));
+        host.registerResearch(
+            List.of(ForbiddenMagicResearchCatalog.category()),
+            ForbiddenMagicResearchCatalog.definitions(
+                new ForbiddenMagicResearchCatalog.Options(
+                    FmConfig.enchantmentsEnabled(),
+                    FmConfig.greedyEnchantmentEnabled(),
+                    FmConfig.lustDisabled(),
+                    FmConfig.emeraldTrans(),
+                    FmWands.isArsMagicaLoaded(),
+                    crystalwellUsesShardTag
+                )
+            )
+        );
+
         SmeltingBonuses.register(Items.EMERALD, FmItems.EMERALD_FRAGMENT.get());
-        Tc4TinkererAdapter.register();
+        host.registerOptionalEnchantments();
     }
 
     private static void logAspectRegistry() {
