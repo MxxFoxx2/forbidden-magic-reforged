@@ -13,7 +13,11 @@ public final class FmBlockEntities {
 
     public static final Supplier<BlockEntityType<WrathCageBlockEntity>> WRATH_CAGE =
         BLOCK_ENTITIES.register("wrath_cage", () ->
-            BlockEntityType.Builder.of((pos, state) -> HostAdapterRegistry.requireBlockEntities().createWrathCageBlockEntity(pos, state), FmBlocks.WRATH_CAGE.get()).build(null));
+            BlockEntityType.Builder.of(
+                (pos, state) -> (WrathCageBlockEntity) HostAdapterRegistry.requireBlockEntities()
+                    .createWrathCageBlockEntity(pos, state),
+                FmBlocks.WRATH_CAGE.get()
+            ).build(null));
 
     private FmBlockEntities() {
     }

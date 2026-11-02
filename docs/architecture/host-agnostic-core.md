@@ -28,7 +28,7 @@ The core may use Minecraft runtime types where behavior necessarily operates on 
 
 ### Adapter contract — `integration/api/`
 
-- `HostAdapter` describes the selected host's catalog registration, diagnostics, bootstrap, and profile.
+- `HostAdapter` describes the selected host's catalog registration, diagnostics, bootstrap, and profile. `HostBlockEntityServices` exposes the Minecraft `BlockEntity` base type; the concrete TC4 Wrath Cage type is resolved only at the 1.21.1 registration and rendering sites.
 - `HostProfile` declares every capability as `NATIVE`, `ADAPTED`, `PARTIAL`, or `UNSUPPORTED`.
 - `HostAdapterRegistry` installs the selected adapter once and exposes typed capability lookups.
 

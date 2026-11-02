@@ -540,8 +540,13 @@ public final class FmGameTests {
 
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void mobCrystalAttunesAndSwapsCageTarget(GameTestHelper helper) {
-        var cage = new WrathCageBlockEntity(new net.minecraft.core.BlockPos(0, 0, 0),
-            dev.visfox.forbiddenreforged.FmBlocks.WRATH_CAGE.get().defaultBlockState());
+        var created = HostAdapterRegistry.requireBlockEntities().createWrathCageBlockEntity(
+            new net.minecraft.core.BlockPos(0, 0, 0),
+            dev.visfox.forbiddenreforged.FmBlocks.WRATH_CAGE.get().defaultBlockState()
+        );
+        helper.assertTrue(created instanceof WrathCageBlockEntity,
+            "the selected host factory creates the registered Wrath Cage implementation");
+        WrathCageBlockEntity cage = (WrathCageBlockEntity) created;
         ItemStack crystal = new ItemStack(FmItems.MOB_CRYSTAL.get());
         MobCrystalItem.setMob(crystal, "minecraft:zombie");
         helper.assertTrue(WrathCageBlock.attune(cage, crystal), "valid crystal should attune cage");

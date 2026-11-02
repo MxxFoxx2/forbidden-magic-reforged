@@ -1,6 +1,7 @@
 package dev.visfox.forbiddenreforged;
 
 import javax.annotation.Nullable;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -24,7 +25,7 @@ public final class WrathCageBlock extends Block implements EntityBlock {
 
     @Override
     public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new WrathCageBlockEntity(pos, state);
+        return HostAdapterRegistry.requireBlockEntities().createWrathCageBlockEntity(pos, state);
     }
 
     @Override
