@@ -373,6 +373,24 @@ public final class FmGameTests {
                 rod.tag().equals("neutronium") && rod.capacity() == 9002 && rod.staff()
                     && rod.update() == WandMaterialCatalog.RodUpdateKind.CREATIVE),
             "Neutronium staff retains its creative update profile");
+        helper.assertValueEqual(WandMaterialCatalog.rodId("profaned"),
+            ContentId.parse("forbiddenmagic:wand_rod/profaned"),
+            "Profane rod uses the canonical semantic material identifier");
+        helper.assertValueEqual(WandMaterialCatalog.capId("alchemical"),
+            ContentId.parse("forbiddenmagic:wand_cap/alchemical"),
+            "Alchemical cap uses the canonical semantic material identifier");
+        helper.assertValueEqual(WandMaterialCatalog.rodTag(
+                ContentId.parse("forbiddenmagic:wand_rod/profaned")),
+            "profaned", "the host key is recovered only from the canonical rod identifier");
+        boolean rejectsForeignRodId = false;
+        try {
+            WandMaterialCatalog.rodTag(ContentId.parse("thaumcraft:profaned"));
+        } catch (IllegalArgumentException expected) {
+            rejectsForeignRodId = true;
+        }
+        helper.assertTrue(rejectsForeignRodId,
+            "foreign host namespaces cannot enter the shared rod mutation contract");
+
         var caps = WandMaterialCatalog.caps();
         helper.assertValueEqual(caps.size(), 2, "both custom wand caps are catalogued");
         helper.assertTrue(caps.stream().anyMatch(cap ->
@@ -384,6 +402,24 @@ public final class FmGameTests {
                 cap.tag().equals("orichalcum") && cap.multiplier() == 0.0F
                     && cap.discount() == 0.0F && cap.aspects().isEmpty()),
             "Orichalcum cap retains its zero-cost creative profile");
+        helper.succeed();
+    }
+
+
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void hostWandPartsCapabilityPreservesUnchangedParts(GameTestHelper helper) {
+        ItemStack wand = Wands.create(WandRegistry.CAP_THAUMIUM, WandRegistry.findRod("tainted"), false);
+        var originalParts = Wands.getParts(wand);
+
+        HostAdapterRegistry.requireWandParts().setRod(wand, WandMaterialCatalog.rodId("profaned"));
+
+        var updatedParts = Wands.getParts(wand);
+        helper.assertValueEqual(Wands.getRod(wand).tag(), "profaned",
+            "the semantic Profane rod identifier resolves to the native rod");
+        helper.assertValueEqual(updatedParts.cap(), originalParts.cap(),
+            "changing the rod does not replace the cap");
+        helper.assertValueEqual(updatedParts.sceptre(), originalParts.sceptre(),
+            "changing the rod preserves the sceptre flag");
         helper.succeed();
     }
 
