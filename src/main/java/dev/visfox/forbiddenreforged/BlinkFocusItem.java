@@ -62,19 +62,9 @@ public class BlinkFocusItem extends FocusItem {
         var focusServices = HostAdapterRegistry.requireFocus();
         boolean hellfire = focusServices.hasFocusUpgrade(focus, BlinkFocusRules.Upgrade.HELLFIRE);
         boolean pandemonium = focusServices.hasFocusUpgrade(focus, BlinkFocusRules.Upgrade.PANDEMONIUM);
-        return BlinkFocusRules.possibleUpgradesByRank(rank, hellfire, pandemonium).stream()
-            .map(BlinkFocusItem::hostUpgrade)
-            .toArray(FocusUpgradeType[]::new);
-    }
-
-    private static FocusUpgradeType hostUpgrade(BlinkFocusRules.Upgrade upgrade) {
-        return switch (upgrade) {
-            case FRUGAL -> FocusUpgradeType.FRUGAL;
-            case HELLFIRE -> HELLFIRE;
-            case PANDEMONIUM -> PANDEMONIUM;
-            case POTENCY -> FocusUpgradeType.POTENCY;
-            case ENLARGE -> FocusUpgradeType.ENLARGE;
-        };
+        return Tc4FocusAdapter.toHostUpgrades(
+            BlinkFocusRules.possibleUpgradesByRank(rank, hellfire, pandemonium)
+        );
     }
 
     public static HitResult target(net.minecraft.world.entity.player.Player player) {
