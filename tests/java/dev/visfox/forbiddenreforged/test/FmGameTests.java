@@ -585,12 +585,12 @@ public final class FmGameTests {
         var host = HostAdapterRegistry.requireBlockEntities();
         ItemStack crystal = new ItemStack(FmItems.MOB_CRYSTAL.get());
         MobCrystalItem.setMob(crystal, "minecraft:zombie");
-        helper.assertTrue(WrathCageBlock.attune(cage, crystal), "valid crystal should attune cage");
+        helper.assertTrue(WrathCageBlock.attune(created, crystal), "valid crystal should attune cage");
         helper.assertValueEqual(host.wrathCageMobId(created), "minecraft:zombie", "cage should remember the captured entity");
         helper.assertTrue(MobCrystalItem.mob(crystal) == null, "crystal should be consumed into an empty cage");
         ItemStack second = new ItemStack(FmItems.MOB_CRYSTAL.get());
         MobCrystalItem.setMob(second, "minecraft:skeleton");
-        helper.assertTrue(WrathCageBlock.attune(cage, second), "second crystal should swap cage target");
+        helper.assertTrue(WrathCageBlock.attune(created, second), "second crystal should swap cage target");
         helper.assertValueEqual(host.wrathCageMobId(created), "minecraft:skeleton", "cage should change its target");
         helper.assertValueEqual(MobCrystalItem.mob(second), "minecraft:zombie", "old target should be returned in the crystal");
         helper.succeed();
