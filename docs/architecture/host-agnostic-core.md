@@ -52,7 +52,7 @@ The original 1.21.1 gameplay implementation is retained for legacy features that
 The 1.21.1 `Tc4HostAdapter` declares every `HostProfile.Feature`. The currently adapted capabilities include:
 
 - Aspect registration, diagnostics, presentation, and scan targets.
-- Semantic recipe and research catalog registration for the supported recipe/page forms.
+- Semantic recipe and research catalog registration for the supported recipe/page forms, including item, entity, and aspect unlock triggers.
 - Warp pools and sticky warp mapping.
 - Morph-tool area mining and cycle sound.
 - Wand inspection and wand/real Vis writes.
