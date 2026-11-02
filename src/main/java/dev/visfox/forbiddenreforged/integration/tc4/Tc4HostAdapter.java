@@ -1,6 +1,12 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
 import dev.visfox.forbiddenreforged.FmAspectTags;
+import dev.visfox.forbiddenreforged.MorphToolItem;
+import dev.visfox.forbiddenreforged.RingNutritionItem;
+import dev.visfox.forbiddenreforged.CrystalwellItem;
+import dev.visfox.forbiddenreforged.PrimewellItem;
+import dev.visfox.forbiddenreforged.BlinkFocusItem;
+import dev.visfox.forbiddenreforged.SubCollarItem;
 import dev.visfox.forbiddenreforged.WrathCageBlockEntity;
 import dev.visfox.forbiddenreforged.core.aspect.AspectDefinition;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
@@ -17,6 +23,8 @@ import dev.visfox.forbiddenreforged.integration.runtime.HostEnchantmentEffectSer
 import dev.visfox.forbiddenreforged.integration.runtime.HostEntityAspectServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostEntityClassificationServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostMorphToolServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostItemFactoryServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostItemPropertyServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostScribingServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostTaintBlockServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandInspectionServices;
@@ -26,6 +34,8 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -33,11 +43,16 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import java.util.Set;
 import java.util.function.Predicate;
+import thaumcraft.item.gear.TcMaterials;
+import thaumcraft.platform.Registration;
+import thaumcraft.wand.focus.FocusItem;
 import net.minecraft.server.level.ServerPlayer;
 
 /**
@@ -47,7 +62,7 @@ import net.minecraft.server.level.ServerPlayer;
  * 1.21.1 gameplay integrations remain intact while their extraction into
  * focused host capabilities proceeds incrementally.
  */
-public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, HostWarpServices, HostMorphToolServices, HostBlockEntityServices, HostWandInspectionServices, HostWandVisServices, HostAccessoryServices, HostTaintBlockServices, HostEnchantmentEffectServices, HostScribingServices, HostEntityAspectServices, HostEntityClassificationServices {
+public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, HostWarpServices, HostMorphToolServices, HostBlockEntityServices, HostWandInspectionServices, HostWandVisServices, HostAccessoryServices, HostTaintBlockServices, HostEnchantmentEffectServices, HostScribingServices, HostEntityAspectServices, HostEntityClassificationServices, HostItemFactoryServices, HostItemPropertyServices {
     public static final Tc4HostAdapter INSTANCE = new Tc4HostAdapter();
 
     private static final String LEGACY_RUNTIME_NOTE =
@@ -111,6 +126,10 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
             "Provides entity-to-aspect mappings using semantic identifiers");
         adapted(support, HostProfile.Feature.ENTITY_CLASSIFICATION,
             "Delegates tainted-mob, TC4 boss and golem classification to TC4");
+        adapted(support, HostProfile.Feature.ITEM_PROPERTIES,
+            "Provides TC4 tool stats, rarity, food and focus properties");
+        adapted(support, HostProfile.Feature.ITEM_FACTORIES,
+            "Creates TC4-bound morph, ring, scribing and accessory items behind the host factory");
         support.put(HostProfile.Feature.TAINT_ORIGINS,
             HostProfile.FeatureSupport.unsupported("No TC4 taint-origin registration or propagation adapter exists"));
 
@@ -307,5 +326,90 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
     @Override
     public Set<ContentId> bossEntityIds() {
         return Tc4EntityAdapter.bossEntityIds();
+    }
+
+    @Override
+    public Item.Properties gluttonyFoodProperties(Item.Properties properties) {
+        return Registration.food(properties, 2, 0.1F);
+    }
+
+    @Override
+    public Item.Properties skullAxeProperties(Item.Properties properties) {
+        return Registration.sword(properties.rarity(Rarity.UNCOMMON), TcMaterials.ELEMENTAL_TOOL, 3.0F, -2.4F);
+    }
+
+    @Override
+    public Item.Properties morphPickaxeProperties(Item.Properties properties) {
+        return Registration.pickaxe(properties.rarity(Rarity.EPIC), TcMaterials.ELEMENTAL_TOOL, 2.0F, -2.8F);
+    }
+
+    @Override
+    public Item.Properties morphSwordProperties(Item.Properties properties) {
+        return Registration.sword(properties.rarity(Rarity.EPIC), TcMaterials.ELEMENTAL_TOOL, 3.0F, -2.4F);
+    }
+
+    @Override
+    public Item.Properties morphShovelProperties(Item.Properties properties) {
+        return Registration.shovel(properties.rarity(Rarity.EPIC), TcMaterials.ELEMENTAL_TOOL, 1.0F, -3.0F);
+    }
+
+    @Override
+    public Item.Properties morphAxeProperties(Item.Properties properties) {
+        return Registration.axe(properties.rarity(Rarity.EPIC), TcMaterials.ELEMENTAL_TOOL, 3.0F, -3.0F);
+    }
+
+    @Override
+    public Item.Properties diabolistForkProperties(Item.Properties properties) {
+        return Registration.sword(properties.rarity(Rarity.UNCOMMON), TcMaterials.THAUMIUM_TOOL, 3.0F, -2.4F);
+    }
+
+    @Override
+    public Item.Properties taintShovelProperties(Item.Properties properties) {
+        return Registration.shovel(properties.rarity(Rarity.UNCOMMON), TcMaterials.ELEMENTAL_TOOL, 1.0F, -3.0F);
+    }
+
+    @Override
+    public Item.Properties taintPickaxeProperties(Item.Properties properties) {
+        return Registration.pickaxe(properties.rarity(Rarity.UNCOMMON), TcMaterials.ELEMENTAL_TOOL, 1.0F, -2.8F);
+    }
+
+    @Override
+    public Item.Properties blinkFocusProperties(Item.Properties properties) {
+        return FocusItem.properties(properties);
+    }
+
+    @Override
+    public Item createMorphTool(Item.Properties properties) {
+        return new MorphToolItem(properties);
+    }
+
+    @Override
+    public Item createRingNutrition(Item.Properties properties) {
+        return new RingNutritionItem(properties);
+    }
+
+    @Override
+    public Item createCrystalwell(Item.Properties properties) {
+        return new CrystalwellItem(properties);
+    }
+
+    @Override
+    public Item createPrimewell(Item.Properties properties) {
+        return new PrimewellItem(properties);
+    }
+
+    @Override
+    public Item createBlinkFocus(Item.Properties properties) {
+        return new BlinkFocusItem(properties);
+    }
+
+    @Override
+    public Item primordialPearlItem() {
+        return BuiltInRegistries.ITEM.get(ResourceLocation.parse("thaumcraft:primordial_pearl"));
+    }
+
+    @Override
+    public Item createSubCollar(Item.Properties properties) {
+        return new SubCollarItem(properties);
     }
 }
