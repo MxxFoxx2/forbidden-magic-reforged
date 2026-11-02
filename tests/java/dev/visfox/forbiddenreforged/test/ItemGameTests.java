@@ -699,10 +699,19 @@ public final class ItemGameTests {
         List<dev.visfox.forbiddenreforged.core.model.ContentId> restored =
             FmToolEvents.taintedVisRolls(RandomSource.create(42L));
         helper.assertValueEqual(restored.size(), 3, "taint damage makes three independent primal-aspect rolls");
+        List<dev.visfox.forbiddenreforged.core.model.ContentId> semanticPrimals = List.of(
+            dev.visfox.forbiddenreforged.core.model.ContentId.parse("forbiddenmagic:concept/entropy"),
+            dev.visfox.forbiddenreforged.core.model.ContentId.parse("forbiddenmagic:concept/order"),
+            dev.visfox.forbiddenreforged.core.model.ContentId.parse("forbiddenmagic:concept/fire"),
+            dev.visfox.forbiddenreforged.core.model.ContentId.parse("forbiddenmagic:concept/water"),
+            dev.visfox.forbiddenreforged.core.model.ContentId.parse("forbiddenmagic:concept/earth"),
+            dev.visfox.forbiddenreforged.core.model.ContentId.parse("forbiddenmagic:concept/air")
+        );
         for (var aspect : restored) {
-            helper.assertTrue(aspect.namespace().equals("thaumcraft")
-                    && List.of("perditio", "ordo", "ignis", "aqua", "terra", "aer").contains(aspect.path()),
-                "every restored semantic aspect must identify a TC4 primal aspect");
+            helper.assertTrue(semanticPrimals.contains(aspect),
+                "taint damage emits only canonical semantic primal identifiers");
+            helper.assertTrue(Aspect.getPrimalAspects().contains(Tc4AspectAdapter.resolveAspect(aspect)),
+                "every semantic restored aspect resolves to a native TC4 primal aspect");
         }
         helper.succeed();
     }
