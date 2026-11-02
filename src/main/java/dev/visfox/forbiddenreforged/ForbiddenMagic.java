@@ -24,7 +24,7 @@ public final class ForbiddenMagic {
         FmConfig.register(modContainer);
         HostAdapterRegistry.install(Tc4HostAdapter.INSTANCE);
         FmAspects.init();
-        FmAspectTags.register();
+        HostAdapterRegistry.require().registerAspectTags();
         FmComponents.register(modEventBus);
         FmBlocks.BLOCKS.register(modEventBus);
         FmBlockEntities.register(modEventBus);
