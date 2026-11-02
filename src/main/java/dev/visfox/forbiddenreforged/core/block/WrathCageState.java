@@ -79,6 +79,40 @@ public final class WrathCageState {
         this.slothful = slothful;
     }
 
+    /** Evaluates the legacy spawn gate against this complete logical state. */
+    public boolean canSpawn(boolean powered, int cost) {
+        return WrathCageBehavior.shouldSpawn(powered, mobId != null, fuel, cost, storage.total());
+    }
+
+    /**
+     * Selects and consumes one complete fuel channel in mob, Wrath, Sloth order.
+     * Returns true only when a channel was consumed and a new fuel duration applied.
+     */
+    public boolean loadFuel(int cost, int fuelDuration) {
+        if (cost <= 0 || fuel > 0) {
+            return false;
+        }
+
+        WrathCageBehavior.FuelChannel channel = WrathCageBehavior.selectFuelChannel(
+            storage.amount(WrathCageStorage.Channel.MOB),
+            storage.amount(WrathCageStorage.Channel.WRATH),
+            storage.amount(WrathCageStorage.Channel.SLOTH),
+            cost
+        );
+        switch (channel) {
+            case SPECIAL -> storage.remove(WrathCageStorage.Channel.MOB, cost);
+            case WRATH -> storage.remove(WrathCageStorage.Channel.WRATH, cost);
+            case SLOTH -> storage.remove(WrathCageStorage.Channel.SLOTH, cost);
+            case NONE -> {
+                return false;
+            }
+        }
+
+        fuel = fuelDuration;
+        slothful = channel == WrathCageBehavior.FuelChannel.SLOTH;
+        return true;
+    }
+
     public Snapshot snapshot() {
         return new Snapshot(mobId, storage.snapshot(), fuel, spawnDelay, slothful);
     }

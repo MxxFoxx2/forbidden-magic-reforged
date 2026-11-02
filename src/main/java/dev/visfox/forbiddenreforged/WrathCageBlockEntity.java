@@ -78,34 +78,12 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
             cage.drawEssentia(level, pos);
         }
         boolean powered = level.hasNeighborSignal(pos);
-        if (!shouldSpawn(powered, cage.cageState.mobId() != null, cage.cageState.fuel(), cost, cage.cageState.storage().total())) {
+        if (!cage.cageState.canSpawn(powered, cost)) {
             return;
         }
-        if (cost > 0 && cage.cageState.fuel() <= 0) {
-            WrathCageBehavior.FuelChannel channel = WrathCageBehavior.selectFuelChannel(
-                cage.cageState.storage().amount(WrathCageStorage.Channel.MOB),
-                cage.cageState.storage().amount(WrathCageStorage.Channel.WRATH),
-                cage.cageState.storage().amount(WrathCageStorage.Channel.SLOTH),
-                cost
-            );
-            switch (channel) {
-                case SPECIAL -> cage.cageState.storage().remove(WrathCageStorage.Channel.MOB, cost);
-                case WRATH -> cage.cageState.storage().remove(WrathCageStorage.Channel.WRATH, cost);
-                case SLOTH -> {
-                    cage.cageState.storage().remove(WrathCageStorage.Channel.SLOTH, cost);
-                    cage.cageState.setSlothful(true);
-                }
-                case NONE -> {
-                    // No complete fuel channel is available.
-                }
-            }
-            if (channel != WrathCageBehavior.FuelChannel.NONE) {
-                cage.cageState.setFuel(FmConfig.wrathEff());
-                if (channel != WrathCageBehavior.FuelChannel.SLOTH) {
-                    cage.cageState.setSlothful(false);
-                }
-                cage.sync();
-            }
+        if (cost > 0 && cage.cageState.fuel() <= 0
+            && cage.cageState.loadFuel(cost, FmConfig.wrathEff())) {
+            cage.sync();
         }
         if (cage.cageState.fuel() <= 0 && cost > 0) {
             return;

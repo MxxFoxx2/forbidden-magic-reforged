@@ -204,6 +204,69 @@ public final class FmGameTests {
     }
 
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void wrathCageStateOwnsSpawnEligibilityAndFuelPriority(GameTestHelper helper) {
+        WrathCageState empty = new WrathCageState();
+        helper.assertTrue(!empty.canSpawn(false, 0),
+            "an unattuned cage cannot spawn even when essentia cost is disabled");
+        empty.setMobId("minecraft:zombie");
+        helper.assertTrue(empty.canSpawn(false, 0),
+            "an unattuned-free cage can spawn when essentia cost is disabled");
+        helper.assertTrue(!empty.canSpawn(true, 0),
+            "redstone power blocks spawn attempts");
+
+        WrathCageState mobPriority = new WrathCageState();
+        mobPriority.setMobId("minecraft:zombie");
+        mobPriority.storage().setAmount(WrathCageStorage.Channel.MOB, 5);
+        mobPriority.storage().setAmount(WrathCageStorage.Channel.WRATH, 5);
+        mobPriority.storage().setAmount(WrathCageStorage.Channel.SLOTH, 5);
+        helper.assertTrue(mobPriority.canSpawn(false, 5),
+            "the spawn gate sees the combined stored amount");
+        helper.assertTrue(mobPriority.loadFuel(5, 120),
+            "mob essentia can be converted into fuel");
+        helper.assertValueEqual(mobPriority.storage().amount(WrathCageStorage.Channel.MOB), 0,
+            "mob essentia has first fuel priority");
+        helper.assertValueEqual(mobPriority.storage().amount(WrathCageStorage.Channel.WRATH), 5,
+            "mob fuel selection leaves Wrath untouched");
+        helper.assertValueEqual(mobPriority.fuel(), 120,
+            "fuel duration is applied after channel consumption");
+        helper.assertTrue(!mobPriority.slothful(),
+            "mob fuel does not enable Sloth delay");
+
+        WrathCageState wrathPriority = new WrathCageState();
+        wrathPriority.setMobId("minecraft:zombie");
+        wrathPriority.storage().setAmount(WrathCageStorage.Channel.WRATH, 5);
+        wrathPriority.storage().setAmount(WrathCageStorage.Channel.SLOTH, 5);
+        helper.assertTrue(wrathPriority.loadFuel(5, 90),
+            "Wrath essentia can be converted when mob essentia is absent");
+        helper.assertValueEqual(wrathPriority.storage().amount(WrathCageStorage.Channel.WRATH), 0,
+            "Wrath has priority over Sloth");
+        helper.assertTrue(!wrathPriority.slothful(),
+            "Wrath fuel does not enable Sloth delay");
+
+        WrathCageState slothPriority = new WrathCageState();
+        slothPriority.setMobId("minecraft:zombie");
+        slothPriority.storage().setAmount(WrathCageStorage.Channel.SLOTH, 5);
+        helper.assertTrue(slothPriority.loadFuel(5, 60),
+            "Sloth essentia can be converted when higher-priority channels are absent");
+        helper.assertValueEqual(slothPriority.storage().amount(WrathCageStorage.Channel.SLOTH), 0,
+            "Sloth fuel is consumed from the Sloth channel");
+        helper.assertTrue(slothPriority.slothful(),
+            "Sloth fuel enables the longer delay");
+
+        WrathCageState splitChannels = new WrathCageState();
+        splitChannels.setMobId("minecraft:zombie");
+        splitChannels.storage().setAmount(WrathCageStorage.Channel.MOB, 2);
+        splitChannels.storage().setAmount(WrathCageStorage.Channel.WRATH, 3);
+        helper.assertTrue(splitChannels.canSpawn(false, 5),
+            "the initial gate still uses the total across channels");
+        helper.assertTrue(!splitChannels.loadFuel(5, 60),
+            "fuel cannot be assembled by combining incomplete channels");
+        helper.assertValueEqual(splitChannels.fuel(), 0,
+            "failed fuel selection does not create fuel");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void wandTriggerCatalogPreservesHellfireDefinition(GameTestHelper helper) {
         var trigger = WandTriggerCatalog.hellfire();
         helper.assertValueEqual(trigger.id(), ContentId.parse("forbiddenmagic:wand_trigger/hellfire"),
