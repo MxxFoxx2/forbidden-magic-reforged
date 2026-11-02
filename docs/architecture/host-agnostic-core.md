@@ -20,6 +20,7 @@ The shared core owns:
 
 - `ContentId` and symbolic host content references.
 - Aspect, recipe, and research definitions/catalogs.
+  `FmRecipes` and `FmResearch` are thin registration facades; their full definitions live in `ForbiddenMagicRecipeCatalog` and `ForbiddenMagicResearchCatalog`.
 - Shared wand behavior rules and narrow access contracts, including Blink Focus targeting, teleport effects, upgrade progression/cost profiles, and Witchwood mana conversion rates.
 - Shared Wrath Cage logical state (attunement, storage, fuel, spawn delay, and Sloth mode), spawn eligibility and fuel selection/application, spawn-delay countdown rules, complete spawn-round orchestration, player-range gating, vanilla entity resolution/creation, per-round attempt limits, nearby-entity caps, placement and collision checks, bounded three-channel Essentia storage, semantic aspect-to-channel routing, extraction eligibility, display-mode selection, and immutable state snapshot/restore.
 - Semantic warp kinds and access contracts.
