@@ -25,12 +25,12 @@ import net.neoforged.neoforge.event.level.BlockDropsEvent;
 
 public final class FmToolEvents {
     private static final ContentId[] TAINTED_PRIMALS = {
-        new ContentId("thaumcraft", "perditio"),
-        new ContentId("thaumcraft", "ordo"),
-        new ContentId("thaumcraft", "ignis"),
-        new ContentId("thaumcraft", "aqua"),
-        new ContentId("thaumcraft", "terra"),
-        new ContentId("thaumcraft", "aer")
+        ContentId.parse("forbiddenmagic:concept/entropy"),
+        ContentId.parse("forbiddenmagic:concept/order"),
+        ContentId.parse("forbiddenmagic:concept/fire"),
+        ContentId.parse("forbiddenmagic:concept/water"),
+        ContentId.parse("forbiddenmagic:concept/earth"),
+        ContentId.parse("forbiddenmagic:concept/air")
     };
 
     private FmToolEvents() {
