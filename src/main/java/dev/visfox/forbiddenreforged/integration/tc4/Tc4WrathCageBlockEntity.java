@@ -1,7 +1,7 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
 import dev.visfox.forbiddenreforged.FmBlockEntities;
-import dev.visfox.forbiddenreforged.FmSpawnerMobs;
+import dev.visfox.forbiddenreforged.FmConfig;
 import dev.visfox.forbiddenreforged.WrathCageBlockEntity;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 import java.util.ArrayList;
@@ -30,8 +30,13 @@ public final class Tc4WrathCageBlockEntity extends WrathCageBlockEntity implemen
 
     @Override
     protected ContentId mobEssentiaType() {
-        ContentId aspect = FmSpawnerMobs.aspect(getMobId());
-        return aspect == null ? ContentId.parse("thaumcraft:lucrum") : aspect;
+        String mobId = getMobId();
+        if (mobId == null) {
+            return ContentId.parse("thaumcraft:lucrum");
+        }
+        ContentId entityId = ContentId.parse(mobId);
+        return Tc4EntityAdapter.aspectCatalog(FmConfig.silverfishEmeralds())
+            .getOrDefault(entityId, ContentId.parse("thaumcraft:lucrum"));
     }
 
     @Override
