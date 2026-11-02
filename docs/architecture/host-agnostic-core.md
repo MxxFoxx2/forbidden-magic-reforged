@@ -80,7 +80,7 @@ Every other declared capability is backed by an implemented runtime capability a
 
 The 1.21.1 workflow builds the pinned Thaumcraft host and addon, verifies artifact provenance, runs GameTests, and uploads the resulting JAR. The architecture boundary checker rejects Thaumcraft dependencies in `core/`, `integration/api/`, and `integration/runtime/`, and checks all production sources outside `integration/tc4/` for direct host imports. The only production exception is the single `Tc4HostAdapter` import in the `ForbiddenMagic` composition root.
 
-The GameTest `hostAdapterDeclaresThe1_21_1CapabilityProfile` asserts the selected host/Minecraft versions, full feature coverage, and representative `ADAPTED`, `PARTIAL`, and `UNSUPPORTED` declarations.
+`hostAdapterDeclaresThe1_21_1CapabilityProfile` checks the selected host/Minecraft versions and feature declarations. `tc4HostProfileMatchesEveryRuntimeCapability` additionally audits all 38 profile entries, requires a non-empty explanation for every support level, verifies the expected `ADAPTED`/`PARTIAL`/`UNSUPPORTED` classification for every feature, and resolves every typed `HostAdapterRegistry` capability accessor. Catalog registration, scan-target registration, diagnostics, and runtime bootstrap are intentionally provided by the base `HostAdapter`; the event-time services are exposed through the narrow `Host*Services` interfaces. The test also checks the mapping between those typed services and the corresponding profile features.
 
 A green headless CI run verifies compilation and GameTest behavior; it does not replace manual client checks for rendering, tooltips, wand/focus interactions, and in-world visuals before release.
 
