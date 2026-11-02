@@ -170,7 +170,7 @@ public final class RecipeGameTests {
         assertTc4FeatureSupport(helper, profile);
         helper.assertValueEqual(profile.id(), ContentId.parse("host:tc4-reforged"), "selected host profile id");
         helper.assertValueEqual(profile.hostVersion(), "1.1.2", "selected host dependency version");
-        helper.assertValueEqual(profile.minecraftVersion(), "26.3", "selected Minecraft version");
+        helper.assertValueEqual(profile.minecraftVersion(), "26.1.2", "selected Minecraft version");
         helper.assertTrue(
             profile.supportOf(HostProfile.Feature.ASPECT_REGISTRATION).level() == HostProfile.SupportLevel.ADAPTED,
             "aspect registration is exposed through the adapter"
