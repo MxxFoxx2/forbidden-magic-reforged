@@ -147,6 +147,17 @@ public final class FmGameTests {
             BlinkFocusRules.CostProfile.PANDEMONIUM, "Pandemonium selects its own cost profile");
         helper.assertValueEqual(BlinkFocusRules.costProfile(false, false),
             BlinkFocusRules.CostProfile.BASE, "unupgraded focus uses base cost");
+        helper.assertValueEqual(BlinkFocusRules.visCosts(false, false),
+            List.of(new BlinkFocusRules.VisCost(ContentId.parse("forbiddenmagic:concept/entropy"), 300)),
+            "base focus costs 300 Entropy");
+        helper.assertValueEqual(BlinkFocusRules.visCosts(true, false),
+            List.of(new BlinkFocusRules.VisCost(ContentId.parse("forbiddenmagic:concept/entropy"), 300),
+                new BlinkFocusRules.VisCost(ContentId.parse("forbiddenmagic:concept/fire"), 100)),
+            "Hellfire focus adds 100 Fire");
+        helper.assertValueEqual(BlinkFocusRules.visCosts(false, true),
+            List.of(new BlinkFocusRules.VisCost(ContentId.parse("forbiddenmagic:concept/entropy"), 300),
+                new BlinkFocusRules.VisCost(ContentId.parse("forbiddenmagic:concept/order"), 100)),
+            "Pandemonium focus adds 100 Order");
         helper.succeed();
     }
 
@@ -182,6 +193,10 @@ public final class FmGameTests {
             "wand part mutation is exposed through the selected host capability");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.WAND_TRIGGERS).level(),
             HostProfile.SupportLevel.PARTIAL, "Hellfire trigger rules are shared but registration remains TC4-specific");
+        helper.assertValueEqual(profile.supportOf(HostProfile.Feature.FOCI_OR_SPELLS).level(),
+            HostProfile.SupportLevel.PARTIAL, "Blink Focus lifecycle and rendering remain TC4-bound");
+        helper.assertTrue(HostAdapterRegistry.requireFocus() != null,
+            "focus upgrade inspection and Vis payment are routed through a typed host capability");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.VILLAGER_TRADES).level(),
             HostProfile.SupportLevel.ADAPTED, "Thaumcraft-specific heretic trades are supplied by the host adapter");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.RUNTIME_BOOTSTRAP).level(),

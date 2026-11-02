@@ -10,6 +10,7 @@ import dev.visfox.forbiddenreforged.SubCollarItem;
 import dev.visfox.forbiddenreforged.WrathCageBlockEntity;
 import dev.visfox.forbiddenreforged.core.aspect.AspectDefinition;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
+import dev.visfox.forbiddenreforged.core.wand.BlinkFocusRules;
 import dev.visfox.forbiddenreforged.core.recipe.RecipeDefinition;
 import dev.visfox.forbiddenreforged.core.research.ResearchCategoryDefinition;
 import dev.visfox.forbiddenreforged.core.research.ResearchDefinition;
@@ -31,6 +32,7 @@ import dev.visfox.forbiddenreforged.integration.runtime.HostTaintBlockServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandInspectionServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandVisServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandPartsServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostFocusServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWarpServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostVillagerTradeServices;
 import java.util.EnumMap;
@@ -68,7 +70,7 @@ import net.minecraft.server.level.ServerPlayer;
  * 1.21.1 gameplay integrations remain intact while their extraction into
  * focused host capabilities proceeds incrementally.
  */
-public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, HostWarpServices, HostMorphToolServices, HostBlockEntityServices, HostWandInspectionServices, HostWandVisServices, HostWandPartsServices, HostAccessoryServices, HostTaintBlockServices, HostEnchantmentEffectServices, HostScribingServices, HostEntityAspectServices, HostEntityClassificationServices, HostItemFactoryServices, HostItemPropertyServices, HostBootstrapServices, HostVillagerTradeServices {
+public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, HostWarpServices, HostMorphToolServices, HostBlockEntityServices, HostWandInspectionServices, HostWandVisServices, HostWandPartsServices, HostFocusServices, HostAccessoryServices, HostTaintBlockServices, HostEnchantmentEffectServices, HostScribingServices, HostEntityAspectServices, HostEntityClassificationServices, HostItemFactoryServices, HostItemPropertyServices, HostBootstrapServices, HostVillagerTradeServices {
     public static final Tc4HostAdapter INSTANCE = new Tc4HostAdapter();
 
     private static final String LEGACY_RUNTIME_NOTE =
@@ -126,6 +128,8 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
             "Core exposes a typed parts access contract; mutation still uses TC4 WandParts and WandKeys"));
         support.put(HostProfile.Feature.WAND_TRIGGERS, HostProfile.FeatureSupport.partial(
             "Hellfire trigger rules are shared; TC4 trigger registration and runtime callbacks remain host-specific"));
+        support.put(HostProfile.Feature.FOCI_OR_SPELLS, HostProfile.FeatureSupport.partial(
+            "Blink Focus upgrade rules and Vis costs are shared; FocusItem registration and runtime remain TC4-bound"));
         adapted(support, HostProfile.Feature.ACCESSORY_INTEGRATION,
             "Reads accessory slots through the TC4 Baubles bridge");
         adapted(support, HostProfile.Feature.TAINT_BLOCK_SERVICES,
@@ -257,6 +261,26 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
     @Override
     public int wandFocusPotency(ItemStack stack) {
         return Tc4WandRuntimeAdapter.focusPotency(stack);
+    }
+
+    @Override
+    public ItemStack wandFocusItem(ItemStack stack) {
+        return Tc4WandRuntimeAdapter.focusItem(stack);
+    }
+
+    @Override
+    public int wandFocusEnlarge(ItemStack stack) {
+        return Tc4WandRuntimeAdapter.focusEnlarge(stack);
+    }
+
+    @Override
+    public boolean hasFocusUpgrade(ItemStack focus, BlinkFocusRules.Upgrade upgrade) {
+        return Tc4FocusAdapter.hasUpgrade(focus, upgrade);
+    }
+
+    @Override
+    public boolean consumeFocusVis(ItemStack wand, Player player, List<BlinkFocusRules.VisCost> costs, boolean apply) {
+        return Tc4FocusAdapter.consumeVis(wand, player, costs, apply);
     }
 
     @Override

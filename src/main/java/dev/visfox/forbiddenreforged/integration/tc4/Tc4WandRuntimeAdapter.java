@@ -26,6 +26,14 @@ public final class Tc4WandRuntimeAdapter {
         return Wands.getFocusPotency(wand);
     }
 
+    public static ItemStack focusItem(ItemStack wand) {
+        return Wands.getFocusItem(wand);
+    }
+
+    public static int focusEnlarge(ItemStack wand) {
+        return Wands.getFocusEnlarge(wand);
+    }
+
     public static void addVis(ItemStack wand, Aspect aspect, int amount, boolean apply) {
         Wands.addVis(wand, aspect, amount, apply);
     }

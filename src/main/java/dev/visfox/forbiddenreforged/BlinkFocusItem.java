@@ -2,6 +2,8 @@ package dev.visfox.forbiddenreforged;
 
 import dev.visfox.forbiddenreforged.core.wand.BlinkFocusBehavior;
 import dev.visfox.forbiddenreforged.core.wand.BlinkFocusRules;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4FocusAdapter;
 import java.util.List;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionResult;
@@ -11,18 +13,11 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import javax.annotation.Nullable;
-import thaumcraft.aspect.Aspect;
 import thaumcraft.aspect.AspectList;
-import thaumcraft.wand.WandItem;
-import thaumcraft.wand.Wands;
 import thaumcraft.wand.focus.FocusItem;
 import thaumcraft.wand.focus.FocusUpgradeType;
 
 public class BlinkFocusItem extends FocusItem {
-    private static final AspectList COST_BASE = new AspectList().add(Aspect.ENTROPY, 300);
-    private static final AspectList COST_HELLFIRE = new AspectList().add(Aspect.ENTROPY, 300).add(Aspect.FIRE, 100);
-    private static final AspectList COST_PANDEMONIUM = new AspectList().add(Aspect.ENTROPY, 300).add(Aspect.ORDER, 100);
-
     public static final FocusUpgradeType HELLFIRE = new FocusUpgradeType(100, "hellfire", ForbiddenMagic.id("textures/misc/hellfire.png"), new AspectList().add(FmAspects.NETHER, 1));
     public static final FocusUpgradeType PANDEMONIUM = new FocusUpgradeType(101, "pandemonium", ForbiddenMagic.id("textures/misc/pandemonium.png"), new AspectList().add(Aspect.DARKNESS, 1));
 
@@ -52,12 +47,10 @@ public class BlinkFocusItem extends FocusItem {
 
     @Override
     public AspectList getVisCost(ItemStack focus) {
-        return switch (BlinkFocusRules.costProfile(
-            this.isUpgradedWith(focus, HELLFIRE), this.isUpgradedWith(focus, PANDEMONIUM))) {
-            case HELLFIRE -> COST_HELLFIRE;
-            case PANDEMONIUM -> COST_PANDEMONIUM;
-            case BASE -> COST_BASE;
-        };
+        var focusServices = HostAdapterRegistry.requireFocus();
+        boolean hellfire = focusServices.hasFocusUpgrade(focus, BlinkFocusRules.Upgrade.HELLFIRE);
+        boolean pandemonium = focusServices.hasFocusUpgrade(focus, BlinkFocusRules.Upgrade.PANDEMONIUM);
+        return Tc4FocusAdapter.toAspectList(BlinkFocusRules.visCosts(hellfire, pandemonium));
     }
 
     @Override
@@ -65,8 +58,9 @@ public class BlinkFocusItem extends FocusItem {
         if (rank < 1 || rank > 5) {
             return null;
         }
-        boolean hellfire = this.isUpgradedWith(focus, HELLFIRE);
-        boolean pandemonium = this.isUpgradedWith(focus, PANDEMONIUM);
+        var focusServices = HostAdapterRegistry.requireFocus();
+        boolean hellfire = focusServices.hasFocusUpgrade(focus, BlinkFocusRules.Upgrade.HELLFIRE);
+        boolean pandemonium = focusServices.hasFocusUpgrade(focus, BlinkFocusRules.Upgrade.PANDEMONIUM);
         return BlinkFocusRules.possibleUpgradesByRank(rank, hellfire, pandemonium).stream()
             .map(BlinkFocusItem::hostUpgrade)
             .toArray(FocusUpgradeType[]::new);
@@ -93,21 +87,17 @@ public class BlinkFocusItem extends FocusItem {
     @Override
     public InteractionResult onFocusRightClick(ItemStack wand, Level level,
         net.minecraft.world.entity.player.Player player, @Nullable HitResult ignored) {
-        ItemStack focus = Wands.getFocusItem(wand);
-        boolean hellfire = this.isUpgradedWith(focus, HELLFIRE);
-        boolean pandemonium = this.isUpgradedWith(focus, PANDEMONIUM);
-        int potency = Wands.getFocusPotency(wand);
-        int enlarge = Wands.getFocusEnlarge(wand);
+        var inspection = HostAdapterRegistry.requireWandInspection();
+        var focusServices = HostAdapterRegistry.requireFocus();
+        ItemStack focus = inspection.wandFocusItem(wand);
+        boolean hellfire = focusServices.hasFocusUpgrade(focus, BlinkFocusRules.Upgrade.HELLFIRE);
+        boolean pandemonium = focusServices.hasFocusUpgrade(focus, BlinkFocusRules.Upgrade.PANDEMONIUM);
+        int potency = inspection.wandFocusPotency(wand);
+        int enlarge = inspection.wandFocusEnlarge(wand);
+        var costs = BlinkFocusRules.visCosts(hellfire, pandemonium);
         return BlinkFocusBehavior.onRightClick(
-            wand,
-            level,
-            player,
-            hellfire,
-            pandemonium,
-            potency,
-            enlarge,
-            (stack, holder, apply) -> ((WandItem) stack.getItem())
-                .consumeAllVis(stack, holder, this.getVisCost(stack), apply, false)
+            wand, level, player, hellfire, pandemonium, potency, enlarge,
+            (stack, holder, apply) -> focusServices.consumeFocusVis(stack, holder, costs, apply)
         );
     }
 }

@@ -36,7 +36,7 @@ The core may use Minecraft runtime types where behavior necessarily operates on 
 
 ### Runtime capabilities — `integration/runtime/`
 
-The narrow interfaces currently cover aspect services, item properties and factories, entity aspects and classification, morph tools, block-entity construction, wand inspection, Vis storage and typed wand-parts mutation, accessory slots, taint block services, enchantment effects, scribing operations, warp, and bootstrap.
+The narrow interfaces currently cover aspect services, item properties and factories, entity aspects and classification, morph tools, block-entity construction, wand inspection, Vis storage, focus upgrade/Vis operations and typed wand-parts mutation, accessory slots, taint block services, enchantment effects, scribing operations, warp, and bootstrap.
 
 These contracts may expose Minecraft/NeoForge runtime types required by the 1.21.1 implementation. They must not expose Thaumcraft types or concrete adapter classes.
 
@@ -44,7 +44,7 @@ These contracts may expose Minecraft/NeoForge runtime types required by the 1.21
 
 The concrete layer owns conversions between semantic identifiers and TC4 values, TC4 aspect/recipe/research registration, wand and Vis calls, Baubles, taint damage, special mining, Thaumcraft entity classification, TC4 item properties/factories, and warp-pool mapping.
 
-The original 1.21.1 gameplay implementation is retained for legacy features that are not fully migrated yet. `WandMaterialCatalog` owns semantic rod/cap registration data, while `WandTriggerCatalog` owns Hellfire trigger blocks, research, aspect, and Vis cost; `Tc4WandAdapter` and `Tc4WandTriggerAdapter` translate those definitions to TC4 registries and callbacks. Physical wand registry objects, update callbacks, creative wand assembly, and rod-part mutation remain host-bound. `BlinkFocusItem` remains the TC4 `FocusItem` integration wrapper, while targeting, destination calculation, teleport effects, upgrade progression/cost-profile selection, and upgrade-specific combat behavior are delegated to `core/wand/BlinkFocusBehavior` and `core/wand/BlinkFocusRules`. `WrathCageBlockEntity` remains the TC4 block-entity/Essentia transport implementation, but spawn eligibility, delay calculation, per-channel insertion limits, extraction eligibility, and fuel-channel priority are delegated to `core/block/WrathCageBehavior`. The transport calls that physically extract Essentia, persistence, and entity spawning remain host/runtime work. Existing compatibility facades such as `FmAspects` and `FmWands` remain transitional; `FmWands` now delegates Witchwood mana rules to the shared core rather than duplicating the formulas.
+The original 1.21.1 gameplay implementation is retained for legacy features that are not fully migrated yet. `WandMaterialCatalog` owns semantic rod/cap registration data, while `WandTriggerCatalog` owns Hellfire trigger blocks, research, aspect, and Vis cost; `Tc4WandAdapter` and `Tc4WandTriggerAdapter` translate those definitions to TC4 registries and callbacks. Physical wand registry objects, update callbacks, creative wand assembly, and rod-part mutation remain host-bound. `BlinkFocusItem` remains the TC4 `FocusItem` integration wrapper. Targeting, destination calculation and teleport/combat behavior live in `core/wand/BlinkFocusBehavior`; upgrade progression and semantic Vis-cost definitions live in `core/wand/BlinkFocusRules`. Focus upgrade inspection and Vis payment use `HostFocusServices`, while TC4 `FocusItem`, `FocusUpgradeType` and `WandItem` calls stay in `integration/tc4/`. `WrathCageBlockEntity` remains the TC4 block-entity/Essentia transport implementation, but spawn eligibility, delay calculation, per-channel insertion limits, extraction eligibility, and fuel-channel priority are delegated to `core/block/WrathCageBehavior`. The transport calls that physically extract Essentia, persistence, and entity spawning remain host/runtime work. Existing compatibility facades such as `FmAspects` and `FmWands` remain transitional; `FmWands` now delegates Witchwood mana rules to the shared core rather than duplicating the formulas.
 
 ## Current capability status
 
@@ -68,7 +68,7 @@ Known limits remain explicit:
 |---|---|---|
 | Research stages | `PARTIAL` | Adapter accepts one page group; multi-stage definitions are rejected |
 | Wand rods, caps, triggers, and parts | `PARTIAL` | Semantic rod/cap and Hellfire trigger definitions are shared; TC4 registry calls, update callbacks, creative wand assembly, and part mutation remain host-bound |
-| Focus/spell runtime | `PARTIAL` | Not fully extracted into a host capability |
+| Focus/spell runtime | `PARTIAL` | Blink Focus upgrade rules and Vis costs are shared; focus upgrade inspection and Vis payment use `HostFocusServices`, while `FocusItem`, `FocusUpgradeType`, rendering and item lifecycle remain TC4-bound |
 | Essentia storage/transport | `PARTIAL` | Shared spawn, storage, extraction-eligibility, and fuel-selection policies are extracted; Wrath Cage still extends TC4 block-entity and transport types directly, and physical transport/persistence remain host-bound |
 | Optional enchantment integration | `PARTIAL` | Legacy optional-mod path remains |
 | Taint origins | `UNSUPPORTED` | No taint-origin registration or propagation adapter is implemented |
