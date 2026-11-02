@@ -122,7 +122,7 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
         support.put(HostProfile.Feature.WAND_CAPS, HostProfile.FeatureSupport.partial(
             "Cap definitions and creative wand selection are shared; TC4 registry registration and native material resolution remain host-specific"));
         support.put(HostProfile.Feature.WAND_PARTS, HostProfile.FeatureSupport.partial(
-            "Core exposes a typed parts access contract; mutation still uses TC4 WandParts and WandKeys"));
+            "Core exposes typed wand-part access and canonical rod identifiers; native mutation writes TC4 WandParts and WandKeys"));
         support.put(HostProfile.Feature.WAND_TRIGGERS, HostProfile.FeatureSupport.partial(
             "Hellfire trigger rules are shared; TC4 trigger registration and runtime callbacks remain host-specific"));
         support.put(HostProfile.Feature.FOCI_OR_SPELLS, HostProfile.FeatureSupport.partial(
