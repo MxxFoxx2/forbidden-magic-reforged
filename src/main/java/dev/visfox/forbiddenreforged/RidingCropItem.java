@@ -16,7 +16,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import thaumcraft.entity.golem.GolemBase;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 
 public class RidingCropItem extends Item {
     public RidingCropItem(Properties properties) {
@@ -31,7 +31,7 @@ public class RidingCropItem extends Item {
     public void hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
         if (target instanceof AbstractHorse || target instanceof Pig) {
             target.addEffect(new MobEffectInstance(MobEffects.SPEED, 200, 5));
-        } else if (target instanceof Player || target instanceof GolemBase) {
+        } else if (target instanceof Player || HostAdapterRegistry.requireEntityClassification().isHostGolem(target)) {
             target.addEffect(new MobEffectInstance(MobEffects.SPEED, 200, 1));
             target.addEffect(new MobEffectInstance(MobEffects.HASTE, 200, 1));
             target.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 200, 1));
