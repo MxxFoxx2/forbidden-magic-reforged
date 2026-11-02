@@ -38,6 +38,7 @@ import dev.visfox.forbiddenreforged.WrathCageBlockEntity;
 import dev.visfox.forbiddenreforged.core.block.WrathCageBehavior;
 import dev.visfox.forbiddenreforged.core.wand.WitchwoodManaBehavior;
 import dev.visfox.forbiddenreforged.core.wand.BlinkFocusRules;
+import dev.visfox.forbiddenreforged.core.wand.WandMaterialCatalog;
 import dev.visfox.forbiddenreforged.FmBlockEntities;
 import dev.visfox.forbiddenreforged.FmItemEvents;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -64,6 +65,44 @@ import net.neoforged.neoforge.event.furnace.FurnaceFuelBurnTimeEvent;
 @PrefixGameTestTemplate(false)
 public final class FmGameTests {
     private FmGameTests() {
+    }
+
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void wandMaterialCatalogPreservesHostRegistrationData(GameTestHelper helper) {
+        var withoutArsMagica = WandMaterialCatalog.rods(false);
+        var withArsMagica = WandMaterialCatalog.rods(true);
+        helper.assertValueEqual(withoutArsMagica.size(), 7,
+            "base wand catalog contains the seven unconditional rods");
+        helper.assertValueEqual(withArsMagica.size(), 9,
+            "optional Ars Magica integration contributes wand and staff rods");
+        helper.assertTrue(withoutArsMagica.stream().noneMatch(rod ->
+                rod.update() == WandMaterialCatalog.RodUpdateKind.WITCHWOOD_WAND
+                    || rod.update() == WandMaterialCatalog.RodUpdateKind.WITCHWOOD_STAFF),
+            "Witchwood rods are omitted when Ars Magica is unavailable");
+        helper.assertTrue(withArsMagica.stream().anyMatch(rod ->
+                rod.update() == WandMaterialCatalog.RodUpdateKind.WITCHWOOD_STAFF
+                    && rod.staff() && rod.capacity() == 50 && rod.cost() == 24),
+            "Witchwood staff retains its staff flag, capacity and crafting cost");
+        helper.assertTrue(withoutArsMagica.stream().anyMatch(rod ->
+                rod.tag().equals("profane") && rod.capacity() == 50
+                    && rod.update() == WandMaterialCatalog.RodUpdateKind.PROFANE),
+            "Profane rod retains its finite-warp update behavior");
+        helper.assertTrue(withoutArsMagica.stream().anyMatch(rod ->
+                rod.tag().equals("neutronium") && rod.capacity() == 9002 && rod.staff()
+                    && rod.update() == WandMaterialCatalog.RodUpdateKind.CREATIVE),
+            "Neutronium staff retains its creative update profile");
+        var caps = WandMaterialCatalog.caps();
+        helper.assertValueEqual(caps.size(), 2, "both custom wand caps are catalogued");
+        helper.assertTrue(caps.stream().anyMatch(cap ->
+                cap.tag().equals("alchemical") && cap.multiplier() == 0.9F
+                    && cap.discount() == 0.8F && cap.cost() == 7
+                    && cap.aspects().equals(List.of(ContentId.parse("thaumcraft:aqua")))),
+            "Alchemical cap retains its water aspect and original tuning");
+        helper.assertTrue(caps.stream().anyMatch(cap ->
+                cap.tag().equals("orichalcum") && cap.multiplier() == 0.0F
+                    && cap.discount() == 0.0F && cap.aspects().isEmpty()),
+            "Orichalcum cap retains its zero-cost creative profile");
+        helper.succeed();
     }
 
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
