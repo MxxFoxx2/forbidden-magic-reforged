@@ -2,7 +2,7 @@ name: Java CI with Gradle
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "mc/26.1.2", "architecture/26.1.2-host-agnostic" ]
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
