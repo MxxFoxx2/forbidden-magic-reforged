@@ -25,6 +25,7 @@ import dev.visfox.forbiddenreforged.integration.runtime.HostWandInspectionServic
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandVisServices;
 import dev.visfox.forbiddenreforged.core.wand.WandVisAccess;
 import dev.visfox.forbiddenreforged.core.wand.WandPartsAccess;
+import dev.visfox.forbiddenreforged.core.wand.WandRodKind;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandPartsServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostFocusServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostEssentiaTransportServices;
@@ -116,7 +117,7 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
         adapted(support, HostProfile.Feature.MORPH_TOOL_RUNTIME,
             "Uses the TC4 ToolHarvest API for morph-tool area harvesting and cycle sounds");
         adapted(support, HostProfile.Feature.WAND_INSPECTION,
-            "Reads wand, rod and focus properties through the TC4 wand API");
+            "Returns semantic wand rod kinds and reads native focus properties through the TC4 wand API");
         support.put(HostProfile.Feature.WAND_RODS, HostProfile.FeatureSupport.partial(
             "Rod definitions, update policy, and creative wand selection are shared; TC4 registry registration, callback construction, and native stack assembly remain host-specific"));
         support.put(HostProfile.Feature.WAND_CAPS, HostProfile.FeatureSupport.partial(
@@ -290,7 +291,7 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
     }
 
     @Override
-    public dev.visfox.forbiddenreforged.core.wand.WandRodKind wandRodKind(ItemStack stack) {
+    public WandRodKind wandRodKind(ItemStack stack) {
         return Tc4WandRuntimeAdapter.rodKind(stack);
     }
 
