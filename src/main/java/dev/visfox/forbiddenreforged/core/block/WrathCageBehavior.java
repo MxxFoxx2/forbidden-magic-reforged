@@ -1,8 +1,8 @@
 package dev.visfox.forbiddenreforged.core.block;
 
 /**
- * Host-independent Wrath Cage rules. Essentia extraction, entity spawning and
- * persistence remain in the Minecraft/TC4 block-entity integration.
+ * Host-independent Wrath Cage policies. Physical Essentia transport, entity
+ * spawning and persistence remain in the Minecraft/TC4 block-entity integration.
  */
 public final class WrathCageBehavior {
     public enum FuelChannel {
