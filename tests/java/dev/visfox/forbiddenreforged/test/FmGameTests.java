@@ -39,6 +39,7 @@ import dev.visfox.forbiddenreforged.core.block.WrathCageBehavior;
 import dev.visfox.forbiddenreforged.core.wand.WitchwoodManaBehavior;
 import dev.visfox.forbiddenreforged.core.wand.BlinkFocusRules;
 import dev.visfox.forbiddenreforged.core.wand.WandMaterialCatalog;
+import dev.visfox.forbiddenreforged.core.wand.WandTriggerCatalog;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.FmBlockEntities;
 import dev.visfox.forbiddenreforged.FmItemEvents;
@@ -66,6 +67,23 @@ import net.neoforged.neoforge.event.furnace.FurnaceFuelBurnTimeEvent;
 @PrefixGameTestTemplate(false)
 public final class FmGameTests {
     private FmGameTests() {
+    }
+
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void wandTriggerCatalogPreservesHellfireDefinition(GameTestHelper helper) {
+        var trigger = WandTriggerCatalog.hellfire();
+        helper.assertValueEqual(trigger.id(), ContentId.parse("forbiddenmagic:wand_trigger/hellfire"),
+            "Hellfire trigger has a stable semantic identifier");
+        helper.assertValueEqual(trigger.blocks(),
+            List.of(ContentId.parse("minecraft:obsidian"), ContentId.parse("minecraft:netherrack")),
+            "Hellfire trigger remains bound to obsidian and netherrack");
+        helper.assertValueEqual(trigger.research(), ContentId.parse("forbiddenmagic:research/hellfire"),
+            "Hellfire trigger retains its research gate");
+        helper.assertValueEqual(trigger.aspect(), ContentId.parse("forbiddenmagic:concept/fire"),
+            "Hellfire trigger consumes the semantic Fire aspect");
+        helper.assertValueEqual(trigger.visCost(), 2,
+            "Hellfire trigger retains its two-Vis cost");
+        helper.succeed();
     }
 
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
