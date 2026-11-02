@@ -10,7 +10,9 @@ import dev.visfox.forbiddenreforged.core.warp.WarpKind;
 import dev.visfox.forbiddenreforged.integration.api.HostAdapter;
 import dev.visfox.forbiddenreforged.integration.api.HostProfile;
 import dev.visfox.forbiddenreforged.integration.runtime.HostAspectServices;
-import dev.visfox.forbiddenreforged.integration.runtime.HostBootstrapServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostWandRegistrationServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostOptionalEnchantmentServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostCreativeContentServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostAccessoryServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostBlockEntityServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostEnchantmentEffectServices;
@@ -65,7 +67,7 @@ import thaumcraft.wand.focus.FocusItem;
  * 1.21.1 gameplay integrations remain intact while their extraction into
  * focused host capabilities proceeds incrementally.
  */
-public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, HostWarpServices, HostMorphToolServices, HostBlockEntityServices, HostWandInspectionServices, HostWandVisServices, HostWandPartsServices, HostFocusServices, HostEssentiaTransportServices, HostAccessoryServices, HostTaintBlockServices, HostEnchantmentEffectServices, HostScribingServices, HostEntityAspectServices, HostEntityClassificationServices, HostItemFactoryServices, HostItemPropertyServices, HostBootstrapServices, HostVillagerTradeServices {
+public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, HostWarpServices, HostMorphToolServices, HostBlockEntityServices, HostWandInspectionServices, HostWandVisServices, HostWandPartsServices, HostFocusServices, HostEssentiaTransportServices, HostAccessoryServices, HostTaintBlockServices, HostEnchantmentEffectServices, HostScribingServices, HostEntityAspectServices, HostEntityClassificationServices, HostItemFactoryServices, HostItemPropertyServices, HostWandRegistrationServices, HostOptionalEnchantmentServices, HostCreativeContentServices, HostVillagerTradeServices {
     private static final WandVisAccess WAND_VIS = new Tc4WandVisAdapter();
     private static final WandPartsAccess WAND_PARTS = new Tc4WandPartsAdapter();
 
@@ -118,16 +120,20 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
             "Uses the TC4 ToolHarvest API for morph-tool area harvesting and cycle sounds");
         adapted(support, HostProfile.Feature.WAND_INSPECTION,
             "Maps native TC4 rod tags to semantic WandRodKind values; wand/focus item inspection and numeric focus modifiers remain host-backed");
-        support.put(HostProfile.Feature.WAND_RODS, HostProfile.FeatureSupport.partial(
-            "Rod definitions, update policy, and creative wand selection are shared; TC4 registry registration, callback construction, and native stack assembly remain host-specific"));
-        support.put(HostProfile.Feature.WAND_CAPS, HostProfile.FeatureSupport.partial(
-            "Cap definitions and creative wand selection are shared; TC4 registry registration and native material resolution remain host-specific"));
-        support.put(HostProfile.Feature.WAND_PARTS, HostProfile.FeatureSupport.partial(
-            "Core exposes typed wand-part access and canonical rod identifiers; native mutation writes TC4 WandParts and WandKeys"));
-        support.put(HostProfile.Feature.WAND_TRIGGERS, HostProfile.FeatureSupport.partial(
-            "Hellfire trigger rules are shared; TC4 trigger registration and runtime callbacks remain host-specific"));
-        support.put(HostProfile.Feature.FOCI_OR_SPELLS, HostProfile.FeatureSupport.partial(
-            "Blink Focus progression, upgrade metadata, Vis costs, and presentation metadata are shared; FocusItem and FocusUpgradeType construction and runtime remain TC4-bound"));
+        adapted(support, HostProfile.Feature.WAND_RODS,
+            "Shared rod definitions and update behavior are translated to TC4 RodRegistry entries and RodUpdate callbacks");
+        adapted(support, HostProfile.Feature.WAND_CAPS,
+            "Shared cap definitions and aspect costs are translated to native TC4 WandCap registry entries");
+        adapted(support, HostProfile.Feature.WAND_PARTS,
+            "The semantic rod mutation contract maps to TC4 WandParts while preserving native cap and sceptre data");
+        adapted(support, HostProfile.Feature.WAND_TRIGGERS,
+            "Shared Hellfire trigger rules and costs are wired to the TC4 WandTriggers registry and callback API");
+        adapted(support, HostProfile.Feature.FOCI_OR_SPELLS,
+            "Shared Blink Focus behavior, progression, costs and presentation are materialized through the native TC4 FocusItem lifecycle");
+        support.put(HostProfile.Feature.OPTIONAL_ENCHANTMENT_INTEGRATION,
+            HostProfile.FeatureSupport.partial("Thaumic Tinkerer is optional; its reflective enchantment-cost bridge is skipped when the mod or expected API is unavailable"));
+        adapted(support, HostProfile.Feature.CREATIVE_CONTENT,
+            "Contributes catalogued TC4 wand stacks through a dedicated creative-content capability");
         adapted(support, HostProfile.Feature.ACCESSORY_INTEGRATION,
             "Reads accessory slots through the TC4 Baubles bridge");
         adapted(support, HostProfile.Feature.TAINT_BLOCK_SERVICES,
@@ -138,10 +144,10 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
             "Reads TC4 research difficulty, primal aspects and player aspect pools");
         adapted(support, HostProfile.Feature.BLOCK_ENTITY_IMPLEMENTATION,
             "Creates the 1.21.1 TC4 EssentiaSource/EssentiaTransport Wrath Cage");
-        support.put(HostProfile.Feature.ESSENTIA_STORAGE, HostProfile.FeatureSupport.partial(
-            "Three-channel storage policy is shared; the TC4 block entity still owns persistence and EssentiaSource callbacks"));
-        support.put(HostProfile.Feature.ESSENTIA_TRANSPORT, HostProfile.FeatureSupport.partial(
-            "Extraction priority is shared and physical neighbor pulls use a typed host capability; TC4 EssentiaTransport remains the runtime implementation"));
+        adapted(support, HostProfile.Feature.ESSENTIA_STORAGE,
+            "Three-channel storage, capacity, routing and extraction policy are shared; the TC4 block entity maps persistence and native callbacks");
+        adapted(support, HostProfile.Feature.ESSENTIA_TRANSPORT,
+            "Shared extraction order is executed through a typed capability backed by the TC4 EssentiaTransport API");
         adapted(support, HostProfile.Feature.WAND_VIS_STORAGE,
             "Exposes semantic wand Vis reads/writes and separate item-backed real-Vis storage writes");
         adapted(support, HostProfile.Feature.ENTITY_ASPECTS,
