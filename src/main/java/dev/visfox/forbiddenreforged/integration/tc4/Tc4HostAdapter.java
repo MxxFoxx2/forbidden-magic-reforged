@@ -242,6 +242,11 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
     }
 
     @Override
+    public void beforeRemoveWrathCage(BlockState state, Level level, BlockPos pos, BlockState newState) {
+        Tc4BlockEntityAdapter.beforeRemoveWrathCage(state, level, pos, newState);
+    }
+
+    @Override
     public boolean takeOneFromOutput(net.minecraft.world.level.block.entity.BlockEntity source,
                                      net.minecraft.core.Direction outputSide, ContentId aspect) {
         return Tc4EssentiaTransportAdapter.takeOneFromOutput(source, outputSide, aspect);

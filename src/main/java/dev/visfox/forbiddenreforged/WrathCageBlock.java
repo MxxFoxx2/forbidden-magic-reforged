@@ -16,7 +16,6 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import thaumcraft.blockentity.TcBlockEntity;
 
 public final class WrathCageBlock extends Block implements EntityBlock {
     public WrathCageBlock(Properties properties) {
@@ -75,7 +74,7 @@ public final class WrathCageBlock extends Block implements EntityBlock {
 
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-        TcBlockEntity.beforeRemove(state, level, pos, newState);
+        HostAdapterRegistry.requireBlockEntities().beforeRemoveWrathCage(state, level, pos, newState);
         super.onRemove(state, level, pos, newState, isMoving);
     }
 
