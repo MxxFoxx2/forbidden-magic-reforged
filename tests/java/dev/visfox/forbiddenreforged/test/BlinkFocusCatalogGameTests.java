@@ -30,7 +30,7 @@ public final class BlinkFocusCatalogGameTests {
                 Upgrade.PANDEMONIUM,
                 "pandemonium",
                 ContentId.parse("forbiddenmagic:textures/misc/pandemonium.png"),
-                List.of(new VisCost(ContentId.parse("thaumcraft:darkness"), 1))
+                List.of(new VisCost(ContentId.parse("forbiddenmagic:concept/darkness"), 1))
             )
         );
 
