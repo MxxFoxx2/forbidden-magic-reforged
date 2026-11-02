@@ -10,7 +10,7 @@ public final class FmWands {
     }
 
     public static void register() {
-        HostAdapterRegistry.requireBootstrap().registerWands();
+        HostAdapterRegistry.requireWandRegistration().registerWands();
     }
 
     public static boolean supportsArsMagicaModId(String modId) {
@@ -18,7 +18,7 @@ public final class FmWands {
     }
 
     public static boolean isArsMagicaLoaded() {
-        return HostAdapterRegistry.requireBootstrap().isArsMagicaLoaded();
+        return HostAdapterRegistry.requireWandRegistration().isArsMagicaLoaded();
     }
 
     public static int witchwoodRechargeInterval(boolean staff) {
