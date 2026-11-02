@@ -155,7 +155,7 @@ public final class RecipeGameTests {
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void materialsHaveCraftingRecipes(GameTestHelper helper) {
         var manager = helper.getLevel().getServer().getRecipeManager();
-        for (String name : new String[]{"taint_planks", "taint_stone_brick", "star_block", "star_from_block"}) {
+        for (String name : new String[]{"taint_planks", "taint_stone_brick", "star_block", "star_from_block", "fragments_from_emerald", "emerald_from_fragments"}) {
             helper.assertTrue(manager.byKey(ResourceLocation.parse("forbiddenmagic:" + name)).isPresent(), name + " recipe must load");
         }
         helper.succeed();
