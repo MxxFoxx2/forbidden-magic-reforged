@@ -117,7 +117,7 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
         adapted(support, HostProfile.Feature.MORPH_TOOL_RUNTIME,
             "Uses the TC4 ToolHarvest API for morph-tool area harvesting and cycle sounds");
         adapted(support, HostProfile.Feature.WAND_INSPECTION,
-            "Returns semantic wand rod kinds and reads native focus properties through the TC4 wand API");
+            "Maps native TC4 rod tags to semantic WandRodKind values; wand/focus item inspection and numeric focus modifiers remain host-backed");
         support.put(HostProfile.Feature.WAND_RODS, HostProfile.FeatureSupport.partial(
             "Rod definitions, update policy, and creative wand selection are shared; TC4 registry registration, callback construction, and native stack assembly remain host-specific"));
         support.put(HostProfile.Feature.WAND_CAPS, HostProfile.FeatureSupport.partial(
