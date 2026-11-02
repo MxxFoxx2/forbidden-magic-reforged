@@ -1,6 +1,8 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
 import dev.visfox.forbiddenreforged.core.model.ContentId;
+import dev.visfox.forbiddenreforged.core.wand.CreativeWandCatalog;
+import dev.visfox.forbiddenreforged.core.wand.WandVisAccess;
 import dev.visfox.forbiddenreforged.core.wand.WandMaterialCatalog;
 import dev.visfox.forbiddenreforged.core.wand.WandMaterialCatalog.RodDefinition;
 import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
@@ -51,36 +53,47 @@ public final class Tc4WandAdapter {
     }
 
     public static void addCreativeWands(List<ItemStack> stacks) {
-        addWand(stacks, WandRegistry.CAP_THAUMIUM, "tainted");
-        addWand(stacks, WandRegistry.CAP_THAUMIUM, "infernal");
-        addWand(stacks, WandRegistry.CAP_VOID, "equivalent");
-
-        WandCap orichalcum = WandRegistry.findCap("orichalcum");
-        WandRod neutronium = WandRegistry.findRod("neutronium");
-        WandRod neutroniumStaff = WandRegistry.findRod("neutronium_staff");
-        if (orichalcum != null && neutronium != null) {
-            stacks.add(Wands.create(orichalcum, neutronium, false));
-        }
-        if (orichalcum != null && neutroniumStaff != null) {
-            stacks.add(Wands.create(orichalcum, neutroniumStaff, false));
-        }
-
-        WandRod profane = WandRegistry.findRod("profane");
-        if (profane != null) {
-            ItemStack filled = Wands.create(WandRegistry.CAP_IRON, profane, false);
-            var wandVis = HostAdapterRegistry.requireWandVis();
-            for (ContentId aspect : wandVis.primalAspects()) {
-                wandVis.addVis(filled, aspect, 5000, true);
+        WandVisAccess wandVis = null;
+        for (CreativeWandCatalog.Definition definition : CreativeWandCatalog.definitions()) {
+            WandCap cap = resolveCap(definition.cap());
+            WandRod rod = resolveRod(definition.rod());
+            if (cap == null || rod == null) {
+                continue;
             }
-            stacks.add(filled);
+
+            ItemStack wand = Wands.create(cap, rod, false);
+            if (definition.visPerPrimal() > 0) {
+                if (wandVis == null) {
+                    wandVis = HostAdapterRegistry.requireWandVis();
+                }
+                for (ContentId aspect : wandVis.primalAspects()) {
+                    wandVis.addVis(wand, aspect, definition.visPerPrimal(), true);
+                }
+            }
+            stacks.add(wand);
         }
     }
 
-    private static void addWand(List<ItemStack> stacks, WandCap cap, String rodTag) {
-        WandRod rod = WandRegistry.findRod(rodTag);
-        if (rod != null) {
-            stacks.add(Wands.create(cap, rod, false));
+    private static WandCap resolveCap(ContentId capId) {
+        String tag = registryKey(capId, "wand_cap/");
+        return switch (tag) {
+            case "thaumium" -> WandRegistry.CAP_THAUMIUM;
+            case "void" -> WandRegistry.CAP_VOID;
+            case "iron" -> WandRegistry.CAP_IRON;
+            default -> WandRegistry.findCap(tag);
+        };
+    }
+
+    private static WandRod resolveRod(ContentId rodId) {
+        return WandRegistry.findRod(registryKey(rodId, "wand_rod/"));
+    }
+
+    private static String registryKey(ContentId id, String prefix) {
+        if (!"forbiddenmagic".equals(id.namespace()) || !id.path().startsWith(prefix)
+            || id.path().length() == prefix.length()) {
+            throw new IllegalArgumentException("Unsupported creative wand identifier: " + id);
         }
+        return id.path().substring(prefix.length());
     }
 
     private static ResourceLocation hostId(ContentId id) {
