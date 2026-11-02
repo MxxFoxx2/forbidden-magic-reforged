@@ -5,6 +5,9 @@ import dev.visfox.forbiddenreforged.FmWands;
 import dev.visfox.forbiddenreforged.FmWandContractAccess;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
 import dev.visfox.forbiddenreforged.core.wand.WandBehaviors;
+import dev.visfox.forbiddenreforged.core.wand.WandMaterialCatalog;
+import dev.visfox.forbiddenreforged.core.wand.WandMaterialCatalog.RodDefinition;
+import dev.visfox.forbiddenreforged.core.wand.WandMaterialCatalog.RodUpdateKind;
 import dev.visfox.forbiddenreforged.core.wand.WitchwoodManaBehavior;
 import dev.visfox.forbiddenreforged.core.wand.WandPartsAccess;
 import dev.visfox.forbiddenreforged.core.wand.WandVisAccess;
@@ -34,41 +37,50 @@ public final class Tc4WandAdapter {
     }
 
     public static void registerWands() {
-        WandRegistry.registerRod("tainted", 150, ForbiddenMagic.id("tainted_rod"), 12,
-            new TaintedWandUpdate(), false, false, false,
-            ForbiddenMagic.id("textures/model/wand_rod_tainted.png"));
-        WandRegistry.registerRod("infernal", 150, ForbiddenMagic.id("infernal_rod"), 12,
-            new InfernalWandUpdate(), false, false, false,
-            ForbiddenMagic.id("textures/model/wand_rod_infernal.png"));
-        WandRegistry.registerRod("profane", 50, ForbiddenMagic.id("profane_rod"), 12,
-            new ProfaneWandUpdate(), false, false, false,
-            ForbiddenMagic.id("textures/model/wand_rod_profane.png"));
-        if (isArsMagicaLoaded()) {
-            WandRegistry.registerRod("witchwood", 100, ForbiddenMagic.id("witchwood_rod"), 12,
-                new ManaWandUpdate(), false, false, false,
-                ForbiddenMagic.id("textures/model/wand_rod_witchwood.png"));
-            WandRegistry.registerRod("witchwood", 50, ForbiddenMagic.id("witchwood_staff_rod"), 24,
-                new ManaStaffUpdate(), false, true, false,
-                ForbiddenMagic.id("textures/model/wand_rod_witchwood_staff.png"));
+        for (RodDefinition rod : WandMaterialCatalog.rods(isArsMagicaLoaded())) {
+            WandRegistry.registerRod(
+                rod.tag(),
+                rod.capacity(),
+                hostId(rod.item()),
+                rod.cost(),
+                rodUpdate(rod.update()),
+                rod.creative(),
+                rod.staff(),
+                rod.sceptre(),
+                hostId(rod.texture())
+            );
         }
-        WandRegistry.registerRod("profaned", 50, ResourceLocation.withDefaultNamespace("bedrock"), 1000,
-            null, false, false, false,
-            ForbiddenMagic.id("textures/model/wand_rod_profaned.png"));
-        WandRegistry.registerCap("orichalcum", 0.0F, List.of(), 0.0F,
-            ResourceLocation.withDefaultNamespace("command_block"), 1000, null,
-            ForbiddenMagic.id("textures/model/wand_cap_orichalcum.png"));
-        WandRegistry.registerCap("alchemical", 0.9F, List.of(Aspect.WATER), 0.8F,
-            ForbiddenMagic.id("alchemical_cap"), 7, null,
-            ForbiddenMagic.id("textures/model/wand_cap_alchemical.png"));
-        WandRegistry.registerRod("equivalent", 100, ForbiddenMagic.id("equivalent_rod"), 12,
-            null, false, false, false,
-            ForbiddenMagic.id("textures/model/wand_rod_equivalent.png"));
-        WandRegistry.registerRod("neutronium", 9001, ResourceLocation.withDefaultNamespace("bedrock"), 1000,
-            new CreativeWandUpdate(), true, false, false,
-            ForbiddenMagic.id("textures/model/wand_rod_neutronium.png"));
-        WandRegistry.registerRod("neutronium", 9002, ResourceLocation.withDefaultNamespace("bedrock"), 1000,
-            new CreativeWandUpdate(), true, true, false,
-            ForbiddenMagic.id("textures/model/wand_rod_neutronium.png"));
+        for (var cap : WandMaterialCatalog.caps()) {
+            List<Aspect> aspects = cap.aspects().stream()
+                .map(Tc4AspectAdapter::resolveAspect)
+                .toList();
+            WandRegistry.registerCap(
+                cap.tag(),
+                cap.multiplier(),
+                aspects,
+                cap.discount(),
+                hostId(cap.item()),
+                cap.cost(),
+                null,
+                hostId(cap.texture())
+            );
+        }
+    }
+
+    private static ResourceLocation hostId(dev.visfox.forbiddenreforged.core.model.ContentId id) {
+        return ResourceLocation.fromNamespaceAndPath(id.namespace(), id.path());
+    }
+
+    private static RodUpdate rodUpdate(RodUpdateKind kind) {
+        return switch (kind) {
+            case TAINTED -> new TaintedWandUpdate();
+            case INFERNAL -> new InfernalWandUpdate();
+            case PROFANE -> new ProfaneWandUpdate();
+            case WITCHWOOD_WAND -> new ManaWandUpdate();
+            case WITCHWOOD_STAFF -> new ManaStaffUpdate();
+            case CREATIVE -> new CreativeWandUpdate();
+            case NONE -> null;
+        };
     }
 
     public static void addCreativeWands(List<ItemStack> stacks) {
