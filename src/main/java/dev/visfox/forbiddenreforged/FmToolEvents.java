@@ -2,6 +2,7 @@ package dev.visfox.forbiddenreforged;
 
 import java.util.List;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
+import dev.visfox.forbiddenreforged.core.wand.WandRodKind;
 import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -93,21 +94,15 @@ public final class FmToolEvents {
     }
 
     public static String wandTooltipKind(ItemStack stack) {
-        var host = HostAdapterRegistry.requireWandInspection();
-        return host.isWand(stack) ? wandTooltipKind(host.wandRodTag(stack)) : "";
+        return wandTooltipKind(HostAdapterRegistry.requireWandInspection().wandRodKind(stack));
     }
 
-    public static String wandTooltipKind(String rodTag) {
-        if (rodTag == null) {
-            return "";
-        }
-        if (rodTag.startsWith("neutronium")) {
-            return "creativeonly";
-        }
-        if (rodTag.startsWith("profane")) {
-            return "profane_contract";
-        }
-        return "";
+    public static String wandTooltipKind(WandRodKind rodKind) {
+        return switch (rodKind) {
+            case NEUTRONIUM -> "creativeonly";
+            case PROFANE -> "profane_contract";
+            default -> "";
+        };
     }
 
     private static void onBreakSpeed(PlayerEvent.BreakSpeed event) {
@@ -158,14 +153,14 @@ public final class FmToolEvents {
 
     public static boolean cancelsInfernalDamage(ItemStack held, boolean fireOrWither) {
         var host = HostAdapterRegistry.requireWandInspection();
-        return fireOrWither && held != null && !held.isEmpty() && host.isWand(held)
-            && "infernal".equals(host.wandRodTag(held));
+        return fireOrWither && held != null && !held.isEmpty()
+            && host.wandRodKind(held) == WandRodKind.INFERNAL;
     }
 
     public static boolean restoresTaintedVis(ItemStack held, boolean taintDamage) {
         var host = HostAdapterRegistry.requireWandInspection();
-        return taintDamage && held != null && !held.isEmpty() && host.isWand(held)
-            && "tainted".equals(host.wandRodTag(held));
+        return taintDamage && held != null && !held.isEmpty()
+            && host.wandRodKind(held) == WandRodKind.TAINTED;
     }
 
     public static List<ContentId> taintedVisRolls(RandomSource random) {
