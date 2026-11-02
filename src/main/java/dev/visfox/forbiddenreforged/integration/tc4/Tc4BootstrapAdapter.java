@@ -1,7 +1,7 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
 import dev.visfox.forbiddenreforged.FmConfig;
-import dev.visfox.forbiddenreforged.FmItems;
+import dev.visfox.forbiddenreforged.FmTinkerer;
 import dev.visfox.forbiddenreforged.FmWandTriggers;
 import dev.visfox.forbiddenreforged.FmWands;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
@@ -10,9 +10,7 @@ import dev.visfox.forbiddenreforged.core.recipe.ForbiddenMagicRecipeCatalog;
 import dev.visfox.forbiddenreforged.core.research.ForbiddenMagicResearchCatalog;
 import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 import java.util.List;
-import net.minecraft.world.item.Items;
 import thaumcraft.aspect.Aspect;
-import thaumcraft.device.SmeltingBonuses;
 
 public final class Tc4BootstrapAdapter {
     private Tc4BootstrapAdapter() {
@@ -22,6 +20,8 @@ public final class Tc4BootstrapAdapter {
         logAspectRegistry();
         Tc4WarpAdapter.registerWarpItem(ContentId.parse("forbiddenmagic:wrath_cage"), 5);
         Tc4WarpAdapter.registerWarpItem(ContentId.parse("forbiddenmagic:taint_sapling"), 1);
+
+        // Keep the existing, known-compatible 1.21.1 wand implementations.
         FmWands.register();
         FmWandTriggers.register();
 
@@ -51,8 +51,8 @@ public final class Tc4BootstrapAdapter {
             )
         );
 
-        SmeltingBonuses.register(Items.EMERALD, FmItems.EMERALD_FRAGMENT.get());
-        host.registerOptionalEnchantments();
+        // Optional integration remains on its original supported 1.21.1 API.
+        FmTinkerer.register();
     }
 
     private static void logAspectRegistry() {

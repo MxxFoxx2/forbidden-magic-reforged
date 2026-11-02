@@ -97,7 +97,7 @@ public final class WandBehaviors {
             parts.setRod(wand, PROFANED_ROD);
             contractAccess.clear(wand);
             warpAccess.changeWarp(player, 1, WarpKind.STICKY);
-            player.level().sendParticles(
+            player.serverLevel().sendParticles(
                 ParticleTypes.EXPLOSION,
                 player.getX(),
                 player.getY() + player.getBbHeight() / 2.0,

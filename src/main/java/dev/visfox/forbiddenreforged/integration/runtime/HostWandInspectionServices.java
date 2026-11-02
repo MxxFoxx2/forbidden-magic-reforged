@@ -1,7 +1,7 @@
 package dev.visfox.forbiddenreforged.integration.runtime;
 
 import net.minecraft.world.item.ItemStack;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /** Read-only wand and focus queries exposed by the selected magic host. */
 public interface HostWandInspectionServices {

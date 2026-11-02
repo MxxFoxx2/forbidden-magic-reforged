@@ -4,7 +4,7 @@ import dev.visfox.forbiddenreforged.core.model.ContentId;
 import net.minecraft.world.item.ItemStack;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.wand.Wands;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public final class Tc4WandRuntimeAdapter {
     private Tc4WandRuntimeAdapter() {
