@@ -36,6 +36,7 @@ import dev.visfox.forbiddenreforged.MobCrystalItem;
 import dev.visfox.forbiddenreforged.WrathCageBlock;
 import dev.visfox.forbiddenreforged.WrathCageBlockEntity;
 import dev.visfox.forbiddenreforged.core.block.WrathCageBehavior;
+import dev.visfox.forbiddenreforged.core.block.WrathCageStorage;
 import dev.visfox.forbiddenreforged.core.wand.WitchwoodManaBehavior;
 import dev.visfox.forbiddenreforged.core.wand.BlinkFocusRules;
 import dev.visfox.forbiddenreforged.core.wand.WandMaterialCatalog;
@@ -67,6 +68,43 @@ import net.neoforged.neoforge.event.furnace.FurnaceFuelBurnTimeEvent;
 @PrefixGameTestTemplate(false)
 public final class FmGameTests {
     private FmGameTests() {
+    }
+
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void wrathCageStorageOwnsBoundedChannelsAndMode(GameTestHelper helper) {
+        WrathCageStorage storage = new WrathCageStorage();
+        helper.assertTrue(storage.hasRoom(), "empty cage storage has room");
+        helper.assertValueEqual(storage.add(WrathCageStorage.Channel.MOB, 70), 64,
+            "mob channel accepts only its capacity");
+        helper.assertValueEqual(storage.add(WrathCageStorage.Channel.MOB, 1), 0,
+            "full mob channel rejects more essentia");
+        helper.assertValueEqual(storage.add(WrathCageStorage.Channel.WRATH, 64), 64,
+            "Wrath channel has independent capacity");
+        helper.assertValueEqual(storage.add(WrathCageStorage.Channel.SLOTH, 64), 64,
+            "Sloth channel has independent capacity");
+        helper.assertValueEqual(storage.total(), 192, "total is the sum of all channels");
+        helper.assertTrue(!storage.hasRoom(), "three full channels leave no room");
+        helper.assertValueEqual(storage.remove(WrathCageStorage.Channel.MOB, 12), 12,
+            "removal takes the requested available amount");
+        helper.assertValueEqual(storage.amount(WrathCageStorage.Channel.MOB), 52,
+            "removal preserves the channel remainder");
+        helper.assertTrue(storage.hasRoom(), "removal restores channel capacity");
+        helper.assertValueEqual(storage.remove(WrathCageStorage.Channel.WRATH, 100), 64,
+            "removal cannot exceed stored amount");
+        helper.assertValueEqual(storage.remove(WrathCageStorage.Channel.SLOTH, -1), 0,
+            "negative removal is ignored");
+        helper.assertValueEqual(storage.selectedChannel(), WrathCageStorage.Channel.MOB,
+            "default display selects mob aspect");
+        helper.assertValueEqual(storage.cycleMode(), 1, "first cycle selects Wrath");
+        helper.assertValueEqual(storage.selectedChannel(), WrathCageStorage.Channel.WRATH,
+            "second display mode selects Wrath");
+        helper.assertValueEqual(storage.selectedAmount(), 0,
+            "selected amount follows the display mode");
+        helper.assertValueEqual(storage.cycleMode(), 2, "second cycle selects Sloth");
+        helper.assertValueEqual(storage.selectedChannel(), WrathCageStorage.Channel.SLOTH,
+            "third display mode selects Sloth");
+        helper.assertValueEqual(storage.cycleMode(), 0, "third cycle returns to mob");
+        helper.succeed();
     }
 
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")

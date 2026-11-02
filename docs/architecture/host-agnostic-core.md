@@ -21,7 +21,7 @@ The shared core owns:
 - `ContentId` and symbolic host content references.
 - Aspect, recipe, and research definitions/catalogs.
 - Shared wand behavior rules and narrow access contracts, including Blink Focus targeting, teleport effects, upgrade progression/cost profiles, and Witchwood mana conversion rates.
-- Shared Wrath Cage spawn eligibility, delay calculation, bounded Essentia insertion, extraction eligibility, and fuel-channel priority rules.
+- Shared Wrath Cage spawn eligibility, delay calculation, bounded three-channel Essentia storage, extraction eligibility, display-mode selection, and fuel-channel priority rules.
 - Semantic warp kinds and access contracts.
 
 The core may use Minecraft runtime types where behavior necessarily operates on Minecraft objects, such as `ItemStack`, entities, and levels. It must not import Thaumcraft or NeoForge implementation APIs, or refer to the concrete TC4 adapter.
@@ -69,7 +69,7 @@ Known limits remain explicit:
 | Research stages | `PARTIAL` | Adapter accepts one page group; multi-stage definitions are rejected |
 | Wand rods, caps, triggers, and parts | `PARTIAL` | Semantic rod/cap and Hellfire trigger definitions are shared; TC4 registry calls, update callbacks, creative wand assembly, and part mutation remain host-bound |
 | Focus/spell runtime | `PARTIAL` | Blink Focus upgrade rules and Vis costs are shared; focus upgrade inspection and Vis payment use `HostFocusServices`, while `FocusItem`, `FocusUpgradeType`, rendering and item lifecycle remain TC4-bound |
-| Essentia storage/transport | `PARTIAL` | Shared spawn, storage, extraction-eligibility, and fuel-selection policies are extracted; Wrath Cage still extends TC4 block-entity and transport types directly, and physical transport/persistence remain host-bound |
+| Essentia storage/transport | `PARTIAL` | Shared spawn, three-channel storage, display selection, extraction-eligibility, and fuel-selection policies are extracted; Wrath Cage still extends TC4 block-entity and transport types directly, and physical transport/persistence remain host-bound |
 | Optional enchantment integration | `PARTIAL` | Legacy optional-mod path remains |
 | Taint origins | `UNSUPPORTED` | No taint-origin registration or propagation adapter is implemented |
 
