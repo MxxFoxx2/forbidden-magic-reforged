@@ -36,7 +36,7 @@ The core may use Minecraft runtime types where behavior necessarily operates on 
 
 ### Runtime capabilities — `integration/runtime/`
 
-The narrow interfaces currently cover aspect services, item properties and factories, entity aspects and classification, morph tools, block-entity construction, wand inspection and Vis storage, accessory slots, taint block services, enchantment effects, scribing operations, warp, and bootstrap.
+The narrow interfaces currently cover aspect services, item properties and factories, entity aspects and classification, morph tools, block-entity construction, wand inspection, Vis storage and typed wand-parts mutation, accessory slots, taint block services, enchantment effects, scribing operations, warp, and bootstrap.
 
 These contracts may expose Minecraft/NeoForge runtime types required by the 1.21.1 implementation. They must not expose Thaumcraft types or concrete adapter classes.
 
