@@ -604,7 +604,7 @@ public final class FmGameTests {
             HostProfile.SupportLevel.ADAPTED, "Thaumcraft-specific heretic trades are supplied by the host adapter");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.RUNTIME_BOOTSTRAP).level(),
             HostProfile.SupportLevel.ADAPTED, "host bootstrap capability is implemented");
-        int optionalEnchantments = HostAdapterRegistry.requireBootstrap().registeredOptionalEnchantments();
+        int optionalEnchantments = HostAdapterRegistry.requireOptionalEnchantments().registeredOptionalEnchantments();
         int expectedOptionalEnchantments = FmConfig.enchantmentsEnabled()
             && ModList.get().isLoaded("thaumictinkerer") ? 8 : 0;
         helper.assertValueEqual(optionalEnchantments, expectedOptionalEnchantments,
