@@ -73,9 +73,6 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
 
     public static final Tc4HostAdapter INSTANCE = new Tc4HostAdapter();
 
-    private static final String LEGACY_RUNTIME_NOTE =
-        "Still implemented by the 1.21.1 legacy gameplay path; extraction behind this host capability is pending";
-
     private static final HostProfile PROFILE = createProfile();
 
     private Tc4HostAdapter() {
@@ -84,10 +81,6 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
     private static HostProfile createProfile() {
         Map<HostProfile.Feature, HostProfile.FeatureSupport> support =
             new EnumMap<>(HostProfile.Feature.class);
-        for (HostProfile.Feature feature : HostProfile.Feature.values()) {
-            support.put(feature, HostProfile.FeatureSupport.partial(LEGACY_RUNTIME_NOTE));
-        }
-
         adapted(support, HostProfile.Feature.ASPECT_REGISTRATION,
             "Registers shared semantic aspect definitions through AddonAspects");
         adapted(support, HostProfile.Feature.ASPECT_DIAGNOSTICS,
@@ -562,7 +555,7 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
     }
 
     @Override
-    public void addCreativeWands(List<ItemStack> stacks) {
+    public void addCreativeContent(List<ItemStack> stacks) {
         Tc4WandAdapter.addCreativeWands(stacks);
     }
 

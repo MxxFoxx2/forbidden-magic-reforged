@@ -43,7 +43,7 @@ public final class FmCreativeTab {
             MobCrystalItem.setMob(crystal, mobId);
             stacks.add(crystal);
         }
-        HostAdapterRegistry.requireCreativeContent().addCreativeWands(stacks);
+        HostAdapterRegistry.requireCreativeContent().addCreativeContent(stacks);
         return stacks;
     }
 }

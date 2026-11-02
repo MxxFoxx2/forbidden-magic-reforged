@@ -58,7 +58,7 @@ The 1.21.1 `Tc4HostAdapter` declares every `HostProfile.Feature`. The currently 
 - Wand inspection and typed wand Vis reads/writes, with item-backed real-Vis writes kept as a distinct operation.
 - Semantic wand rods/caps, update behavior, trigger rules, typed part mutation, Blink Focus progression and cost profiles, all materialized through native TC4 registration/lifecycle adapters.
 - Bounded Essentia storage and extraction policy, with native persistence and physical transport calls isolated in the TC4 block-entity/transport adapters.
-- Host-native creative wand samples through the dedicated creative-content capability.
+- Host-native creative-tab contributions through the dedicated creative-content capability (currently catalogued wand samples).
 - Baubles accessory lookup and slot assignment.
 - Taint material classification, taint-shovel behavior, and special-mining/taint-damage hooks.
 - Scribing research difficulty, primal-aspect selection, aspect-pool updates, and spent scribing-tool creation.

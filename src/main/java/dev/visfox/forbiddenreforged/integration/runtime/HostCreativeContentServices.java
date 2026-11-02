@@ -5,5 +5,5 @@ import net.minecraft.world.item.ItemStack;
 
 /** Adds host-native sample stacks to the shared creative tab. */
 public interface HostCreativeContentServices {
-    void addCreativeWands(List<ItemStack> stacks);
+    void addCreativeContent(List<ItemStack> stacks);
 }
