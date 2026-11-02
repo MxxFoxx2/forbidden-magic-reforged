@@ -37,6 +37,7 @@ import dev.visfox.forbiddenreforged.WrathCageBlock;
 import dev.visfox.forbiddenreforged.WrathCageBlockEntity;
 import dev.visfox.forbiddenreforged.core.block.WrathCageBehavior;
 import dev.visfox.forbiddenreforged.core.wand.WitchwoodManaBehavior;
+import dev.visfox.forbiddenreforged.core.wand.BlinkFocusRules;
 import dev.visfox.forbiddenreforged.FmBlockEntities;
 import dev.visfox.forbiddenreforged.FmItemEvents;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -63,6 +64,32 @@ import net.neoforged.neoforge.event.furnace.FurnaceFuelBurnTimeEvent;
 @PrefixGameTestTemplate(false)
 public final class FmGameTests {
     private FmGameTests() {
+    }
+
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void blinkFocusUpgradeProgressionRemainsStable(GameTestHelper helper) {
+        helper.assertValueEqual(BlinkFocusRules.possibleUpgradesByRank(1, false, false),
+            List.of(BlinkFocusRules.Upgrade.FRUGAL), "rank one only offers Frugal");
+        helper.assertValueEqual(BlinkFocusRules.possibleUpgradesByRank(2, false, false),
+            List.of(BlinkFocusRules.Upgrade.HELLFIRE, BlinkFocusRules.Upgrade.PANDEMONIUM,
+                BlinkFocusRules.Upgrade.FRUGAL), "rank two offers both special paths and Frugal");
+        helper.assertValueEqual(BlinkFocusRules.possibleUpgradesByRank(4, true, false),
+            List.of(BlinkFocusRules.Upgrade.POTENCY, BlinkFocusRules.Upgrade.FRUGAL,
+                BlinkFocusRules.Upgrade.ENLARGE), "Hellfire path unlocks Potency and Enlarge");
+        helper.assertValueEqual(BlinkFocusRules.possibleUpgradesByRank(4, false, true),
+            List.of(BlinkFocusRules.Upgrade.FRUGAL, BlinkFocusRules.Upgrade.ENLARGE),
+            "Pandemonium path excludes Potency");
+        helper.assertValueEqual(BlinkFocusRules.possibleUpgradesByRank(4, false, false),
+            List.of(BlinkFocusRules.Upgrade.FRUGAL), "base path only retains Frugal");
+        helper.assertTrue(BlinkFocusRules.possibleUpgradesByRank(6, false, false).isEmpty(),
+            "unsupported focus ranks expose no upgrades");
+        helper.assertValueEqual(BlinkFocusRules.costProfile(true, true),
+            BlinkFocusRules.CostProfile.HELLFIRE, "Hellfire cost takes precedence when both flags are set");
+        helper.assertValueEqual(BlinkFocusRules.costProfile(false, true),
+            BlinkFocusRules.CostProfile.PANDEMONIUM, "Pandemonium selects its own cost profile");
+        helper.assertValueEqual(BlinkFocusRules.costProfile(false, false),
+            BlinkFocusRules.CostProfile.BASE, "unupgraded focus uses base cost");
+        helper.succeed();
     }
 
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
