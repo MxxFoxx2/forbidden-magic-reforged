@@ -35,6 +35,7 @@ import dev.visfox.forbiddenreforged.FmComponents;
 import dev.visfox.forbiddenreforged.MobCrystalItem;
 import dev.visfox.forbiddenreforged.WrathCageBlock;
 import dev.visfox.forbiddenreforged.WrathCageBlockEntity;
+import dev.visfox.forbiddenreforged.core.block.WrathCageBehavior;
 import dev.visfox.forbiddenreforged.FmBlockEntities;
 import dev.visfox.forbiddenreforged.FmItemEvents;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -182,6 +183,18 @@ public final class FmGameTests {
         helper.assertTrue(WrathCageBlockEntity.shouldSpawn(false, true, 0, 12, 12), "cage should spawn when fuel is available");
         helper.assertTrue(!WrathCageBlockEntity.shouldSpawn(true, true, 0, 12, 12), "redstone must disable spawning");
         helper.assertTrue(!WrathCageBlockEntity.shouldSpawn(false, false, 0, 12, 12), "unattuned cage must not spawn");
+        helper.assertValueEqual(WrathCageBehavior.acceptedAmount(60, 10, 64), 4,
+            "essentia insertion must respect the remaining per-channel capacity");
+        helper.assertValueEqual(WrathCageBehavior.acceptedAmount(64, 10, 64), 0,
+            "a full essentia channel must reject additional storage");
+        helper.assertValueEqual(WrathCageBehavior.acceptedAmount(0, -5, 64), 0,
+            "negative essentia requests must not change storage");
+        helper.assertTrue(WrathCageBehavior.nextDelay(net.minecraft.util.RandomSource.create(1L), false) >= 200
+            && WrathCageBehavior.nextDelay(net.minecraft.util.RandomSource.create(1L), false) < 300,
+            "normal spawn delay must remain in the original 200..299 tick range");
+        helper.assertTrue(WrathCageBehavior.nextDelay(net.minecraft.util.RandomSource.create(1L), true) >= 400
+            && WrathCageBehavior.nextDelay(net.minecraft.util.RandomSource.create(1L), true) < 500,
+            "slothful spawn delay must remain in the original 400..499 tick range");
         helper.succeed();
     }
 
