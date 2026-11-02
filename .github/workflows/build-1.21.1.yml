@@ -21,12 +21,12 @@ jobs:
     timeout-minutes: 90
     steps:
       - name: Checkout addon
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           path: forbidden-magic-reforged
 
       - name: Checkout pinned Thaumcraft source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: notlikethiss/thaumcraft-4-reforged
           ref: 2beb6871123328968bbdba3ae4872d09d3ab1510
@@ -34,19 +34,20 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
       - name: Set up Java 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: "21"
-          cache: gradle
-          cache-dependency-path: |
-            forbidden-magic-reforged/gradle/wrapper/gradle-wrapper.properties
-            thaumcraft-4-reforged/gradle/wrapper/gradle-wrapper.properties
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6.4.1
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/1.21.1' }}
 
       - name: Prepare pinned host and apply local patches
         working-directory: forbidden-magic-reforged
@@ -60,11 +61,11 @@ jobs:
         working-directory: forbidden-magic-reforged/host
         run: |
           chmod +x gradlew
-          ./gradlew --no-daemon build
+          ./gradlew build
 
       - name: Build addon
         working-directory: forbidden-magic-reforged
-        run: ./gradlew --no-daemon build
+        run: ./gradlew build
 
       - name: Verify addon artifact provenance
         working-directory: forbidden-magic-reforged
@@ -72,7 +73,7 @@ jobs:
 
       - name: Run GameTests
         working-directory: forbidden-magic-reforged
-        run: ./gradlew --no-daemon runGameTestServer
+        run: ./gradlew runGameTestServer
 
       - name: Upload 1.21.1 mod JAR
         if: always()

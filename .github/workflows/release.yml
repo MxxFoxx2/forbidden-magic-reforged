@@ -46,14 +46,14 @@ jobs:
     steps:
       - name: Checkout Minecraft 26.3 source
         if: github.ref == 'refs/heads/main'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.event_name == 'workflow_dispatch' && inputs.source_ref != '' && inputs.source_ref || github.sha }}
           fetch-depth: 0
 
       - name: Checkout port branch source
         if: github.ref != 'refs/heads/main'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.event_name == 'workflow_dispatch' && inputs.source_ref != '' && inputs.source_ref || github.sha }}
           path: port/forbidden-magic-reforged
@@ -163,19 +163,20 @@ jobs:
           echo "Publishing Minecraft $channel from $source_sha as mod version $mod_version"
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
       - name: Set up matching Java toolchain
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: ${{ steps.meta.outputs.java_version }}
-          cache: gradle
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6.4.1
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
       - name: Clone Thaumcraft host for Minecraft 26.3
         if: steps.meta.outputs.channel == '26.3'
@@ -183,7 +184,7 @@ jobs:
 
       - name: Checkout pinned Thaumcraft host for port branches
         if: steps.meta.outputs.channel != '26.3'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: notlikethiss/thaumcraft-4-reforged
           ref: ${{ steps.meta.outputs.host_sha }}
@@ -209,11 +210,11 @@ jobs:
         shell: bash
         run: |
           chmod +x gradlew
-          ./gradlew --no-daemon build
+          ./gradlew build
 
       - name: Build add-on
         working-directory: ${{ steps.meta.outputs.repo_dir }}
-        run: ./gradlew --no-daemon build
+        run: ./gradlew build
 
       - name: Verify add-on artifact provenance
         working-directory: ${{ steps.meta.outputs.repo_dir }}
@@ -221,7 +222,7 @@ jobs:
 
       - name: Run GameTests
         working-directory: ${{ steps.meta.outputs.repo_dir }}
-        run: ./gradlew --no-daemon runGameTestServer
+        run: ./gradlew runGameTestServer
 
       - name: Run GameTests with Luxuria disabled (26.x)
         if: steps.meta.outputs.channel != '1.21.1'
@@ -230,7 +231,7 @@ jobs:
         run: |
           set -euo pipefail
           python3 tools/set_startup_config.py no_lust=true
-          ./gradlew --no-daemon runGameTestServer
+          ./gradlew runGameTestServer
 
       - name: Prepare stable release assets
         id: asset
