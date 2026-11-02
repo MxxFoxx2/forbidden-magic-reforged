@@ -120,6 +120,11 @@ public final class Tc4ResearchAdapter {
                 .map(Tc4ResearchAdapter::researchKey)
                 .toArray(String[]::new));
         }
+        if (!definition.siblings().isEmpty()) {
+            item.setSiblings(definition.siblings().stream()
+                .map(Tc4ResearchAdapter::researchKey)
+                .toArray(String[]::new));
+        }
         if (!definition.itemTriggers().isEmpty()) {
             item.setItemTriggers(definition.itemTriggers().stream()
                 .map(ContentId::toString)
