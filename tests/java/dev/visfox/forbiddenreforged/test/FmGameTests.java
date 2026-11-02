@@ -189,6 +189,28 @@ public final class FmGameTests {
             "a full essentia channel must reject additional storage");
         helper.assertValueEqual(WrathCageBehavior.acceptedAmount(0, -5, 64), 0,
             "negative essentia requests must not change storage");
+        helper.assertTrue(WrathCageBehavior.canDrawMobEssentia(63, 64),
+            "mob essentia can be drawn while its channel has room");
+        helper.assertTrue(!WrathCageBehavior.canDrawMobEssentia(64, 64),
+            "mob essentia must stop at channel capacity");
+        helper.assertTrue(WrathCageBehavior.canDrawWrathEssentia(11, 63, 64, 12),
+            "Wrath can be drawn until its own channel fills or mob fuel reaches cost");
+        helper.assertTrue(!WrathCageBehavior.canDrawWrathEssentia(12, 0, 64, 12),
+            "Wrath extraction pauses once mob essentia alone reaches the fuel cost");
+        helper.assertTrue(WrathCageBehavior.canDrawSlothEssentia(11, 11, 63, 64, 12),
+            "Sloth can be drawn while both higher-priority channels are below cost");
+        helper.assertTrue(!WrathCageBehavior.canDrawSlothEssentia(11, 12, 0, 64, 12),
+            "Sloth extraction pauses once the Wrath channel reaches cost");
+        helper.assertValueEqual(WrathCageBehavior.selectFuelChannel(12, 12, 12, 12),
+            WrathCageBehavior.FuelChannel.SPECIAL, "mob aspect has first fuel priority");
+        helper.assertValueEqual(WrathCageBehavior.selectFuelChannel(0, 12, 12, 12),
+            WrathCageBehavior.FuelChannel.WRATH, "Wrath has second fuel priority");
+        helper.assertValueEqual(WrathCageBehavior.selectFuelChannel(0, 0, 12, 12),
+            WrathCageBehavior.FuelChannel.SLOTH, "Sloth is the final fuel fallback");
+        helper.assertValueEqual(WrathCageBehavior.selectFuelChannel(0, 0, 11, 12),
+            WrathCageBehavior.FuelChannel.NONE, "partial channels cannot fuel a spawn cycle");
+        helper.assertValueEqual(WrathCageBehavior.selectFuelChannel(64, 64, 64, 0),
+            WrathCageBehavior.FuelChannel.NONE, "disabled essentia cost consumes no fuel channel");
         helper.assertTrue(WrathCageBehavior.nextDelay(0, false) >= 200
             && WrathCageBehavior.nextDelay(99, false) < 300,
             "normal spawn delay must remain in the original 200..299 tick range");
