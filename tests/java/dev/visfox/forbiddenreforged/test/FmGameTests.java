@@ -36,6 +36,7 @@ import dev.visfox.forbiddenreforged.MobCrystalItem;
 import dev.visfox.forbiddenreforged.WrathCageBlock;
 import dev.visfox.forbiddenreforged.WrathCageBlockEntity;
 import dev.visfox.forbiddenreforged.core.block.WrathCageBehavior;
+import dev.visfox.forbiddenreforged.core.wand.WitchwoodManaBehavior;
 import dev.visfox.forbiddenreforged.FmBlockEntities;
 import dev.visfox.forbiddenreforged.FmItemEvents;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -222,6 +223,20 @@ public final class FmGameTests {
 
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void witchwoodManaCostsPreserveOriginalRates(GameTestHelper helper) {
+        helper.assertTrue(WitchwoodManaBehavior.supportsArsMagicaModId("arsmagicalegacy"),
+            "modern Ars Magica: Legacy mod id is recognized by shared core");
+        helper.assertTrue(WitchwoodManaBehavior.supportsArsMagicaModId("arsmagica2"),
+            "legacy Ars Magica 2 mod id remains supported by shared core");
+        helper.assertTrue(!WitchwoodManaBehavior.supportsArsMagicaModId("unrelatedmod"),
+            "unrelated mods do not activate Witchwood mana integration");
+        helper.assertValueEqual(WitchwoodManaBehavior.rechargeInterval(false), 100,
+            "shared Witchwood wand interval remains 100 ticks");
+        helper.assertValueEqual(WitchwoodManaBehavior.rechargeInterval(true), 40,
+            "shared Witchwood staff interval remains 40 ticks");
+        helper.assertTrue(Math.abs(WitchwoodManaBehavior.manaCost(false, "iron", 20) - 28.0F) < 0.01F,
+            "shared core scales partial wand deficits correctly");
+        helper.assertTrue(Math.abs(WitchwoodManaBehavior.manaCost(true, "vinteum", 20) - 10.0F) < 0.01F,
+            "shared core scales partial Vinteum staff deficits correctly");
         helper.assertValueEqual(FmWands.witchwoodRechargeInterval(false), 100,
             "Witchwood wand recharges on the original 100-tick interval");
         helper.assertValueEqual(FmWands.witchwoodRechargeInterval(true), 40,
