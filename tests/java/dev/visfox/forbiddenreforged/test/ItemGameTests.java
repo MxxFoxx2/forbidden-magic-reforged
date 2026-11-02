@@ -67,9 +67,10 @@ import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.neoforged.fml.ModList;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
+import dev.visfox.forbiddenreforged.core.aspect.ForbiddenMagicAspectCatalog;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectAdapter;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4CrystalwellItem;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4PrimewellItem;
-import dev.visfox.forbiddenreforged.FmAspects;
 import dev.visfox.forbiddenreforged.FmComponents;
 import dev.visfox.forbiddenreforged.FmDrops;
 import dev.visfox.forbiddenreforged.FmItems;
@@ -116,9 +117,9 @@ public final class ItemGameTests {
         InfusionRecipe recipe = (InfusionRecipe) TcRecipes.get("SKULLAXE");
         helper.assertTrue(recipe != null, "skull axe recipe must be registered");
         helper.assertValueEqual(recipe.instability(), 1, "instability");
-        helper.assertValueEqual(recipe.aspects().getAmount(FmAspects.WRATH), 8, "wrath cost");
+        helper.assertValueEqual(recipe.aspects().getAmount(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.IRA)), 8, "wrath cost");
         helper.assertValueEqual(recipe.aspects().getAmount(Aspect.WEAPON), 8, "weapon cost");
-        helper.assertValueEqual(recipe.aspects().getAmount(FmAspects.NETHER), 8, "nether cost");
+        helper.assertValueEqual(recipe.aspects().getAmount(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INFERNUS)), 8, "nether cost");
         helper.assertValueEqual(recipe.components().size(), 4, "four components");
         helper.succeed();
     }
@@ -130,7 +131,7 @@ public final class ItemGameTests {
         helper.assertTrue(fork.isSecondary(), "FORK is secondary");
         helper.assertTrue(fork.isConcealed(), "FORK is concealed");
         helper.assertValueEqual(fork.warp(), 0, "FORK has no warp");
-        helper.assertValueEqual(fork.tags().getAmount(FmAspects.NETHER), 3, "FORK research NETHER cost");
+        helper.assertValueEqual(fork.tags().getAmount(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INFERNUS)), 3, "FORK research NETHER cost");
         helper.assertValueEqual(fork.tags().getAmount(Aspect.MECHANISM), 1, "FORK research MECHANISM cost");
         helper.assertValueEqual(fork.tags().getAmount(Aspect.TOOL), 1, "FORK research TOOL cost");
         helper.assertValueEqual(fork.tags().getAmount(Aspect.FIRE), 0, "FORK research has no FIRE cost");
@@ -138,7 +139,7 @@ public final class ItemGameTests {
         InfusionRecipe recipe = (InfusionRecipe) TcRecipes.get("FORK");
         helper.assertTrue(recipe != null, "FORK infusion recipe exists");
         helper.assertValueEqual(recipe.instability(), 1, "FORK instability");
-        helper.assertValueEqual(recipe.aspects().getAmount(FmAspects.NETHER), 8, "FORK NETHER cost");
+        helper.assertValueEqual(recipe.aspects().getAmount(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INFERNUS)), 8, "FORK NETHER cost");
         helper.assertValueEqual(recipe.aspects().getAmount(Aspect.FIRE), 0, "FORK has no FIRE cost");
         helper.assertValueEqual(recipe.aspects().getAmount(Aspect.MECHANISM), 8, "FORK mechanism cost");
         helper.assertValueEqual(recipe.aspects().getAmount(Aspect.ENERGY), 8, "FORK energy cost");

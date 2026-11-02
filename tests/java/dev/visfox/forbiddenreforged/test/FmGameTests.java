@@ -23,9 +23,11 @@ import thaumcraft.crafting.CrucibleRecipe;
 import thaumcraft.crafting.InfusionRecipe;
 import thaumcraft.research.ResearchItem;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
+import dev.visfox.forbiddenreforged.core.aspect.ForbiddenMagicAspectCatalog;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectAdapter;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectDiagnostics;
 import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 import dev.visfox.forbiddenreforged.integration.api.HostProfile;
-import dev.visfox.forbiddenreforged.FmAspects;
 import dev.visfox.forbiddenreforged.FmConfig;
 import dev.visfox.forbiddenreforged.FmItems;
 import dev.visfox.forbiddenreforged.FmCreativeTab;
@@ -746,7 +748,7 @@ public final class FmGameTests {
         AspectList shard = AspectRegistry.active().getObjectTags(FmItems.DEADLY_SHARDS.get("wrath").get());
         helper.assertTrue(fruit != null && fruit.getAmount(Aspect.TAINT) >= 2,
             "taint fruit must carry taint aspects");
-        helper.assertTrue(shard != null && shard.getAmount(FmAspects.WRATH) >= 2,
+        helper.assertTrue(shard != null && shard.getAmount(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.IRA)) >= 2,
             "wrath shard must carry wrath aspects");
         AspectList taintLog = AspectRegistry.active().getObjectTags(
             BuiltInRegistries.ITEM.get(ForbiddenMagic.id("taint_log")));
@@ -758,13 +760,13 @@ public final class FmGameTests {
 
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void addonAspectsSurviveSerialization(GameTestHelper helper) {
-        Aspect nether = FmAspects.NETHER;
-        helper.assertTrue(nether != null && nether.ordinal() >= FmAspects.BUILTIN_ASPECT_COUNT, "infernus must be an add-on aspect");
+        Aspect nether = Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INFERNUS);
+        helper.assertTrue(nether != null && nether.ordinal() >= Tc4AspectDiagnostics.BUILTIN_ASPECT_COUNT, "infernus must be an add-on aspect");
         helper.assertValueEqual(Aspect.getAspect("infernus"), nether, "by-tag lookup must find infernus");
-        helper.assertTrue(FmAspects.PRIDE != null && FmAspects.GLUTTONY != null && FmAspects.ENVY != null
-            && FmAspects.SLOTH != null && FmAspects.WRATH != null, "all enabled sin aspects must be registered");
+        helper.assertTrue(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.SUPERBIA) != null && Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.GULA) != null && Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INVIDIA) != null
+            && Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.DESIDIA) != null && Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.IRA) != null, "all enabled sin aspects must be registered");
         if (!FmConfig.lustDisabled()) {
-            helper.assertTrue(FmAspects.LUST != null, "luxuria must register when no_lust is disabled");
+            helper.assertTrue(Tc4AspectAdapter.isRegistered(ForbiddenMagicAspectCatalog.LUXURIA), "luxuria must register when no_lust is disabled");
         } else {
             helper.assertTrue(Aspect.getAspect("luxuria") == null, "luxuria must not register when no_lust is enabled");
         }

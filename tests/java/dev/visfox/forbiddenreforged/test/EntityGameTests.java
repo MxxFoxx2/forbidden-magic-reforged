@@ -13,7 +13,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
-import dev.visfox.forbiddenreforged.FmAspects;
+import dev.visfox.forbiddenreforged.core.aspect.ForbiddenMagicAspectCatalog;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectAdapter;
 import dev.visfox.forbiddenreforged.FmBlocks;
 import dev.visfox.forbiddenreforged.FmItems;
 import dev.visfox.forbiddenreforged.FmSpawnerMobs;
@@ -104,7 +105,7 @@ public final class EntityGameTests {
         helper.assertValueEqual(cage.pages().size(), 5, "wrath cage has 5 pages");
         InfusionRecipe cageRecipe = (InfusionRecipe) TcRecipes.get("WRATHCAGE");
         helper.assertTrue(cageRecipe != null, "wrath cage infusion recipe exists");
-        helper.assertTrue(cageRecipe.aspects().getAmount(FmAspects.WRATH) >= 32, "wrath cage recipe needs WRATH 32");
+        helper.assertTrue(cageRecipe.aspects().getAmount(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.IRA)) >= 32, "wrath cage recipe needs WRATH 32");
         CrucibleRecipe crystalRecipe = (CrucibleRecipe) TcRecipes.get("MOBCRYSTAL");
         helper.assertTrue(crystalRecipe != null, "mob crystal crucible recipe exists");
         helper.assertTrue(crystalRecipe.aspects().getAmount(Aspect.MIND) >= 10, "mob crystal recipe needs MIND 10");

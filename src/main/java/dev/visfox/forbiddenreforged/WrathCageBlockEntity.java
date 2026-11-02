@@ -5,6 +5,7 @@ import dev.visfox.forbiddenreforged.core.block.WrathCageStorage;
 import dev.visfox.forbiddenreforged.core.block.WrathCageState;
 import dev.visfox.forbiddenreforged.core.block.WrathCageSpawnBehavior;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
+import dev.visfox.forbiddenreforged.core.aspect.ForbiddenMagicAspectCatalog;
 import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectAdapter;
 import net.minecraft.core.BlockPos;
@@ -96,12 +97,12 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
         return aspect == null ? ContentId.parse("thaumcraft:lucrum") : aspect;
     }
 
-    private @Nullable ContentId wrathAspectId() {
-        return FmAspects.WRATH == null ? null : Tc4AspectAdapter.toContentId(FmAspects.WRATH);
+    private ContentId wrathAspectId() {
+        return ForbiddenMagicAspectCatalog.IRA;
     }
 
-    private @Nullable ContentId slothAspectId() {
-        return FmAspects.SLOTH == null ? null : Tc4AspectAdapter.toContentId(FmAspects.SLOTH);
+    private ContentId slothAspectId() {
+        return ForbiddenMagicAspectCatalog.DESIDIA;
     }
 
     private @Nullable WrathCageStorage.Channel channelFor(Aspect aspect) {

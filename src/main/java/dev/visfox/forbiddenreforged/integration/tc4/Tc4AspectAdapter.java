@@ -41,6 +41,10 @@ public final class Tc4AspectAdapter {
     }
 
 
+    public static boolean isRegistered(ContentId id) {
+        return registeredAspects.containsKey(id);
+    }
+
     public static ContentId toContentId(Aspect aspect) {
         for (Map.Entry<ContentId, Aspect> entry : registeredAspects.entrySet()) {
             if (entry.getValue().equals(aspect)) {
