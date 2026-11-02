@@ -190,10 +190,10 @@ public final class FmGameTests {
         helper.assertValueEqual(WrathCageBehavior.acceptedAmount(0, -5, 64), 0,
             "negative essentia requests must not change storage");
         helper.assertTrue(WrathCageBehavior.nextDelay(0, false) >= 200
-            && WrathCageBehavior.nextDelay(net.minecraft.util.RandomSource.create(1L), false) < 300,
+            && WrathCageBehavior.nextDelay(99, false) < 300,
             "normal spawn delay must remain in the original 200..299 tick range");
         helper.assertTrue(WrathCageBehavior.nextDelay(99, true) >= 400
-            && WrathCageBehavior.nextDelay(net.minecraft.util.RandomSource.create(1L), true) < 500,
+            && WrathCageBehavior.nextDelay(0, true) < 500,
             "slothful spawn delay must remain in the original 400..499 tick range");
         helper.succeed();
     }
