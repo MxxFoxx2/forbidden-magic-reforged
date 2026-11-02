@@ -6,6 +6,8 @@ import dev.visfox.forbiddenreforged.test.EnchantmentGameTests;
 import dev.visfox.forbiddenreforged.test.EntityGameTests;
 import dev.visfox.forbiddenreforged.test.ItemGameTests;
 import dev.visfox.forbiddenreforged.test.RecipeGameTests;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4HostAdapter;
 import net.minecraft.resources.Identifier;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -20,6 +22,7 @@ public final class ForbiddenMagic {
 
     public ForbiddenMagic(IEventBus modEventBus, ModContainer modContainer) {
         FmConfig.register(modContainer);
+        HostAdapterRegistry.install(Tc4HostAdapter.INSTANCE);
         FmAspects.init();
         FmAspectTags.register();
         FmComponents.register(modEventBus);

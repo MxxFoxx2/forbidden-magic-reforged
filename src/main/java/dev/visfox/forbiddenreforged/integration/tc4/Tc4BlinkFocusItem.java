@@ -1,6 +1,6 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
-import dev.visfox.forbiddenreforged.FmAspects;
+import dev.visfox.forbiddenreforged.core.aspect.ForbiddenMagicAspectCatalog;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
 import dev.visfox.forbiddenreforged.core.wand.BlinkFocusBehavior;
 import net.minecraft.resources.Identifier;
@@ -23,7 +23,7 @@ public class Tc4BlinkFocusItem extends FocusItem {
     private static final AspectList COST_PANDEMONIUM = new AspectList().add(Aspect.ENTROPY, 300).add(Aspect.ORDER, 100);
 
     public static final FocusUpgradeType HELLFIRE = new FocusUpgradeType(100, "hellfire",
-        ForbiddenMagic.id("textures/misc/hellfire.png"), new AspectList().add(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER), 1));
+        ForbiddenMagic.id("textures/misc/hellfire.png"), new AspectList().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INFERNUS), 1));
     public static final FocusUpgradeType PANDEMONIUM = new FocusUpgradeType(101, "pandemonium",
         ForbiddenMagic.id("textures/misc/pandemonium.png"), new AspectList().add(Aspect.DARKNESS, 1));
 
