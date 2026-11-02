@@ -31,9 +31,11 @@ import dev.visfox.forbiddenreforged.integration.runtime.HostTaintBlockServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandInspectionServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandVisServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWarpServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostVillagerTradeServices;
 import java.util.EnumMap;
 import java.util.List;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.entity.npc.VillagerTrades;
 import java.util.Map;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -65,7 +67,7 @@ import net.minecraft.server.level.ServerPlayer;
  * 1.21.1 gameplay integrations remain intact while their extraction into
  * focused host capabilities proceeds incrementally.
  */
-public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, HostWarpServices, HostMorphToolServices, HostBlockEntityServices, HostWandInspectionServices, HostWandVisServices, HostAccessoryServices, HostTaintBlockServices, HostEnchantmentEffectServices, HostScribingServices, HostEntityAspectServices, HostEntityClassificationServices, HostItemFactoryServices, HostItemPropertyServices, HostBootstrapServices {
+public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, HostWarpServices, HostMorphToolServices, HostBlockEntityServices, HostWandInspectionServices, HostWandVisServices, HostAccessoryServices, HostTaintBlockServices, HostEnchantmentEffectServices, HostScribingServices, HostEntityAspectServices, HostEntityClassificationServices, HostItemFactoryServices, HostItemPropertyServices, HostBootstrapServices, HostVillagerTradeServices {
     public static final Tc4HostAdapter INSTANCE = new Tc4HostAdapter();
 
     private static final String LEGACY_RUNTIME_NOTE =
@@ -109,6 +111,8 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
         adapted(support, HostProfile.Feature.WARP_POOLS,
             "Maps semantic warp kinds to the three TC4 warp pools");
         adapted(support, HostProfile.Feature.STICKY_WARP, "Preserves sticky warp as WarpType.STICKY");
+        adapted(support, HostProfile.Feature.VILLAGER_TRADES,
+            "Contributes TC4-backed Profane Wand and Fire Focus novice trade offers");
         adapted(support, HostProfile.Feature.MORPH_TOOL_RUNTIME,
             "Uses the TC4 ToolHarvest API for morph-tool area harvesting and cycle sounds");
         adapted(support, HostProfile.Feature.WAND_INSPECTION,
@@ -452,5 +456,10 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
     @Override
     public void addCreativeWands(List<ItemStack> stacks) {
         Tc4WandAdapter.addCreativeWands(stacks);
+    }
+
+    @Override
+    public void addNoviceTrades(List<VillagerTrades.ItemListing> trades) {
+        Tc4VillagerTradeAdapter.addNoviceTrades(trades);
     }
 }

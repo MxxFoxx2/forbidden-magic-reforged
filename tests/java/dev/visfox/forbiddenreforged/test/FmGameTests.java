@@ -93,6 +93,8 @@ public final class FmGameTests {
             HostProfile.SupportLevel.ADAPTED, "Profane Wand rod replacement uses a typed parts port");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.WAND_TRIGGERS).level(),
             HostProfile.SupportLevel.ADAPTED, "Hellfire wand trigger registration is owned by the TC4 adapter");
+        helper.assertValueEqual(profile.supportOf(HostProfile.Feature.VILLAGER_TRADES).level(),
+            HostProfile.SupportLevel.ADAPTED, "Thaumcraft-specific heretic trades are supplied by the host adapter");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.RUNTIME_BOOTSTRAP).level(),
             HostProfile.SupportLevel.ADAPTED, "host bootstrap capability is implemented");
         int optionalEnchantments = HostAdapterRegistry.requireBootstrap().registeredOptionalEnchantments();

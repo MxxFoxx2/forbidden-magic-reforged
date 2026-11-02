@@ -15,6 +15,7 @@ import dev.visfox.forbiddenreforged.integration.runtime.HostTaintBlockServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostEnchantmentEffectServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostScribingServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWarpServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostVillagerTradeServices;
 import java.util.Objects;
 
 /**
@@ -125,5 +126,10 @@ public final class HostAdapterRegistry {
      */
     public static HostBootstrapServices requireBootstrap() {
         return capability(HostBootstrapServices.class, "bootstrap");
+    }
+
+    /** Returns host-specific trades for the Forbidden Magic heretic profession. */
+    public static HostVillagerTradeServices requireVillagerTrades() {
+        return capability(HostVillagerTradeServices.class, "villager trades");
     }
 }
