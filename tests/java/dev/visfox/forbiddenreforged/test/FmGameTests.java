@@ -36,7 +36,6 @@ import dev.visfox.forbiddenreforged.FmWands;
 import dev.visfox.forbiddenreforged.FmComponents;
 import dev.visfox.forbiddenreforged.MobCrystalItem;
 import dev.visfox.forbiddenreforged.WrathCageBlock;
-import dev.visfox.forbiddenreforged.WrathCageBlockEntity;
 import dev.visfox.forbiddenreforged.core.block.WrathCageBehavior;
 import dev.visfox.forbiddenreforged.core.block.WrathCageStorage;
 import dev.visfox.forbiddenreforged.core.block.WrathCageState;
@@ -581,18 +580,18 @@ public final class FmGameTests {
             new net.minecraft.core.BlockPos(0, 0, 0),
             dev.visfox.forbiddenreforged.FmBlocks.WRATH_CAGE.get().defaultBlockState()
         );
-        helper.assertTrue(created instanceof WrathCageBlockEntity,
-            "the selected host factory creates the registered Wrath Cage implementation");
-        WrathCageBlockEntity cage = (WrathCageBlockEntity) created;
+        helper.assertTrue(created != null,
+            "the selected host factory creates the registered Wrath Cage block entity");
+        var host = HostAdapterRegistry.requireBlockEntities();
         ItemStack crystal = new ItemStack(FmItems.MOB_CRYSTAL.get());
         MobCrystalItem.setMob(crystal, "minecraft:zombie");
         helper.assertTrue(WrathCageBlock.attune(cage, crystal), "valid crystal should attune cage");
-        helper.assertValueEqual(cage.getMobId(), "minecraft:zombie", "cage should remember the captured entity");
+        helper.assertValueEqual(host.wrathCageMobId(created), "minecraft:zombie", "cage should remember the captured entity");
         helper.assertTrue(MobCrystalItem.mob(crystal) == null, "crystal should be consumed into an empty cage");
         ItemStack second = new ItemStack(FmItems.MOB_CRYSTAL.get());
         MobCrystalItem.setMob(second, "minecraft:skeleton");
         helper.assertTrue(WrathCageBlock.attune(cage, second), "second crystal should swap cage target");
-        helper.assertValueEqual(cage.getMobId(), "minecraft:skeleton", "cage should change its target");
+        helper.assertValueEqual(host.wrathCageMobId(created), "minecraft:skeleton", "cage should change its target");
         helper.assertValueEqual(MobCrystalItem.mob(second), "minecraft:zombie", "old target should be returned in the crystal");
         helper.succeed();
     }
@@ -614,9 +613,9 @@ public final class FmGameTests {
         helper.assertValueEqual(WandRegistry.findRod("witchwood_staff") != null, am2, "witchwood staff rod registration follows Ars Magica 2");
         helper.assertTrue(BuiltInRegistries.BLOCK_ENTITY_TYPE.get(ForbiddenMagic.id("wrath_cage")) == FmBlockEntities.WRATH_CAGE.get(),
             "Wrath Cage block entity type must be registered");
-        helper.assertTrue(WrathCageBlockEntity.shouldSpawn(false, true, 0, 12, 12), "cage should spawn when fuel is available");
-        helper.assertTrue(!WrathCageBlockEntity.shouldSpawn(true, true, 0, 12, 12), "redstone must disable spawning");
-        helper.assertTrue(!WrathCageBlockEntity.shouldSpawn(false, false, 0, 12, 12), "unattuned cage must not spawn");
+        helper.assertTrue(WrathCageBehavior.shouldSpawn(false, true, 0, 12, 12), "cage should spawn when fuel is available");
+        helper.assertTrue(!WrathCageBehavior.shouldSpawn(true, true, 0, 12, 12), "redstone must disable spawning");
+        helper.assertTrue(!WrathCageBehavior.shouldSpawn(false, false, 0, 12, 12), "unattuned cage must not spawn");
         helper.assertValueEqual(WrathCageBehavior.acceptedAmount(60, 10, 64), 4,
             "essentia insertion must respect the remaining per-channel capacity");
         helper.assertValueEqual(WrathCageBehavior.acceptedAmount(64, 10, 64), 0,
