@@ -73,7 +73,7 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
     }
 
     public static int nextDelay(RandomSource random, boolean slothful) {
-        return WrathCageBehavior.nextDelay(random, slothful);
+        return WrathCageBehavior.nextDelay(random.nextInt(100), slothful);
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, WrathCageBlockEntity cage) {
