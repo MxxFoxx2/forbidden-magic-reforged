@@ -2,6 +2,7 @@ package dev.visfox.forbiddenreforged.core.wand;
 
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Semantic definitions for Forbidden Magic wand materials.
@@ -86,6 +87,42 @@ public final class WandMaterialCatalog {
                 id(MOD, "alchemical_cap"), 7,
                 id(MOD, "textures/model/wand_cap_alchemical.png"))
         );
+    }
+
+    public static ContentId rodId(String tag) {
+        return materialId("wand_rod/", tag);
+    }
+
+    public static ContentId capId(String tag) {
+        return materialId("wand_cap/", tag);
+    }
+
+    public static String rodTag(ContentId id) {
+        return materialTag(id, "wand_rod/");
+    }
+
+    public static String capTag(ContentId id) {
+        return materialTag(id, "wand_cap/");
+    }
+
+    private static ContentId materialId(String prefix, String tag) {
+        Objects.requireNonNull(tag, "tag");
+        if (tag.isBlank() || tag.indexOf('/') >= 0) {
+            throw new IllegalArgumentException("Invalid wand material tag: " + tag);
+        }
+        return id(MOD, prefix + tag);
+    }
+
+    private static String materialTag(ContentId id, String prefix) {
+        Objects.requireNonNull(id, "id");
+        if (!MOD.equals(id.namespace()) || !id.path().startsWith(prefix)) {
+            throw new IllegalArgumentException("Unsupported wand material identifier: " + id);
+        }
+        String tag = id.path().substring(prefix.length());
+        if (tag.isBlank() || tag.indexOf('/') >= 0) {
+            throw new IllegalArgumentException("Unsupported wand material identifier: " + id);
+        }
+        return tag;
     }
 
     private static RodDefinition rod(
