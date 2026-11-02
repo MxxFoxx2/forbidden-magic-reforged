@@ -53,25 +53,32 @@ public final class Tc4WandAdapter {
     }
 
     public static void addCreativeWands(List<ItemStack> stacks) {
-        WandVisAccess wandVis = null;
         for (CreativeWandCatalog.Definition definition : CreativeWandCatalog.definitions()) {
-            WandCap cap = resolveCap(definition.cap());
-            WandRod rod = resolveRod(definition.rod());
-            if (cap == null || rod == null) {
-                continue;
+            ItemStack wand = createCreativeWand(definition);
+            if (wand != null) {
+                stacks.add(wand);
             }
-
-            ItemStack wand = Wands.create(cap, rod, false);
-            if (definition.visPerPrimal() > 0) {
-                if (wandVis == null) {
-                    wandVis = HostAdapterRegistry.requireWandVis();
-                }
-                for (ContentId aspect : wandVis.primalAspects()) {
-                    wandVis.addVis(wand, aspect, definition.visPerPrimal(), true);
-                }
-            }
-            stacks.add(wand);
         }
+    }
+
+    /** Creates one catalogued wand with the exact fill profile shared by all host-backed offers. */
+    public static @org.jetbrains.annotations.Nullable ItemStack createCreativeWand(
+        CreativeWandCatalog.Definition definition
+    ) {
+        WandCap cap = resolveCap(definition.cap());
+        WandRod rod = resolveRod(definition.rod());
+        if (cap == null || rod == null) {
+            return null;
+        }
+
+        ItemStack wand = Wands.create(cap, rod, false);
+        if (definition.visPerPrimal() > 0) {
+            WandVisAccess wandVis = HostAdapterRegistry.requireWandVis();
+            for (ContentId aspect : wandVis.primalAspects()) {
+                wandVis.addVis(wand, aspect, definition.visPerPrimal(), true);
+            }
+        }
+        return wand;
     }
 
     private static WandCap resolveCap(ContentId capId) {
