@@ -173,13 +173,13 @@ public final class FmGameTests {
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.TAINT_ORIGINS).level(),
             HostProfile.SupportLevel.UNSUPPORTED, "taint origins are explicitly declared unsupported");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.WAND_CAPS).level(),
-            HostProfile.SupportLevel.ADAPTED, "wand cap registration is owned by the TC4 adapter");
+            HostProfile.SupportLevel.PARTIAL, "wand cap definitions are shared but registration remains TC4-specific");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.WAND_RODS).level(),
-            HostProfile.SupportLevel.ADAPTED, "wand rod registration is owned by the TC4 adapter");
+            HostProfile.SupportLevel.PARTIAL, "wand rod definitions are shared but callbacks remain TC4-specific");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.WAND_PARTS).level(),
-            HostProfile.SupportLevel.ADAPTED, "Profane Wand rod replacement uses a typed parts port");
+            HostProfile.SupportLevel.PARTIAL, "Profane Wand part mutation still uses TC4 WandParts and WandKeys");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.WAND_TRIGGERS).level(),
-            HostProfile.SupportLevel.ADAPTED, "Hellfire wand trigger registration is owned by the TC4 adapter");
+            HostProfile.SupportLevel.PARTIAL, "Hellfire trigger rules are shared but registration remains TC4-specific");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.VILLAGER_TRADES).level(),
             HostProfile.SupportLevel.ADAPTED, "Thaumcraft-specific heretic trades are supplied by the host adapter");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.RUNTIME_BOOTSTRAP).level(),
