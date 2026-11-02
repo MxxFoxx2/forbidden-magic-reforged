@@ -16,6 +16,7 @@ public record ResearchDefinition(
     AspectDefinition.Cost noteCost,
     List<ContentId> parents,
     List<ContentId> hiddenParents,
+    List<ContentId> siblings,
     Set<Flag> flags,
     List<ContentId> itemTriggers,
     List<ContentId> entityTriggers,
@@ -40,7 +41,7 @@ public record ResearchDefinition(
         List<Stage> stages
     ) {
         this(id, category, icon, column, row, complexity, noteCost,
-            parents, hiddenParents, flags, List.of(), List.of(), aspectTriggers, stages);
+            parents, hiddenParents, List.of(), flags, List.of(), List.of(), aspectTriggers, stages);
     }
 
     public ResearchDefinition {
@@ -50,6 +51,7 @@ public record ResearchDefinition(
         Objects.requireNonNull(noteCost, "noteCost");
         Objects.requireNonNull(parents, "parents");
         Objects.requireNonNull(hiddenParents, "hiddenParents");
+        Objects.requireNonNull(siblings, "siblings");
         Objects.requireNonNull(flags, "flags");
         Objects.requireNonNull(itemTriggers, "itemTriggers");
         Objects.requireNonNull(entityTriggers, "entityTriggers");
@@ -57,6 +59,7 @@ public record ResearchDefinition(
         Objects.requireNonNull(stages, "stages");
         parents = List.copyOf(parents);
         hiddenParents = List.copyOf(hiddenParents);
+        siblings = List.copyOf(siblings);
         flags = Set.copyOf(flags);
         itemTriggers = List.copyOf(itemTriggers);
         entityTriggers = List.copyOf(entityTriggers);
