@@ -89,20 +89,24 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
             return;
         }
         if (cost > 0 && cage.fuel <= 0) {
-            if (cage.special >= cost) {
-                cage.special -= cost;
+            WrathCageBehavior.FuelChannel channel =
+                WrathCageBehavior.selectFuelChannel(cage.special, cage.wrath, cage.sloth, cost);
+            switch (channel) {
+                case SPECIAL -> cage.special -= cost;
+                case WRATH -> cage.wrath -= cost;
+                case SLOTH -> {
+                    cage.sloth -= cost;
+                    cage.slothful = true;
+                }
+                case NONE -> {
+                    // No complete fuel channel is available.
+                }
+            }
+            if (channel != WrathCageBehavior.FuelChannel.NONE) {
                 cage.fuel = FmConfig.wrathEff();
-                cage.slothful = false;
-                cage.sync();
-            } else if (cage.wrath >= cost) {
-                cage.wrath -= cost;
-                cage.fuel = FmConfig.wrathEff();
-                cage.slothful = false;
-                cage.sync();
-            } else if (cage.sloth >= cost) {
-                cage.sloth -= cost;
-                cage.fuel = FmConfig.wrathEff();
-                cage.slothful = true;
+                if (channel != WrathCageBehavior.FuelChannel.SLOTH) {
+                    cage.slothful = false;
+                }
                 cage.sync();
             }
         }
@@ -133,18 +137,21 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
             if (!transport.canOutputTo(side)) {
                 continue;
             }
-            if (special < MAX_STORED && transport.takeEssentia(mobAspect, 1, side) == 1) {
+            if (WrathCageBehavior.canDrawMobEssentia(special, MAX_STORED)
+                && transport.takeEssentia(mobAspect, 1, side) == 1) {
                 special++;
                 sync();
                 return;
             }
-            if (FmAspects.WRATH != null && wrath < MAX_STORED && special < cost
+            if (FmAspects.WRATH != null
+                && WrathCageBehavior.canDrawWrathEssentia(special, wrath, MAX_STORED, cost)
                 && transport.takeEssentia(FmAspects.WRATH, 1, side) == 1) {
                 wrath++;
                 sync();
                 return;
             }
-            if (FmAspects.SLOTH != null && sloth < MAX_STORED && special < cost && wrath < cost
+            if (FmAspects.SLOTH != null
+                && WrathCageBehavior.canDrawSlothEssentia(special, wrath, sloth, MAX_STORED, cost)
                 && transport.takeEssentia(FmAspects.SLOTH, 1, side) == 1) {
                 sloth++;
                 sync();
