@@ -22,13 +22,15 @@ public final class CreativeWandCatalog {
         }
     }
 
+    private static final Definition PROFANE = definition("iron", "profane", 5000);
+
     private static final List<Definition> DEFINITIONS = List.of(
         definition("thaumium", "tainted", 0),
         definition("thaumium", "infernal", 0),
         definition("void", "equivalent", 0),
         definition("orichalcum", "neutronium", 0),
         definition("orichalcum", "neutronium_staff", 0),
-        definition("iron", "profane", 5000)
+        PROFANE
     );
 
     private CreativeWandCatalog() {
@@ -36,6 +38,10 @@ public final class CreativeWandCatalog {
 
     public static List<Definition> definitions() {
         return DEFINITIONS;
+    }
+
+    public static Definition profane() {
+        return PROFANE;
     }
 
     private static Definition definition(String cap, String rod, int visPerPrimal) {
