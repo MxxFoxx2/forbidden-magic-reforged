@@ -55,7 +55,7 @@ The 1.21.1 `Tc4HostAdapter` declares every `HostProfile.Feature`. The currently 
 - Warp pools and sticky warp mapping.
 - Morph-tool area mining and cycle sound.
 - Wand inspection and wand/real Vis writes.
-- Baubles accessory lookup.
+- Baubles accessory lookup and slot assignment.
 - Taint material classification, taint-shovel behavior, and special-mining/taint-damage hooks.
 - Scribing research difficulty, primal-aspect selection, and aspect-pool updates.
 - Wrath Cage block-entity construction.

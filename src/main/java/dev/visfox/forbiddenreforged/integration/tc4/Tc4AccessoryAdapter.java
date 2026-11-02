@@ -11,4 +11,8 @@ public final class Tc4AccessoryAdapter {
     public static ItemStack getBauble(Player player, int slot) {
         return Baubles.get(player, slot);
     }
+
+    public static void setBauble(Player player, int slot, ItemStack stack) {
+        Baubles.set(player, slot, stack);
+    }
 }

@@ -315,6 +315,11 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
     }
 
     @Override
+    public void setAccessory(Player player, int slot, ItemStack stack) {
+        Tc4AccessoryAdapter.setBauble(player, slot, stack);
+    }
+
+    @Override
     public boolean isTaintMaterial(BlockState state) {
         return Tc4TaintAdapter.isHostTaintMaterial(state);
     }
