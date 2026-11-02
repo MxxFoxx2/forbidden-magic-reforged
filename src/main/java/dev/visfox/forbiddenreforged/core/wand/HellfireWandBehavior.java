@@ -1,6 +1,5 @@
 package dev.visfox.forbiddenreforged.core.wand;
 
-import dev.visfox.forbiddenreforged.core.model.ContentId;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
@@ -13,9 +12,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 
 public final class HellfireWandBehavior {
-    private static final ContentId FIRE = ContentId.parse("forbiddenmagic:concept/fire");
-    private static final ContentId HELLFIRE_RESEARCH = ContentId.parse("forbiddenmagic:research/hellfire");
-
     private HellfireWandBehavior() {
     }
 
@@ -25,6 +21,7 @@ public final class HellfireWandBehavior {
         Player player,
         BlockPos position,
         Direction side,
+        WandTriggerCatalog.Definition definition,
         WandTriggerAccess access
     ) {
         BlockPos firePosition = position.above();
@@ -32,10 +29,10 @@ public final class HellfireWandBehavior {
             || side != Direction.UP
             || !access.isWand(wand)
             || access.hasFocus(wand)
-            || !access.researchComplete(player, HELLFIRE_RESEARCH)
+            || !access.researchComplete(player, definition.research())
             || !player.mayUseItemAt(firePosition, Direction.UP, new ItemStack(Items.FIRE_CHARGE))
             || !level.isEmptyBlock(firePosition)
-            || !access.consumeVis(wand, player, FIRE, 2)) {
+            || !access.consumeVis(wand, player, definition.aspect(), definition.visCost())) {
             return false;
         }
         if (!level.setBlockAndUpdate(firePosition, Blocks.FIRE.defaultBlockState())) {
