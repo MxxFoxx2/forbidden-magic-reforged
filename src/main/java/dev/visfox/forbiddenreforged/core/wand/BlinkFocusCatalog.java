@@ -7,6 +7,19 @@ import java.util.List;
 
 /** Semantic definitions for add-on-specific Blink Focus upgrades. */
 public final class BlinkFocusCatalog {
+    public record Presentation(
+        String sortingPrefix,
+        int color,
+        ContentId focusTexture,
+        ContentId ornamentTexture
+    ) {
+        public Presentation {
+            if (sortingPrefix == null || focusTexture == null || ornamentTexture == null) {
+                throw new IllegalArgumentException("Blink Focus presentation metadata is incomplete");
+            }
+        }
+    }
+
     public record Definition(
         Upgrade upgrade,
         String name,
@@ -20,6 +33,13 @@ public final class BlinkFocusCatalog {
             visCosts = List.copyOf(visCosts);
         }
     }
+
+    private static final Presentation PRESENTATION = new Presentation(
+        "BL",
+        0x909090,
+        ContentId.parse("forbiddenmagic:item/blink_focus"),
+        ContentId.parse("forbiddenmagic:item/blink_focus_ornament")
+    );
 
     private static final List<Definition> DEFINITIONS = List.of(
         new Definition(
@@ -37,6 +57,10 @@ public final class BlinkFocusCatalog {
     );
 
     private BlinkFocusCatalog() {
+    }
+
+    public static Presentation presentation() {
+        return PRESENTATION;
     }
 
     public static List<Definition> definitions() {
