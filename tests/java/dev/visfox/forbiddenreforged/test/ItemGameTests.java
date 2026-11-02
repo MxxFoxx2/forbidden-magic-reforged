@@ -304,9 +304,9 @@ public final class ItemGameTests {
     public static void blinkFocusUpgradesUseOriginalIconAssets(GameTestHelper helper) {
         helper.assertTrue(FmItems.BLINK_FOCUS.get() instanceof Tc4BlinkFocusItem,
             "Blink Focus is created by the selected TC4 item factory");
-        helper.assertValueEqual(Tc4Tc4BlinkFocusItem.HELLFIRE.icon(),
+        helper.assertValueEqual(Tc4BlinkFocusItem.HELLFIRE.icon(),
             ForbiddenMagic.id("textures/misc/hellfire.png"), "Hellfire uses the bundled original icon");
-        helper.assertValueEqual(Tc4Tc4BlinkFocusItem.PANDEMONIUM.icon(),
+        helper.assertValueEqual(Tc4BlinkFocusItem.PANDEMONIUM.icon(),
             ForbiddenMagic.id("textures/misc/pandemonium.png"), "Pandemonium uses the bundled original icon");
         helper.assertTrue(ForbiddenMagic.class.getResourceAsStream("/assets/forbiddenmagic/textures/misc/hellfire.png") != null,
             "Hellfire icon asset is bundled");
