@@ -5,8 +5,6 @@ import dev.visfox.forbiddenreforged.ForbiddenMagic;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.core.recipe.ForbiddenMagicRecipeCatalog;
 import dev.visfox.forbiddenreforged.core.research.ForbiddenMagicResearchCatalog;
-import java.util.List;
-import net.minecraft.world.item.ItemStack;
 import thaumcraft.aspect.Aspect;
 
 public final class Tc4BootstrapAdapter {
@@ -21,7 +19,7 @@ public final class Tc4BootstrapAdapter {
         Tc4WandAdapter.registerWands();
         Tc4WandTriggerAdapter.register();
 
-        var host = HostAdapterRegistry.require();
+        var host = Tc4HostAdapter.INSTANCE;
         boolean crystalwellUsesShardTag = host.crystalwellUsesShardTag();
         host.registerRecipes(ForbiddenMagicRecipeCatalog.definitions(
             new ForbiddenMagicRecipeCatalog.Options(
@@ -50,14 +48,6 @@ public final class Tc4BootstrapAdapter {
         // Optional integration remains on its original supported 1.21.1 API,
         // but registration is owned by the selected host adapter.
         Tc4TinkererAdapter.register();
-    }
-
-    /**
-     * Adds the TC4-backed wand samples to the shared creative-tab stack list.
-     * Host wand objects are resolved only in this adapter.
-     */
-    public static void addCreativeWands(List<ItemStack> stacks) {
-        Tc4WandAdapter.addCreativeWands(stacks);
     }
 
     private static void logAspectRegistry() {

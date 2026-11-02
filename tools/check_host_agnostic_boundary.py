@@ -14,18 +14,18 @@ NEUTRAL_SCOPES = (
     SOURCE_ROOT / "integration/runtime",
 )
 FORBIDDEN_NEUTRAL = (
-    (re.compile(r"\\bimport\\s+(?:static\\s+)?thaumcraft\\."), "Thaumcraft import"),
-    (re.compile(r"\\bthaumcraft\\.[A-Za-z_]"), "fully-qualified Thaumcraft reference"),
-    (re.compile(r"\\bimport\\s+(?:static\\s+)?net\\.neoforged\\."), "NeoForge import"),
-    (re.compile(r"\\bnet\\.neoforged\\.[A-Za-z_]"), "fully-qualified NeoForge reference"),
-    (re.compile(r"dev\\.visfox\\.forbiddenreforged\\.integration\\.tc4"), "concrete TC4 adapter reference"),
-    (re.compile(r"\\bTc4[A-Z][A-Za-z0-9_]*\\b"), "concrete TC4 adapter type"),
+    (re.compile(r"\bimport\s+(?:static\s+)?thaumcraft\."), "Thaumcraft import"),
+    (re.compile(r"\bthaumcraft\.[A-Za-z_]"), "fully-qualified Thaumcraft reference"),
+    (re.compile(r"\bimport\s+(?:static\s+)?net\.neoforged\."), "NeoForge import"),
+    (re.compile(r"\bnet\.neoforged\.[A-Za-z_]"), "fully-qualified NeoForge reference"),
+    (re.compile(r"dev\.visfox\.forbiddenreforged\.integration\.tc4"), "concrete TC4 adapter reference"),
+    (re.compile(r"\bTc4[A-Z][A-Za-z0-9_]*\b"), "concrete TC4 adapter type"),
 )
 FORBIDDEN_HOST = (
-    (re.compile(r"\\bimport\\s+(?:static\\s+)?thaumcraft\\."), "Thaumcraft import"),
-    (re.compile(r"\\bthaumcraft\\.[A-Za-z_]"), "fully-qualified Thaumcraft reference"),
-    (re.compile(r"dev\\.visfox\\.forbiddenreforged\\.integration\\.tc4"), "concrete TC4 adapter reference"),
-    (re.compile(r"\\bTc4[A-Z][A-Za-z0-9_]*\\b"), "concrete TC4 adapter type"),
+    (re.compile(r"\bimport\s+(?:static\s+)?thaumcraft\."), "Thaumcraft import"),
+    (re.compile(r"\bthaumcraft\.[A-Za-z_]"), "fully-qualified Thaumcraft reference"),
+    (re.compile(r"dev\.visfox\.forbiddenreforged\.integration\.tc4"), "concrete TC4 adapter reference"),
+    (re.compile(r"\bTc4[A-Z][A-Za-z0-9_]*\b"), "concrete TC4 adapter type"),
 )
 COMPOSITION_ROOT_ALLOWLIST = {
     "import dev.visfox.forbiddenreforged.integration.tc4.Tc4HostAdapter;"
@@ -33,12 +33,12 @@ COMPOSITION_ROOT_ALLOWLIST = {
 
 
 def scan_file(source: Path, patterns: tuple[tuple[re.Pattern[str], str], ...],
-              failures: list[str], allowlisted_lines: set[str] | None = None) -> int:
+              failures: list[str], allowlisted_lines: set[str] | None = None) -> None:
     try:
         lines = source.read_text(encoding="utf-8").splitlines()
     except OSError as error:
         failures.append(f"{source.relative_to(ROOT)}: cannot read source: {error}")
-        return 0
+        return
 
     for line_number, line in enumerate(lines, start=1):
         if allowlisted_lines and line.strip() in allowlisted_lines:
@@ -49,7 +49,6 @@ def scan_file(source: Path, patterns: tuple[tuple[re.Pattern[str], str], ...],
                     f"{source.relative_to(ROOT)}:{line_number}: "
                     f"{description}: {line.strip()}"
                 )
-    return len(lines)
 
 
 def main() -> int:
@@ -78,7 +77,7 @@ def main() -> int:
 
     if failures:
         print("Host-agnostic architecture boundary check failed:")
-        print("\\n".join(failures))
+        print("\n".join(failures))
         return 1
 
     print(
