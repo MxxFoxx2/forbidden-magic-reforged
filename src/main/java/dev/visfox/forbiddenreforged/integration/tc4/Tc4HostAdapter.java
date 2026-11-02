@@ -286,11 +286,6 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
     }
 
     @Override
-    public boolean isWand(ItemStack stack) {
-        return Tc4WandRuntimeAdapter.isWand(stack);
-    }
-
-    @Override
     public WandRodKind wandRodKind(ItemStack stack) {
         return Tc4WandRuntimeAdapter.rodKind(stack);
     }
