@@ -1,5 +1,18 @@
 # Verification status
 
+## Minecraft 26.1.2 — host-agnostic architecture port
+
+- Verified implementation commit: [`62a3e5e`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/62a3e5ee89fba12ba7e902501725d1bc5b1eea9f).
+- [Java CI with Gradle #472](https://github.com/MxxFoxx2/forbidden-magic-reforged/actions/runs/41375528543) completed successfully on 2 November 2026.
+- Host-agnostic API boundary check passed.
+- Pinned Thaumcraft 4: Reforged 1.1.2 preparation and build passed.
+- Forbidden Magic compilation, artifact provenance, and generated-resource freshness checks passed.
+- With `no_lust=false`: **111/111 GameTests passed** (`luxuria=luxuria`).
+- With `no_lust=true`: **111/111 GameTests passed** (`luxuria=null`).
+- The selected TC4 adapter profile reports Minecraft 26.1.2 and the support-level GameTest matrix matches all 36 declared feature flags.
+- This CI is headless. Client launch, rendering/tooltips, and manual in-world gameplay checks are still required before treating the port as release-ready.
+
+
 ## Последний успешный runtime CI
 
 - Проверенный коммит: [`74a6dcd`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/74a6dcd0e31d7c222ce2198475658e997d295e6e).

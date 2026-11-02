@@ -39,9 +39,13 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
-import dev.visfox.forbiddenreforged.FmAspectDiagnostics;
+import dev.visfox.forbiddenreforged.core.aspect.AspectDefinition;
+import dev.visfox.forbiddenreforged.core.aspect.ForbiddenMagicAspectCatalog;
+import dev.visfox.forbiddenreforged.core.model.ContentId;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectDiagnostics;
 import dev.visfox.forbiddenreforged.FmAspects;
-import dev.visfox.forbiddenreforged.FmAspectTags;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectAdapter;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectTagAdapter;
 import dev.visfox.forbiddenreforged.FmConfig;
 import dev.visfox.forbiddenreforged.FmCreativeTab;
 import dev.visfox.forbiddenreforged.FmDrops;
@@ -76,7 +80,8 @@ public final class AspectGameTests {
         "nether_shard_drop_rules_match_original_boundaries",
         "aspect_diagnostics_expose_stable_registry_table",
         "forbiddenmagic_aspects_command_is_registered",
-        "addon_item_aspects_match_original_assignments"
+        "addon_item_aspects_match_original_assignments",
+        "core_aspect_catalog_is_host_neutral_and_complete"
     };
 
     static {
@@ -97,6 +102,7 @@ public final class AspectGameTests {
         FUNCTIONS.register(TESTS[14], () -> AspectGameTests::aspectDiagnosticsExposeStableRegistryTable);
         FUNCTIONS.register(TESTS[15], () -> AspectGameTests::forbiddenmagicAspectsCommandIsRegistered);
         FUNCTIONS.register(TESTS[16], () -> AspectGameTests::addonItemAspectsMatchOriginalAssignments);
+        FUNCTIONS.register(TESTS[17], () -> AspectGameTests::coreAspectCatalogIsHostNeutralAndComplete);
     }
 
     private AspectGameTests() {}
@@ -115,6 +121,40 @@ public final class AspectGameTests {
         }
     }
 
+    private static void coreAspectCatalogIsHostNeutralAndComplete(GameTestHelper helper) {
+        List<AspectDefinition> enabled = ForbiddenMagicAspectCatalog.definitions(true);
+        List<AspectDefinition> disabled = ForbiddenMagicAspectCatalog.definitions(false);
+        helper.assertValueEqual(enabled.size(), 7, "full catalog must define seven Forbidden Magic aspects");
+        helper.assertValueEqual(disabled.size(), 6, "no-lust catalog must define six aspects");
+        helper.assertTrue(enabled.stream().allMatch(definition ->
+            definition.id().namespace().equals(ForbiddenMagic.MODID)
+                && definition.components().stream().allMatch(component ->
+                    component.namespace().equals(ForbiddenMagic.MODID)
+                        && component.path().startsWith("concept/"))),
+            "catalog component references must use semantic IDs, not host aspect IDs");
+
+        AspectDefinition luxuria = enabled.get(0);
+        helper.assertValueEqual(luxuria.id(), ForbiddenMagicAspectCatalog.LUXURIA, "Luxuria must be the first enabled definition");
+        helper.assertValueEqual(luxuria.components(), List.of(
+            ContentId.parse("forbiddenmagic:concept/flesh"),
+            ContentId.parse("forbiddenmagic:concept/hunger")
+        ), "Luxuria must preserve its original semantic components");
+        helper.assertValueEqual(enabled.get(1).blendMode(), AspectDefinition.BlendMode.ONE_MINUS_SOURCE_COLOR,
+            "Infernus must retain its original blend mode");
+        helper.assertTrue(disabled.stream().noneMatch(definition ->
+            definition.id().equals(ForbiddenMagicAspectCatalog.LUXURIA)),
+            "no-lust catalog must omit Luxuria");
+
+        ContentId fire = ContentId.parse("forbiddenmagic:concept/fire");
+        AspectDefinition.Cost merged = new AspectDefinition.Cost(List.of(
+            new AspectDefinition.Amount(fire, 2),
+            new AspectDefinition.Amount(fire, 3)
+        ));
+        helper.assertValueEqual(merged.amountOf(fire), 5, "duplicate aspect costs must merge");
+        helper.assertValueEqual(merged.totalAmount(), 5, "merged cost total must remain stable");
+        helper.succeed();
+    }
+
     private static void modLoadsAndHostIsPresent(GameTestHelper helper) {
         helper.assertTrue(ModList.get().isLoaded("thaumcraft"), "thaumcraft must be loaded");
         helper.succeed();
@@ -122,7 +162,7 @@ public final class AspectGameTests {
 
     private static void aspectRegistryKeepsBuiltinOrderAndCombines(GameTestHelper helper) {
         Aspect[] all = Aspect.values();
-        helper.assertValueEqual(FmAspects.BUILTIN_ASPECT_COUNT, 48, "exactly 48 builtin aspects");
+        helper.assertValueEqual(Tc4AspectDiagnostics.BUILTIN_ASPECT_COUNT, 48, "exactly 48 builtin aspects");
         helper.assertTrue(all.length >= 48, "builtins must remain registered");
         helper.assertValueEqual(all[0], Aspect.AIR, "first builtin must stay index 0");
         helper.assertValueEqual(all[47], Aspect.TRAP, "last builtin must stay index 47");
@@ -133,8 +173,8 @@ public final class AspectGameTests {
     }
 
     private static void addonAspectSurvivesClientSync(GameTestHelper helper) {
-        Aspect nether = FmAspects.NETHER;
-        helper.assertTrue(nether != null && nether.ordinal() >= FmAspects.BUILTIN_ASPECT_COUNT, "infernus must be an add-on aspect");
+        Aspect nether = Tc4AspectAdapter.resolveAspect(FmAspects.NETHER);
+        helper.assertTrue(nether != null && nether.ordinal() >= Tc4AspectDiagnostics.BUILTIN_ASPECT_COUNT, "infernus must be an add-on aspect");
         helper.assertValueEqual(Aspect.getAspect("infernus"), nether, "by-tag lookup must find the add-on aspect");
         AspectList list = new AspectList().add(nether, 3);
         ByteBuf buffer = io.netty.buffer.Unpooled.buffer();
@@ -147,27 +187,27 @@ public final class AspectGameTests {
 
     private static void sinAspectsRegisteredWithOwnTextures(GameTestHelper helper) {
         helper.assertTrue(FmAspects.available(), "add-on aspect API missing: host too old");
-        Aspect[] sins = {FmAspects.NETHER, FmAspects.WRATH, FmAspects.ENVY, FmAspects.GLUTTONY, FmAspects.PRIDE, FmAspects.SLOTH};
+        Aspect[] sins = {Tc4AspectAdapter.resolveAspect(FmAspects.NETHER), Tc4AspectAdapter.resolveAspect(FmAspects.WRATH), Tc4AspectAdapter.resolveAspect(FmAspects.ENVY), Tc4AspectAdapter.resolveAspect(FmAspects.GLUTTONY), Tc4AspectAdapter.resolveAspect(FmAspects.PRIDE), Tc4AspectAdapter.resolveAspect(FmAspects.SLOTH)};
         for (Aspect aspect : sins) {
             helper.assertTrue(aspect != null, "sin aspect must be registered");
-            helper.assertTrue(aspect.ordinal() >= FmAspects.BUILTIN_ASPECT_COUNT, aspect.getSerializedName() + " must be an add-on aspect");
+            helper.assertTrue(aspect.ordinal() >= Tc4AspectDiagnostics.BUILTIN_ASPECT_COUNT, aspect.getSerializedName() + " must be an add-on aspect");
             helper.assertTrue(aspect.getImage().getNamespace().equals(ForbiddenMagic.MODID), aspect.getSerializedName() + " texture must live in the add-on namespace");
         }
         Aspect ira = Aspect.combine(Aspect.WEAPON, Aspect.FIRE);
-        helper.assertTrue(ira == FmAspects.WRATH, "combine(WEAPON, FIRE) must resolve to the add-on ira");
+        helper.assertTrue(ira == Tc4AspectAdapter.resolveAspect(FmAspects.WRATH), "combine(WEAPON, FIRE) must resolve to the add-on ira");
         helper.assertTrue(Aspect.combine(Aspect.AIR, Aspect.FIRE) == Aspect.LIGHT, "adding ira must not disturb builtin combine");
         int expected = FmConfig.lustDisabled() ? 6 : 7;
-        helper.assertValueEqual(FmAspects.count(), FmAspects.BUILTIN_ASPECT_COUNT + expected, FmConfig.lustDisabled() ? "six add-on aspects: luxuria is switched off" : "exactly seven add-on aspects");
+        helper.assertValueEqual(Tc4AspectDiagnostics.totalCount(), Tc4AspectDiagnostics.BUILTIN_ASPECT_COUNT + expected, FmConfig.lustDisabled() ? "six add-on aspects: luxuria is switched off" : "exactly seven add-on aspects");
         helper.succeed();
     }
 
     private static void sinAspectTagsMergeWithExisting(GameTestHelper helper) {
         AspectRegistry active = AspectRegistry.active();
         AspectList netherrack = active.getObjectTags(Items.NETHERRACK);
-        helper.assertTrue(netherrack != null && netherrack.getAmount(FmAspects.NETHER) >= 1, "netherrack must carry infernus");
+        helper.assertTrue(netherrack != null && netherrack.getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER)) >= 1, "netherrack must carry infernus");
         helper.assertTrue(netherrack.getAmount(Aspect.FIRE) >= 1, "netherrack must keep its built-in fire aspect");
         AspectList star = active.getObjectTags(Items.NETHER_STAR);
-        helper.assertTrue(star != null && star.getAmount(FmAspects.NETHER) >= 8 && star.getAmount(FmAspects.PRIDE) >= 8, "nether star must carry infernus 8 and superbia 8");
+        helper.assertTrue(star != null && star.getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER)) >= 8 && star.getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.PRIDE)) >= 8, "nether star must carry infernus 8 and superbia 8");
         helper.succeed();
     }
 
@@ -178,13 +218,13 @@ public final class AspectGameTests {
         helper.assertTrue(entity != null, "brainy zombie must be creatable");
         AspectList tags = AspectRegistry.active().getEntityTags(entity);
         helper.assertTrue(tags != null && tags.getAmount(Aspect.UNDEAD) >= 3, "brainy zombie keeps its base undead tag");
-        helper.assertTrue(tags.getAmount(FmAspects.WRATH) >= 3, "brainy zombie gains wrath from the FM table");
+        helper.assertTrue(tags.getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.WRATH)) >= 3, "brainy zombie gains wrath from the FM table");
         helper.succeed();
     }
 
     private static void everyTagTargetResolved(GameTestHelper helper) {
         List<String> unresolved = new ArrayList<>();
-        for (String target : FmAspectTags.declaredTargets()) {
+        for (String target : Tc4AspectTagAdapter.declaredTargets()) {
             if (target.startsWith("entity:")) {
                 if (BuiltInRegistries.ENTITY_TYPE.getOptional(Identifier.parse(target.substring("entity:".length()))).isEmpty()) {
                     unresolved.add(target);
@@ -228,7 +268,7 @@ public final class AspectGameTests {
             helper.succeed();
             return;
         }
-        helper.assertTrue(FmAspects.LUST == null && Aspect.getAspect("luxuria") == null, "luxuria must be absent from the registry");
+        helper.assertTrue(Aspect.getAspect("luxuria") == null, "luxuria must be absent from the registry");
         ItemStack shard = new ItemStack(FmItems.DEADLY_SHARDS.get("lust").get());
         helper.assertValueEqual(shard.getHoverName(), Component.translatable("item.forbiddenmagic.despair_shard"), "no_lust renames the fourth shard to despair");
         AspectList tags = AspectRegistry.active().getObjectTags(shard.getItem());
@@ -289,14 +329,14 @@ public final class AspectGameTests {
                     && crop.getAmount(Aspect.TREE) == 2
                     && crop.getAmount(Aspect.CLOTH) == 2
                     && crop.getAmount(Aspect.BEAST) == 1
-                    && crop.getAmount(FmAspects.LUST) == 1
+                    && crop.getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.LUST)) == 1
                     && crop.getAmount(Aspect.WEAPON) == 1,
                 "riding crop keeps the original aspect list when lust is enabled");
         }
         BlockPos portalPos = helper.absolutePos(new BlockPos(3, 3, 3));
         helper.getLevel().setBlockAndUpdate(portalPos, Blocks.NETHER_PORTAL.defaultBlockState());
         ScanManager.Target portal = ScanManager.resolveBlock(helper.getLevel(), portalPos);
-        if (!FmAspectTags.blockTargetsAvailable()) {
+        if (!Tc4AspectTagAdapter.blockTargetsAvailable()) {
             helper.assertTrue(portal == null || !portal.key().startsWith("block:"),
                 "without block aspect targets the portal cannot resolve through its block identity");
             helper.succeed();
@@ -307,7 +347,7 @@ public final class AspectGameTests {
             helper.assertValueEqual(portal.key(), "block:minecraft:nether_portal", "the portal scan target must use its block identity");
             helper.assertTrue(portal.aspects() != null, "the portal must have registered aspects");
             if (portal.aspects() != null) {
-                helper.assertValueEqual(portal.aspects().getAmount(FmAspects.NETHER), 4,
+                helper.assertValueEqual(portal.aspects().getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER)), 4,
                     "the original NETHER 4 aspect assignment belongs to the portal block, not obsidian");
             }
         }
@@ -359,8 +399,8 @@ public final class AspectGameTests {
         }
 
     private static void aspectDiagnosticsExposeStableRegistryTable(GameTestHelper helper) {
-            List<String> registryLines = FmAspectDiagnostics.registryLines();
-            helper.assertValueEqual(registryLines.size(), FmAspects.count(), "diagnostics must contain every registered aspect");
+            List<String> registryLines = Tc4AspectDiagnostics.registryLines();
+            helper.assertValueEqual(registryLines.size(), Tc4AspectDiagnostics.totalCount(), "diagnostics must contain every registered aspect");
             for (int index = 0; index < Aspect.values().length; index++) {
                 Aspect aspect = Aspect.values()[index];
                 helper.assertTrue(registryLines.get(index).contains("ordinal=" + index + " "), "registry ordinals must be strict and ordered: " + aspect.getTag());
@@ -368,12 +408,12 @@ public final class AspectGameTests {
             helper.assertValueEqual(registryLines.get(0), "ordinal=0 tag=aer name=Aer kind=builtin components=-", "first registry row must be exact");
             helper.assertTrue(registryLines.stream().anyMatch(line -> line.contains("ordinal=47 ") && line.contains("tag=vinculum ") && line.contains("name=Vinculum ") && line.contains("kind=builtin")), "ordinal 47 vinculum must be present");
             for (Aspect aspect : Aspect.values()) {
-                if (aspect.ordinal() < FmAspects.BUILTIN_ASPECT_COUNT) {
+                if (aspect.ordinal() < Tc4AspectDiagnostics.BUILTIN_ASPECT_COUNT) {
                     helper.assertTrue(registryLines.stream().anyMatch(line -> line.contains("ordinal=" + aspect.ordinal() + " ") && line.contains("tag=" + aspect.getTag() + " ") && line.contains("kind=builtin")), "builtin aspect must be classified: " + aspect.getTag());
                 }
             }
     
-            List<String> addonLines = FmAspectDiagnostics.addonLines();
+            List<String> addonLines = Tc4AspectDiagnostics.addonLines();
             int expected = FmConfig.lustDisabled() ? 6 : 7;
             helper.assertValueEqual(addonLines.size(), expected, "diagnostics must list every registered Forbidden Magic aspect");
             helper.assertValueEqual(
@@ -381,7 +421,7 @@ public final class AspectGameTests {
                 addonLines,
                 "Forbidden Magic rows must match the add-on section of the canonical registry"
             );
-            int expectedOrdinal = FmAspects.BUILTIN_ASPECT_COUNT;
+            int expectedOrdinal = Tc4AspectDiagnostics.BUILTIN_ASPECT_COUNT;
             for (String line : addonLines) {
                 helper.assertTrue(line.contains("ordinal=" + expectedOrdinal + " "), "add-on ordinals must be consecutive: " + line);
                 helper.assertTrue(line.contains("kind=addon"), "add-on aspect must be classified: " + line);
@@ -389,7 +429,7 @@ public final class AspectGameTests {
                 helper.assertTrue(line.contains("components="), "add-on aspect must include its components: " + line);
                 expectedOrdinal++;
             }
-            helper.assertValueEqual(expectedOrdinal, FmAspects.BUILTIN_ASPECT_COUNT + expected, "all add-on ordinals must be present");
+            helper.assertValueEqual(expectedOrdinal, Tc4AspectDiagnostics.BUILTIN_ASPECT_COUNT + expected, "all add-on ordinals must be present");
             helper.assertTrue(addonLines.stream().anyMatch(line -> line.contains("tag=infernus ") && line.contains("name=Infernus ") && line.contains("components=ignis,praecantatio")), "infernus row must include exact name and component tags");
             helper.succeed();
         }

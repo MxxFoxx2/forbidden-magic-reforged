@@ -1,16 +1,18 @@
-package dev.visfox.forbiddenreforged;
+package dev.visfox.forbiddenreforged.integration.tc4;
+
+import dev.visfox.forbiddenreforged.FmConfig;
 
 import net.minecraft.resources.Identifier;
 import thaumcraft.aspect.AspectList;
 import thaumcraft.crafting.TcStack;
 import thaumcraft.research.ResearchItem;
 
-public final class FmResearchItem extends ResearchItem {
-    public FmResearchItem(String key, String category, AspectList tags, int column, int row, int complexity, TcStack icon) {
+public final class Tc4ResearchItem extends ResearchItem {
+    public Tc4ResearchItem(String key, String category, AspectList tags, int column, int row, int complexity, TcStack icon) {
         super(key, category, tags, column, row, complexity, icon);
     }
 
-    public FmResearchItem(String key, String category, AspectList tags, int column, int row, int complexity, Identifier icon) {
+    public Tc4ResearchItem(String key, String category, AspectList tags, int column, int row, int complexity, Identifier icon) {
         super(key, category, tags, column, row, complexity, icon);
     }
 

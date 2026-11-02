@@ -1,9 +1,8 @@
-package dev.visfox.forbiddenreforged;
+package dev.visfox.forbiddenreforged.core.wand;
 
 import java.util.List;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.particles.SimpleParticleType;
-import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -18,71 +17,14 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import org.jspecify.annotations.Nullable;
-import thaumcraft.aspect.Aspect;
-import thaumcraft.aspect.AspectList;
-import thaumcraft.wand.WandItem;
-import thaumcraft.wand.Wands;
-import thaumcraft.wand.focus.FocusItem;
-import thaumcraft.wand.focus.FocusUpgradeType;
 
-public class BlinkFocusItem extends FocusItem {
-    private static final AspectList COST_BASE = new AspectList().add(Aspect.ENTROPY, 300);
-    private static final AspectList COST_HELLFIRE = new AspectList().add(Aspect.ENTROPY, 300).add(Aspect.FIRE, 100);
-    private static final AspectList COST_PANDEMONIUM = new AspectList().add(Aspect.ENTROPY, 300).add(Aspect.ORDER, 100);
-
-    public static final FocusUpgradeType HELLFIRE = new FocusUpgradeType(100, "hellfire", ForbiddenMagic.id("textures/misc/hellfire.png"), new AspectList().add(FmAspects.NETHER, 1));
-    public static final FocusUpgradeType PANDEMONIUM = new FocusUpgradeType(101, "pandemonium", ForbiddenMagic.id("textures/misc/pandemonium.png"), new AspectList().add(Aspect.DARKNESS, 1));
-
-    public BlinkFocusItem(Properties properties) {
-        super(properties);
+public final class BlinkFocusBehavior {
+    @FunctionalInterface
+    public interface VisConsumer {
+        boolean consume(ItemStack wand, Player player, boolean apply);
     }
 
-    @Override
-    public String getSortingHelper(ItemStack focus) {
-        return "BL" + super.getSortingHelper(focus);
-    }
-
-    @Override
-    public int getFocusColor(ItemStack focus) {
-        return 0x909090;
-    }
-
-    @Override
-    public @Nullable Identifier getFocusTexture(ItemStack focus) {
-        return ForbiddenMagic.id("item/blink_focus");
-    }
-
-    @Override
-    public @Nullable Identifier getOrnamentTexture(ItemStack focus) {
-        return ForbiddenMagic.id("item/blink_focus_ornament");
-    }
-
-    @Override
-    public AspectList getVisCost(ItemStack focus) {
-        return this.isUpgradedWith(focus, HELLFIRE) ? COST_HELLFIRE : this.isUpgradedWith(focus, PANDEMONIUM) ? COST_PANDEMONIUM : COST_BASE;
-    }
-
-    @Override
-    public FocusUpgradeType @Nullable [] getPossibleUpgradesByRank(ItemStack focus, int rank) {
-        switch (rank) {
-            case 1:
-                return new FocusUpgradeType[]{FocusUpgradeType.FRUGAL};
-            case 2:
-                return new FocusUpgradeType[]{HELLFIRE, PANDEMONIUM, FocusUpgradeType.FRUGAL};
-            case 3:
-            case 4:
-            case 5:
-                if (this.isUpgradedWith(focus, HELLFIRE)) {
-                    return new FocusUpgradeType[]{FocusUpgradeType.POTENCY, FocusUpgradeType.FRUGAL, FocusUpgradeType.ENLARGE};
-                } else if (this.isUpgradedWith(focus, PANDEMONIUM)) {
-                    return new FocusUpgradeType[]{FocusUpgradeType.FRUGAL, FocusUpgradeType.ENLARGE};
-                } else {
-                    return new FocusUpgradeType[]{FocusUpgradeType.FRUGAL};
-                }
-            default:
-                return null;
-        }
+    private BlinkFocusBehavior() {
     }
 
     public static HitResult target(Player player) {
@@ -106,13 +48,20 @@ public class BlinkFocusItem extends FocusItem {
         return new Vec3(x, y, z);
     }
 
-    @Override
-    public InteractionResult onFocusRightClick(ItemStack wand, Level level, Player player, @Nullable HitResult ignored) {
+    public static InteractionResult onRightClick(
+        ItemStack wand,
+        Level level,
+        Player player,
+        boolean hellfire,
+        boolean pandemonium,
+        int potency,
+        int enlarge,
+        VisConsumer visConsumer
+    ) {
         if (!(target(player) instanceof BlockHitResult blockHit) || blockHit.getType() != HitResult.Type.BLOCK) {
             return InteractionResult.PASS;
         }
-        WandItem item = (WandItem) wand.getItem();
-        if (!item.consumeAllVis(wand, player, this.getVisCost(wand), !level.isClientSide(), false)) {
+        if (!visConsumer.consume(wand, player, !level.isClientSide())) {
             return InteractionResult.PASS;
         }
         if (level.isClientSide()) {
@@ -120,14 +69,12 @@ public class BlinkFocusItem extends FocusItem {
         }
         ServerLevel serverLevel = (ServerLevel) level;
         Vec3 targetPos = destination(blockHit);
-        double range = 3.0 + 1.5 * Wands.getFocusEnlarge(wand);
-        ItemStack focus = Wands.getFocusItem(wand);
+        double range = 3.0 + 1.5 * enlarge;
         teleportSound(serverLevel, player);
         puff(serverLevel, ParticleTypes.SMOKE, player);
         AABB aabb = new AABB(targetPos.x - range, targetPos.y - range, targetPos.z - range,
             targetPos.x + range, targetPos.y + range, targetPos.z + range);
-        if (this.isUpgradedWith(focus, HELLFIRE)) {
-            int potency = Wands.getFocusPotency(wand);
+        if (hellfire) {
             float damage = 3.0F + 3.0F * potency;
             List<LivingEntity> entities = serverLevel.getEntitiesOfClass(LivingEntity.class, aabb);
             for (LivingEntity entity : entities) {
@@ -138,7 +85,7 @@ public class BlinkFocusItem extends FocusItem {
                 entity.setRemainingFireTicks((3 + 3 * potency) * 20);
                 puff(serverLevel, ParticleTypes.FLAME, entity);
             }
-        } else if (this.isUpgradedWith(focus, PANDEMONIUM)) {
+        } else if (pandemonium) {
             List<LivingEntity> enemies = serverLevel.getEntitiesOfClass(
                 LivingEntity.class, aabb, entity -> entity instanceof Enemy);
             for (LivingEntity enemy : enemies) {

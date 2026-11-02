@@ -2,9 +2,9 @@ name: Java CI with Gradle
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "mc/26.1.2", "architecture/26.1.2-host-agnostic" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "mc/26.1.2", "architecture/26.1.2-host-agnostic" ]
   workflow_dispatch:
 
 concurrency:
@@ -21,6 +21,9 @@ jobs:
     steps:
       - name: Checkout mod
         uses: actions/checkout@v4
+
+      - name: Verify host-agnostic API boundary
+        run: python3 tools/check_host_agnostic_api.py
 
       - name: Clone host upstream
         run: git clone https://github.com/notlikethiss/thaumcraft-4-reforged.git ../thaumcraft-4-reforged
