@@ -365,6 +365,11 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
     }
 
     @Override
+    public ItemStack createSpentScribingToolsStack() {
+        return Tc4ScribingAdapter.spentScribingToolsStack();
+    }
+
+    @Override
     public Map<ContentId, ContentId> aspectCatalog(boolean silverfishEmeralds) {
         return Tc4EntityAdapter.aspectCatalog(silverfishEmeralds);
     }

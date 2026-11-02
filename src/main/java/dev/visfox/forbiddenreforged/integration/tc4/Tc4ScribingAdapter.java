@@ -24,4 +24,11 @@ public final class Tc4ScribingAdapter {
     public static boolean addAspectPool(ServerPlayer player, ContentId aspect, int amount) {
         return ResearchManager.addAspectPool(player, Tc4AspectAdapter.resolveAspect(aspect), amount);
     }
+
+    public static net.minecraft.world.item.ItemStack spentScribingToolsStack() {
+        net.minecraft.world.item.ItemStack stack =
+            new net.minecraft.world.item.ItemStack(thaumcraft.registry.ModItems.SCRIBING_TOOLS.get());
+        stack.setDamageValue(stack.getMaxDamage());
+        return stack;
+    }
 }

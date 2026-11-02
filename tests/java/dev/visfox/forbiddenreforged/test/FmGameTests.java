@@ -486,6 +486,14 @@ public final class FmGameTests {
             "physical essentia pulls use a typed host capability");
         helper.assertTrue(HostAdapterRegistry.requireFocus() != null,
             "focus upgrade inspection and Vis payment are routed through a typed host capability");
+        var scribing = HostAdapterRegistry.requireScribing();
+        helper.assertTrue(!scribing.primalAspectIds().isEmpty(),
+            "the host exposes primal research aspects through semantic identifiers");
+        ItemStack spentScribingTools = scribing.createSpentScribingToolsStack();
+        helper.assertTrue(!spentScribingTools.isEmpty(),
+            "the host creates the spent vanilla scribing-tool replacement");
+        helper.assertValueEqual(spentScribingTools.getDamageValue(), spentScribingTools.getMaxDamage(),
+            "the spent scribing tool is returned fully consumed");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.VILLAGER_TRADES).level(),
             HostProfile.SupportLevel.ADAPTED, "Thaumcraft-specific heretic trades are supplied by the host adapter");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.RUNTIME_BOOTSTRAP).level(),

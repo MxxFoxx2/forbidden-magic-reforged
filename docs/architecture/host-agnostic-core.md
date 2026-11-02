@@ -57,7 +57,7 @@ The 1.21.1 `Tc4HostAdapter` declares every `HostProfile.Feature`. The currently 
 - Wand inspection and wand/real Vis writes.
 - Baubles accessory lookup and slot assignment.
 - Taint material classification, taint-shovel behavior, and special-mining/taint-damage hooks.
-- Scribing research difficulty, primal-aspect selection, and aspect-pool updates.
+- Scribing research difficulty, primal-aspect selection, aspect-pool updates, and spent scribing-tool creation.
 - Wrath Cage block-entity construction.
 - Entity-to-aspect catalog and host entity classification, consumed by gameplay without importing concrete TC4 mob classes.
 - Host-specific item properties and factories.
