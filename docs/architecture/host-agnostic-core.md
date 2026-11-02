@@ -21,6 +21,7 @@ The shared core owns:
 - `ContentId` and symbolic host content references.
 - Aspect, recipe, and research definitions/catalogs.
 - Shared wand behavior rules and narrow access contracts, including Blink Focus targeting, teleport effects, and upgrade behavior.
+- Shared Wrath Cage spawn eligibility, delay calculation, and bounded Essentia insertion rules.
 - Semantic warp kinds and access contracts.
 
 The core may use Minecraft runtime types where behavior necessarily operates on Minecraft objects, such as `ItemStack`, entities, and levels. It must not import Thaumcraft or NeoForge implementation APIs, or refer to the concrete TC4 adapter.
@@ -43,7 +44,7 @@ These contracts may expose Minecraft/NeoForge runtime types required by the 1.21
 
 The concrete layer owns conversions between semantic identifiers and TC4 values, TC4 aspect/recipe/research registration, wand and Vis calls, Baubles, taint damage, special mining, Thaumcraft entity classification, TC4 item properties/factories, and warp-pool mapping.
 
-The original 1.21.1 gameplay implementation is retained for legacy features that are not fully migrated yet. `BlinkFocusItem` remains the TC4 `FocusItem` integration wrapper, while targeting, destination calculation, teleport effects, and upgrade-specific combat behavior are delegated to the shared `core/wand/BlinkFocusBehavior`. Existing compatibility facades such as `FmAspects` remain transitional; they are not part of the semantic core.
+The original 1.21.1 gameplay implementation is retained for legacy features that are not fully migrated yet. `BlinkFocusItem` remains the TC4 `FocusItem` integration wrapper, while targeting, destination calculation, teleport effects, and upgrade-specific combat behavior are delegated to the shared `core/wand/BlinkFocusBehavior`. `WrathCageBlockEntity` remains the TC4 block-entity/Essentia transport implementation, but spawn eligibility, delay calculation, and per-channel insertion limits are delegated to `core/block/WrathCageBehavior`. Essentia extraction, persistence, and entity spawning remain host/runtime work. Existing compatibility facades such as `FmAspects` remain transitional; they are not part of the semantic core.
 
 ## Current capability status
 
@@ -68,7 +69,7 @@ Known limits remain explicit:
 | Research stages | `PARTIAL` | Adapter accepts one page group; multi-stage definitions are rejected |
 | Wand rods, caps, triggers, and parts | `PARTIAL` | Existing 1.21.1 registration remains in the legacy gameplay path |
 | Focus/spell runtime | `PARTIAL` | Not fully extracted into a host capability |
-| Essentia storage/transport | `PARTIAL` | Wrath Cage implementation still extends the TC4 block-entity and transport types directly |
+| Essentia storage/transport | `PARTIAL` | Shared spawn/storage policies are extracted; Wrath Cage still extends TC4 block-entity and transport types directly, and extraction/persistence remain host-bound |
 | Optional enchantment integration | `PARTIAL` | Legacy optional-mod path remains |
 | Taint origins | `UNSUPPORTED` | No taint-origin registration or propagation adapter is implemented |
 
