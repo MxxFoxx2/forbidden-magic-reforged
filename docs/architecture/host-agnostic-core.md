@@ -20,7 +20,7 @@ The shared core owns:
 
 - `ContentId` and symbolic host content references.
 - Aspect, recipe, and research definitions/catalogs.
-- Shared wand behavior rules and narrow access contracts, including Blink Focus targeting, teleport effects, upgrade behavior, and Witchwood mana conversion rates.
+- Shared wand behavior rules and narrow access contracts, including Blink Focus targeting, teleport effects, upgrade progression/cost profiles, and Witchwood mana conversion rates.
 - Shared Wrath Cage spawn eligibility, delay calculation, bounded Essentia insertion, extraction eligibility, and fuel-channel priority rules.
 - Semantic warp kinds and access contracts.
 
@@ -44,7 +44,7 @@ These contracts may expose Minecraft/NeoForge runtime types required by the 1.21
 
 The concrete layer owns conversions between semantic identifiers and TC4 values, TC4 aspect/recipe/research registration, wand and Vis calls, Baubles, taint damage, special mining, Thaumcraft entity classification, TC4 item properties/factories, and warp-pool mapping.
 
-The original 1.21.1 gameplay implementation is retained for legacy features that are not fully migrated yet. `BlinkFocusItem` remains the TC4 `FocusItem` integration wrapper, while targeting, destination calculation, teleport effects, and upgrade-specific combat behavior are delegated to the shared `core/wand/BlinkFocusBehavior`. `WrathCageBlockEntity` remains the TC4 block-entity/Essentia transport implementation, but spawn eligibility, delay calculation, per-channel insertion limits, extraction eligibility, and fuel-channel priority are delegated to `core/block/WrathCageBehavior`. The transport calls that physically extract Essentia, persistence, and entity spawning remain host/runtime work. Existing compatibility facades such as `FmAspects` and `FmWands` remain transitional; `FmWands` now delegates Witchwood mana rules to the shared core rather than duplicating the formulas.
+The original 1.21.1 gameplay implementation is retained for legacy features that are not fully migrated yet. `BlinkFocusItem` remains the TC4 `FocusItem` integration wrapper, while targeting, destination calculation, teleport effects, upgrade progression/cost-profile selection, and upgrade-specific combat behavior are delegated to `core/wand/BlinkFocusBehavior` and `core/wand/BlinkFocusRules`. `WrathCageBlockEntity` remains the TC4 block-entity/Essentia transport implementation, but spawn eligibility, delay calculation, per-channel insertion limits, extraction eligibility, and fuel-channel priority are delegated to `core/block/WrathCageBehavior`. The transport calls that physically extract Essentia, persistence, and entity spawning remain host/runtime work. Existing compatibility facades such as `FmAspects` and `FmWands` remain transitional; `FmWands` now delegates Witchwood mana rules to the shared core rather than duplicating the formulas.
 
 ## Current capability status
 
