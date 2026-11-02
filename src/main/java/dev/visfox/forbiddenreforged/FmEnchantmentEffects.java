@@ -2,6 +2,7 @@ package dev.visfox.forbiddenreforged;
 
 import java.util.List;
 import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
+import dev.visfox.forbiddenreforged.core.wand.WandRodKind;
 import java.util.Set;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
@@ -245,7 +246,7 @@ public final class FmEnchantmentEffects {
             FmToolEvents.collarDamage(wearer, event.getAmount(), event.getSource().getEntity());
             ItemStack held = wearer.getMainHandItem();
             var wandHost = HostAdapterRegistry.requireWandInspection();
-            if (wandHost.isWand(held)) {
+            if (wandHost.wandRodKind(held) != WandRodKind.NONE) {
                 boolean fireOrWither = event.getSource().is(DamageTypeTags.IS_FIRE)
                     || event.getSource().is(DamageTypes.WITHER);
                 if (FmToolEvents.cancelsInfernalDamage(held, fireOrWither)) {
