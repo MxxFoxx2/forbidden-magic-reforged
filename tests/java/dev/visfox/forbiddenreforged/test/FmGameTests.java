@@ -86,7 +86,13 @@ public final class FmGameTests {
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.TAINT_ORIGINS).level(),
             HostProfile.SupportLevel.UNSUPPORTED, "taint origins are explicitly declared unsupported");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.WAND_CAPS).level(),
-            HostProfile.SupportLevel.PARTIAL, "remaining direct wand registration is not overstated as migrated");
+            HostProfile.SupportLevel.ADAPTED, "wand cap registration is owned by the TC4 adapter");
+        helper.assertValueEqual(profile.supportOf(HostProfile.Feature.WAND_RODS).level(),
+            HostProfile.SupportLevel.ADAPTED, "wand rod registration is owned by the TC4 adapter");
+        helper.assertValueEqual(profile.supportOf(HostProfile.Feature.WAND_PARTS).level(),
+            HostProfile.SupportLevel.ADAPTED, "Profane Wand rod replacement uses a typed parts port");
+        helper.assertValueEqual(profile.supportOf(HostProfile.Feature.WAND_TRIGGERS).level(),
+            HostProfile.SupportLevel.ADAPTED, "Hellfire wand trigger registration is owned by the TC4 adapter");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.RUNTIME_BOOTSTRAP).level(),
             HostProfile.SupportLevel.ADAPTED, "host bootstrap capability is implemented");
         int optionalEnchantments = HostAdapterRegistry.requireBootstrap().registeredOptionalEnchantments();

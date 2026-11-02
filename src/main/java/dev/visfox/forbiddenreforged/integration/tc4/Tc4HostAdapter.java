@@ -1,9 +1,6 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
 import dev.visfox.forbiddenreforged.FmAspectTags;
-import dev.visfox.forbiddenreforged.FmWands;
-import dev.visfox.forbiddenreforged.FmWandTriggers;
-import dev.visfox.forbiddenreforged.FmTinkerer;
 import dev.visfox.forbiddenreforged.MorphToolItem;
 import dev.visfox.forbiddenreforged.RingNutritionItem;
 import dev.visfox.forbiddenreforged.CrystalwellItem;
@@ -57,6 +54,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import thaumcraft.item.gear.TcMaterials;
 import thaumcraft.platform.Registration;
+import net.neoforged.fml.ModList;
 import thaumcraft.wand.focus.FocusItem;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -115,6 +113,14 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
             "Uses the TC4 ToolHarvest API for morph-tool area harvesting and cycle sounds");
         adapted(support, HostProfile.Feature.WAND_INSPECTION,
             "Reads wand, rod and focus properties through the TC4 wand API");
+        adapted(support, HostProfile.Feature.WAND_RODS,
+            "Registers TC4 wand rods, including optional Witchwood mana-conversion rods");
+        adapted(support, HostProfile.Feature.WAND_CAPS,
+            "Registers TC4 wand cap materials and their wand properties");
+        adapted(support, HostProfile.Feature.WAND_PARTS,
+            "Replaces the Profane Wand rod through the typed wand-parts bridge");
+        adapted(support, HostProfile.Feature.WAND_TRIGGERS,
+            "Registers Hellfire block triggers through the TC4 wand trigger API");
         adapted(support, HostProfile.Feature.ACCESSORY_INTEGRATION,
             "Reads accessory slots through the TC4 Baubles bridge");
         adapted(support, HostProfile.Feature.TAINT_BLOCK_SERVICES,
@@ -420,26 +426,31 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
 
     @Override
     public void registerWands() {
-        FmWands.register();
+        Tc4WandAdapter.registerWands();
     }
 
     @Override
     public void registerWandTriggers() {
-        FmWandTriggers.register();
+        Tc4WandTriggerAdapter.register();
     }
 
     @Override
     public void registerOptionalEnchantments() {
-        FmTinkerer.register();
+        Tc4TinkererAdapter.register();
     }
 
     @Override
     public int registeredOptionalEnchantments() {
-        return FmTinkerer.registeredCount();
+        return Tc4TinkererAdapter.registeredCount();
+    }
+
+    @Override
+    public boolean isArsMagicaLoaded() {
+        return ModList.get().isLoaded("arsmagicalegacy") || ModList.get().isLoaded("arsmagica2");
     }
 
     @Override
     public void addCreativeWands(List<ItemStack> stacks) {
-        Tc4BootstrapAdapter.addCreativeWands(stacks);
+        Tc4WandAdapter.addCreativeWands(stacks);
     }
 }

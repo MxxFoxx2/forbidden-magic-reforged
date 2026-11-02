@@ -18,5 +18,7 @@ public interface HostBootstrapServices {
 
     int registeredOptionalEnchantments();
 
+    boolean isArsMagicaLoaded();
+
     void addCreativeWands(List<ItemStack> stacks);
 }
