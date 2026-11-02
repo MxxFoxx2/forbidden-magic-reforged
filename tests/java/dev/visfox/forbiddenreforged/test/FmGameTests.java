@@ -388,6 +388,35 @@ public final class FmGameTests {
     }
 
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void hostWandVisCapabilityExposesSemanticPrimalAccess(GameTestHelper helper) {
+        var vis = HostAdapterRegistry.requireWandVis();
+        List<ContentId> primals = vis.primalAspects();
+        helper.assertValueEqual(primals.size(), 6, "the wand capability exposes the six primal aspects");
+        helper.assertTrue(primals.contains(ContentId.parse("forbiddenmagic:concept/air")),
+            "Aer is exposed as the semantic air concept");
+        helper.assertTrue(primals.contains(ContentId.parse("forbiddenmagic:concept/earth")),
+            "Terra is exposed as the semantic earth concept");
+        helper.assertTrue(primals.contains(ContentId.parse("forbiddenmagic:concept/fire")),
+            "Ignis is exposed as the semantic fire concept");
+        helper.assertTrue(primals.contains(ContentId.parse("forbiddenmagic:concept/water")),
+            "Aqua is exposed as the semantic water concept");
+        helper.assertTrue(primals.contains(ContentId.parse("forbiddenmagic:concept/order")),
+            "Ordo is exposed as the semantic order concept");
+        helper.assertTrue(primals.contains(ContentId.parse("forbiddenmagic:concept/entropy")),
+            "Perditio is exposed as the semantic entropy concept");
+
+        ItemStack wand = Wands.create(WandRegistry.CAP_THAUMIUM, WandRegistry.findRod("tainted"), false);
+        ContentId fire = ContentId.parse("forbiddenmagic:concept/fire");
+        vis.addWandVis(wand, fire, 200, true);
+        helper.assertValueEqual(vis.vis(wand, fire), 200,
+            "compatibility wand writes use the inherited typed wand Vis capability");
+        vis.addRealVis(wand, fire, 75, true);
+        helper.assertValueEqual(vis.vis(wand, fire), 275,
+            "raw wand Vis writes preserve their exact internal-unit amount");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void blinkFocusUpgradeProgressionRemainsStable(GameTestHelper helper) {
         helper.assertValueEqual(BlinkFocusRules.possibleUpgradesByRank(1, false, false),
             List.of(BlinkFocusRules.Upgrade.FRUGAL), "rank one only offers Frugal");
