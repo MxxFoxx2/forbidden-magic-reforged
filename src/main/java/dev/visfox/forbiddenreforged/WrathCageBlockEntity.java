@@ -370,9 +370,10 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
         if (mobId != null) {
             output.putString("MobId", mobId);
         }
-        output.putInt("Special", storage.amount(WrathCageStorage.Channel.MOB));
-        output.putInt("Wrath", storage.amount(WrathCageStorage.Channel.WRATH));
-        output.putInt("Sloth", storage.amount(WrathCageStorage.Channel.SLOTH));
+        WrathCageStorage.State storageState = storage.snapshot();
+        output.putInt("Special", storageState.mob());
+        output.putInt("Wrath", storageState.wrath());
+        output.putInt("Sloth", storageState.sloth());
         output.putInt("Fuel", fuel);
         output.putInt("Delay", spawnDelay);
         output.putBoolean("Slothful", slothful);
@@ -383,12 +384,14 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         mobId = input.getString("MobId").orElse(null);
-        storage.setAmount(WrathCageStorage.Channel.MOB, input.getIntOr("Special", 0));
-        storage.setAmount(WrathCageStorage.Channel.WRATH, input.getIntOr("Wrath", 0));
-        storage.setAmount(WrathCageStorage.Channel.SLOTH, input.getIntOr("Sloth", 0));
+        storage.restore(new WrathCageStorage.State(
+            input.getIntOr("Special", 0),
+            input.getIntOr("Wrath", 0),
+            input.getIntOr("Sloth", 0),
+            input.getIntOr("Mode", 0)
+        ));
         fuel = input.getIntOr("Fuel", 0);
         spawnDelay = input.getIntOr("Delay", 20);
         slothful = input.getBooleanOr("Slothful", false);
-        storage.setMode(input.getIntOr("Mode", 0));
     }
 }

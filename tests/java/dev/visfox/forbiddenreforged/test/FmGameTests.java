@@ -139,6 +139,33 @@ public final class FmGameTests {
     }
 
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void wrathCageStorageSnapshotsPreserveLegacyState(GameTestHelper helper) {
+        WrathCageStorage storage = new WrathCageStorage();
+        helper.assertValueEqual(storage.snapshot(), new WrathCageStorage.State(0, 0, 0, 0),
+            "new storage starts from the legacy empty state");
+
+        // Preserve values as read from older saves; do not clamp or reinterpret them here.
+        storage.setAmount(WrathCageStorage.Channel.MOB, 65);
+        storage.setAmount(WrathCageStorage.Channel.WRATH, -3);
+        storage.setAmount(WrathCageStorage.Channel.SLOTH, 41);
+        storage.setMode(7);
+        WrathCageStorage.State saved = storage.snapshot();
+        helper.assertValueEqual(saved, new WrathCageStorage.State(65, -3, 41, 7),
+            "snapshot records every channel and the raw display mode");
+
+        storage.setAmount(WrathCageStorage.Channel.MOB, 0);
+        storage.setAmount(WrathCageStorage.Channel.WRATH, 0);
+        storage.setAmount(WrathCageStorage.Channel.SLOTH, 0);
+        storage.setMode(1);
+        storage.restore(saved);
+        helper.assertValueEqual(storage.snapshot(), saved,
+            "restore round-trips all persisted storage values exactly");
+        helper.assertValueEqual(storage.selectedChannel(), WrathCageStorage.Channel.SLOTH,
+            "legacy unknown display modes retain the Sloth fallback");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void wandTriggerCatalogPreservesHellfireDefinition(GameTestHelper helper) {
         var trigger = WandTriggerCatalog.hellfire();
         helper.assertValueEqual(trigger.id(), ContentId.parse("forbiddenmagic:wand_trigger/hellfire"),

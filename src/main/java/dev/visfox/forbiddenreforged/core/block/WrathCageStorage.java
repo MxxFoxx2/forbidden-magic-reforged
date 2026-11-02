@@ -5,8 +5,8 @@ import java.util.List;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 
 /**
- * Host-independent three-channel storage and display selection for the Wrath Cage.
- * Physical Essentia transport and persistence remain in the host block entity.
+ * Host-independent three-channel storage, display selection, and persisted-state model
+ * for the Wrath Cage. Physical Essentia transport and legacy key IO remain host-side.
  */
 public final class WrathCageStorage {
     public static final int CAPACITY = 64;
@@ -15,6 +15,13 @@ public final class WrathCageStorage {
         MOB,
         WRATH,
         SLOTH
+    }
+
+    /**
+     * Immutable semantic storage state. Values are deliberately not normalized so
+     * legacy saved values round-trip without silently changing their meaning.
+     */
+    public record State(int mob, int wrath, int sloth, int mode) {
     }
 
     private int mob;
@@ -61,6 +68,20 @@ public final class WrathCageStorage {
             case WRATH -> wrath = amount;
             case SLOTH -> sloth = amount;
         }
+    }
+
+    /** Captures the complete semantic state that belongs to this storage model. */
+    public State snapshot() {
+        return new State(mob, wrath, sloth, mode);
+    }
+
+    /** Restores a previously captured state without rewriting legacy values. */
+    public void restore(State state) {
+        java.util.Objects.requireNonNull(state, "state");
+        mob = state.mob();
+        wrath = state.wrath();
+        sloth = state.sloth();
+        mode = state.mode();
     }
 
     /** Adds only what fits and returns the accepted amount. */
