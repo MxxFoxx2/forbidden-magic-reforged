@@ -69,9 +69,15 @@ public final class FmSpawnerMobs {
         if (id == null) {
             return null;
         }
+        final ContentId entityId;
+        try {
+            entityId = ContentId.parse(id);
+        } catch (IllegalArgumentException invalidId) {
+            return null;
+        }
         return HostAdapterRegistry.requireEntityAspects()
             .aspectCatalog(FmConfig.silverfishEmeralds())
-            .get(ContentId.parse(id));
+            .get(entityId);
     }
 
     public static List<String> ids() {

@@ -497,6 +497,8 @@ public final class FmGameTests {
             "Wrath Cage mob aspect lookup delegates to the host catalog");
         helper.assertTrue(FmSpawnerMobs.aspectId(null) == null,
             "missing mob IDs do not resolve an aspect");
+        helper.assertTrue(FmSpawnerMobs.aspectId("invalid entity id") == null,
+            "malformed legacy mob IDs do not throw during aspect lookup");
         var hostBosses = HostAdapterRegistry.requireEntityClassification().bossEntityIds();
         helper.assertTrue(hostBosses.contains(ContentId.parse("thaumcraft:cultist_leader")),
             "Thaumcraft boss identifiers are supplied by the selected host");
