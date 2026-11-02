@@ -1,7 +1,5 @@
 package dev.visfox.forbiddenreforged.core.block;
 
-import net.minecraft.util.RandomSource;
-
 /**
  * Host-independent Wrath Cage rules. Essentia extraction, entity spawning and
  * persistence remain in the Minecraft/TC4 block-entity integration.
@@ -20,8 +18,8 @@ public final class WrathCageBehavior {
         return !powered && mobSet && (cost == 0 || fuel > 0 || availableEssentia >= cost);
     }
 
-    public static int nextDelay(RandomSource random, boolean slothful) {
-        int delay = 200 + random.nextInt(100);
+    public static int nextDelay(int randomOffset, boolean slothful) {
+        int delay = 200 + Math.max(0, Math.min(99, randomOffset));
         return slothful ? delay + 200 : delay;
     }
 
