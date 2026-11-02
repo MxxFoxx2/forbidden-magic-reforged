@@ -2,8 +2,6 @@ package dev.visfox.forbiddenreforged;
 
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -14,8 +12,6 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 /** Restores player-side behavior for the two original Forbidden Magic scribing tools. */
 public final class ScribeWellEvents {
-    private static final ResourceLocation PRIMORDIAL_PEARL_ID = ResourceLocation.parse("thaumcraft:primordial_pearl");
-
     private ScribeWellEvents() {
     }
 
@@ -62,9 +58,9 @@ public final class ScribeWellEvents {
             return;
         }
 
-        Item pearl = BuiltInRegistries.ITEM.get(PRIMORDIAL_PEARL_ID);
+        Item pearl = HostAdapterRegistry.requireItemFactories().primordialPearlItem();
         if (pearl == Items.AIR) {
-            ForbiddenMagic.LOGGER.warn("Could not refund Primewell's primordial pearl: {} is not registered", PRIMORDIAL_PEARL_ID);
+            ForbiddenMagic.LOGGER.warn("Could not refund Primewell's primordial pearl: Thaumcraft has no registered pearl item");
             return;
         }
 

@@ -23,6 +23,8 @@ import thaumcraft.crafting.CrucibleRecipe;
 import thaumcraft.crafting.InfusionRecipe;
 import thaumcraft.research.ResearchItem;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
+import dev.visfox.forbiddenreforged.integration.api.HostProfile;
 import dev.visfox.forbiddenreforged.FmAspects;
 import dev.visfox.forbiddenreforged.FmConfig;
 import dev.visfox.forbiddenreforged.FmItems;
@@ -59,6 +61,32 @@ public final class FmGameTests {
     private FmGameTests() {
     }
 
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void hostAdapterDeclaresThe1_21_1CapabilityProfile(GameTestHelper helper) {
+        HostProfile profile = HostAdapterRegistry.require().profile();
+        helper.assertValueEqual(profile.minecraftVersion(), "1.21.1",
+            "the selected TC4 adapter must target Minecraft 1.21.1");
+        helper.assertValueEqual(profile.hostVersion(), "1.1.2",
+            "the selected adapter must identify the pinned Thaumcraft host version");
+        helper.assertValueEqual(profile.features().size(), HostProfile.Feature.values().length,
+            "the host profile must declare every capability");
+
+        helper.assertValueEqual(profile.supportOf(HostProfile.Feature.ASPECT_REGISTRATION).level(),
+            HostProfile.SupportLevel.ADAPTED, "aspect registration uses the shared catalog adapter");
+        helper.assertValueEqual(profile.supportOf(HostProfile.Feature.ITEM_PROPERTIES).level(),
+            HostProfile.SupportLevel.ADAPTED, "item properties are supplied through host capabilities");
+        helper.assertValueEqual(profile.supportOf(HostProfile.Feature.ITEM_FACTORIES).level(),
+            HostProfile.SupportLevel.ADAPTED, "host-backed item factories are routed through capabilities");
+        helper.assertValueEqual(profile.supportOf(HostProfile.Feature.MORPH_TOOL_RUNTIME).level(),
+            HostProfile.SupportLevel.ADAPTED, "morph tool behavior uses host services");
+        helper.assertValueEqual(profile.supportOf(HostProfile.Feature.TAINT_BLOCK_SERVICES).level(),
+            HostProfile.SupportLevel.ADAPTED, "taint block services use the host adapter");
+        helper.assertValueEqual(profile.supportOf(HostProfile.Feature.TAINT_ORIGINS).level(),
+            HostProfile.SupportLevel.UNSUPPORTED, "taint origins are explicitly declared unsupported");
+        helper.assertValueEqual(profile.supportOf(HostProfile.Feature.WAND_CAPS).level(),
+            HostProfile.SupportLevel.PARTIAL, "remaining direct wand registration is not overstated as migrated");
+        helper.succeed();
+    }
 
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void taintCoalHasFuelValue(GameTestHelper helper) {
