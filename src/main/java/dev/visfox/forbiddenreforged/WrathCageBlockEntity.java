@@ -1,6 +1,5 @@
 package dev.visfox.forbiddenreforged;
 
-import java.util.Objects;
 import dev.visfox.forbiddenreforged.core.block.WrathCageBehavior;
 import dev.visfox.forbiddenreforged.core.block.WrathCageStorage;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
@@ -37,11 +36,7 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
     private static final int PLAYER_RANGE = 16;
     private static final int SUCTION = 128;
 
-    private @Nullable String mobId;
-    private final WrathCageStorage storage = new WrathCageStorage();
-    private int fuel;
-    private int spawnDelay = 20;
-    private boolean slothful;
+    private final WrathCageState cageState = new WrathCageState();
 
     public WrathCageBlockEntity(BlockPos pos, BlockState state) {
         this(FmBlockEntities.WRATH_CAGE.get(), pos, state);
@@ -52,19 +47,16 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
     }
 
     public @Nullable String getMobId() {
-        return mobId;
+        return cageState.mobId();
     }
 
     public void cycleMode() {
-        storage.cycleMode();
+        cageState.storage().cycleMode();
         sync();
     }
 
     public void setMobId(@Nullable String mobId) {
-        if (!Objects.equals(this.mobId, mobId)) {
-            storage.setAmount(WrathCageStorage.Channel.MOB, 0);
-        }
-        this.mobId = mobId;
+        cageState.setMobId(mobId);
         sync();
     }
 
@@ -81,44 +73,44 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
             return;
         }
         int cost = FmConfig.wrathCost();
-        if (cost > 0 && cage.mobId != null && cage.hasRoom()) {
+        if (cost > 0 && cage.cageState.mobId() != null && cage.hasRoom()) {
             cage.drawEssentia(level, pos);
         }
         boolean powered = level.hasNeighborSignal(pos);
-        if (!shouldSpawn(powered, cage.mobId != null, cage.fuel, cost, cage.storage.total())) {
+        if (!shouldSpawn(powered, cage.cageState.mobId() != null, cage.cageState.fuel(), cost, cage.cageState.storage().total())) {
             return;
         }
-        if (cost > 0 && cage.fuel <= 0) {
+        if (cost > 0 && cage.cageState.fuel() <= 0) {
             WrathCageBehavior.FuelChannel channel = WrathCageBehavior.selectFuelChannel(
-                cage.storage.amount(WrathCageStorage.Channel.MOB),
-                cage.storage.amount(WrathCageStorage.Channel.WRATH),
-                cage.storage.amount(WrathCageStorage.Channel.SLOTH),
+                cage.cageState.storage().amount(WrathCageStorage.Channel.MOB),
+                cage.cageState.storage().amount(WrathCageStorage.Channel.WRATH),
+                cage.cageState.storage().amount(WrathCageStorage.Channel.SLOTH),
                 cost
             );
             switch (channel) {
-                case SPECIAL -> cage.storage.remove(WrathCageStorage.Channel.MOB, cost);
-                case WRATH -> cage.storage.remove(WrathCageStorage.Channel.WRATH, cost);
+                case SPECIAL -> cage.cageState.storage().remove(WrathCageStorage.Channel.MOB, cost);
+                case WRATH -> cage.cageState.storage().remove(WrathCageStorage.Channel.WRATH, cost);
                 case SLOTH -> {
-                    cage.storage.remove(WrathCageStorage.Channel.SLOTH, cost);
-                    cage.slothful = true;
+                    cage.cageState.storage().remove(WrathCageStorage.Channel.SLOTH, cost);
+                    cage.cageState.setSlothful(true);
                 }
                 case NONE -> {
                     // No complete fuel channel is available.
                 }
             }
             if (channel != WrathCageBehavior.FuelChannel.NONE) {
-                cage.fuel = FmConfig.wrathEff();
+                cage.cageState.setFuel(FmConfig.wrathEff());
                 if (channel != WrathCageBehavior.FuelChannel.SLOTH) {
-                    cage.slothful = false;
+                    cage.cageState.setSlothful(false);
                 }
                 cage.sync();
             }
         }
-        if (cage.fuel <= 0 && cost > 0) {
+        if (cage.cageState.fuel() <= 0 && cost > 0) {
             return;
         }
-        if (cage.spawnDelay > 0) {
-            cage.spawnDelay--;
+        if (cage.cageState.spawnDelay() > 0) {
+            cage.cageState.decrementSpawnDelay();
             return;
         }
         if (level instanceof ServerLevel serverLevel) {
@@ -127,7 +119,7 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
     }
 
     private boolean hasRoom() {
-        return storage.hasRoom();
+        return cageState.storage().hasRoom();
     }
 
     private ContentId mobAspectId() {
@@ -143,7 +135,7 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
     }
 
     private @Nullable WrathCageStorage.Channel channelFor(Aspect aspect) {
-        return storage.channelFor(
+        return cageState.storage().channelFor(
             Tc4AspectAdapter.toContentId(aspect),
             mobAspectId(),
             wrathAspectId(),
@@ -152,7 +144,7 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
     }
 
     private @Nullable ContentId selectedAspectId() {
-        return switch (storage.selectedChannel()) {
+        return switch (cageState.storage().selectedChannel()) {
             case MOB -> mobAspectId();
             case WRATH -> wrathAspectId();
             case SLOTH -> slothAspectId();
@@ -161,7 +153,7 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
 
     private void drawEssentia(Level level, BlockPos pos) {
         int cost = FmConfig.wrathCost();
-        var extractionOrder = storage.extractionOrder(cost);
+        var extractionOrder = cageState.storage().extractionOrder(cost);
         if (extractionOrder.isEmpty()) {
             return;
         }
@@ -184,7 +176,7 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
                     case SLOTH -> slothAspectId;
                 };
                 if (aspect != null && transport.takeOneFromOutput(source, outputSide, aspect)) {
-                    storage.add(channel, 1);
+                    cageState.storage().add(channel, 1);
                     sync();
                     return;
                 }
@@ -196,19 +188,19 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
         if (level.getNearestPlayer(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, PLAYER_RANGE, false) == null) {
             return;
         }
-        ResourceLocation id = mobId == null ? null : ResourceLocation.tryParse(mobId);
+        ResourceLocation id = cageState.mobId() == null ? null : ResourceLocation.tryParse(cageState.mobId());
         if (id == null || !BuiltInRegistries.ENTITY_TYPE.containsKey(id)) {
-            spawnDelay = nextDelay(level.getRandom(), slothful);
+            cageState.setSpawnDelay(nextDelay(level.getRandom(), cageState.slothful()));
             return;
         }
         EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.getOptional(id).orElse(null);
         if (type == null) {
-            spawnDelay = nextDelay(level.getRandom(), slothful);
+            cageState.setSpawnDelay(nextDelay(level.getRandom(), cageState.slothful()));
             return;
         }
         AABB nearby = new AABB(pos.getX() - 4, pos.getY() - 1, pos.getZ() - 4, pos.getX() + 5, pos.getY() + 2, pos.getZ() + 5);
         int cost = FmConfig.wrathCost();
-        for (int attempt = 0; attempt < SPAWN_COUNT && (fuel > 0 || cost <= 0); attempt++) {
+        for (int attempt = 0; attempt < SPAWN_COUNT && (cageState.fuel() > 0 || cost <= 0); attempt++) {
             // Minecraft 1.21.1 exposes the spawn-aware overload with level, consumer, position and flags.
             Entity entity = type.create(level, null, pos, MobSpawnType.SPAWNER, false, false);
             if (entity == null) {
@@ -223,23 +215,21 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
             entity.moveTo(x, y, z, level.getRandom().nextFloat() * 360.0F, 0.0F);
             if (level.noCollision(entity) && !level.containsAnyLiquid(entity.getBoundingBox())) {
                 level.addFreshEntity(entity);
-                if (fuel > 0) {
-                    fuel--;
-                }
+                cageState.consumeFuel();
             }
         }
-        spawnDelay = nextDelay(level.getRandom(), slothful);
+        cageState.setSpawnDelay(nextDelay(level.getRandom(), cageState.slothful()));
     }
 
     private Aspect mobAspect() {
-        Aspect aspect = FmSpawnerMobs.aspect(mobId);
+        Aspect aspect = FmSpawnerMobs.aspect(cageState.mobId());
         return aspect == null ? Aspect.GREED : aspect;
     }
 
     public static ItemStack crystalForBreak(WrathCageBlockEntity cage) {
         ItemStack stack = new ItemStack(FmItems.MOB_CRYSTAL.get());
-        if (cage.mobId != null) {
-            MobCrystalItem.setMob(stack, cage.mobId);
+        if (cage.cageState.mobId() != null) {
+            MobCrystalItem.setMob(stack, cage.cageState.mobId());
         }
         return stack;
     }
@@ -247,7 +237,7 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
     @Override
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {
         super.preRemoveSideEffects(pos, state);
-        if (mobId != null && level != null) {
+        if (cageState.mobId() != null && level != null) {
             ItemEntity drop = new ItemEntity(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, crystalForBreak(this));
             level.addFreshEntity(drop);
         }
@@ -256,10 +246,10 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
     @Override
     public AspectList getAspects() {
         AspectList aspects = new AspectList();
-        if (FmConfig.wrathCost() > 0 && mobId != null) {
+        if (FmConfig.wrathCost() > 0 && cageState.mobId() != null) {
             ContentId selectedAspect = selectedAspectId();
             if (selectedAspect != null) {
-                aspects.add(Tc4AspectAdapter.resolveAspect(selectedAspect), storage.selectedAmount());
+                aspects.add(Tc4AspectAdapter.resolveAspect(selectedAspect), cageState.storage().selectedAmount());
             }
         }
         return aspects;
@@ -280,7 +270,7 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
             return amount;
         }
         WrathCageStorage.Channel channel = channelFor(aspect);
-        return channel == null ? amount : amount - storage.add(channel, amount);
+        return channel == null ? amount : amount - cageState.storage().add(channel, amount);
     }
 
     @Override
@@ -291,13 +281,13 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
     @Override
     public boolean doesContainerContainAmount(Aspect aspect, int amount) {
         WrathCageStorage.Channel channel = channelFor(aspect);
-        return channel != null && storage.contains(channel, amount);
+        return channel != null && cageState.storage().contains(channel, amount);
     }
 
     @Override
     public int containerContains(Aspect aspect) {
         WrathCageStorage.Channel channel = channelFor(aspect);
-        return channel == null ? 0 : storage.amount(channel);
+        return channel == null ? 0 : cageState.storage().amount(channel);
     }
 
     @Override
@@ -341,7 +331,7 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
     @Override
     public int addEssentia(Aspect aspect, int amount, Direction face) {
         WrathCageStorage.Channel channel = channelFor(aspect);
-        return channel == null ? amount : storage.add(channel, amount);
+        return channel == null ? amount : cageState.storage().add(channel, amount);
     }
 
     @Override
@@ -351,7 +341,7 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
 
     @Override
     public int getEssentiaAmount(Direction face) {
-        return storage.selectedAmount();
+        return cageState.storage().selectedAmount();
     }
 
     @Override
@@ -367,31 +357,33 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
-        if (mobId != null) {
-            output.putString("MobId", mobId);
+        WrathCageState.Snapshot saved = cageState.snapshot();
+        if (saved.mobId() != null) {
+            output.putString("MobId", saved.mobId());
         }
-        WrathCageStorage.State storageState = storage.snapshot();
-        output.putInt("Special", storageState.mob());
-        output.putInt("Wrath", storageState.wrath());
-        output.putInt("Sloth", storageState.sloth());
-        output.putInt("Fuel", fuel);
-        output.putInt("Delay", spawnDelay);
-        output.putBoolean("Slothful", slothful);
-        output.putInt("Mode", storage.mode());
+        output.putInt("Special", saved.storage().mob());
+        output.putInt("Wrath", saved.storage().wrath());
+        output.putInt("Sloth", saved.storage().sloth());
+        output.putInt("Fuel", saved.fuel());
+        output.putInt("Delay", saved.spawnDelay());
+        output.putBoolean("Slothful", saved.slothful());
+        output.putInt("Mode", saved.storage().mode());
     }
 
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
-        mobId = input.getString("MobId").orElse(null);
-        storage.restore(new WrathCageStorage.State(
-            input.getIntOr("Special", 0),
-            input.getIntOr("Wrath", 0),
-            input.getIntOr("Sloth", 0),
-            input.getIntOr("Mode", 0)
+        cageState.restore(new WrathCageState.Snapshot(
+            input.getString("MobId").orElse(null),
+            new WrathCageStorage.State(
+                input.getIntOr("Special", 0),
+                input.getIntOr("Wrath", 0),
+                input.getIntOr("Sloth", 0),
+                input.getIntOr("Mode", 0)
+            ),
+            input.getIntOr("Fuel", 0),
+            input.getIntOr("Delay", 20),
+            input.getBooleanOr("Slothful", false)
         ));
-        fuel = input.getIntOr("Fuel", 0);
-        spawnDelay = input.getIntOr("Delay", 20);
-        slothful = input.getBooleanOr("Slothful", false);
     }
 }

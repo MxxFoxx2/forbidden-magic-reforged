@@ -37,6 +37,7 @@ import dev.visfox.forbiddenreforged.WrathCageBlock;
 import dev.visfox.forbiddenreforged.WrathCageBlockEntity;
 import dev.visfox.forbiddenreforged.core.block.WrathCageBehavior;
 import dev.visfox.forbiddenreforged.core.block.WrathCageStorage;
+import dev.visfox.forbiddenreforged.core.block.WrathCageState;
 import dev.visfox.forbiddenreforged.core.wand.WitchwoodManaBehavior;
 import dev.visfox.forbiddenreforged.core.wand.BlinkFocusRules;
 import dev.visfox.forbiddenreforged.core.wand.WandMaterialCatalog;
@@ -162,6 +163,43 @@ public final class FmGameTests {
             "restore round-trips all persisted storage values exactly");
         helper.assertValueEqual(storage.selectedChannel(), WrathCageStorage.Channel.SLOTH,
             "legacy unknown display modes retain the Sloth fallback");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void wrathCageStateOwnsAttunementAndPersistentRuntimeFields(GameTestHelper helper) {
+        WrathCageState state = new WrathCageState();
+        helper.assertValueEqual(state.snapshot(),
+            new WrathCageState.Snapshot(null, new WrathCageStorage.State(0, 0, 0, 0), 0, 20, false),
+            "new cage state has legacy defaults");
+
+        state.storage().setAmount(WrathCageStorage.Channel.MOB, 12);
+        state.setMobId("minecraft:zombie");
+        helper.assertValueEqual(state.storage().amount(WrathCageStorage.Channel.MOB), 0,
+            "changing the attuned mob clears mob-specific essentia");
+        state.storage().setAmount(WrathCageStorage.Channel.MOB, 8);
+        state.setMobId("minecraft:zombie");
+        helper.assertValueEqual(state.storage().amount(WrathCageStorage.Channel.MOB), 8,
+            "setting the same mob keeps its accumulated essentia");
+
+        state.setFuel(6);
+        state.consumeFuel();
+        state.setSpawnDelay(99);
+        state.setSlothful(true);
+        WrathCageState.Snapshot saved = state.snapshot();
+        helper.assertValueEqual(saved,
+            new WrathCageState.Snapshot("minecraft:zombie",
+                new WrathCageStorage.State(8, 0, 0, 0), 5, 99, true),
+            "snapshot includes attunement, storage, fuel, delay, and Sloth mode");
+
+        WrathCageState restored = new WrathCageState();
+        restored.restore(saved);
+        helper.assertValueEqual(restored.snapshot(), saved,
+            "complete cage state restores without running attunement side effects");
+
+        restored.setMobId(null);
+        helper.assertValueEqual(restored.storage().amount(WrathCageStorage.Channel.MOB), 0,
+            "clearing attunement also clears mob-specific essentia");
         helper.succeed();
     }
 
