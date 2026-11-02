@@ -68,7 +68,7 @@ Known limits remain explicit:
 |---|---|---|
 | Research stages | `PARTIAL` | Adapter accepts one page group; multi-stage definitions are rejected |
 | Wand rods, caps, triggers, and parts | `PARTIAL` | Semantic rod/cap and Hellfire trigger definitions are shared; TC4 registry calls, update callbacks, creative wand assembly, and part mutation remain host-bound |
-| Focus/spell runtime | `PARTIAL` | Blink Focus upgrade rules and Vis costs are shared; focus upgrade inspection and Vis payment use `HostFocusServices`, while `FocusItem`, `FocusUpgradeType`, rendering and item lifecycle remain TC4-bound |
+| Focus/spell runtime | `PARTIAL` | Blink Focus targeting and teleport behavior use `BlinkFocusBehavior`, upgrade progression and semantic Vis cost profiles use `BlinkFocusRules`, and focus inspection/payment use `HostFocusServices`; `Tc4BlinkFocusItem` and custom `FocusUpgradeType` definitions stay inside `integration/tc4` |
 | Essentia storage/transport | `PARTIAL` | Logical attunement/runtime state, three-channel storage, aspect-to-channel routing, extraction policy, and complete state snapshot/restore are shared; the legacy NBT key bridge, physical neighbor pulls, and TC4 callback interfaces remain host-bound; Minecraft spawn-round orchestration is shared core behavior |
 | Optional enchantment integration | `PARTIAL` | Legacy optional-mod path remains |
 | Taint origins | `UNSUPPORTED` | No taint-origin registration or propagation adapter is implemented |

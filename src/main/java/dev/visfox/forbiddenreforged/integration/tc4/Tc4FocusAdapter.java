@@ -1,6 +1,5 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
-import dev.visfox.forbiddenreforged.BlinkFocusItem;
 import dev.visfox.forbiddenreforged.core.wand.BlinkFocusRules;
 import dev.visfox.forbiddenreforged.core.wand.BlinkFocusRules.VisCost;
 import java.util.List;
@@ -24,8 +23,8 @@ public final class Tc4FocusAdapter {
     public static FocusUpgradeType toHostUpgrade(BlinkFocusRules.Upgrade upgrade) {
         return switch (upgrade) {
             case FRUGAL -> FocusUpgradeType.FRUGAL;
-            case HELLFIRE -> BlinkFocusItem.HELLFIRE;
-            case PANDEMONIUM -> BlinkFocusItem.PANDEMONIUM;
+            case HELLFIRE -> Tc4BlinkFocusItem.HELLFIRE;
+            case PANDEMONIUM -> Tc4BlinkFocusItem.PANDEMONIUM;
             case POTENCY -> FocusUpgradeType.POTENCY;
             case ENLARGE -> FocusUpgradeType.ENLARGE;
         };

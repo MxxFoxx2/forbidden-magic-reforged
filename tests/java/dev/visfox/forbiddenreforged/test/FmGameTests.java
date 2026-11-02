@@ -42,7 +42,7 @@ import dev.visfox.forbiddenreforged.core.block.WrathCageSpawnBehavior;
 import net.minecraft.world.phys.AABB;
 import dev.visfox.forbiddenreforged.core.wand.WitchwoodManaBehavior;
 import dev.visfox.forbiddenreforged.core.wand.BlinkFocusRules;
-import dev.visfox.forbiddenreforged.BlinkFocusItem;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4BlinkFocusItem;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4FocusAdapter;
 import thaumcraft.wand.focus.FocusUpgradeType;
 import dev.visfox.forbiddenreforged.core.wand.WandMaterialCatalog;
@@ -423,9 +423,9 @@ public final class FmGameTests {
         helper.assertValueEqual(Tc4FocusAdapter.toHostUpgrade(BlinkFocusRules.Upgrade.FRUGAL),
             FocusUpgradeType.FRUGAL, "Frugal maps to the pinned host upgrade");
         helper.assertValueEqual(Tc4FocusAdapter.toHostUpgrade(BlinkFocusRules.Upgrade.HELLFIRE),
-            BlinkFocusItem.HELLFIRE, "Hellfire maps to the custom host upgrade");
+            Tc4BlinkFocusItem.HELLFIRE, "Hellfire maps to the custom host upgrade");
         helper.assertValueEqual(Tc4FocusAdapter.toHostUpgrade(BlinkFocusRules.Upgrade.PANDEMONIUM),
-            BlinkFocusItem.PANDEMONIUM, "Pandemonium maps to the custom host upgrade");
+            Tc4BlinkFocusItem.PANDEMONIUM, "Pandemonium maps to the custom host upgrade");
         helper.assertValueEqual(Tc4FocusAdapter.toHostUpgrade(BlinkFocusRules.Upgrade.POTENCY),
             FocusUpgradeType.POTENCY, "Potency maps to the pinned host upgrade");
         helper.assertValueEqual(Tc4FocusAdapter.toHostUpgrade(BlinkFocusRules.Upgrade.ENLARGE),
@@ -435,9 +435,9 @@ public final class FmGameTests {
             BlinkFocusRules.possibleUpgradesByRank(2, false, false)
         );
         helper.assertValueEqual(rankTwo.length, 3, "host conversion preserves the number of rank-two upgrades");
-        helper.assertValueEqual(rankTwo[0], BlinkFocusItem.HELLFIRE,
+        helper.assertValueEqual(rankTwo[0], Tc4BlinkFocusItem.HELLFIRE,
             "host conversion preserves Hellfire as the first rank-two upgrade");
-        helper.assertValueEqual(rankTwo[1], BlinkFocusItem.PANDEMONIUM,
+        helper.assertValueEqual(rankTwo[1], Tc4BlinkFocusItem.PANDEMONIUM,
             "host conversion preserves Pandemonium as the second rank-two upgrade");
         helper.assertValueEqual(rankTwo[2], FocusUpgradeType.FRUGAL,
             "host conversion preserves Frugal as the final rank-two upgrade");

@@ -1,7 +1,8 @@
 package dev.visfox.forbiddenreforged.test;
 
 import com.google.gson.JsonArray;
-import dev.visfox.forbiddenreforged.BlinkFocusItem;
+import dev.visfox.forbiddenreforged.core.wand.BlinkFocusBehavior;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4BlinkFocusItem;
 import dev.visfox.forbiddenreforged.FmVillagers;
 import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.item.trading.MerchantOffer;
@@ -301,9 +302,11 @@ public final class ItemGameTests {
 
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void blinkFocusUpgradesUseOriginalIconAssets(GameTestHelper helper) {
-        helper.assertValueEqual(dev.visfox.forbiddenreforged.BlinkFocusItem.HELLFIRE.icon(),
+        helper.assertTrue(FmItems.BLINK_FOCUS.get() instanceof Tc4BlinkFocusItem,
+            "Blink Focus is created by the selected TC4 item factory");
+        helper.assertValueEqual(Tc4Tc4BlinkFocusItem.HELLFIRE.icon(),
             ForbiddenMagic.id("textures/misc/hellfire.png"), "Hellfire uses the bundled original icon");
-        helper.assertValueEqual(dev.visfox.forbiddenreforged.BlinkFocusItem.PANDEMONIUM.icon(),
+        helper.assertValueEqual(Tc4Tc4BlinkFocusItem.PANDEMONIUM.icon(),
             ForbiddenMagic.id("textures/misc/pandemonium.png"), "Pandemonium uses the bundled original icon");
         helper.assertTrue(ForbiddenMagic.class.getResourceAsStream("/assets/forbiddenmagic/textures/misc/hellfire.png") != null,
             "Hellfire icon asset is bundled");
@@ -895,7 +898,7 @@ public final class ItemGameTests {
         ServerPlayer player = mockConnectedPlayer(helper);
         player.experienceLevel = 100;
 
-        helper.assertTrue(table.startCraft(BlinkFocusItem.HELLFIRE.id(), player), "the manipulator refused the Hellfire upgrade");
+        helper.assertTrue(table.startCraft(Tc4BlinkFocusItem.HELLFIRE.id(), player), "the manipulator refused the Hellfire upgrade");
         helper.assertValueEqual(table.getSize(), 2000, "Hellfire rank 2 pending vis");
         helper.assertValueEqual(table.getAspects().getAmount(Aspect.FIRE), 800, "Hellfire FIRE cost");
         helper.assertValueEqual(table.getAspects().getAmount(Aspect.AIR), 400, "Hellfire AIR cost");
@@ -908,7 +911,7 @@ public final class ItemGameTests {
 
         helper.assertValueEqual(table.getSize(), 0, "Hellfire craft never finished");
         FocusItem focusItem = (FocusItem) focus.getItem();
-        helper.assertTrue(focusItem.isUpgradedWith(focus, BlinkFocusItem.HELLFIRE), "Hellfire was not stored on the focus");
+        helper.assertTrue(focusItem.isUpgradedWith(focus, Tc4BlinkFocusItem.HELLFIRE), "Hellfire was not stored on the focus");
         helper.succeed();
     }
 
@@ -929,13 +932,13 @@ public final class ItemGameTests {
         helper.assertTrue(player.pick(4.5, 1.0F, false).getType() != HitResult.Type.BLOCK,
             "the test target must sit beyond the vanilla wand reach");
 
-        HitResult hit = BlinkFocusItem.target(player);
+        HitResult hit = BlinkFocusBehavior.target(player);
         helper.assertTrue(hit instanceof BlockHitResult blockHit && blockHit.getType() == HitResult.Type.BLOCK,
             "the blink focus must reach a block beyond the wand's own reach");
         BlockHitResult blockHit = (BlockHitResult) hit;
         helper.assertValueEqual(blockHit.getBlockPos(), targetBlock, "blink target block");
 
-        Vec3 landing = BlinkFocusItem.destination(blockHit);
+        Vec3 landing = BlinkFocusBehavior.destination(blockHit);
         helper.assertTrue(Math.abs(landing.x - (targetBlock.getX() - 0.5)) < 0.001, "blink lands half a block outside the west face");
         helper.assertTrue(Math.abs(landing.z - pz) < 0.001, "blink keeps the hit depth on Z");
         helper.assertTrue(Math.abs(landing.y - (py + 1.62)) < 0.01, "blink keeps the hit height on a side face");

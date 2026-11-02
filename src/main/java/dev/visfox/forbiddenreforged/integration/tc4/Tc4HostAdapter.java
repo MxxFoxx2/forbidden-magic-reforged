@@ -1,7 +1,6 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
 import dev.visfox.forbiddenreforged.FmAspectTags;
-import dev.visfox.forbiddenreforged.BlinkFocusItem;
 import dev.visfox.forbiddenreforged.WrathCageBlockEntity;
 import dev.visfox.forbiddenreforged.core.aspect.AspectDefinition;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
@@ -461,7 +460,7 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
 
     @Override
     public Item createBlinkFocus(Item.Properties properties) {
-        return new BlinkFocusItem(properties);
+        return new Tc4BlinkFocusItem(properties);
     }
 
     @Override
