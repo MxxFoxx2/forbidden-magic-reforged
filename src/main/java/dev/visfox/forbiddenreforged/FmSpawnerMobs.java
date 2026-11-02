@@ -54,14 +54,6 @@ public final class FmSpawnerMobs {
         "thaumcraft:eldritch_guardian"
     );
 
-    private static final Set<String> BOSSES = Set.of(
-        "minecraft:ender_dragon",
-        "minecraft:wither",
-        "thaumcraft:cultist_leader",
-        "thaumcraft:eldritch_golem",
-        "thaumcraft:eldritch_warden"
-    );
-
     private FmSpawnerMobs() {
     }
 
