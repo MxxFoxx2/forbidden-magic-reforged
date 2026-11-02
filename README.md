@@ -73,14 +73,14 @@ Windows:
 python tools/prepare_host.py
 python tools/prepare_host.py --verify
 Set-Location host
-.\\gradlew.bat build
+.\gradlew.bat build
 Set-Location ..
-.\\gradlew.bat build
+.\gradlew.bat build
 python tools/check_provenance.py
 python tools/gen_resources.py
-.\\gradlew.bat runGameTestServer
+.\gradlew.bat runGameTestServer
 python tools/set_startup_config.py no_lust=true
-.\\gradlew.bat runGameTestServer
+.\gradlew.bat runGameTestServer
 ```
 
 Не редактируйте `host/` вручную: следующая подготовка пересоздаёт эту папку. Изменения хоста храните в `patches/`; после редактирования подготовленной копии экспортируйте их командой `python3 tools/prepare_host.py --export` (на Windows — `python`).
