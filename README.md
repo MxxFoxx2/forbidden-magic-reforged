@@ -8,7 +8,7 @@
 
 | Minecraft | NeoForge | Thaumcraft 4: Reforged | Ветка | Последний релиз |
 | --- | --- | --- | --- | --- |
-| **26.3** | 26.3.0.57-beta | 1.1.2 | `main` | [2.0.0](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/release%2F26.3) |
+| **26.3** | 26.3.0.57-beta или более новая совместимая сборка 26.3 | 1.1.2 или новее | `main` | [2.0.0](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/release%2F26.3) |
 | **26.1.2** | 26.1.2.122 | 1.1.2 | `mc/26.1.2` | [1.0.2](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/release%2F26.1.2) |
 | **1.21.1** | 21.1.256 | 1.1.2 | `1.21.1` | [1.0.47](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/release%2F1.21.1) |
 
@@ -58,7 +58,7 @@
 - Minecraft и NeoForge не вынесены из runtime и не заменяются абстрактным игровым движком;
 - несколько версий Minecraft не объединены в один source set или JAR;
 - второй магический хост пока не подключён: в релизе 2.0.0 используется Thaumcraft 4: Reforged;
-- аудит совместимости с Thaumaturge — это анализ API и ограничений, а не готовый production-адаптер.
+- аудит совместимости с [Thaumaturge](docs/host-compatibility/thaumaturge-26.1.2.md) — это анализ API и ограничений, а не готовый production-адаптер.
 
 Подробное описание устройства и ограничений находится в [документе архитектуры](docs/architecture/host-agnostic-core.md). Результаты проверки — в [verification report](docs/verification.md).
 
