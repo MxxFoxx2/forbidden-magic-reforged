@@ -23,6 +23,7 @@ import dev.visfox.forbiddenreforged.integration.runtime.HostScribingServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostTaintBlockServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandInspectionServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandVisServices;
+import dev.visfox.forbiddenreforged.core.wand.WandVisAccess;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandPartsServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostFocusServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostEssentiaTransportServices;
@@ -65,6 +66,8 @@ import net.minecraft.server.level.ServerPlayer;
  * focused host capabilities proceeds incrementally.
  */
 public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, HostWarpServices, HostMorphToolServices, HostBlockEntityServices, HostWandInspectionServices, HostWandVisServices, HostWandPartsServices, HostFocusServices, HostEssentiaTransportServices, HostAccessoryServices, HostTaintBlockServices, HostEnchantmentEffectServices, HostScribingServices, HostEntityAspectServices, HostEntityClassificationServices, HostItemFactoryServices, HostItemPropertyServices, HostBootstrapServices, HostVillagerTradeServices {
+    private static final WandVisAccess WAND_VIS = new Tc4WandVisAdapter();
+
     public static final Tc4HostAdapter INSTANCE = new Tc4HostAdapter();
 
     private static final String LEGACY_RUNTIME_NOTE =
@@ -139,7 +142,7 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
         support.put(HostProfile.Feature.ESSENTIA_TRANSPORT, HostProfile.FeatureSupport.partial(
             "Extraction priority is shared and physical neighbor pulls use a typed host capability; TC4 EssentiaTransport remains the runtime implementation"));
         adapted(support, HostProfile.Feature.WAND_VIS_STORAGE,
-            "Adds semantic aspects to TC4 wand and real Vis stores");
+            "Exposes semantic wand Vis reads/writes and separate item-backed real-Vis storage writes");
         adapted(support, HostProfile.Feature.ENTITY_ASPECTS,
             "Provides entity-to-aspect mappings using semantic identifiers");
         adapted(support, HostProfile.Feature.ENTITY_CLASSIFICATION,
@@ -322,18 +325,43 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
     }
 
     @Override
-    public void addWandVis(ItemStack stack, ContentId aspect, int amount, boolean apply) {
-        Tc4WandRuntimeAdapter.addVis(stack, aspect, amount, apply);
+    public List<ContentId> primalAspects() {
+        return WAND_VIS.primalAspects();
+    }
+
+    @Override
+    public int maximumVis(ItemStack wand) {
+        return WAND_VIS.maximumVis(wand);
+    }
+
+    @Override
+    public int vis(ItemStack wand, ContentId aspect) {
+        return WAND_VIS.vis(wand, aspect);
+    }
+
+    @Override
+    public void addVis(ItemStack wand, ContentId aspect, int amount, boolean apply) {
+        WAND_VIS.addVis(wand, aspect, amount, apply);
+    }
+
+    @Override
+    public void addRealVis(ItemStack wand, ContentId aspect, int amount, boolean apply) {
+        WAND_VIS.addRealVis(wand, aspect, amount, apply);
+    }
+
+    @Override
+    public void fill(ItemStack wand) {
+        WAND_VIS.fill(wand);
+    }
+
+    @Override
+    public void addItemRealVis(ItemStack stack, ContentId aspect, int amount, boolean apply) {
+        Tc4VisAdapter.addRealVis(stack, aspect, amount, apply);
     }
 
     @Override
     public void setRod(ItemStack wand, ContentId rod) {
         new Tc4WandPartsAdapter().setRod(wand, rod);
-    }
-
-    @Override
-    public void addRealVis(ItemStack stack, ContentId aspect, int amount, boolean apply) {
-        Tc4VisAdapter.addRealVis(stack, aspect, amount, apply);
     }
 
     @Override
