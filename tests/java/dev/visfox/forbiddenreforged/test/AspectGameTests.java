@@ -33,8 +33,9 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.GameType;
 import net.neoforged.fml.ModList;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
-import dev.visfox.forbiddenreforged.FmAspectDiagnostics;
 import dev.visfox.forbiddenreforged.FmAspects;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectDiagnostics;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectTagAdapter;
 import dev.visfox.forbiddenreforged.FmConfig;
 import dev.visfox.forbiddenreforged.FmCreativeTab;
@@ -317,8 +318,8 @@ public final class AspectGameTests {
 
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void aspectDiagnosticsExposeStableRegistryTable(GameTestHelper helper) {
-            List<String> registryLines = FmAspectDiagnostics.registryLines();
-            helper.assertValueEqual(registryLines.size(), FmAspects.count(), "diagnostics must contain every registered aspect");
+            List<String> registryLines = HostAdapterRegistry.require().aspectDiagnostics();
+            helper.assertValueEqual(registryLines.size(), Aspect.values().length, "diagnostics must contain every registered aspect");
             for (int index = 0; index < Aspect.values().length; index++) {
                 Aspect aspect = Aspect.values()[index];
                 helper.assertTrue(registryLines.get(index).contains("ordinal=" + index + " "), "registry ordinals must be strict and ordered: " + aspect.getTag());
@@ -326,12 +327,12 @@ public final class AspectGameTests {
             helper.assertValueEqual(registryLines.get(0), "ordinal=0 tag=aer name=Aer kind=builtin components=-", "first registry row must be exact");
             helper.assertTrue(registryLines.stream().anyMatch(line -> line.contains("ordinal=47 ") && line.contains("tag=vinculum ") && line.contains("name=Vinculum ") && line.contains("kind=builtin")), "ordinal 47 vinculum must be present");
             for (Aspect aspect : Aspect.values()) {
-                if (aspect.ordinal() < FmAspects.BUILTIN_ASPECT_COUNT) {
+                if (aspect.ordinal() < Tc4AspectDiagnostics.BUILTIN_ASPECT_COUNT) {
                     helper.assertTrue(registryLines.stream().anyMatch(line -> line.contains("ordinal=" + aspect.ordinal() + " ") && line.contains("tag=" + aspect.getTag() + " ") && line.contains("kind=builtin")), "builtin aspect must be classified: " + aspect.getTag());
                 }
             }
     
-            List<String> addonLines = FmAspectDiagnostics.addonLines();
+            List<String> addonLines = registryLines.stream().filter(line -> line.contains("kind=addon")).toList();
             int expected = FmConfig.lustDisabled() ? 6 : 7;
             helper.assertValueEqual(addonLines.size(), expected, "diagnostics must list every registered Forbidden Magic aspect");
             helper.assertValueEqual(
@@ -339,7 +340,7 @@ public final class AspectGameTests {
                 addonLines,
                 "Forbidden Magic rows must match the add-on section of the canonical registry"
             );
-            int expectedOrdinal = FmAspects.BUILTIN_ASPECT_COUNT;
+            int expectedOrdinal = Tc4AspectDiagnostics.BUILTIN_ASPECT_COUNT;
             for (String line : addonLines) {
                 helper.assertTrue(line.contains("ordinal=" + expectedOrdinal + " "), "add-on ordinals must be consecutive: " + line);
                 helper.assertTrue(line.contains("kind=addon"), "add-on aspect must be classified: " + line);
@@ -347,7 +348,7 @@ public final class AspectGameTests {
                 helper.assertTrue(line.contains("components="), "add-on aspect must include its components: " + line);
                 expectedOrdinal++;
             }
-            helper.assertValueEqual(expectedOrdinal, FmAspects.BUILTIN_ASPECT_COUNT + expected, "all add-on ordinals must be present");
+            helper.assertValueEqual(expectedOrdinal, Tc4AspectDiagnostics.BUILTIN_ASPECT_COUNT + expected, "all add-on ordinals must be present");
             helper.assertTrue(addonLines.stream().anyMatch(line -> line.contains("tag=infernus ") && line.contains("name=Infernus ") && line.contains("components=ignis,praecantatio")), "infernus row must include exact name and component tags");
             helper.succeed();
         }
