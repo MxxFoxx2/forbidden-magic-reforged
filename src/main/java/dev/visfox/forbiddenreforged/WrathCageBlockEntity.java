@@ -1,6 +1,7 @@
 package dev.visfox.forbiddenreforged;
 
 import java.util.Objects;
+import dev.visfox.forbiddenreforged.core.block.WrathCageBehavior;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -68,12 +69,11 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
     }
 
     public static boolean shouldSpawn(boolean powered, boolean mobSet, int fuel, int cost, int availableEssentia) {
-        return !powered && mobSet && (cost == 0 || fuel > 0 || availableEssentia >= cost);
+        return WrathCageBehavior.shouldSpawn(powered, mobSet, fuel, cost, availableEssentia);
     }
 
     public static int nextDelay(RandomSource random, boolean slothful) {
-        int delay = 200 + random.nextInt(100);
-        return slothful ? delay + 200 : delay;
+        return WrathCageBehavior.nextDelay(random, slothful);
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, WrathCageBlockEntity cage) {
@@ -246,16 +246,19 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
             return amount;
         }
         if (aspect == FmAspects.WRATH) {
-            wrath += amount;
-            return 0;
+            int accepted = WrathCageBehavior.acceptedAmount(wrath, amount, MAX_STORED);
+            wrath += accepted;
+            return amount - accepted;
         }
         if (aspect == FmAspects.SLOTH) {
-            sloth += amount;
-            return 0;
+            int accepted = WrathCageBehavior.acceptedAmount(sloth, amount, MAX_STORED);
+            sloth += accepted;
+            return amount - accepted;
         }
         if (aspect == mobAspect()) {
-            special += amount;
-            return 0;
+            int accepted = WrathCageBehavior.acceptedAmount(special, amount, MAX_STORED);
+            special += accepted;
+            return amount - accepted;
         }
         return amount;
     }
@@ -335,16 +338,18 @@ public class WrathCageBlockEntity extends TcBlockEntity implements AspectSource,
 
     @Override
     public int addEssentia(Aspect aspect, int amount, Direction face) {
-        int accepted = Math.min(amount, MAX_STORED);
         if (aspect == mobAspect()) {
+            int accepted = WrathCageBehavior.acceptedAmount(special, amount, MAX_STORED);
             special += accepted;
             return accepted;
         }
         if (aspect == FmAspects.WRATH) {
+            int accepted = WrathCageBehavior.acceptedAmount(wrath, amount, MAX_STORED);
             wrath += accepted;
             return accepted;
         }
         if (aspect == FmAspects.SLOTH) {
+            int accepted = WrathCageBehavior.acceptedAmount(sloth, amount, MAX_STORED);
             sloth += accepted;
             return accepted;
         }
