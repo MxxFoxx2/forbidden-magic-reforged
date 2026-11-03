@@ -28,6 +28,8 @@
 
 Подробнее — [архитектура проекта](docs/architecture/host-agnostic-core.md).
 
+Используемые API и ограничения интеграции с Thaumcraft для основного таргета описаны в [справочнике host API](docs/host-compatibility/thaumcraft-26.3.md).
+
 ## Установка и использование
 
 Скачайте релиз для своей версии Minecraft, установите указанные выше NeoForge и Thaumcraft (а для 1.21.1 — также Curios), затем поместите JAR мода в папку `mods/`.

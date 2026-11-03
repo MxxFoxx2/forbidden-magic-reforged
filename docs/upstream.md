@@ -18,6 +18,10 @@
 
 Стоковый хост 1.1.2+ предоставляет аддонам API аспектов. Без локального block-target patch конкретно портал не получает прямой аспект блоковой цели; это ограничение не требует возвращать патчи реестра аспектов.
 
+## API reference для main
+
+Подробная карта фактически используемых API Thaumcraft 4: Reforged, адаптеров и ограничений — [Thaumcraft 26.3 integration reference](host-compatibility/thaumcraft-26.3.md). Документ привязан к текущему `host.sha`; это не общая гарантия совместимости будущих версий.
+
 ## API аспектов аддонов
 
 [Thaumcraft PR #37](https://github.com/notlikethiss/thaumcraft-4-reforged/pull/37) принят в upstream коммитом [d75a946](https://github.com/notlikethiss/thaumcraft-4-reforged/commit/d75a94602100595f48bf31debab0f26c5ad521e2); соответствующий API включён в версию 1.1.2. Он добавляет регистрацию аспектов аддонов и объединение аспектов сущностей. Последующее упрощение API находится в [7df0506](https://github.com/notlikethiss/thaumcraft-4-reforged/commit/7df05066a1d8d8d5d6539a9110c9c22b1ea7053d).
