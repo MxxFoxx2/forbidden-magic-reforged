@@ -77,6 +77,8 @@ import dev.visfox.forbiddenreforged.FmDrops;
 import dev.visfox.forbiddenreforged.FmItems;
 import dev.visfox.forbiddenreforged.FmCreativeTab;
 import dev.visfox.forbiddenreforged.FmConfig;
+import dev.visfox.forbiddenreforged.FmSpawnerMobs;
+import dev.visfox.forbiddenreforged.MobCrystalItem;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4ResearchItem;
 import dev.visfox.forbiddenreforged.MorphState;
 import dev.visfox.forbiddenreforged.FmEnchantmentEffects;
@@ -232,8 +234,12 @@ public final class ItemGameTests {
             listed.add(stack.getItem());
         }
         for (var holder : FmItems.ITEMS.getEntries()) {
-            helper.assertTrue(listed.contains(holder.get()), "the tab is missing the item " + holder.getId());
+            if (holder.get() != FmItems.MOB_CRYSTAL.get()) {
+                helper.assertTrue(listed.contains(holder.get()), "the tab is missing the item " + holder.getId());
+            }
         }
+        helper.assertTrue(stacks.stream().noneMatch(stack -> stack.is(FmItems.MOB_CRYSTAL.get())),
+            "Mob Crystals belong to their dedicated tab, not the main Forbidden Magic tab");
         for (var holder : dev.visfox.forbiddenreforged.FmBlocks.BLOCKS.getEntries()) {
             Item blockItem = holder.get().asItem();
             if (blockItem != Items.AIR) {
@@ -242,6 +248,41 @@ public final class ItemGameTests {
         }
         long unique = stacks.stream().map(stack -> stack.getItem() + "#" + stack.getComponents()).distinct().count();
         helper.assertValueEqual(stacks.size(), (int) unique, "no duplicate entries in the tab list");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void mobCrystalCreativeTabMatchesLegacyConfigAndContents(GameTestHelper helper) {
+        CreativeModeTab tab = BuiltInRegistries.CREATIVE_MODE_TAB.get(ForbiddenMagic.id("mobcrystal"));
+        if (!FmConfig.wrathCage()) {
+            helper.assertTrue(tab == null, "the Mob Crystal tab is absent when Wrath Cage is disabled");
+            helper.assertTrue(FmCreativeTab.mobCrystalStacks().isEmpty(),
+                "disabled Wrath Cage exposes no Mob Crystal creative entries");
+            helper.succeed();
+            return;
+        }
+
+        helper.assertTrue(tab != null, "the Mob Crystal tab is registered when Wrath Cage is enabled");
+        helper.assertValueEqual(tab.getIconItem().getItem(), FmItems.MOB_CRYSTAL.get(),
+            "the Mob Crystal tab uses the crystal as its icon");
+
+        List<ItemStack> crystals = FmCreativeTab.mobCrystalStacks();
+        helper.assertValueEqual(crystals.size(), FmSpawnerMobs.ids().size() + 1,
+            "the dedicated tab contains one empty crystal and every supported mob imprint");
+        helper.assertTrue(crystals.get(0).is(FmItems.MOB_CRYSTAL.get()),
+            "the first entry is the empty crystal");
+        helper.assertTrue(MobCrystalItem.mob(crystals.get(0)) == null,
+            "the first entry has no mob imprint");
+
+        Set<String> expectedMobs = new HashSet<>(FmSpawnerMobs.ids());
+        Set<String> actualMobs = new HashSet<>();
+        for (int index = 1; index < crystals.size(); index++) {
+            String mobId = MobCrystalItem.mob(crystals.get(index));
+            helper.assertTrue(mobId != null, "every remaining crystal has a mob imprint");
+            actualMobs.add(mobId);
+        }
+        helper.assertValueEqual(actualMobs, expectedMobs,
+            "the tab contains exactly the configured mob imprint identifiers");
         helper.succeed();
     }
 
