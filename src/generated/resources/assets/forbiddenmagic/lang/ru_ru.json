@@ -212,5 +212,6 @@
   "tc.research_text.WRATH": "Когда каждая проблема - гвоздь, всё, что Вам нужно - это большой молот.",
   "tc.research_text.WRATHCAGE": "Бесконечная битва",
   "tooltip.creativeonly": "Только для творческого режима",
-  "tooltip.profane_contract": "Контракт: %s"
+  "tooltip.profane_contract": "Контракт: %s",
+  "item.forbiddenmagic.tainted_blood_shard": "Заражённый кровавый осколок"
 }
