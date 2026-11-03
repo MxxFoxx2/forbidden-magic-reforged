@@ -7,11 +7,18 @@ import dev.visfox.forbiddenreforged.core.research.ResearchDefinition;
 import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 import dev.visfox.forbiddenreforged.integration.api.HostProfile;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4ResearchAdapter;
+import io.netty.channel.embedded.EmbeddedChannel;
 import java.util.List;
 import java.util.Set;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.PacketFlow;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.CommonListenerCookie;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
@@ -27,6 +34,24 @@ import thaumcraft.taint.TaintSpread;
 @PrefixGameTestTemplate(false)
 public final class ArchitectureCapabilityGameTests {
     private ArchitectureCapabilityGameTests() {
+    }
+
+    private static ServerPlayer mockServerPlayer(GameTestHelper helper) {
+        ServerPlayer player = TestSupport.mockServerPlayer(helper);
+        CommonListenerCookie cookie = CommonListenerCookie.createInitial(player.getGameProfile(), false);
+        Connection connection = new Connection(PacketFlow.SERVERBOUND);
+        new EmbeddedChannel(connection);
+        player.connection = new ServerGamePacketListenerImpl(
+            helper.getLevel().getServer(),
+            connection,
+            player,
+            cookie
+        ) {
+            @Override
+            public void send(Packet<?> packet) {
+            }
+        };
+        return player;
     }
 
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
@@ -163,7 +188,7 @@ public final class ArchitectureCapabilityGameTests {
         helper.assertTrue(first != null && last != null, "both stage entries are registered in TC4");
         helper.assertValueEqual(last.tags().size(), 0,
             "continuation entries carry no duplicate note cost");
-        var player = TestSupport.mockServerPlayer(helper);
+        ServerPlayer player = mockServerPlayer(helper);
 
         ResearchManager.complete(player, "NETHERSHARDS", false);
         ResearchManager.complete(player, first.key());

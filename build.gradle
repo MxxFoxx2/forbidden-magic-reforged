@@ -179,10 +179,11 @@ tasks.named('jar', Jar) {
     archiveFileName = "forbidden-magic-${mod_version}.jar"
 }
 
+def tinkererVerifiedModJar = layout.buildDirectory.file("libs/forbidden-magic-${mod_version}.jar")
 def verifyTinkererCompileOnly = tasks.register("verifyTinkererCompileOnly") {
-    dependsOn(tasks.named('jar'))
+    dependsOn(tasks.named('jar', Jar))
     doLast {
-        File modJar = tasks.named('jar', Jar).get().archiveFile.get().asFile
+        File modJar = tinkererVerifiedModJar.get().asFile
         new java.util.jar.JarFile(modJar).withCloseable { archive ->
             def entries = archive.entries()
             while (entries.hasMoreElements()) {
