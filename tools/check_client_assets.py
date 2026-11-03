@@ -151,19 +151,19 @@ def main() -> int:
     events_text = CLIENT_EVENTS.read_text(encoding="utf-8") if CLIENT_EVENTS.is_file() else ""
     registrations: set[tuple[str, str]] = set()
     registration_pattern = re.compile(
-        r'ItemProperties\\.register\\(\\s*(.+?),\\s*ForbiddenMagic\\.id\\("([^"]+)"\\)',
+        r'ItemProperties\.register\(\s*(.+?),\s*ForbiddenMagic\.id\("([^"]+)"\)',
         re.DOTALL,
     )
     for match in registration_pattern.finditer(events_text):
         item_expression, predicate_path = match.groups()
         if "DEADLY_SHARDS" in item_expression:
-            shard = re.search(r'DEADLY_SHARDS\\.get\\("([^"]+)"\\)', item_expression)
+            shard = re.search(r'DEADLY_SHARDS\.get\("([^"]+)"\)', item_expression)
             if shard is None:
                 failures.append(f"cannot resolve item expression for predicate {predicate_path}")
                 continue
             item_name = shard.group(1) + "_shard"
         else:
-            item_match = re.search(r"FmItems\\.([A-Z0-9_]+)\\.get\\(\\)", item_expression)
+            item_match = re.search(r"FmItems\.([A-Z0-9_]+)\.get\(\)", item_expression)
             if item_match is None:
                 failures.append(f"cannot resolve item expression for predicate {predicate_path}")
                 continue
@@ -213,7 +213,7 @@ def main() -> int:
 
     if TAINT_LOG_MODEL.is_file():
         model_text = TAINT_LOG_MODEL.read_text(encoding="utf-8")
-        for model_path in re.findall(r'ForbiddenMagic\\.id\\("(block/[^"]+)"\\)', model_text):
+        for model_path in re.findall(r'ForbiddenMagic\.id\("(block/[^"]+)"\)', model_text):
             if ("forbiddenmagic", model_path) not in models:
                 failures.append(f"TaintLogFaceModel bakes missing model forbiddenmagic:{model_path}")
 
@@ -227,7 +227,7 @@ def main() -> int:
 
     if failures:
         print("Client asset integrity check failed:")
-        print("\\n".join(failures))
+        print("\n".join(failures))
         return 1
 
     print(
