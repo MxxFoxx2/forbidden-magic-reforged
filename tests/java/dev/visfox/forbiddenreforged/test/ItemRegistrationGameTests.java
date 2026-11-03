@@ -117,26 +117,26 @@ final class ItemRegistrationGameTests {
         }
     
     static void diabolistForkSwitchesToTheSporkModel(GameTestHelper helper) {
-            JsonObject definition = readJson(helper, "/assets/forbiddenmagic/items/diabolist_fork.json");
+            JsonObject definition = GameTestResources.readJson(helper, "/assets/forbiddenmagic/items/diabolist_fork.json");
             JsonObject model = definition.getAsJsonObject("model");
             helper.assertValueEqual(model.get("type").getAsString(), "minecraft:condition", "the fork model is conditional");
             helper.assertValueEqual(model.get("property").getAsString(), "forbiddenmagic:spork", "condition reads the spork config");
             helper.assertValueEqual(model.getAsJsonObject("on_true").get("model").getAsString(), "forbiddenmagic:item/diabolist_fork_spork", "on_true is the spork");
             helper.assertValueEqual(model.getAsJsonObject("on_false").get("model").getAsString(), "forbiddenmagic:item/diabolist_fork", "on_false is the ordinary fork");
-            JsonObject spork = readJson(helper, "/assets/forbiddenmagic/models/item/diabolist_fork_spork.json");
+            JsonObject spork = GameTestResources.readJson(helper, "/assets/forbiddenmagic/models/item/diabolist_fork_spork.json");
             helper.assertValueEqual(spork.getAsJsonObject("textures").get("layer0").getAsString(), "forbiddenmagic:item/spork", "spork model uses the spork texture");
             helper.assertTrue(ForbiddenMagic.class.getResourceAsStream("/assets/forbiddenmagic/textures/item/spork.png") != null, "spork texture ships with the mod");
             helper.succeed();
         }
     
     static void lustShardSwitchesToTheDespairModel(GameTestHelper helper) {
-            JsonObject definition = readJson(helper, "/assets/forbiddenmagic/items/lust_shard.json");
+            JsonObject definition = GameTestResources.readJson(helper, "/assets/forbiddenmagic/items/lust_shard.json");
             JsonObject model = definition.getAsJsonObject("model");
             helper.assertValueEqual(model.get("type").getAsString(), "minecraft:condition", "the lust shard model is conditional");
             helper.assertValueEqual(model.get("property").getAsString(), "forbiddenmagic:no_lust", "condition reads the no_lust config");
             helper.assertValueEqual(model.getAsJsonObject("on_true").get("model").getAsString(), "forbiddenmagic:item/lust_shard_despair", "on_true is the despair shard");
             helper.assertValueEqual(model.getAsJsonObject("on_false").get("model").getAsString(), "forbiddenmagic:item/lust_shard", "on_false is the lust shard");
-            JsonObject despair = readJson(helper, "/assets/forbiddenmagic/models/item/lust_shard_despair.json");
+            JsonObject despair = GameTestResources.readJson(helper, "/assets/forbiddenmagic/models/item/lust_shard_despair.json");
             helper.assertValueEqual(despair.getAsJsonObject("textures").get("layer0").getAsString(), "forbiddenmagic:item/despair_shard", "despair model uses the despair texture");
             helper.assertTrue(ForbiddenMagic.class.getResourceAsStream("/assets/forbiddenmagic/textures/item/despair_shard.png") != null, "despair texture ships with the mod");
             helper.succeed();

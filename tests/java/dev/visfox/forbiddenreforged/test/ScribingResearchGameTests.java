@@ -106,8 +106,8 @@ final class ScribingResearchGameTests {
         }
     
     static void itemTranslationKeysAreNotNestedUnderResearchPages(GameTestHelper helper) {
-                JsonObject english = readJson(helper, "/assets/forbiddenmagic/lang/en_us.json");
-                JsonObject russian = readJson(helper, "/assets/forbiddenmagic/lang/ru_ru.json");
+                JsonObject english = GameTestResources.readJson(helper, "/assets/forbiddenmagic/lang/en_us.json");
+                JsonObject russian = GameTestResources.readJson(helper, "/assets/forbiddenmagic/lang/ru_ru.json");
                 List<String> expected = List.of(
                     "item.forbiddenmagic.taint_coal",
                     "item.forbiddenmagic.riding_crop",
@@ -159,8 +159,8 @@ final class ScribingResearchGameTests {
             }
     
     static void researchTranslationKeysAreComplete(GameTestHelper helper) {
-            JsonObject english = readJson(helper, "/assets/forbiddenmagic/lang/en_us.json");
-            JsonObject russian = readJson(helper, "/assets/forbiddenmagic/lang/ru_ru.json");
+            JsonObject english = GameTestResources.readJson(helper, "/assets/forbiddenmagic/lang/en_us.json");
+            JsonObject russian = GameTestResources.readJson(helper, "/assets/forbiddenmagic/lang/ru_ru.json");
             List<String> researchIds = ResearchCategories.allResearch().stream()
                 .filter(item -> item.category().equals("FORBIDDEN"))
                 .map(ResearchItem::key)

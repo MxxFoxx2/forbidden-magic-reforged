@@ -316,4 +316,24 @@ final class RecipeParityGameTests {
             helper.assertTrue(research.aspectTriggers().contains(Tc4AspectAdapter.resolveAspect(FmAspects.LUST)), "lust triggers the collar research");
             helper.succeed();
         }
+
+    private static void checkIngredient(TcIngredient ingredient, List<String> missing) {
+        if (!ingredient.exists()) {
+            missing.add(ingredient.toString());
+        }
+    }
+
+    private static void checkStack(TcStack stack, List<String> missing) {
+        if (!stack.exists()) {
+            missing.add(stack.item().toString());
+        }
+    }
+
+    private static void assertResearchLayout(GameTestHelper helper, String id, int column, int row, int complexity) {
+        ResearchItem research = ResearchCategories.getResearch(id);
+        helper.assertTrue(research != null, id + " research exists");
+        helper.assertValueEqual(research.column(), column, id + " column");
+        helper.assertValueEqual(research.row(), row, id + " row");
+        helper.assertValueEqual(research.complexity(), complexity, id + " complexity");
+    }
 }

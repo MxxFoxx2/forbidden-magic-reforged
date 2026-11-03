@@ -68,7 +68,7 @@ final class ItemMechanicsGameTests {
                 state = state.advance();
             }
             for (String name : List.of("morph_pickaxe", "morph_sword", "morph_shovel", "morph_axe")) {
-                JsonObject definition = readJson(helper, "/assets/forbiddenmagic/items/" + name + ".json");
+                JsonObject definition = GameTestResources.readJson(helper, "/assets/forbiddenmagic/items/" + name + ".json");
                 JsonObject model = definition.getAsJsonObject("model");
                 JsonArray tints = model.getAsJsonArray("tints");
                 helper.assertValueEqual(tints.size(), 2, name + " has a base tint and a phase tint");
@@ -201,26 +201,26 @@ final class ItemMechanicsGameTests {
         }
     
     static void hereticTradesMatchOriginalListing(GameTestHelper helper) {
-            JsonObject level1 = readJson(helper, "/data/forbiddenmagic/trade_set/heretic/level_1.json");
+            JsonObject level1 = GameTestResources.readJson(helper, "/data/forbiddenmagic/trade_set/heretic/level_1.json");
             helper.assertValueEqual(level1.get("amount").getAsInt(), 9, "all nine heretic offers are available from the first level");
             for (int level = 2; level <= 5; level++) {
-                JsonObject set = readJson(helper, "/data/forbiddenmagic/trade_set/heretic/level_" + level + ".json");
+                JsonObject set = GameTestResources.readJson(helper, "/data/forbiddenmagic/trade_set/heretic/level_" + level + ".json");
                 helper.assertValueEqual(set.get("amount").getAsInt(), 0, "level " + level + " adds no extra offers");
             }
     
-            JsonArray pool = readJson(helper, "/data/forbiddenmagic/tags/villager_trade/heretic/pool.json").getAsJsonArray("values");
+            JsonArray pool = GameTestResources.readJson(helper, "/data/forbiddenmagic/tags/villager_trade/heretic/pool.json").getAsJsonArray("values");
             helper.assertValueEqual(pool.size(), 9, "the lust pool lists nine offers");
             Set<String> unique = new HashSet<>();
             for (var value : pool) {
                 unique.add(value.getAsString());
             }
             helper.assertValueEqual(unique.size(), 9, "the lust pool has no duplicate offers");
-            JsonArray noLustPool = readJson(helper, "/data/forbiddenmagic/tags/villager_trade/heretic/no_lust_pool.json").getAsJsonArray("values");
+            JsonArray noLustPool = GameTestResources.readJson(helper, "/data/forbiddenmagic/tags/villager_trade/heretic/no_lust_pool.json").getAsJsonArray("values");
             helper.assertValueEqual(noLustPool.size(), 8, "the no_lust pool lists eight offers");
-            JsonObject noLustLevel1 = readJson(helper, "/data/forbiddenmagic/trade_set/heretic/no_lust/level_1.json");
+            JsonObject noLustLevel1 = GameTestResources.readJson(helper, "/data/forbiddenmagic/trade_set/heretic/no_lust/level_1.json");
             helper.assertValueEqual(noLustLevel1.get("amount").getAsInt(), 9, "the no_lust profession also offers everything at once");
             for (int level = 2; level <= 5; level++) {
-                JsonObject set = readJson(helper, "/data/forbiddenmagic/trade_set/heretic/no_lust/level_" + level + ".json");
+                JsonObject set = GameTestResources.readJson(helper, "/data/forbiddenmagic/trade_set/heretic/no_lust/level_" + level + ".json");
                 helper.assertValueEqual(set.get("amount").getAsInt(), 0, "no_lust level " + level + " adds no extra offers");
             }
     
@@ -229,13 +229,13 @@ final class ItemMechanicsGameTests {
                 "emerald_skull", "emerald_ghast_tear", "emerald_glowstone"
             };
             for (String name : normal) {
-                JsonObject trade = readJson(helper, "/data/forbiddenmagic/villager_trade/heretic/" + name + ".json");
+                JsonObject trade = GameTestResources.readJson(helper, "/data/forbiddenmagic/villager_trade/heretic/" + name + ".json");
                 helper.assertValueEqual(trade.get("max_uses").getAsInt(), 7, name + " keeps the original seven uses");
                 helper.assertValueEqual(trade.get("xp").getAsInt(), 0, name + " grants no trade xp");
                 helper.assertValueEqual(trade.get("reputation_discount").getAsDouble(), 0.0, name + " has no reputation discount");
             }
             for (String name : new String[]{"emerald_profane_wand", "emerald_fire_focus"}) {
-                JsonObject trade = readJson(helper, "/data/forbiddenmagic/villager_trade/heretic/" + name + ".json");
+                JsonObject trade = GameTestResources.readJson(helper, "/data/forbiddenmagic/villager_trade/heretic/" + name + ".json");
                 helper.assertValueEqual(trade.get("max_uses").getAsInt(), 1, name + " keeps the original single use");
                 helper.assertValueEqual(trade.get("xp").getAsInt(), 0, name + " grants no trade xp");
             }
