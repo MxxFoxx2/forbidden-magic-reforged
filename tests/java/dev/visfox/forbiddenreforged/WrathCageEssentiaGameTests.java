@@ -1,6 +1,7 @@
 package dev.visfox.forbiddenreforged;
 
 import java.util.function.Consumer;
+import dev.visfox.forbiddenreforged.test.EntityGameTests;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.FunctionGameTestInstance;
@@ -12,12 +13,11 @@ import net.minecraft.resources.ResourceKey;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
-import net.neoforged.neoforge.registries.DeferredRegister;
 
 @EventBusSubscriber(modid = ForbiddenMagic.MODID)
 public final class WrathCageEssentiaGameTests {
-    public static final DeferredRegister<Consumer<GameTestHelper>> FUNCTIONS =
-        DeferredRegister.create(Registries.TEST_FUNCTION, ForbiddenMagic.MODID);
+    public static final net.neoforged.neoforge.registries.DeferredRegister<Consumer<GameTestHelper>> FUNCTIONS =
+        EntityGameTests.FUNCTIONS;
     private static final String[] TESTS = {
         "wrath_cage_essentia_capacity_gate_matches_original",
         "wrath_cage_fuel_channel_priority_matches_original",
