@@ -10,7 +10,7 @@ import java.util.Map;
  * World access, persistence, and client synchronization stay in the block entity.
  */
 final class WrathCageEssentiaStore {
-    static final int SUCTION = 128;
+    static final int SUCTION = 256;
 
     private static final int MAX_STORED = 64;
     private static final ContentId WRATH_ASPECT = ContentId.parse("forbiddenmagic:ira");
@@ -30,7 +30,7 @@ final class WrathCageEssentiaStore {
     }
 
     boolean hasRoom() {
-        return special < MAX_STORED || wrath < MAX_STORED || sloth < MAX_STORED;
+        return special < MAX_STORED && wrath < MAX_STORED && sloth < MAX_STORED;
     }
 
     int totalAmount() {

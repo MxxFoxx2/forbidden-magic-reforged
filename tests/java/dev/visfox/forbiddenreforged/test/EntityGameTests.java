@@ -177,6 +177,10 @@ public final class EntityGameTests {
         helper.assertTrue(transport.isConnectable(Direction.UP), "configured cage connects to essentia tubes");
         helper.assertTrue(transport.canInputFrom(Direction.UP), "cage accepts incoming essentia");
         helper.assertFalse(transport.canOutputTo(Direction.UP), "cage does not output essentia");
+        helper.assertValueEqual(transport.getSuctionAmount(Direction.UP), 256,
+            "cage retains the original suction strength");
+        helper.assertValueEqual(transport.getMinimumSuction(), 9000,
+            "cage retains the original minimum output suction threshold");
         helper.assertValueEqual(transport.addEssentia(Aspect.FLESH, 7, Direction.UP), 7,
             "special mob channel accepts the incoming quantity");
         helper.assertValueEqual(source.getAspects().getAmount(Aspect.FLESH), 7,
@@ -202,6 +206,16 @@ public final class EntityGameTests {
         helper.assertTrue(source.doesContainerContainAmount(Aspect.FLESH, 7), "aspect container reports stored mob essentia");
         helper.assertValueEqual(source.containerContains(Aspect.FLESH), 7, "aspect container reports exact stored amount");
         helper.assertFalse(transport.canOutputTo(Direction.DOWN), "transport remains input-only on every side");
+
+        cage.setMobId("thaumcraft:brainy_zombie");
+        helper.assertValueEqual(cage.addTransportEssentia(ContentId.parse("thaumcraft:cognitio"), 4), 4,
+            "brainy zombie essentia enters the special channel");
+        cage.setMobId("thaumcraft:giant_brainy_zombie");
+        helper.assertValueEqual(cage.essentiaAmount(ContentId.parse("thaumcraft:cognitio")), 4,
+            "changing to another mob with the same aspect preserves special essentia");
+        cage.setMobId("minecraft:zombie");
+        helper.assertValueEqual(cage.essentiaAmount(ContentId.parse("thaumcraft:cognitio")), 0,
+            "changing to a mob with a different aspect clears special essentia");
         helper.succeed();
     }
 

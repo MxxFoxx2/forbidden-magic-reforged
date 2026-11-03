@@ -48,7 +48,7 @@ public final class Tc4WrathCageBlockEntity extends WrathCageBlockEntity implemen
                 continue;
             }
             Direction side = direction.getOpposite();
-            if (transport.canOutputTo(side)) {
+            if (transport.isConnectable(side) && transport.canOutputTo(side)) {
                 inputs.add((aspect, amount) -> transport.takeEssentia(
                     Tc4AspectAdapter.resolveAspect(aspect),
                     amount,
@@ -149,7 +149,7 @@ public final class Tc4WrathCageBlockEntity extends WrathCageBlockEntity implemen
 
     @Override
     public int getMinimumSuction() {
-        return 0;
+        return 9000;
     }
 
     @Override

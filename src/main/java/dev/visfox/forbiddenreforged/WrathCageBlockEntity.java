@@ -32,7 +32,6 @@ public abstract class WrathCageBlockEntity extends BlockEntity {
     private static final int MAX_NEARBY = 6;
     private static final int SPAWN_RANGE = 4;
     private static final int SPAWN_COUNT = 3;
-    private static final int PLAYER_RANGE = 16;
 
     private final WrathCageEssentiaStore essentia = new WrathCageEssentiaStore();
     private @Nullable String mobId;
@@ -54,10 +53,11 @@ public abstract class WrathCageBlockEntity extends BlockEntity {
     }
 
     public void setMobId(@Nullable String mobId) {
-        if (!Objects.equals(this.mobId, mobId)) {
+        ContentId previousAspect = mobEssentiaType();
+        this.mobId = mobId;
+        if (!previousAspect.equals(mobEssentiaType())) {
             essentia.clearMobEssentia();
         }
-        this.mobId = mobId;
         sync();
     }
 
@@ -71,35 +71,43 @@ public abstract class WrathCageBlockEntity extends BlockEntity {
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, WrathCageBlockEntity cage) {
-        if (level.isClientSide() || !FmConfig.wrathCage()) {
+        if (level.isClientSide()) {
             return;
         }
         int cost = FmConfig.wrathCost();
+        if (level instanceof ServerLevel serverLevel
+            && FmConfig.wrathCage()
+            && !level.hasNeighborSignal(pos)) {
+            cage.tickSpawner(serverLevel, pos, cost);
+        }
         if (cost > 0 && cage.mobId != null && cage.essentia.hasRoom()) {
             cage.drawEssentia(cost);
         }
-        boolean powered = level.hasNeighborSignal(pos);
-        if (!shouldSpawn(powered, cage.mobId != null, cage.fuel, cost, cage.essentia.totalAmount())) {
+    }
+
+    private void tickSpawner(ServerLevel level, BlockPos pos, int cost) {
+        if (mobId == null) {
             return;
         }
-        if (cost > 0 && cage.fuel <= 0) {
-            WrathCageEssentiaStore.FuelChannel channel = cage.essentia.consumeFuel(cost);
+        if (cost > 0 && fuel <= 0) {
+            WrathCageEssentiaStore.FuelChannel channel = essentia.consumeFuel(cost);
             if (channel != null) {
-                cage.fuel = FmConfig.wrathEff();
-                cage.slothful = channel == WrathCageEssentiaStore.FuelChannel.SLOTH;
-                cage.sync();
+                fuel = FmConfig.wrathEff();
+                slothful = channel == WrathCageEssentiaStore.FuelChannel.SLOTH;
+                sync();
             }
         }
-        if (cage.fuel <= 0 && cost > 0) {
+        if (spawnDelay == -1) {
+            spawnDelay = nextDelay(level.getRandom(), slothful);
+        }
+        if (fuel <= 0 && cost > 0) {
             return;
         }
-        if (cage.spawnDelay > 0) {
-            cage.spawnDelay--;
+        if (spawnDelay > 0) {
+            spawnDelay--;
             return;
         }
-        if (level instanceof ServerLevel serverLevel) {
-            cage.spawnRound(serverLevel, pos);
-        }
+        spawnRound(level, pos);
     }
 
     private void drawEssentia(int cost) {
@@ -164,38 +172,38 @@ public abstract class WrathCageBlockEntity extends BlockEntity {
         return essentia.selectedAmount();
     }
 
+    static AABB nearbyEntityBounds(BlockPos pos) {
+        return new AABB(pos).inflate(SPAWN_RANGE * 2, 4.0, SPAWN_RANGE * 2);
+    }
+
     private void spawnRound(ServerLevel level, BlockPos pos) {
-        if (level.getNearestPlayer(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, PLAYER_RANGE, false) == null) {
-            return;
-        }
         net.minecraft.resources.Identifier id = mobId == null ? null : net.minecraft.resources.Identifier.tryParse(mobId);
         if (id == null || !BuiltInRegistries.ENTITY_TYPE.containsKey(id)) {
-            spawnDelay = nextDelay(level.getRandom(), slothful);
             return;
         }
         EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.getValue(id);
-        AABB nearby = new AABB(pos.getX() - 4, pos.getY() - 1, pos.getZ() - 4, pos.getX() + 5, pos.getY() + 2, pos.getZ() + 5);
+        AABB nearby = nearbyEntityBounds(pos);
         int cost = FmConfig.wrathCost();
         for (int attempt = 0; attempt < SPAWN_COUNT && (fuel > 0 || cost <= 0); attempt++) {
             Entity entity = type.create(level, EntitySpawnReason.SPAWNER);
             if (entity == null) {
-                break;
+                return;
             }
-            if (level.getEntitiesOfClass(Entity.class, nearby, other -> other.getType() == type).size() >= MAX_NEARBY) {
-                break;
+            if (level.getEntitiesOfClass(entity.getClass(), nearby).size() >= MAX_NEARBY) {
+                spawnDelay = nextDelay(level.getRandom(), slothful);
+                return;
             }
-            double x = pos.getX() + 0.5 + (level.getRandom().nextDouble() - level.getRandom().nextDouble()) * SPAWN_RANGE;
+            double x = pos.getX() + (level.getRandom().nextDouble() - level.getRandom().nextDouble()) * SPAWN_RANGE;
             double y = pos.getY() + level.getRandom().nextInt(3) - 1;
-            double z = pos.getZ() + 0.5 + (level.getRandom().nextDouble() - level.getRandom().nextDouble()) * SPAWN_RANGE;
+            double z = pos.getZ() + (level.getRandom().nextDouble() - level.getRandom().nextDouble()) * SPAWN_RANGE;
             entity.snapTo(x, y, z, level.getRandom().nextFloat() * 360.0F, 0.0F);
             if (level.noCollision(entity) && !level.containsAnyLiquid(entity.getBoundingBox())) {
                 level.addFreshEntity(entity);
-                if (fuel > 0) {
-                    fuel--;
-                }
+                level.levelEvent(2004, pos, 0);
+                fuel--;
+                spawnDelay = nextDelay(level.getRandom(), slothful);
             }
         }
-        spawnDelay = nextDelay(level.getRandom(), slothful);
     }
 
     public static ItemStack crystalForBreak(WrathCageBlockEntity cage) {
