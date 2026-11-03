@@ -4,9 +4,9 @@ Date: Tue, 3 Nov 2026 17:30:00 +0300
 Subject: [PATCH] feat: add opt-in taint origin registration
 
 ---
- .../java/thaumcraft/taint/TaintOriginRegistry.java | 57 ++++++++++++++++++++++
+ .../java/thaumcraft/taint/TaintOriginRegistry.java | 61 +++++++++++++++++++++++++
  .../java/thaumcraft/taint/TaintSpread.java         |  3 +-
- 2 files changed, 59 insertions(+), 1 deletion(-)
+ 2 files changed, 63 insertions(+), 1 deletion(-)
  create mode 100644 src/main/java/thaumcraft/taint/TaintOriginRegistry.java
 
 diff --git a/src/main/java/thaumcraft/taint/TaintOriginRegistry.java b/src/main/java/thaumcraft/taint/TaintOriginRegistry.java
@@ -14,7 +14,7 @@ new file mode 100644
 index 0000000..aa2c3f1
 --- /dev/null
 +++ b/src/main/java/thaumcraft/taint/TaintOriginRegistry.java
-@@ -0,0 +1,57 @@
+@@ -0,0 +1,61 @@
 +package thaumcraft.taint;
 +
 +import java.util.Objects;
@@ -23,7 +23,6 @@ index 0000000..aa2c3f1
 +import net.minecraft.core.BlockPos;
 +import net.minecraft.server.level.ServerLevel;
 +import net.minecraft.world.level.block.Block;
-+import net.minecraft.world.level.block.state.BlockState;
 +import net.minecraft.world.level.block.state.BlockState;
 +
 +/**

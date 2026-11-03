@@ -4,9 +4,9 @@ Date: Tue, 3 Nov 2026 17:45:00 +0300
 Subject: [PATCH] feat: add automatic progression for addon research stages
 
 ---
- .../thaumcraft/research/ResearchStageRegistry.java | 56 ++++++++++++++++++++++
+ .../thaumcraft/research/ResearchStageRegistry.java | 59 +++++++++++++++++++++++++
  .../java/thaumcraft/research/ResearchManager.java   |  2 +
- 2 files changed, 58 insertions(+)
+ 2 files changed, 61 insertions(+)
  create mode 100644 src/main/java/thaumcraft/research/ResearchStageRegistry.java
 
 diff --git a/src/main/java/thaumcraft/research/ResearchStageRegistry.java b/src/main/java/thaumcraft/research/ResearchStageRegistry.java
@@ -14,7 +14,7 @@ new file mode 100644
 index 0000000..a72db0f
 --- /dev/null
 +++ b/src/main/java/thaumcraft/research/ResearchStageRegistry.java
-@@ -0,0 +1,56 @@
+@@ -0,0 +1,59 @@
 +package thaumcraft.research;
 +
 +import java.util.List;
