@@ -66,9 +66,9 @@ def main() -> int:
                 continue
             parsed_json[path] = document
             relative = path.relative_to(resource_root)
-            if len(relative.parts) >= 3 and relative.parts[1] == "models":
-                namespace = relative.parts[0]
-                model_path = Path(*relative.parts[2:]).with_suffix("").as_posix()
+            if len(relative.parts) >= 4 and relative.parts[0] == "assets" and relative.parts[2] == "models":
+                namespace = relative.parts[1]
+                model_path = Path(*relative.parts[3:]).with_suffix("").as_posix()
                 models[(namespace, model_path)] = path
 
         assets_root = resource_root / "assets"
