@@ -27,7 +27,7 @@ The architecture checker rejects Minecraft/NeoForge/host API imports from the pu
 
 `HostAdapter` is the registration/lifecycle contract. It exposes the selected host profile, aspect-tag registration, aspect/recipe/research registration, Crystalwell mode, diagnostics, and runtime bootstrap.
 
-`HostProfile` declares feature support with explicit `NATIVE`, `ADAPTED`, `PARTIAL`, or `UNSUPPORTED` levels. Every enum feature has exactly one adapter declaration. The TC4 GameTest carries an exhaustive expected support-level matrix, and the boundary checker requires exact coverage between the enum, adapter map, and test matrix. A feature should be declared only when the adapter and tests support the claim.
+`HostProfile` advertises feature support with `NATIVE`, `ADAPTED`, `PARTIAL`, or `UNSUPPORTED` levels. It is descriptive compatibility metadata, not a runtime feature switch. An omitted entry is treated as `UNSUPPORTED` by `supportOf()`. Keep the declarations accurate; test material `PARTIAL`/`UNSUPPORTED` limitations and actual behavior rather than copying the entire metadata table into GameTests.
 
 `HostAdapterRegistry` is the capability lookup. `ForbiddenMagic` is the composition root: it installs the selected adapter before registering shared catalogs and content. Shared feature classes must not select or import a concrete adapter.
 
@@ -83,13 +83,11 @@ The silverfish configuration is passed to the host capability as an explicit opt
 
 ## Validation
 
-Every architectural slice should include all of the following:
+Use checks that match the change:
 
-1. Extend `tools/check_host_agnostic_api.py` to guard the new boundary. The checker scans all production Java files outside `integration/tc4`; the only allowed concrete-host selection is `Tc4HostAdapter` in `ForbiddenMagic`.
-2. Add GameTest coverage for the adapter capability and the preserved gameplay semantics.
-3. Run the pinned host preparation/build and the mod build.
-4. Run GameTests in both `no_lust`/Luxuria configurations.
-5. Keep artifact provenance and generated-resource checks green.
+1. Use `tools/check_host_agnostic_api.py` to guard package and import boundaries; extend it only when a real boundary changes.
+2. Add GameTests for changed runtime behavior, compatibility-sensitive paths, and meaningful host limitations. Do not mirror the full `HostProfile` metadata table in tests.
+3. For integration changes, run the pinned host preparation/build and the relevant GameTests. The full release CI gate remains responsible for provenance, generated-resource freshness, and both `no_lust` configurations.
 
 Static boundary checks catch unwanted dependencies; GameTests verify the current TC4 adapter. Neither is proof that a second host works. That claim requires an actual second adapter compiled and tested against its own compatible host version.
 
@@ -98,6 +96,6 @@ Static boundary checks catch unwanted dependencies; GameTests verify the current
 - Keep semantic IDs and content definitions in `core/`; resolve them to host objects only in the concrete adapter.
 - Do not add host API imports to shared gameplay, common facades, or capability contracts.
 - Prefer a new narrow capability over adding unrelated methods to an existing contract.
-- Add/adjust `HostProfile.Feature` declarations and tests whenever support changes.
+- Update `HostProfile` when host support materially changes. Test the important `PARTIAL`/`UNSUPPORTED` limitations and affected behavior instead of adding a test for every metadata entry.
 - Keep Minecraft/NeoForge version tracks separate. Do not combine incompatible host versions in one source set or binary.
 - Record partial or non-equivalent host behavior as `PARTIAL` and document the gap rather than silently approximating it.

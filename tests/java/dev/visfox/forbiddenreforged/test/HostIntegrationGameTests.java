@@ -63,105 +63,12 @@ final class HostIntegrationGameTests {
 
     static void hostAdapterRegistryExposesTc4Profile(GameTestHelper helper) {
         HostProfile profile = HostAdapterRegistry.require().profile();
-        assertTc4FeatureSupport(helper, profile);
         helper.assertValueEqual(profile.id(), ContentId.parse("host:tc4-reforged"), "selected host profile id");
         helper.assertValueEqual(profile.hostVersion(), "1.1.2", "selected host dependency version");
         helper.assertValueEqual(profile.minecraftVersion(), "26.3", "selected Minecraft version");
         helper.assertTrue(
-            profile.supportOf(HostProfile.Feature.ASPECT_REGISTRATION).level() == HostProfile.SupportLevel.ADAPTED,
-            "aspect registration is exposed through the adapter"
-        );
-        helper.assertTrue(
-            profile.supportOf(HostProfile.Feature.ASPECT_RECIPE_DERIVATION).level() == HostProfile.SupportLevel.ADAPTED,
-            "custom aspect component recipes are declared by the selected adapter"
-        );
-        helper.assertTrue(
-            profile.supportOf(HostProfile.Feature.ASPECT_SCAN_TARGETS).level() == HostProfile.SupportLevel.ADAPTED,
-            "host aspect scan-target registration is declared by the adapter"
-        );
-        helper.assertTrue(
             profile.supportOf(HostProfile.Feature.RESEARCH_STAGES).level() == HostProfile.SupportLevel.PARTIAL,
             "multi-stage research limitations are declared by the adapter"
-        );
-        helper.assertTrue(
-            profile.supportOf(HostProfile.Feature.RUNTIME_BOOTSTRAP).level() == HostProfile.SupportLevel.ADAPTED,
-            "runtime bootstrap is declared by the selected adapter"
-        );
-        helper.assertTrue(
-            profile.supportOf(HostProfile.Feature.ASPECT_DIAGNOSTICS).level() == HostProfile.SupportLevel.ADAPTED,
-            "aspect diagnostics are declared by the selected adapter"
-        );
-        helper.assertTrue(
-            profile.supportOf(HostProfile.Feature.ASPECT_PRESENTATION).level() == HostProfile.SupportLevel.ADAPTED,
-            "host aspect presentation is declared by the selected adapter"
-        );
-        helper.assertTrue(
-            profile.supportOf(HostProfile.Feature.MORPH_TOOL_RUNTIME).level() == HostProfile.SupportLevel.ADAPTED,
-            "morph-tool runtime behavior is declared by the selected adapter"
-        );
-        helper.assertTrue(
-            profile.supportOf(HostProfile.Feature.WAND_INSPECTION).level() == HostProfile.SupportLevel.ADAPTED,
-            "wand and focus inspection is declared by the selected adapter"
-        );
-        helper.assertTrue(
-            profile.supportOf(HostProfile.Feature.WAND_VIS_STORAGE).level() == HostProfile.SupportLevel.ADAPTED,
-            "wand and real Vis operations are declared by the selected adapter"
-        );
-        helper.assertTrue(
-            profile.supportOf(HostProfile.Feature.ACCESSORY_INTEGRATION).level() == HostProfile.SupportLevel.ADAPTED,
-            "host accessory slot access is declared by the selected adapter"
-        );
-        helper.assertTrue(
-            profile.supportOf(HostProfile.Feature.TAINT_BLOCK_SERVICES).level() == HostProfile.SupportLevel.ADAPTED,
-            "taint block and shovel behavior is declared by the selected adapter"
-        );
-        helper.assertTrue(
-            profile.supportOf(HostProfile.Feature.ENCHANTMENT_EFFECTS).level() == HostProfile.SupportLevel.ADAPTED,
-            "host-specific enchantment effects are declared by the selected adapter"
-        );
-        helper.assertTrue(
-            profile.supportOf(HostProfile.Feature.SCRIBING_RUNTIME).level() == HostProfile.SupportLevel.ADAPTED,
-            "Scribing Well runtime behavior is declared by the selected adapter"
-        );
-        helper.assertTrue(
-            profile.supportOf(HostProfile.Feature.ITEM_PROPERTIES).level() == HostProfile.SupportLevel.ADAPTED,
-            "host-specific item-property customization is declared by the selected adapter"
-        );
-        helper.assertTrue(
-            profile.supportOf(HostProfile.Feature.ITEM_FACTORIES).level() == HostProfile.SupportLevel.ADAPTED,
-            "host-backed item factories are declared by the selected adapter"
-        );
-        helper.assertTrue(
-            profile.supportOf(HostProfile.Feature.BLOCK_ENTITY_IMPLEMENTATION).level() == HostProfile.SupportLevel.ADAPTED,
-            "host block entity implementation is declared by the selected adapter"
-        );
-        helper.assertTrue(
-            profile.supportOf(HostProfile.Feature.ESSENTIA_STORAGE).level() == HostProfile.SupportLevel.ADAPTED,
-            "Wrath Cage essentia storage is declared by the selected adapter"
-        );
-        helper.assertTrue(
-            profile.supportOf(HostProfile.Feature.ESSENTIA_TRANSPORT).level() == HostProfile.SupportLevel.ADAPTED,
-            "Wrath Cage essentia transport is declared by the selected adapter"
-        );
-        helper.assertTrue(
-            profile.supportOf(HostProfile.Feature.ENTITY_ASPECTS).level() == HostProfile.SupportLevel.ADAPTED,
-            "the selected host declares its entity aspect catalog"
-        );
-        helper.assertTrue(
-            profile.supportOf(HostProfile.Feature.ENTITY_CLASSIFICATION).level() == HostProfile.SupportLevel.ADAPTED,
-            "host entity classification predicates are declared by the selected adapter"
-        );
-        helper.assertTrue(
-            profile.supportOf(HostProfile.Feature.WAND_RODS).level() == HostProfile.SupportLevel.ADAPTED,
-            "host wand rod registration is declared by the selected adapter"
-        );
-        helper.assertTrue(
-            profile.supportOf(HostProfile.Feature.WAND_CAPS).level() == HostProfile.SupportLevel.ADAPTED,
-            "host wand cap registration is declared by the selected adapter"
-        );
-        helper.assertTrue(
-            profile.supportOf(HostProfile.Feature.WAND_PARTS).level() == HostProfile.SupportLevel.ADAPTED,
-            "host wand part replacement is declared by the selected adapter"
         );
         ItemStack wandPartsProbe = thaumcraft.wand.Wands.create(
             thaumcraft.wand.WandRegistry.CAP_THAUMIUM,
@@ -178,40 +85,12 @@ final class HostIntegrationGameTests {
             "the host wand-parts adapter replaces the rod while preserving wand data"
         );
         helper.assertTrue(
-            profile.supportOf(HostProfile.Feature.WAND_TRIGGERS).level() == HostProfile.SupportLevel.ADAPTED,
-            "host wand triggers are declared by the selected adapter"
-        );
-        helper.assertTrue(
-            profile.supportOf(HostProfile.Feature.WARP_POOLS).level() == HostProfile.SupportLevel.ADAPTED,
-            "host warp pool integration is declared by the selected adapter"
-        );
-        helper.assertTrue(
-            profile.supportOf(HostProfile.Feature.STICKY_WARP).level() == HostProfile.SupportLevel.ADAPTED,
-            "sticky warp semantics are declared by the selected adapter"
-        );
-        helper.assertTrue(
             profile.supportOf(HostProfile.Feature.TAINT_ORIGINS).level() == HostProfile.SupportLevel.UNSUPPORTED,
             "unimplemented host taint-origin integration remains explicitly unsupported"
         );
         helper.assertTrue(
             profile.supportOf(HostProfile.Feature.OPTIONAL_ENCHANTMENT_INTEGRATION).level() == HostProfile.SupportLevel.PARTIAL,
             "optional enchantment integration declares its conditional availability"
-        );
-        helper.assertTrue(
-            HostAdapterRegistry.requireBootstrap() != null,
-            "the selected host exposes its bootstrap and creative-tab services"
-        );
-        helper.assertTrue(
-            HostAdapterRegistry.requireAspects() != null,
-            "the selected host exposes aspect presentation services"
-        );
-        helper.assertTrue(
-            HostAdapterRegistry.requireMorphTools() != null,
-            "the selected host exposes morph-tool services"
-        );
-        helper.assertTrue(
-            HostAdapterRegistry.requireBlockEntities() != null,
-            "the selected host exposes block-entity services"
         );
         var wrathCageBridge = HostAdapterRegistry.requireBlockEntities().createWrathCageBlockEntity(
             net.minecraft.core.BlockPos.ZERO,
@@ -225,18 +104,6 @@ final class HostIntegrationGameTests {
             wrathCageBridge instanceof thaumcraft.essentia.EssentiaTransport,
             "Wrath Cage exposes the host essentia transport contract"
         );
-        helper.assertTrue(
-            HostAdapterRegistry.requireWandInspection() != null,
-            "the selected host exposes wand and focus inspection"
-        );
-        helper.assertTrue(
-            HostAdapterRegistry.requireWandVis() != null,
-            "the selected host exposes Vis operations"
-        );
-        helper.assertTrue(
-            HostAdapterRegistry.requireAccessories() != null,
-            "the selected host exposes accessory slot access"
-        );
         helper.assertFalse(
             HostAdapterRegistry.requireWandInspection().isWand(new ItemStack(Items.AIR)),
             "the host wand inspection rejects a non-wand item"
@@ -244,22 +111,6 @@ final class HostIntegrationGameTests {
         helper.assertTrue(
             HostAdapterRegistry.requireWandInspection().wandRodTag(new ItemStack(Items.AIR)) == null,
             "the host wand rod tag is nullable for a non-wand item"
-        );
-        helper.assertTrue(
-            HostAdapterRegistry.requireTaintBlocks() != null,
-            "the selected host exposes taint block and shovel services"
-        );
-        helper.assertTrue(
-            HostAdapterRegistry.requireEnchantmentEffects() != null,
-            "the selected host exposes host-specific enchantment effects"
-        );
-        helper.assertTrue(
-            HostAdapterRegistry.requireScribing() != null,
-            "the selected host exposes Scribing Well services"
-        );
-        helper.assertTrue(
-            HostAdapterRegistry.requireWarp() != null,
-            "the selected host exposes semantic warp mutation services"
         );
         ItemStack contractProbe = new ItemStack(Items.STICK);
         helper.assertTrue(
@@ -276,14 +127,6 @@ final class HostIntegrationGameTests {
         helper.assertTrue(
             FmWandContractAccess.INSTANCE.remaining(contractProbe) == null,
             "the common Profane Contract component adapter clears completed progress"
-        );
-        helper.assertTrue(
-            HostAdapterRegistry.requireEntityAspects() != null,
-            "the selected host exposes its entity aspect catalog"
-        );
-        helper.assertTrue(
-            HostAdapterRegistry.requireEntityClassification() != null,
-            "the selected host exposes entity classification services"
         );
         helper.assertValueEqual(
             FmSpawnerMobs.aspect("thaumcraft:firebat"),
@@ -312,14 +155,6 @@ final class HostIntegrationGameTests {
         helper.assertTrue(
             mobIds.equals(mobIds.stream().sorted().toList()),
             "the host entity catalog produces a stable sorted Mob Crystal list"
-        );
-        helper.assertTrue(
-            HostAdapterRegistry.requireItemProperties() != null,
-            "the selected host exposes item-property services"
-        );
-        helper.assertTrue(
-            HostAdapterRegistry.requireItemFactories() != null,
-            "the selected host exposes item-factory services"
         );
         helper.assertTrue(
             !HostAdapterRegistry.requireScribing().primalAspectIds().isEmpty(),
@@ -580,53 +415,5 @@ final class HostIntegrationGameTests {
         helper.succeed();
     }
 
-    static void assertTc4FeatureSupport(GameTestHelper helper, HostProfile profile) {
-        Map<HostProfile.Feature, HostProfile.SupportLevel> expected = Map.ofEntries(
-            Map.entry(HostProfile.Feature.ASPECT_REGISTRATION, HostProfile.SupportLevel.ADAPTED),
-            Map.entry(HostProfile.Feature.ASPECT_RECIPE_DERIVATION, HostProfile.SupportLevel.ADAPTED),
-            Map.entry(HostProfile.Feature.ASPECT_SCAN_TARGETS, HostProfile.SupportLevel.ADAPTED),
-            Map.entry(HostProfile.Feature.ASPECT_DIAGNOSTICS, HostProfile.SupportLevel.ADAPTED),
-            Map.entry(HostProfile.Feature.ASPECT_PRESENTATION, HostProfile.SupportLevel.ADAPTED),
-            Map.entry(HostProfile.Feature.RUNTIME_BOOTSTRAP, HostProfile.SupportLevel.ADAPTED),
-            Map.entry(HostProfile.Feature.MORPH_TOOL_RUNTIME, HostProfile.SupportLevel.ADAPTED),
-            Map.entry(HostProfile.Feature.WAND_INSPECTION, HostProfile.SupportLevel.ADAPTED),
-            Map.entry(HostProfile.Feature.ACCESSORY_INTEGRATION, HostProfile.SupportLevel.ADAPTED),
-            Map.entry(HostProfile.Feature.TAINT_BLOCK_SERVICES, HostProfile.SupportLevel.ADAPTED),
-            Map.entry(HostProfile.Feature.ENCHANTMENT_EFFECTS, HostProfile.SupportLevel.ADAPTED),
-            Map.entry(HostProfile.Feature.SCRIBING_RUNTIME, HostProfile.SupportLevel.ADAPTED),
-            Map.entry(HostProfile.Feature.ITEM_PROPERTIES, HostProfile.SupportLevel.ADAPTED),
-            Map.entry(HostProfile.Feature.ITEM_FACTORIES, HostProfile.SupportLevel.ADAPTED),
-            Map.entry(HostProfile.Feature.BLOCK_ENTITY_IMPLEMENTATION, HostProfile.SupportLevel.ADAPTED),
-            Map.entry(HostProfile.Feature.RESEARCH_ENTRIES, HostProfile.SupportLevel.ADAPTED),
-            Map.entry(HostProfile.Feature.RESEARCH_STAGES, HostProfile.SupportLevel.PARTIAL),
-            Map.entry(HostProfile.Feature.ARCANE_RECIPES, HostProfile.SupportLevel.ADAPTED),
-            Map.entry(HostProfile.Feature.CRAFTING_RECIPE_REFERENCES, HostProfile.SupportLevel.ADAPTED),
-            Map.entry(HostProfile.Feature.CRUCIBLE_RECIPES, HostProfile.SupportLevel.ADAPTED),
-            Map.entry(HostProfile.Feature.INFUSION_RECIPES, HostProfile.SupportLevel.ADAPTED),
-            Map.entry(HostProfile.Feature.INFUSION_ENCHANTMENTS, HostProfile.SupportLevel.ADAPTED),
-            Map.entry(HostProfile.Feature.WAND_RODS, HostProfile.SupportLevel.ADAPTED),
-            Map.entry(HostProfile.Feature.WAND_CAPS, HostProfile.SupportLevel.ADAPTED),
-            Map.entry(HostProfile.Feature.WAND_TRIGGERS, HostProfile.SupportLevel.ADAPTED),
-            Map.entry(HostProfile.Feature.OPTIONAL_ENCHANTMENT_INTEGRATION, HostProfile.SupportLevel.PARTIAL),
-            Map.entry(HostProfile.Feature.WAND_VIS_STORAGE, HostProfile.SupportLevel.ADAPTED),
-            Map.entry(HostProfile.Feature.WAND_PARTS, HostProfile.SupportLevel.ADAPTED),
-            Map.entry(HostProfile.Feature.FOCI_OR_SPELLS, HostProfile.SupportLevel.ADAPTED),
-            Map.entry(HostProfile.Feature.ESSENTIA_STORAGE, HostProfile.SupportLevel.ADAPTED),
-            Map.entry(HostProfile.Feature.ESSENTIA_TRANSPORT, HostProfile.SupportLevel.ADAPTED),
-            Map.entry(HostProfile.Feature.WARP_POOLS, HostProfile.SupportLevel.ADAPTED),
-            Map.entry(HostProfile.Feature.STICKY_WARP, HostProfile.SupportLevel.ADAPTED),
-            Map.entry(HostProfile.Feature.TAINT_ORIGINS, HostProfile.SupportLevel.UNSUPPORTED),
-            Map.entry(HostProfile.Feature.ENTITY_ASPECTS, HostProfile.SupportLevel.ADAPTED),
-            Map.entry(HostProfile.Feature.ENTITY_CLASSIFICATION, HostProfile.SupportLevel.ADAPTED)
-        );
-        helper.assertValueEqual(expected.size(), HostProfile.Feature.values().length,
-            "every HostProfile feature has exactly one expected support level");
-        for (Map.Entry<HostProfile.Feature, HostProfile.SupportLevel> feature : expected.entrySet()) {
-            helper.assertValueEqual(
-                profile.supportOf(feature.getKey()).level(),
-                feature.getValue(),
-                "TC4 host feature support: " + feature.getKey()
-            );
-        }
-    }
+
 }
