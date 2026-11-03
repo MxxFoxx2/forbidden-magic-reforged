@@ -58,7 +58,7 @@ final class ItemMechanicsGameTests {
         helper.assertValueEqual(recipe.aspects().getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER)), 8, "nether cost");
         helper.assertValueEqual(recipe.components().size(), 4, "four components");
         helper.succeed();
-        }
+    }
     
     static void morphPhaseTintsMatchOriginal(GameTestHelper helper) {
         MorphState state = MorphState.EMPTY;
@@ -77,7 +77,7 @@ final class ItemMechanicsGameTests {
             helper.assertValueEqual(tints.get(1).getAsJsonObject().get("type").getAsString(), "forbiddenmagic:morph_phase", name + " overlay tint uses the phase source");
         }
         helper.succeed();
-        }
+    }
     
     static void toolAndSkullAxeChanceRulesPreserveOriginalBoundaries(GameTestHelper helper) {
         helper.assertValueEqual(FmToolEvents.taintPickaxeSpeed(0.0F), 0.0F, "zero-hardness blocks remain instant");
@@ -114,7 +114,7 @@ final class ItemMechanicsGameTests {
         helper.assertFalse(FmToolEvents.cancelsInfernalDamage(new ItemStack(Items.STICK), true),
             "ordinary items do not cancel fire damage");
         helper.succeed();
-        }
+    }
     
     static void silverfishEmeraldDropThresholdsMatchOriginal(GameTestHelper helper) {
         helper.assertTrue(FmEnchantmentEffects.silverfishEmeraldRoll(true, 2, 0), "Windswept Hills includes roll 2 at Looting 0");
@@ -127,7 +127,7 @@ final class ItemMechanicsGameTests {
         helper.assertTrue(FmEnchantmentEffects.silverfishEmeraldRoll(false, 4, 1), "other biomes add three per Looting level");
         helper.assertFalse(FmEnchantmentEffects.silverfishEmeraldRoll(false, 5, 1), "other biomes exclude the next roll");
         helper.succeed();
-        }
+    }
     
     static void subcollarPlacesOnAnotherPlayerAndStoresDamageVis(GameTestHelper helper) {
         if (FmConfig.lustDisabled()) {
@@ -155,7 +155,7 @@ final class ItemMechanicsGameTests {
         FmToolEvents.collarDamage(target, 2.0F, attacker);
         helper.assertValueEqual(VisStorage.getAllVis(worn).visSize(), 15, "a crop attacker adds three more doses");
         helper.succeed();
-        }
+    }
     
     static void ridingCropEffectsMatchOriginal(GameTestHelper helper) {
         ItemStack crop = new ItemStack(FmItems.RIDING_CROP.get());
@@ -198,7 +198,7 @@ final class ItemMechanicsGameTests {
         helper.assertTrue(mountSpeed != null && mountSpeed.getDuration() == 200 && mountSpeed.getAmplifier() == 5, "right-click while riding gives the mount speed 200 at amplifier 5");
         helper.assertValueEqual(mount.getHealth(), health - 1.0F, "right-click while riding deals one damage to the mount");
         helper.succeed();
-        }
+    }
     
     static void hereticTradesMatchOriginalListing(GameTestHelper helper) {
         JsonObject level1 = GameTestResources.readJson(helper, "/data/forbiddenmagic/trade_set/heretic/level_1.json");
@@ -240,7 +240,7 @@ final class ItemMechanicsGameTests {
             helper.assertValueEqual(trade.get("xp").getAsInt(), 0, name + " grants no trade xp");
         }
         helper.succeed();
-        }
+    }
     
     static void wrathShardFormulaMatchesOriginal(GameTestHelper helper) {
         helper.assertValueEqual(FmDrops.heldWrathDamage(new ItemStack(Items.WOODEN_SWORD)), 4, "wooden sword adds four wrath");
@@ -254,7 +254,7 @@ final class ItemMechanicsGameTests {
         helper.assertTrue(FmDrops.wrathEligible(helper.spawn(EntityTypes.ZOMBIE, new BlockPos(2, 4, 2))), "hostile mobs are eligible");
         helper.assertFalse(FmDrops.wrathEligible(helper.spawn(EntityTypes.PIG, new BlockPos(4, 4, 4))), "passive animals are not eligible");
         helper.succeed();
-        }
+    }
     
     static void witchwoodRequiresArsMagica(GameTestHelper helper) {
         boolean am2 = ModList.get().isLoaded("arsmagica2");
@@ -263,5 +263,5 @@ final class ItemMechanicsGameTests {
         helper.assertValueEqual(ResearchCategories.getResearch("ROD_witchwood") != null, am2, "the witchwood research exists only with Ars Magica 2");
         helper.assertValueEqual(ResearchCategories.getResearch("ROD_witchwood_staff") != null, am2, "the witchwood staff research exists only with Ars Magica 2");
         helper.succeed();
-        }
+    }
 }

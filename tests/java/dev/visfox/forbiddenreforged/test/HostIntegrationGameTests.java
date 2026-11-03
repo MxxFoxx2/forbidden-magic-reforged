@@ -59,7 +59,7 @@ final class HostIntegrationGameTests {
             Identifier.parse("minecraft:diamond"),
             "vanilla item identifiers pass through unchanged");
         helper.succeed();
-        }
+    }
     
     static void hostAdapterRegistryExposesTc4Profile(GameTestHelper helper) {
         HostProfile profile = HostAdapterRegistry.require().profile();
@@ -352,7 +352,7 @@ final class HostIntegrationGameTests {
         helper.assertValueEqual(FmAspects.NETHER, ContentId.parse("forbiddenmagic:infernus"),
             "custom aspects are exposed as host-neutral content IDs");
         helper.succeed();
-        }
+    }
     
     static void profaneWandBehaviorUsesCorePorts(GameTestHelper helper) {
         ServerPlayer player = GameTestPlayers.connected(helper);
@@ -425,7 +425,7 @@ final class HostIntegrationGameTests {
         helper.assertTrue(warpKinds.stream().allMatch(kind -> kind == WarpKind.STICKY),
             "Profane Wand requests sticky warp for every contract penalty");
         helper.succeed();
-        }
+    }
     
     static void commonRecipeCatalogMatchesTc4Registration(GameTestHelper helper) {
         ForbiddenMagicRecipeCatalog.Options options = new ForbiddenMagicRecipeCatalog.Options(
@@ -455,7 +455,7 @@ final class HostIntegrationGameTests {
         helper.assertValueEqual(translatedKeys.size(), definitions.size(),
             "every common recipe definition must have a unique host recipe key");
         helper.succeed();
-        }
+    }
     
     static void commonResearchCatalogMatchesTc4Registration(GameTestHelper helper) {
         ForbiddenMagicResearchCatalog.Options options = new ForbiddenMagicResearchCatalog.Options(
@@ -510,7 +510,7 @@ final class HostIntegrationGameTests {
         helper.assertValueEqual(translatedKeys.size(), definitions.size(),
             "every common research definition must have a unique TC4 key");
         helper.succeed();
-        }
+    }
     
     static void researchCatalogPreservesFlagsPagesAndProgression(GameTestHelper helper) {
         ForbiddenMagicResearchCatalog.Options options = new ForbiddenMagicResearchCatalog.Options(
@@ -556,7 +556,7 @@ final class HostIntegrationGameTests {
         helper.assertTrue(ResearchCategories.getResearch("ROD_silverwood") != null,
             "mixed-case ROD_silverwood parent resolves");
         helper.succeed();
-        }
+    }
     
     static void tc4WarpAdapterPreservesSemanticTypesAndItemCosts(GameTestHelper helper) {
         helper.assertValueEqual(Tc4WarpAdapter.toHostType(WarpKind.PERMANENT), WarpType.PERMANENT,
@@ -578,7 +578,7 @@ final class HostIntegrationGameTests {
         helper.assertValueEqual(Warp.get(player, WarpType.STICKY), stickyBefore + 1,
             "common warp request must reach the TC4 runtime adapter");
         helper.succeed();
-        }
+    }
 
     private static void assertTc4FeatureSupport(GameTestHelper helper, HostProfile profile) {
         Map<HostProfile.Feature, HostProfile.SupportLevel> expected = Map.ofEntries(

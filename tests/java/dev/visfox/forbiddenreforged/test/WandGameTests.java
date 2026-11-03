@@ -71,7 +71,7 @@ final class WandGameTests {
         helper.assertTrue(Wands.isWand(wand), "tainted wand is created");
         helper.assertValueEqual(Wands.getRod(wand).tag(), "tainted", "created wand uses the tainted rod");
         helper.succeed();
-        }
+    }
     
     static void blinkFocusUpgradesUseOriginalIconAssets(GameTestHelper helper) {
         helper.assertValueEqual(Tc4BlinkFocusItem.HELLFIRE.icon(),
@@ -83,7 +83,7 @@ final class WandGameTests {
         helper.assertTrue(ForbiddenMagic.class.getResourceAsStream("/assets/forbiddenmagic/textures/misc/pandemonium.png") != null,
             "Pandemonium icon asset is bundled");
         helper.succeed();
-        }
+    }
     
     static void alchemicalCapAndEquivalentRodMatchOriginal(GameTestHelper helper) {
         WandCap cap = WandRegistry.findCap("alchemical");
@@ -123,7 +123,7 @@ final class WandGameTests {
             && Wands.getCap(stack).tag().equals("void") && Wands.getRod(stack).tag().equals("equivalent")),
             "equivalent wand is present in the creative tab");
         helper.succeed();
-        }
+    }
     
     static void creativeWandFamilyMatchesOriginal(GameTestHelper helper) {
         WandRod neutronium = WandRegistry.findRod("neutronium");
@@ -175,7 +175,7 @@ final class WandGameTests {
             helper.assertValueEqual(Wands.getVis(profaneWand, aspect), 5000, "profane creative wand starts with 5000 " + aspect);
         }
         helper.succeed();
-        }
+    }
     
     static void wandTooltipKindsPreserveOriginalHints(GameTestHelper helper) {
         helper.assertValueEqual(FmToolEvents.wandTooltipKind("neutronium"), "creativeonly",
@@ -206,7 +206,7 @@ final class WandGameTests {
         helper.assertValueEqual(FmToolEvents.wandTooltipKind(taintedWand), "",
             "ordinary registered wand stacks have no special tooltip");
         helper.succeed();
-        }
+    }
     
     static void infernalAndTaintedWandDamageBehaviorsMatchOriginal(GameTestHelper helper) {
         WandRod tainted = WandRegistry.findRod("tainted");
@@ -245,7 +245,7 @@ final class WandGameTests {
                 "the TC4 adapter must resolve every semantic ID to a primal aspect");
         }
         helper.succeed();
-        }
+    }
     
     static void hellfireTriggerTargetsNetherrackAndObsidian(GameTestHelper helper) {
         helper.assertTrue(WandTriggers.hasTrigger(Blocks.NETHERRACK.defaultBlockState()),
@@ -255,7 +255,7 @@ final class WandGameTests {
         helper.assertTrue(ResearchCategories.getResearch("HELLFIRE") != null,
             "the trigger's HELLFIRE research gate must exist");
         helper.succeed();
-        }
+    }
     
     static void hellfireBehaviorUsesHostNeutralAccess(GameTestHelper helper) {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
@@ -325,7 +325,7 @@ final class WandGameTests {
         helper.assertTrue(helper.getLevel().getBlockState(absolutePosition.above()).is(Blocks.FIRE),
             "Hellfire places fire above the clicked block");
         helper.succeed();
-        }
+    }
     
     static void blinkFocusHellfireAppliesThroughFocalManipulator(GameTestHelper helper) {
         BlockPos tablePos = new BlockPos(2, 2, 2);
@@ -366,7 +366,7 @@ final class WandGameTests {
         FocusItem focusItem = (FocusItem) focus.getItem();
         helper.assertTrue(focusItem.isUpgradedWith(focus, Tc4BlinkFocusItem.HELLFIRE), "Hellfire was not stored on the focus");
         helper.succeed();
-        }
+    }
     
     static void blinkFocusReachesBeyondWandReachAndLandsLikeOriginal(GameTestHelper helper) {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
@@ -397,7 +397,7 @@ final class WandGameTests {
     
         helper.getLevel().removeBlock(targetBlock, false);
         helper.succeed();
-        }
+    }
     
     static void wandVisAndPartsUseNeutralAccessPorts(GameTestHelper helper) {
         WandRod tainted = WandRegistry.findRod("tainted");
@@ -441,5 +441,5 @@ final class WandGameTests {
         helper.assertValueEqual(Wands.getCap(wand).tag(), "thaumium",
             "rod replacement preserves the existing cap");
         helper.succeed();
-        }
+    }
 }

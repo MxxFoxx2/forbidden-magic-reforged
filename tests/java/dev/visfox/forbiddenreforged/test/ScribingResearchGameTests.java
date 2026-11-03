@@ -59,7 +59,7 @@ final class ScribingResearchGameTests {
         ItemStack forkStack = new ItemStack(FmItems.DIABOLIST_FORK.get());
         helper.assertValueEqual(forkStack.getItem().getDestroySpeed(forkStack, Blocks.COBWEB.defaultBlockState()), 1.0F, "the fork always digs at speed 1");
         helper.succeed();
-        }
+    }
     
     static void crystalwellIsAScribingToolWithOriginalDurability(GameTestHelper helper) {
         ItemStack stack = new ItemStack(FmItems.CRYSTALWELL.get());
@@ -69,7 +69,7 @@ final class ScribingResearchGameTests {
         helper.assertValueEqual(stack.getMaxDamage(), expectedMaxDamage, "crystalwell durability follows research difficulty");
         helper.assertValueEqual(stack.getCount(), 1, "crystalwell is unstackable");
         helper.succeed();
-        }
+    }
     
     static void primewellIsAPermanentEpicScribingTool(GameTestHelper helper) {
         ItemStack stack = new ItemStack(FmItems.PRIMEWELL.get());
@@ -81,7 +81,7 @@ final class ScribingResearchGameTests {
         helper.assertFalse(stack.getItem().isBarVisible(stack), "primewell does not display a misleading durability bar");
         helper.assertTrue(stack.getDamageValue() < stack.getMaxDamage(), "primewell remains usable after repeated scribe operations");
         helper.succeed();
-        }
+    }
     
     static void scribeWellsKeepOriginalRecipesAndResearch(GameTestHelper helper) {
         ShapelessArcaneRecipe crystalwell = (ShapelessArcaneRecipe) TcRecipes.get("CRYSTALWELL");
@@ -103,7 +103,7 @@ final class ScribingResearchGameTests {
                 "the hard recipe uses balanced shards");
         }
         helper.succeed();
-        }
+    }
     
     static void itemTranslationKeysAreNotNestedUnderResearchPages(GameTestHelper helper) {
             JsonObject english = GameTestResources.readJson(helper, "/assets/forbiddenmagic/lang/en_us.json");
@@ -156,7 +156,7 @@ final class ScribingResearchGameTests {
                 }
             }
             helper.succeed();
-        }
+    }
     
     static void researchTranslationKeysAreComplete(GameTestHelper helper) {
         JsonObject english = GameTestResources.readJson(helper, "/assets/forbiddenmagic/lang/en_us.json");
@@ -213,7 +213,7 @@ final class ScribingResearchGameTests {
         helper.assertTrue(english.keySet().equals(russian.keySet()),
             "English and Russian translation key sets must match");
         helper.succeed();
-        }
+    }
     
     static void scribeWellAspectIdsStaySemantic(GameTestHelper helper) {
         Set<ContentId> expected = Set.of(
@@ -235,7 +235,7 @@ final class ScribingResearchGameTests {
         helper.assertValueEqual(Tc4ScribingAdapter.isNoResearchDifficulty(), Config.researchDifficulty() == -1,
             "no-research mode remains sourced from the host config");
         helper.succeed();
-        }
+    }
     
     static void crystalwellResearchPageMatchesDifficulty(GameTestHelper helper) {
         ResearchItem item = ResearchCategories.getResearch("CRYSTALWELL");
@@ -251,7 +251,7 @@ final class ScribingResearchGameTests {
         helper.assertValueEqual(textPages.size(), 1, "crystalwell exposes one behavior page");
         helper.assertValueEqual(textPages.get(0), expected, "crystalwell page follows research difficulty");
         helper.succeed();
-        }
+    }
     
     static void researchPrefixRespectsTagResearch(GameTestHelper helper) {
         ResearchItem item = new Tc4ResearchItem("TEST", "FORBIDDEN", new AspectList(), 0, 0, 1,
@@ -261,7 +261,7 @@ final class ScribingResearchGameTests {
             : "tc.research_text.TEST";
         helper.assertValueEqual(item.textKey(), expected, "research text key follows tagResearch config");
         helper.succeed();
-        }
+    }
     
     static void researchIconsResolveToRealContent(GameTestHelper helper) {
         List<String> broken = new ArrayList<>();
@@ -279,5 +279,5 @@ final class ScribingResearchGameTests {
         }
         helper.assertTrue(broken.isEmpty(), "research icons must resolve to a real item or texture: " + broken);
         helper.succeed();
-        }
+    }
 }

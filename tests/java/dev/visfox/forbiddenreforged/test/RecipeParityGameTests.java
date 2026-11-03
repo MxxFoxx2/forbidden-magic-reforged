@@ -57,7 +57,7 @@ final class RecipeParityGameTests {
         }
         helper.assertTrue(missing.isEmpty(), "unresolved recipe references: " + missing);
         helper.succeed();
-        }
+    }
     
     static void chainFromNetherrackToWrathShard(GameTestHelper helper) {
         ServerPlayer player = GameTestPlayers.connected(helper);
@@ -74,7 +74,7 @@ final class RecipeParityGameTests {
         helper.assertTrue(skullAxe != null, "skull axe recipe registered");
         helper.assertValueEqual(skullAxe.aspects().getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.WRATH)), 8, "skull axe costs eight ira");
         helper.succeed();
-        }
+    }
     
     static void enchantmentRecipesCoverFive(GameTestHelper helper) {
         for (String key : new String[]{"WRATH", "GREEDY", "CONSUMING", "EDUCATIONAL", "CORRUPTING"}) {
@@ -87,7 +87,7 @@ final class RecipeParityGameTests {
         helper.assertValueEqual(wrath.instability(), 8, "wrath instability");
         helper.assertValueEqual(wrath.aspects().getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.WRATH)), 16, "wrath aspect cost");
         helper.succeed();
-        }
+    }
     
     static void morphRecipesMatchTheOriginal(GameTestHelper helper) {
         for (String key : new String[]{"MORPHPICK", "MORPHSWORD", "MORPHSHOVEL", "MORPHAXE"}) {
@@ -102,7 +102,7 @@ final class RecipeParityGameTests {
         InfusionEnchantmentRecipe voidtouched = (InfusionEnchantmentRecipe) TcRecipes.get("VOIDTOUCHED");
         helper.assertValueEqual(voidtouched.aspects().getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.ENVY)), 24, "voidtouched envy cost");
         helper.succeed();
-        }
+    }
     
     static void materialsHaveCraftingRecipes(GameTestHelper helper) {
         var manager = helper.getLevel().getServer().getRecipeManager();
@@ -111,7 +111,7 @@ final class RecipeParityGameTests {
             helper.assertTrue(manager.byKey(key).isPresent(), name + " recipe must load");
         }
         helper.succeed();
-        }
+    }
     
     static void plantResearchAndRecipes(GameTestHelper helper) {
         ResearchItem tree = ResearchCategories.getResearch("TAINTTREE");
@@ -139,7 +139,7 @@ final class RecipeParityGameTests {
             "the linked black ink crafting recipe loads");
     
         helper.succeed();
-        }
+    }
     
     static void wandRodRecipesRegistered(GameTestHelper helper) {
         InfusionRecipe taintedRod = (InfusionRecipe) TcRecipes.get("ROD_TAINTED");
@@ -151,7 +151,7 @@ final class RecipeParityGameTests {
         helper.assertValueEqual(infernalRod.instability(), 5, "infernal rod instability");
         helper.assertValueEqual(infernalRod.aspects().getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER)), 32, "infernal rod nether cost");
         helper.succeed();
-        }
+    }
     
     static void taintstoneResearchAndArcaneRecipe(GameTestHelper helper) {
         ResearchItem research = ResearchCategories.getResearch("TAINTSTONE");
@@ -182,7 +182,7 @@ final class RecipeParityGameTests {
         helper.assertTrue(brick instanceof CraftingRecipeRef ref, "brick recipe is registered as a reference");
         helper.assertValueEqual(((CraftingRecipeRef) brick).recipe(), ForbiddenMagic.id("taint_stone_brick"), "brick recipe id");
         helper.succeed();
-        }
+    }
     
     static void emeraldTransmutationMatchesOriginal(GameTestHelper helper) {
         if (!FmConfig.emeraldTrans()) {
@@ -207,7 +207,7 @@ final class RecipeParityGameTests {
         helper.assertValueEqual(research.pages().size(), 2, "transmutation research has text and crucible pages");
         helper.assertTrue(research.isSecondary() && research.isConcealed(), "transmutation research retains secondary/concealed status");
         helper.succeed();
-        }
+    }
     
     static void oreDictionaryEntriesBecameTags(GameTestHelper helper) {
         TagKey<Item> netherStars = TagKey.create(Registries.ITEM, Identifier.parse("c:nether_stars"));
@@ -220,7 +220,7 @@ final class RecipeParityGameTests {
         helper.assertTrue(recipe != null, "taint stone recipe exists");
         helper.assertTrue(recipe.grid().get(4).test(new ItemStack(FmItems.DEADLY_SHARDS.get("taint").get())), "the arcane centre accepts the taint shard tag");
         helper.succeed();
-        }
+    }
     
     static void ringFoodRecipeMatchesOriginal(GameTestHelper helper) {
         TcRecipe base = TcRecipes.get("RINGFOOD");
@@ -234,7 +234,7 @@ final class RecipeParityGameTests {
         helper.assertValueEqual(recipe.grid().size(), 9, "RingFood has a 3x3 ingredient grid");
         helper.assertTrue(recipe.grid().get(4).exists(), "mundane ring is the center ingredient");
         helper.succeed();
-        }
+    }
     
     static void researchLayoutMatchesOriginal(GameTestHelper helper) {
         assertResearchLayout(helper, "MORPHTOOLS", -9, -3, 3);
@@ -269,7 +269,7 @@ final class RecipeParityGameTests {
         helper.assertTrue(profaneRod.isHidden(), "Profane Rod research remains hidden");
         helper.assertTrue(profaneRod.isStub(), "Profane Rod research remains a stub");
         helper.succeed();
-        }
+    }
     
     static void warpValuesMatchOriginal(GameTestHelper helper) {
         helper.assertValueEqual(ResearchCategories.getResearch("ROD_infernal").warp(), 2, "infernal rod research warp");
@@ -282,7 +282,7 @@ final class RecipeParityGameTests {
         helper.assertValueEqual(Warp.getItemWarp(new ItemStack(FmBlocks.WRATH_CAGE.get())), 5, "wrath cage item warp");
         helper.assertValueEqual(Warp.getItemWarp(new ItemStack(FmBlocks.TAINT_SAPLING.get())), 1, "taint sapling item warp");
         helper.succeed();
-        }
+    }
     
     static void subcollarMatchesOriginal(GameTestHelper helper) {
         if (FmConfig.lustDisabled()) {
@@ -317,7 +317,7 @@ final class RecipeParityGameTests {
         helper.assertTrue(research.isHidden(), "collar research is hidden");
         helper.assertTrue(research.aspectTriggers().contains(Tc4AspectAdapter.resolveAspect(FmAspects.LUST)), "lust triggers the collar research");
         helper.succeed();
-        }
+    }
 
     private static void checkIngredient(TcIngredient ingredient, List<String> missing) {
         if (!ingredient.exists()) {

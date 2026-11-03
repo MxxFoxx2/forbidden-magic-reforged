@@ -41,7 +41,7 @@ final class ItemRegistrationGameTests {
         helper.assertValueEqual(BuiltInRegistries.ITEM.getKey(stack.getItem()), Identifier.parse("forbiddenmagic:taint_coal"), "taint coal id");
         helper.assertTrue(stack.has(DataComponents.COOKING_FUEL), "taint coal is a fuel");
         helper.succeed();
-        }
+    }
     
     static void taintCoalBurnTimeVariesWithinOriginalRange(GameTestHelper helper) {
         ItemStack stack = new ItemStack(FmItems.TAINT_COAL.get());
@@ -59,21 +59,21 @@ final class ItemRegistrationGameTests {
         helper.assertTrue(drawn.size() > 1, "burn time must be drawn per use, not a constant");
         helper.assertTrue(ItemStack.CODEC.encodeStart(NbtOps.INSTANCE, stack).result().isPresent(), "taint coal must serialize its fuel component");
         helper.succeed();
-        }
+    }
     
     static void emeraldFragmentIsRegistered(GameTestHelper helper) {
         ItemStack stack = new ItemStack(FmItems.EMERALD_FRAGMENT.get());
         helper.assertFalse(stack.isEmpty(), "emerald fragment must exist");
         helper.assertValueEqual(BuiltInRegistries.ITEM.getKey(stack.getItem()), Identifier.parse("forbiddenmagic:emerald_fragment"), "emerald fragment id");
         helper.succeed();
-        }
+    }
     
     static void ridingCropIsRegisteredAsSword(GameTestHelper helper) {
         Item crop = BuiltInRegistries.ITEM.getValue(Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, "riding_crop"));
         helper.assertTrue(crop != Items.AIR, "riding crop must be registered");
         helper.assertTrue(crop instanceof RidingCropItem, "riding crop must be RidingCropItem");
         helper.succeed();
-        }
+    }
     
     static void creativeTabIsRegisteredWithForkIcon(GameTestHelper helper) {
         CreativeModeTab tab = BuiltInRegistries.CREATIVE_MODE_TAB.get(ForbiddenMagic.id("forbidden"))
@@ -82,7 +82,7 @@ final class ItemRegistrationGameTests {
         helper.assertTrue(tab != null, "the addon registers its own creative tab");
         helper.assertValueEqual(tab.getIconItem().getItem(), FmItems.DIABOLIST_FORK.get(), "the tab icon is the diabolist fork");
         helper.succeed();
-        }
+    }
     
     static void creativeTabListsEveryRegisteredItem(GameTestHelper helper) {
         List<ItemStack> stacks = dev.visfox.forbiddenreforged.FmCreativeTab.stacks();
@@ -105,7 +105,7 @@ final class ItemRegistrationGameTests {
         long unique = stacks.stream().map(stack -> stack.getItem() + "#" + stack.getComponents()).distinct().count();
         helper.assertValueEqual(stacks.size(), (int) unique, "no duplicate entries in the tab list");
         helper.succeed();
-        }
+    }
     
     static void orichalcumCapIsRegistered(GameTestHelper helper) {
         thaumcraft.wand.WandCap cap = WandRegistry.findCap("orichalcum");
@@ -114,7 +114,7 @@ final class ItemRegistrationGameTests {
         helper.assertValueEqual(cap.craftCost(), 1000, "orichalcum craft cost is 1000");
         helper.assertTrue(cap.specialAspects().isEmpty(), "orichalcum has no special aspects");
         helper.succeed();
-        }
+    }
     
     static void diabolistForkSwitchesToTheSporkModel(GameTestHelper helper) {
         JsonObject definition = GameTestResources.readJson(helper, "/assets/forbiddenmagic/items/diabolist_fork.json");
@@ -127,7 +127,7 @@ final class ItemRegistrationGameTests {
         helper.assertValueEqual(spork.getAsJsonObject("textures").get("layer0").getAsString(), "forbiddenmagic:item/spork", "spork model uses the spork texture");
         helper.assertTrue(ForbiddenMagic.class.getResourceAsStream("/assets/forbiddenmagic/textures/item/spork.png") != null, "spork texture ships with the mod");
         helper.succeed();
-        }
+    }
     
     static void lustShardSwitchesToTheDespairModel(GameTestHelper helper) {
         JsonObject definition = GameTestResources.readJson(helper, "/assets/forbiddenmagic/items/lust_shard.json");
@@ -140,7 +140,7 @@ final class ItemRegistrationGameTests {
         helper.assertValueEqual(despair.getAsJsonObject("textures").get("layer0").getAsString(), "forbiddenmagic:item/despair_shard", "despair model uses the despair texture");
         helper.assertTrue(ForbiddenMagic.class.getResourceAsStream("/assets/forbiddenmagic/textures/item/despair_shard.png") != null, "despair texture ships with the mod");
         helper.succeed();
-        }
+    }
     
     static void ringOfNutritionOnlyWorksInRingSlots(GameTestHelper helper) {
         ServerPlayer player = GameTestPlayers.connected(helper);
@@ -166,5 +166,5 @@ final class ItemRegistrationGameTests {
         Baubles.set(player, 3, ring.copy());
         helper.assertFalse(FmToolEvents.hasNutritionRingInRingSlot(player), "belt slot does not activate Ring of Nutrition");
         helper.succeed();
-        }
+    }
 }
