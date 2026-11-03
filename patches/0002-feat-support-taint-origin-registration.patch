@@ -24,6 +24,7 @@ index 0000000..aa2c3f1
 +import net.minecraft.server.level.ServerLevel;
 +import net.minecraft.world.level.block.Block;
 +import net.minecraft.world.level.block.state.BlockState;
++import net.minecraft.world.level.block.state.BlockState;
 +
 +/**
 + * Opt-in extension point for add-ons that provide their own taint source blocks.
@@ -61,11 +62,19 @@ index 0000000..aa2c3f1
 +        int distance = Math.abs(origin.getX() - target.getX())
 +            + Math.abs(origin.getY() - target.getY())
 +            + Math.abs(origin.getZ() - target.getZ());
-+        if (distance != 1 || !TaintSpread.spreadFibres(level, target)) {
++        if (distance != 1) {
 +            return false;
 +        }
-+        TaintBiomes.set(level, target, TaintBiomes.TAINTED_LAND);
-+        return true;
++        BlockState previous = level.getBlockState(target);
++        if (!TaintSpread.spreadFibres(level, target)) {
++            return false;
++        }
++        if (!TaintBiomes.isTainted(level, target)
++            && !TaintBiomes.set(level, target, TaintBiomes.TAINTED_LAND)) {
++            level.setBlockAndUpdate(target, previous);
++            return false;
++        }
++        return TaintBiomes.isTainted(level, target);
 +    }
 +}
 diff --git a/src/main/java/thaumcraft/taint/TaintSpread.java b/src/main/java/thaumcraft/taint/TaintSpread.java
