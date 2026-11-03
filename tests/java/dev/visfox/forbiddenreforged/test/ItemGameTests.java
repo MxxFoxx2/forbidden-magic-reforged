@@ -333,6 +333,44 @@ public final class ItemGameTests {
     }
 
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void additionalWandCapsAndItemsMatchOriginal(GameTestHelper helper) {
+        String[] capTags = {"vinteum", "manasteel", "elementium", "terrasteel"};
+        float[] multipliers = {0.9F, 0.9F, 0.8F, 1.8F};
+        int[] craftCosts = {6, 6, 9, 1};
+        for (int index = 0; index < capTags.length; index++) {
+            thaumcraft.wand.WandCap cap = WandRegistry.findCap(capTags[index]);
+            helper.assertTrue(cap != null, capTags[index] + " cap must be registered");
+            helper.assertValueEqual(cap.baseCostModifier(), multipliers[index], capTags[index] + " vis multiplier");
+            helper.assertValueEqual(cap.craftCost(), craftCosts[index], capTags[index] + " craft cost");
+            helper.assertTrue(cap.specialAspects().isEmpty(), capTags[index] + " has no special aspects");
+        }
+        Item[] items = {
+            FmItems.VINTEUM_CAP.get(), FmItems.TERRASTEEL_CAP.get(), FmItems.MANASTEEL_CAP.get(),
+            FmItems.MANASTEEL_INERT_CAP.get(), FmItems.ELEMENTIUM_CAP.get(), FmItems.ELEMENTIUM_INERT_CAP.get()
+        };
+        String[] itemIds = {
+            "vinteum_cap", "terrasteel_cap", "manasteel_cap",
+            "manasteel_inert_cap", "elementium_cap", "elementium_inert_cap"
+        };
+        for (int index = 0; index < items.length; index++) {
+            helper.assertValueEqual(BuiltInRegistries.ITEM.getKey(items[index]), ForbiddenMagic.id(itemIds[index]), itemIds[index] + " item id");
+            helper.assertValueEqual(new ItemStack(items[index]).getMaxStackSize(), 64, itemIds[index] + " stack size");
+            JsonObject model = readJson(helper, "/assets/forbiddenmagic/models/item/" + itemIds[index] + ".json");
+            helper.assertValueEqual(model.getAsJsonObject("textures").get("layer0").getAsString(),
+                "forbiddenmagic:item/" + itemIds[index], itemIds[index] + " item model texture");
+            helper.assertTrue(ForbiddenMagic.class.getResourceAsStream(
+                "/assets/forbiddenmagic/textures/item/" + itemIds[index] + ".png") != null,
+                itemIds[index] + " item texture ships with the mod");
+        }
+        for (String skin : new String[]{"vinteum", "manasteel", "elementium", "terrasteel"}) {
+            helper.assertTrue(ForbiddenMagic.class.getResourceAsStream(
+                "/assets/forbiddenmagic/textures/model/wand_cap_" + skin + ".png") != null,
+                skin + " wand cap renderer texture ships with the mod");
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void diabolistForkSwitchesToTheSporkModel(GameTestHelper helper) {
         JsonObject definition = readJson(helper, "/assets/forbiddenmagic/models/item/diabolist_fork.json");
         helper.assertValueEqual(definition.getAsJsonObject("textures").get("layer0").getAsString(), "forbiddenmagic:item/diabolist_fork", "base model is the ordinary fork");

@@ -214,5 +214,11 @@
   "tc.research_text.WRATHCAGE": "Бесконечная битва",
   "tooltip.creativeonly": "Только для творческого режима",
   "tooltip.profane_contract": "Контракт: %s",
-  "item.forbiddenmagic.tainted_blood_shard": "Заражённый кровавый осколок"
+  "item.forbiddenmagic.tainted_blood_shard": "Заражённый кровавый осколок",
+  "item.forbiddenmagic.vinteum_cap": "Колпачок жезла из винтеума",
+  "item.forbiddenmagic.terrasteel_cap": "Колпачок жезла из террастали",
+  "item.forbiddenmagic.manasteel_cap": "Колпачок жезла из манастали",
+  "item.forbiddenmagic.manasteel_inert_cap": "Инертный колпачок жезла из манастали",
+  "item.forbiddenmagic.elementium_cap": "Колпачок жезла из элементия",
+  "item.forbiddenmagic.elementium_inert_cap": "Инертный колпачок жезла из элементия"
 }

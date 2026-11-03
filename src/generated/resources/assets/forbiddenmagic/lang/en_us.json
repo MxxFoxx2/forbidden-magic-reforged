@@ -214,5 +214,11 @@
   "tc.research_text.WRATHCAGE": "Neverending battle",
   "tooltip.creativeonly": "Creative Only",
   "tooltip.profane_contract": "Contract: %s",
-  "item.forbiddenmagic.tainted_blood_shard": "Tainted Blood Shard"
+  "item.forbiddenmagic.tainted_blood_shard": "Tainted Blood Shard",
+  "item.forbiddenmagic.vinteum_cap": "Vinteum Wand Cap",
+  "item.forbiddenmagic.terrasteel_cap": "Terrasteel Wand Cap",
+  "item.forbiddenmagic.manasteel_cap": "Manasteel Wand Cap",
+  "item.forbiddenmagic.manasteel_inert_cap": "Inert Manasteel Wand Cap",
+  "item.forbiddenmagic.elementium_cap": "Elementium Wand Cap",
+  "item.forbiddenmagic.elementium_inert_cap": "Inert Elementium Wand Cap"
 }

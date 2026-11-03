@@ -393,7 +393,7 @@ public final class FmGameTests {
             "foreign host namespaces cannot enter the shared rod mutation contract");
 
         var caps = WandMaterialCatalog.caps();
-        helper.assertValueEqual(caps.size(), 2, "both custom wand caps are catalogued");
+        helper.assertValueEqual(caps.size(), 6, "all six wand cap definitions are catalogued");
         helper.assertTrue(caps.stream().anyMatch(cap ->
                 cap.tag().equals("alchemical") && cap.multiplier() == 0.9F
                     && cap.discount() == 0.8F && cap.cost() == 7
@@ -403,6 +403,26 @@ public final class FmGameTests {
                 cap.tag().equals("orichalcum") && cap.multiplier() == 0.0F
                     && cap.discount() == 0.0F && cap.aspects().isEmpty()),
             "Orichalcum cap retains its zero-cost creative profile");
+        helper.assertTrue(caps.stream().anyMatch(cap ->
+                cap.tag().equals("vinteum") && cap.multiplier() == 0.9F
+                    && cap.discount() == 0.0F && cap.cost() == 6 && cap.aspects().isEmpty()
+                    && cap.item().equals(ContentId.parse("forbiddenmagic:vinteum_cap"))),
+            "Vinteum cap retains its original material, item and tuning");
+        helper.assertTrue(caps.stream().anyMatch(cap ->
+                cap.tag().equals("manasteel") && cap.multiplier() == 0.9F
+                    && cap.discount() == 0.0F && cap.cost() == 6 && cap.aspects().isEmpty()
+                    && cap.item().equals(ContentId.parse("forbiddenmagic:manasteel_cap"))),
+            "Manasteel cap retains its original material, item and tuning");
+        helper.assertTrue(caps.stream().anyMatch(cap ->
+                cap.tag().equals("elementium") && cap.multiplier() == 0.8F
+                    && cap.discount() == 0.0F && cap.cost() == 9 && cap.aspects().isEmpty()
+                    && cap.item().equals(ContentId.parse("forbiddenmagic:elementium_cap"))),
+            "Elementium cap retains its original material, item and tuning");
+        helper.assertTrue(caps.stream().anyMatch(cap ->
+                cap.tag().equals("terrasteel") && cap.multiplier() == 1.8F
+                    && cap.discount() == 0.0F && cap.cost() == 1 && cap.aspects().isEmpty()
+                    && cap.item().equals(ContentId.parse("forbiddenmagic:terrasteel_cap"))),
+            "Terrasteel cap retains its original material, item and tuning");
         helper.succeed();
     }
 

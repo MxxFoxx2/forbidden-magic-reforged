@@ -41,6 +41,12 @@ taint_pickaxe = "Кирка искажения"
 crystalwell = "Кристальная чернильница с пером"
 primewell = "Первобытные письменные инструменты"
 blink_focus = "Набалдашник: Телепортация"
+vinteum_cap = "Колпачок жезла из винтеума"
+terrasteel_cap = "Колпачок жезла из террастали"
+manasteel_cap = "Колпачок жезла из манастали"
+manasteel_inert_cap = "Инертный колпачок жезла из манастали"
+elementium_cap = "Колпачок жезла из элементия"
+elementium_inert_cap = "Инертный колпачок жезла из элементия"
 
 sub_collar = "Ошейник боли"
 [item.Wand.tainted]

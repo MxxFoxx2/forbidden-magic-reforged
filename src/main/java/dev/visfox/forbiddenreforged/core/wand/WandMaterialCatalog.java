@@ -85,7 +85,19 @@ public final class WandMaterialCatalog {
                 id(MOD, "textures/model/wand_cap_orichalcum.png")),
             new CapDefinition("alchemical", 0.9F, List.of(id(MOD, "concept/water")), 0.8F,
                 id(MOD, "alchemical_cap"), 7,
-                id(MOD, "textures/model/wand_cap_alchemical.png"))
+                id(MOD, "textures/model/wand_cap_alchemical.png")),
+            new CapDefinition("vinteum", 0.9F, List.of(), 0.0F,
+                id(MOD, "vinteum_cap"), 6,
+                id(MOD, "textures/model/wand_cap_vinteum.png")),
+            new CapDefinition("manasteel", 0.9F, List.of(), 0.0F,
+                id(MOD, "manasteel_cap"), 6,
+                id(MOD, "textures/model/wand_cap_manasteel.png")),
+            new CapDefinition("elementium", 0.8F, List.of(), 0.0F,
+                id(MOD, "elementium_cap"), 9,
+                id(MOD, "textures/model/wand_cap_elementium.png")),
+            new CapDefinition("terrasteel", 1.8F, List.of(), 0.0F,
+                id(MOD, "terrasteel_cap"), 1,
+                id(MOD, "textures/model/wand_cap_terrasteel.png"))
         );
     }
 
