@@ -5,6 +5,7 @@ This file tracks the 1.21.1 backport-specific checks separately from the 26.3 fi
 ## Restored behavior and metadata
 
 - FORK uses the Infernus/NETHER aspect for its infusion cost and research requirement.
+- Bacon aspect parity: `#forbiddenmagic:item_bacon` receives FLESH 6, LIFE 6, ENERGY 6, BEAST 4, and GULA 6, matching the original `itemBacon` mapping. The tag is intentionally empty in this mod's data so other mods can contribute their bacon items.
 - WRATHCAGE depends on FORK; TAINTSHOVEL and ROD_tainted use the restored research aspects and prerequisite paths; ROD_profane uses the round research icon.
 - Ring of Nutrition only triggers from Baubles ring slots 1 and 2. The amulet and belt slots do not activate its food bonus.
 - Blink Focus Hellfire and Pandemonium upgrades point at their original icon textures, included in the resource pack.
@@ -17,8 +18,8 @@ This file tracks the 1.21.1 backport-specific checks separately from the 26.3 fi
 - (g) Silverfish spawner aspect is config-dependent (GREED iff general.silverfish_emeralds, else BEAST).
 - (h) general.garbage_blocks config drives FmEnchantmentEffects.isGarbage.
 
-Still deferred on this target: (c) Tainted Blood Shard, (d) itemBacon tag, (e) smelting bonus (inert in the original), (f) six additional wand caps.
+Still deferred on this target: (c) Tainted Blood Shard, (e) smelting bonus (inert in the original), (f) six additional wand caps.
 
 ## Automated coverage
 
-GameTests check Witchwood updater registration, its tick intervals and mana-cost rules, and the Ring of Nutrition ring-slot predicate. These tests do not replace a client run to visually verify item models, focus-upgrade icons, and research-browser pages.
+GameTests check Witchwood updater registration, its tick intervals and mana-cost rules, the Ring of Nutrition ring-slot predicate, and the `item_bacon` tag plus its aspect mapping for every tagged member. These tests do not replace a client run to visually verify item models, focus-upgrade icons, and research-browser pages.
