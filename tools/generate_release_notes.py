@@ -44,7 +44,7 @@ def render_release_notes(
     lines = [
         f"Version {release_version} for Minecraft {mc_version}",
         "",
-        f"{chr(96)}{source_sha[:7]}{chr(96)}: {commit_subject}",
+        f"\x60{source_sha[:7]}\x60: {commit_subject}",
     ]
     if compare_url:
         lines += ["", f"[Changes since previous build]({compare_url})"]
