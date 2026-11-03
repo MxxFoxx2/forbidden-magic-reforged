@@ -17,7 +17,7 @@ This file tracks the 1.21.1 backport-specific checks separately from the 26.3 fi
 - (g) Silverfish spawner aspect is config-dependent (GREED iff general.silverfish_emeralds, else BEAST).
 - (h) general.garbage_blocks config drives FmEnchantmentEffects.isGarbage.
 
-Still deferred on this target: (c) Tainted Blood Shard, (d) itemBacon tag, (e) smelting bonus (inert in the original), (f) six additional wand caps, (i) mobcrystal creative tab.
+Still deferred on this target: (c) Tainted Blood Shard, (d) itemBacon tag, (e) smelting bonus (inert in the original), (f) six additional wand caps.
 
 ## Automated coverage
 
