@@ -42,6 +42,12 @@ primewell = "Primal Scribing Tools"
 blink_focus = "Wand Focus: Blink"
 
 alchemical_cap = "Alchemical Wand Cap"
+vinteum_cap = "Vinteum Wand Cap"
+terrasteel_cap = "Terrasteel Wand Cap"
+manasteel_cap = "Manasteel Wand Cap"
+manasteel_inert_cap = "Inert Manasteel Wand Cap"
+elementium_cap = "Elementium Wand Cap"
+elementium_inert_cap = "Inert Elementium Wand Cap"
 equivalent_rod = "Equivalent Wand Rod"
 sub_collar = "Collar of Pain"
 [item.Wand.tainted]

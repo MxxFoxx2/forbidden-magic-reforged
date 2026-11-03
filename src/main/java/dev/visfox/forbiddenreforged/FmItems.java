@@ -35,6 +35,12 @@ public final class FmItems {
     public static final DeferredItem<Item> TAINT_FRUIT;
     public static final DeferredItem<Item> RING_NUTRITION;
     public static final DeferredItem<Item> ALCHEMICAL_CAP;
+    public static final DeferredItem<Item> VINTEUM_CAP;
+    public static final DeferredItem<Item> TERRASTEEL_CAP;
+    public static final DeferredItem<Item> MANASTEEL_CAP;
+    public static final DeferredItem<Item> MANASTEEL_INERT_CAP;
+    public static final DeferredItem<Item> ELEMENTIUM_CAP;
+    public static final DeferredItem<Item> ELEMENTIUM_INERT_CAP;
     public static final DeferredItem<Item> EQUIVALENT_ROD;
     public static final DeferredItem<Item> TAINTED_ROD;
     public static final DeferredItem<Item> INFERNAL_ROD;
@@ -78,6 +84,12 @@ public final class FmItems {
         RING_NUTRITION = register("ring_nutrition", factories::createRingNutrition,
             itemProperties -> itemProperties.stacksTo(1));
         ALCHEMICAL_CAP = ITEMS.registerSimpleItem("alchemical_cap");
+        VINTEUM_CAP = ITEMS.registerSimpleItem("vinteum_cap");
+        TERRASTEEL_CAP = ITEMS.registerSimpleItem("terrasteel_cap");
+        MANASTEEL_CAP = ITEMS.registerSimpleItem("manasteel_cap");
+        MANASTEEL_INERT_CAP = ITEMS.registerSimpleItem("manasteel_inert_cap");
+        ELEMENTIUM_CAP = ITEMS.registerSimpleItem("elementium_cap");
+        ELEMENTIUM_INERT_CAP = ITEMS.registerSimpleItem("elementium_inert_cap");
         EQUIVALENT_ROD = ITEMS.registerSimpleItem("equivalent_rod");
         TAINTED_ROD = ITEMS.registerSimpleItem("tainted_rod");
         INFERNAL_ROD = ITEMS.registerSimpleItem("infernal_rod");
