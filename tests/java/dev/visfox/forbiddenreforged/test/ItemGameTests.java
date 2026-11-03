@@ -185,6 +185,42 @@ public final class ItemGameTests {
     }
 
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void taintedBloodShardDropMatchesOriginalConditions(GameTestHelper helper) {
+        helper.assertTrue(FmDrops.taintedBloodShardRoll(true, true, 2, 0.0D),
+            "a tainted mob killed by a direct player attack drops on a successful 50% roll");
+        helper.assertTrue(FmDrops.taintedBloodShardRoll(true, true, 2, 0.499999D),
+            "rolls below 0.5 drop the shard");
+        helper.assertFalse(FmDrops.taintedBloodShardRoll(true, true, 2, 0.5D),
+            "the exact 0.5 boundary does not drop the shard");
+        helper.assertFalse(FmDrops.taintedBloodShardRoll(true, true, 1, 0.0D),
+            "Weakness I is insufficient");
+        helper.assertFalse(FmDrops.taintedBloodShardRoll(true, true, -1, 0.0D),
+            "the absence of Weakness is insufficient");
+        helper.assertFalse(FmDrops.taintedBloodShardRoll(false, true, 2, 0.0D),
+            "non-tainted mobs never drop the shard");
+        helper.assertFalse(FmDrops.taintedBloodShardRoll(true, false, 2, 0.0D),
+            "non-player damage never drops the shard");
+
+        ItemStack shard = new ItemStack(FmItems.TAINTED_BLOOD_SHARD.get());
+        helper.assertFalse(shard.isEmpty(), "tainted blood shard item must be registered");
+        helper.assertValueEqual(
+            BuiltInRegistries.ITEM.getKey(shard.getItem()),
+            ResourceLocation.parse("forbiddenmagic:tainted_blood_shard"),
+            "tainted blood shard registry id"
+        );
+        helper.assertTrue(FmCreativeTab.stacks().stream().anyMatch(stack -> stack.is(FmItems.TAINTED_BLOOD_SHARD.get())),
+            "tainted blood shard appears in the Forbidden Magic creative tab");
+
+        JsonObject model = readJson(helper, "/assets/forbiddenmagic/models/item/tainted_blood_shard.json");
+        helper.assertValueEqual(
+            model.getAsJsonObject("textures").get("layer0").getAsString(),
+            "forbiddenmagic:item/tainted_blood_shard",
+            "tainted blood shard uses its original animated texture"
+        );
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void ridingCropIsRegisteredAsSword(GameTestHelper helper) {
         Item crop = BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(ForbiddenMagic.MODID, "riding_crop"));
         helper.assertTrue(crop != Items.AIR, "riding crop must be registered");
@@ -551,6 +587,7 @@ public final class ItemGameTests {
             JsonObject russian = readJson(helper, "/assets/forbiddenmagic/lang/ru_ru.json");
             List<String> expected = List.of(
                 "item.forbiddenmagic.taint_coal",
+                "item.forbiddenmagic.tainted_blood_shard",
                 "item.forbiddenmagic.riding_crop",
                 "item.forbiddenmagic.black_dye",
                 "item.forbiddenmagic.taint_fruit",
