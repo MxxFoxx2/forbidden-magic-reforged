@@ -77,6 +77,8 @@ import dev.visfox.forbiddenreforged.FmDrops;
 import dev.visfox.forbiddenreforged.FmItems;
 import dev.visfox.forbiddenreforged.FmCreativeTab;
 import dev.visfox.forbiddenreforged.FmConfig;
+import dev.visfox.forbiddenreforged.FmSpawnerMobs;
+import dev.visfox.forbiddenreforged.MobCrystalItem;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4ResearchItem;
 import dev.visfox.forbiddenreforged.MorphState;
 import dev.visfox.forbiddenreforged.FmEnchantmentEffects;
@@ -185,6 +187,42 @@ public final class ItemGameTests {
     }
 
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void taintedBloodShardDropMatchesOriginalConditions(GameTestHelper helper) {
+        helper.assertTrue(FmDrops.taintedBloodShardRoll(true, true, 2, 0.0D),
+            "a tainted mob killed by a direct player attack drops on a successful 50% roll");
+        helper.assertTrue(FmDrops.taintedBloodShardRoll(true, true, 2, 0.499999D),
+            "rolls below 0.5 drop the shard");
+        helper.assertFalse(FmDrops.taintedBloodShardRoll(true, true, 2, 0.5D),
+            "the exact 0.5 boundary does not drop the shard");
+        helper.assertFalse(FmDrops.taintedBloodShardRoll(true, true, 1, 0.0D),
+            "Weakness I is insufficient");
+        helper.assertFalse(FmDrops.taintedBloodShardRoll(true, true, -1, 0.0D),
+            "the absence of Weakness is insufficient");
+        helper.assertFalse(FmDrops.taintedBloodShardRoll(false, true, 2, 0.0D),
+            "non-tainted mobs never drop the shard");
+        helper.assertFalse(FmDrops.taintedBloodShardRoll(true, false, 2, 0.0D),
+            "non-player damage never drops the shard");
+
+        ItemStack shard = new ItemStack(FmItems.TAINTED_BLOOD_SHARD.get());
+        helper.assertFalse(shard.isEmpty(), "tainted blood shard item must be registered");
+        helper.assertValueEqual(
+            BuiltInRegistries.ITEM.getKey(shard.getItem()),
+            ResourceLocation.parse("forbiddenmagic:tainted_blood_shard"),
+            "tainted blood shard registry id"
+        );
+        helper.assertTrue(FmCreativeTab.stacks().stream().anyMatch(stack -> stack.is(FmItems.TAINTED_BLOOD_SHARD.get())),
+            "tainted blood shard appears in the Forbidden Magic creative tab");
+
+        JsonObject model = readJson(helper, "/assets/forbiddenmagic/models/item/tainted_blood_shard.json");
+        helper.assertValueEqual(
+            model.getAsJsonObject("textures").get("layer0").getAsString(),
+            "forbiddenmagic:item/tainted_blood_shard",
+            "tainted blood shard uses its original animated texture"
+        );
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void ridingCropIsRegisteredAsSword(GameTestHelper helper) {
         Item crop = BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(ForbiddenMagic.MODID, "riding_crop"));
         helper.assertTrue(crop != Items.AIR, "riding crop must be registered");
@@ -232,8 +270,12 @@ public final class ItemGameTests {
             listed.add(stack.getItem());
         }
         for (var holder : FmItems.ITEMS.getEntries()) {
-            helper.assertTrue(listed.contains(holder.get()), "the tab is missing the item " + holder.getId());
+            if (holder.get() != FmItems.MOB_CRYSTAL.get()) {
+                helper.assertTrue(listed.contains(holder.get()), "the tab is missing the item " + holder.getId());
+            }
         }
+        helper.assertTrue(stacks.stream().noneMatch(stack -> stack.is(FmItems.MOB_CRYSTAL.get())),
+            "Mob Crystals belong to their dedicated tab, not the main Forbidden Magic tab");
         for (var holder : dev.visfox.forbiddenreforged.FmBlocks.BLOCKS.getEntries()) {
             Item blockItem = holder.get().asItem();
             if (blockItem != Items.AIR) {
@@ -242,6 +284,41 @@ public final class ItemGameTests {
         }
         long unique = stacks.stream().map(stack -> stack.getItem() + "#" + stack.getComponents()).distinct().count();
         helper.assertValueEqual(stacks.size(), (int) unique, "no duplicate entries in the tab list");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void mobCrystalCreativeTabMatchesLegacyConfigAndContents(GameTestHelper helper) {
+        CreativeModeTab tab = BuiltInRegistries.CREATIVE_MODE_TAB.get(ForbiddenMagic.id("mobcrystal"));
+        if (!FmConfig.wrathCage()) {
+            helper.assertTrue(tab == null, "the Mob Crystal tab is absent when Wrath Cage is disabled");
+            helper.assertTrue(FmCreativeTab.mobCrystalStacks().isEmpty(),
+                "disabled Wrath Cage exposes no Mob Crystal creative entries");
+            helper.succeed();
+            return;
+        }
+
+        helper.assertTrue(tab != null, "the Mob Crystal tab is registered when Wrath Cage is enabled");
+        helper.assertValueEqual(tab.getIconItem().getItem(), FmItems.MOB_CRYSTAL.get(),
+            "the Mob Crystal tab uses the crystal as its icon");
+
+        List<ItemStack> crystals = FmCreativeTab.mobCrystalStacks();
+        helper.assertValueEqual(crystals.size(), FmSpawnerMobs.ids().size() + 1,
+            "the dedicated tab contains one empty crystal and every supported mob imprint");
+        helper.assertTrue(crystals.get(0).is(FmItems.MOB_CRYSTAL.get()),
+            "the first entry is the empty crystal");
+        helper.assertTrue(MobCrystalItem.mob(crystals.get(0)) == null,
+            "the first entry has no mob imprint");
+
+        Set<String> expectedMobs = new HashSet<>(FmSpawnerMobs.ids());
+        Set<String> actualMobs = new HashSet<>();
+        for (int index = 1; index < crystals.size(); index++) {
+            String mobId = MobCrystalItem.mob(crystals.get(index));
+            helper.assertTrue(mobId != null, "every remaining crystal has a mob imprint");
+            actualMobs.add(mobId);
+        }
+        helper.assertValueEqual(actualMobs, expectedMobs,
+            "the tab contains exactly the configured mob imprint identifiers");
         helper.succeed();
     }
 
@@ -589,6 +666,7 @@ public final class ItemGameTests {
             JsonObject russian = readJson(helper, "/assets/forbiddenmagic/lang/ru_ru.json");
             List<String> expected = List.of(
                 "item.forbiddenmagic.taint_coal",
+                "item.forbiddenmagic.tainted_blood_shard",
                 "item.forbiddenmagic.riding_crop",
                 "item.forbiddenmagic.black_dye",
                 "item.forbiddenmagic.taint_fruit",
