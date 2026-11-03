@@ -1,5 +1,18 @@
 # Verification status
 
+## Последний успешный CI и релиз — 4 ноября 2026
+
+- Проверенный HEAD main: [`baf4935`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/baf49355a7e6d238e4fd194474dd2b06f2fa591a). После runtime-проверки `a467bf2` были внесены только документационные изменения README.
+- [Java CI with Gradle #638](https://github.com/MxxFoxx2/forbidden-magic-reforged/actions/runs/41730932399) завершился успешно: подготовка и сборка закреплённого хоста, сборка аддона, artifact provenance, generated-resource freshness и GameTests.
+- С `no_lust=false`: **111/111** required GameTests passed.
+- С `no_lust=true`: **111/111** required GameTests passed.
+- [Release workflow #66](https://github.com/MxxFoxx2/forbidden-magic-reforged/actions/runs/41730793206) завершился успешно; опубликован [`2.0.1 (NeoForge 26.3)`](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/release/26.3) с JAR `forbidden-magic-2.0.1-26.3.jar`. Release был собран и протестирован с исходного commit [`50a91ed`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/50a91edc39c0ad0edeaf14cf3b50f53c28e0e557); последующие коммиты меняют только `.gitignore` и документацию.
+- В рефакторинге генератора тела всех перенесённых функций были сравнены с исходным `tools/gen_resources.py`; они совпадают. CI подтвердил, что повторная генерация не меняет `src/generated`.
+- Проверки headless не заменяют оставшиеся ручные визуальные и игровые проверки клиента, перечисленные ниже.
+
+## Предыдущий runtime CI
+
+
 ## Последний успешный runtime CI
 
 - Проверенный коммит: [`24684ce`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/24684ce2770cf3d62a7a2f76ea75929485b6f29b).
