@@ -70,7 +70,7 @@ Known limits remain explicit:
 
 | Capability | Current declaration | Limitation |
 |---|---|---|
-| Research stages | `PARTIAL` | The pinned adapter accepts one page group; multi-stage definitions are rejected |
+| Research stages | `PARTIAL` | The pinned adapter accepts exactly one page group and rejects both multi-stage definitions and non-empty stage-specific prerequisites |
 | Optional enchantment integration | `PARTIAL` | Thaumic Tinkerer is optional and its current bridge uses reflective API discovery; missing or incompatible APIs leave the integration disabled with a warning |
 | Taint origins | `UNSUPPORTED` | No taint-origin registration or propagation adapter is implemented |
 
