@@ -60,7 +60,7 @@ final class ScribingResearchGameTests {
         helper.assertValueEqual(forkStack.getItem().getDestroySpeed(forkStack, Blocks.COBWEB.defaultBlockState()), 1.0F, "the fork always digs at speed 1");
         helper.succeed();
     }
-    
+
     static void crystalwellIsAScribingToolWithOriginalDurability(GameTestHelper helper) {
         ItemStack stack = new ItemStack(FmItems.CRYSTALWELL.get());
         helper.assertTrue(stack.getItem() instanceof Tc4CrystalwellItem, "crystalwell uses its behavior item");
@@ -70,7 +70,7 @@ final class ScribingResearchGameTests {
         helper.assertValueEqual(stack.getCount(), 1, "crystalwell is unstackable");
         helper.succeed();
     }
-    
+
     static void primewellIsAPermanentEpicScribingTool(GameTestHelper helper) {
         ItemStack stack = new ItemStack(FmItems.PRIMEWELL.get());
         helper.assertTrue(stack.getItem() instanceof Tc4PrimewellItem, "primewell uses its behavior item");
@@ -82,7 +82,7 @@ final class ScribingResearchGameTests {
         helper.assertTrue(stack.getDamageValue() < stack.getMaxDamage(), "primewell remains usable after repeated scribe operations");
         helper.succeed();
     }
-    
+
     static void scribeWellsKeepOriginalRecipesAndResearch(GameTestHelper helper) {
         ShapelessArcaneRecipe crystalwell = (ShapelessArcaneRecipe) TcRecipes.get("CRYSTALWELL");
         helper.assertTrue(crystalwell != null, "crystalwell arcane recipe is registered");
@@ -104,7 +104,7 @@ final class ScribingResearchGameTests {
         }
         helper.succeed();
     }
-    
+
     static void itemTranslationKeysAreNotNestedUnderResearchPages(GameTestHelper helper) {
             JsonObject english = GameTestResources.readJson(helper, "/assets/forbiddenmagic/lang/en_us.json");
             JsonObject russian = GameTestResources.readJson(helper, "/assets/forbiddenmagic/lang/ru_ru.json");
@@ -156,8 +156,8 @@ final class ScribingResearchGameTests {
                 }
             }
             helper.succeed();
-    }
-    
+        }
+
     static void researchTranslationKeysAreComplete(GameTestHelper helper) {
         JsonObject english = GameTestResources.readJson(helper, "/assets/forbiddenmagic/lang/en_us.json");
         JsonObject russian = GameTestResources.readJson(helper, "/assets/forbiddenmagic/lang/ru_ru.json");
@@ -201,7 +201,7 @@ final class ScribingResearchGameTests {
             .toList();
         helper.assertTrue(infernalTextPages.contains("forbiddenmagic.research_page.ROD_infernal.2"),
             "infernal wand includes the original protection and extinguishing page");
-    
+
         helper.assertValueEqual(
             english.get("forbiddenmagic.research_page.ROD_tainted.1").getAsString(),
             "Tainted Lands are places of great and terrible power for those Thaumaturges who know how to tap into them.<BR><BR>The Tainted Wand Core can store up to 150 vis of each type and slowly replenishes itself up to 10% in every aspect as long as it is being held inside of a Tainted Land.  While the wand is held in your hand, it can also feed off of taint coursing through your veins, randomly restoring vis every time you take damage from flux taint.",
@@ -214,7 +214,7 @@ final class ScribingResearchGameTests {
             "English and Russian translation key sets must match");
         helper.succeed();
     }
-    
+
     static void scribeWellAspectIdsStaySemantic(GameTestHelper helper) {
         Set<ContentId> expected = Set.of(
             ContentId.parse("thaumcraft:aer"),
@@ -236,7 +236,7 @@ final class ScribingResearchGameTests {
             "no-research mode remains sourced from the host config");
         helper.succeed();
     }
-    
+
     static void crystalwellResearchPageMatchesDifficulty(GameTestHelper helper) {
         ResearchItem item = ResearchCategories.getResearch("CRYSTALWELL");
         helper.assertTrue(item != null, "crystalwell research is registered");
@@ -252,7 +252,7 @@ final class ScribingResearchGameTests {
         helper.assertValueEqual(textPages.get(0), expected, "crystalwell page follows research difficulty");
         helper.succeed();
     }
-    
+
     static void researchPrefixRespectsTagResearch(GameTestHelper helper) {
         ResearchItem item = new Tc4ResearchItem("TEST", "FORBIDDEN", new AspectList(), 0, 0, 1,
             ForbiddenMagic.id("textures/misc/forbidden.png"));
@@ -262,7 +262,7 @@ final class ScribingResearchGameTests {
         helper.assertValueEqual(item.textKey(), expected, "research text key follows tagResearch config");
         helper.succeed();
     }
-    
+
     static void researchIconsResolveToRealContent(GameTestHelper helper) {
         List<String> broken = new ArrayList<>();
         for (ResearchItem item : ResearchCategories.allResearch()) {

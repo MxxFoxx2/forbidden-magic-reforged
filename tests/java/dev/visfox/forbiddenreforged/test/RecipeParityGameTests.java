@@ -25,14 +25,14 @@ import thaumcraft.aspect.Aspect;
 import thaumcraft.aspect.AspectList;
 import thaumcraft.aspect.AspectRegistry;
 import thaumcraft.crafting.CraftingRecipeRef;
-import thaumcraft.crafting.TcIngredient;
-import thaumcraft.crafting.TcStack;
 import thaumcraft.crafting.CrucibleRecipe;
 import thaumcraft.crafting.InfusionEnchantmentRecipe;
 import thaumcraft.crafting.InfusionRecipe;
 import thaumcraft.crafting.ShapedArcaneRecipe;
+import thaumcraft.crafting.TcIngredient;
 import thaumcraft.crafting.TcRecipe;
 import thaumcraft.crafting.TcRecipes;
+import thaumcraft.crafting.TcStack;
 import thaumcraft.research.ResearchCategories;
 import thaumcraft.research.ResearchItem;
 import thaumcraft.research.ResearchManager;
@@ -58,7 +58,7 @@ final class RecipeParityGameTests {
         helper.assertTrue(missing.isEmpty(), "unresolved recipe references: " + missing);
         helper.succeed();
     }
-    
+
     static void chainFromNetherrackToWrathShard(GameTestHelper helper) {
         ServerPlayer player = GameTestPlayers.connected(helper);
         AspectList tags = AspectRegistry.active().getObjectTags(Items.NETHERRACK);
@@ -75,7 +75,7 @@ final class RecipeParityGameTests {
         helper.assertValueEqual(skullAxe.aspects().getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.WRATH)), 8, "skull axe costs eight ira");
         helper.succeed();
     }
-    
+
     static void enchantmentRecipesCoverFive(GameTestHelper helper) {
         for (String key : new String[]{"WRATH", "GREEDY", "CONSUMING", "EDUCATIONAL", "CORRUPTING"}) {
             TcRecipe recipe = TcRecipes.get(key);
@@ -88,7 +88,7 @@ final class RecipeParityGameTests {
         helper.assertValueEqual(wrath.aspects().getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.WRATH)), 16, "wrath aspect cost");
         helper.succeed();
     }
-    
+
     static void morphRecipesMatchTheOriginal(GameTestHelper helper) {
         for (String key : new String[]{"MORPHPICK", "MORPHSWORD", "MORPHSHOVEL", "MORPHAXE"}) {
             InfusionRecipe recipe = (InfusionRecipe) TcRecipes.get(key);
@@ -103,7 +103,7 @@ final class RecipeParityGameTests {
         helper.assertValueEqual(voidtouched.aspects().getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.ENVY)), 24, "voidtouched envy cost");
         helper.succeed();
     }
-    
+
     static void materialsHaveCraftingRecipes(GameTestHelper helper) {
         var manager = helper.getLevel().getServer().getRecipeManager();
         for (String name : new String[]{"taint_planks", "taint_stone_brick", "star_block", "star_from_block"}) {
@@ -112,7 +112,7 @@ final class RecipeParityGameTests {
         }
         helper.succeed();
     }
-    
+
     static void plantResearchAndRecipes(GameTestHelper helper) {
         ResearchItem tree = ResearchCategories.getResearch("TAINTTREE");
         helper.assertTrue(tree != null, "taint tree research must exist");
@@ -126,7 +126,7 @@ final class RecipeParityGameTests {
         CrucibleRecipe blackFlower = (CrucibleRecipe) TcRecipes.get("BLACKFLOWER");
         helper.assertTrue(blackFlower != null, "black flower recipe exists");
         helper.assertValueEqual(blackFlower.aspects().getAmount(Aspect.DARKNESS), 8, "black flower needs eight darkness");
-    
+
         TcRecipe inkRef = TcRecipes.get("BlackInk");
         helper.assertTrue(inkRef instanceof CraftingRecipeRef, "black flower ink recipe is exposed in research");
         CraftingRecipeRef ink = (CraftingRecipeRef) inkRef;
@@ -137,10 +137,10 @@ final class RecipeParityGameTests {
         var inkRecipeKey = ResourceKey.create(Registries.RECIPE, ForbiddenMagic.id("ink_from_rose"));
         helper.assertTrue(helper.getLevel().getServer().getRecipeManager().byKey(inkRecipeKey).isPresent(),
             "the linked black ink crafting recipe loads");
-    
+
         helper.succeed();
     }
-    
+
     static void wandRodRecipesRegistered(GameTestHelper helper) {
         InfusionRecipe taintedRod = (InfusionRecipe) TcRecipes.get("ROD_TAINTED");
         helper.assertTrue(taintedRod != null, "tainted rod recipe must exist");
@@ -152,14 +152,14 @@ final class RecipeParityGameTests {
         helper.assertValueEqual(infernalRod.aspects().getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER)), 32, "infernal rod nether cost");
         helper.succeed();
     }
-    
+
     static void taintstoneResearchAndArcaneRecipe(GameTestHelper helper) {
         ResearchItem research = ResearchCategories.getResearch("TAINTSTONE");
         helper.assertTrue(research != null, "taint stone research must exist");
         helper.assertTrue(research.isConcealed(), "taint stone research is concealed");
         helper.assertValueEqual(research.pages().size(), 3, "taint stone has text, arcane and brick pages");
         helper.assertValueEqual(research.parents(), List.of("THAUMIUM", "INFUSION", "ETHEREALBLOOM"), "taint stone parents");
-    
+
         ShapedArcaneRecipe recipe = (ShapedArcaneRecipe) TcRecipes.get("TaintStone");
         helper.assertTrue(recipe != null, "taint stone arcane recipe exists");
         helper.assertValueEqual(recipe.width(), 3, "taint stone grid width");
@@ -177,20 +177,20 @@ final class RecipeParityGameTests {
         for (int slot : new int[]{0, 1, 2, 3, 5, 6, 7, 8}) {
             helper.assertTrue(recipe.grid().get(slot).test(new ItemStack(Items.STONE)), "slot " + slot + " takes plain stone");
         }
-    
+
         TcRecipe brick = TcRecipes.get("TaintBrick");
         helper.assertTrue(brick instanceof CraftingRecipeRef ref, "brick recipe is registered as a reference");
         helper.assertValueEqual(((CraftingRecipeRef) brick).recipe(), ForbiddenMagic.id("taint_stone_brick"), "brick recipe id");
         helper.succeed();
     }
-    
+
     static void emeraldTransmutationMatchesOriginal(GameTestHelper helper) {
         if (!FmConfig.emeraldTrans()) {
             helper.assertTrue(TcRecipes.get("TRANSEMERALD") == null, "disabled emerald transmutation has no recipe");
             helper.succeed();
             return;
         }
-    
+
         CrucibleRecipe recipe = (CrucibleRecipe) TcRecipes.get("TRANSEMERALD");
         helper.assertTrue(recipe != null, "emerald transmutation crucible recipe exists");
         helper.assertValueEqual(recipe.result().count(), 4, "transmutation produces four emerald nuggets");
@@ -201,27 +201,27 @@ final class RecipeParityGameTests {
         TagKey<Item> emeraldNuggets = TagKey.create(Registries.ITEM, Identifier.parse("c:nuggets/emerald"));
         helper.assertTrue(new ItemStack(FmItems.EMERALD_FRAGMENT.get()).is(emeraldNuggets),
             "emerald fragment carries the common emerald nugget tag");
-    
+
         ResearchItem research = ResearchCategories.getResearch("TRANSEMERALD");
         helper.assertTrue(research != null, "transmutation research exists when enabled");
         helper.assertValueEqual(research.pages().size(), 2, "transmutation research has text and crucible pages");
         helper.assertTrue(research.isSecondary() && research.isConcealed(), "transmutation research retains secondary/concealed status");
         helper.succeed();
     }
-    
+
     static void oreDictionaryEntriesBecameTags(GameTestHelper helper) {
         TagKey<Item> netherStars = TagKey.create(Registries.ITEM, Identifier.parse("c:nether_stars"));
         helper.assertTrue(new ItemStack(FmBlocks.STAR_BLOCK.get().asItem()).is(netherStars), "the star block joins c:nether_stars like the blockNetherStar ore entry");
-    
+
         TagKey<Item> taintShards = TagKey.create(Registries.ITEM, Identifier.parse("forbiddenmagic:taint_shards"));
         helper.assertTrue(new ItemStack(FmItems.DEADLY_SHARDS.get("taint").get()).is(taintShards), "the taint shard joins forbiddenmagic:taint_shards like the resourceTaint ore entry");
-    
+
         ShapedArcaneRecipe recipe = (ShapedArcaneRecipe) TcRecipes.get("TaintStone");
         helper.assertTrue(recipe != null, "taint stone recipe exists");
         helper.assertTrue(recipe.grid().get(4).test(new ItemStack(FmItems.DEADLY_SHARDS.get("taint").get())), "the arcane centre accepts the taint shard tag");
         helper.succeed();
     }
-    
+
     static void ringFoodRecipeMatchesOriginal(GameTestHelper helper) {
         TcRecipe base = TcRecipes.get("RINGFOOD");
         helper.assertTrue(base instanceof ShapedArcaneRecipe, "Ring of Nutrition is an arcane crafting recipe");
@@ -235,7 +235,7 @@ final class RecipeParityGameTests {
         helper.assertTrue(recipe.grid().get(4).exists(), "mundane ring is the center ingredient");
         helper.succeed();
     }
-    
+
     static void researchLayoutMatchesOriginal(GameTestHelper helper) {
         assertResearchLayout(helper, "MORPHTOOLS", -9, -3, 3);
         assertResearchLayout(helper, "ROD_tainted", -8, 3, 3);
@@ -247,7 +247,7 @@ final class RecipeParityGameTests {
         assertResearchLayout(helper, "VOIDTOUCHED", -8, -1, 3);
         assertResearchLayout(helper, "WRATH", -6, -3, 3);
         assertResearchLayout(helper, "WRATHCAGE", -6, -9, 3);
-    
+
         ResearchItem taintedRod = ResearchCategories.getResearch("ROD_tainted");
         helper.assertTrue(taintedRod.isConcealed(), "tainted rod research is concealed");
         helper.assertFalse(taintedRod.isHidden(), "tainted rod research is not hidden");
@@ -255,13 +255,13 @@ final class RecipeParityGameTests {
         helper.assertValueEqual(taintedRod.tags().getAmount(Aspect.TAINT), 5, "tainted rod TAINT cost");
         helper.assertValueEqual(taintedRod.tags().getAmount(Aspect.TOOL), 2, "tainted rod TOOL cost");
         helper.assertValueEqual(taintedRod.parents(), List.of("ROD_silverwood", "TAINTSHOVEL", "INFUSION"), "tainted rod parents");
-    
+
         ResearchItem taintShovel = ResearchCategories.getResearch("TAINTSHOVEL");
         helper.assertValueEqual(taintShovel.tags().getAmount(Aspect.CRYSTAL), 3, "taint shovel CRYSTAL cost");
         helper.assertValueEqual(taintShovel.tags().getAmount(Aspect.TAINT), 2, "taint shovel TAINT cost");
         helper.assertValueEqual(taintShovel.tags().getAmount(Aspect.TOOL), 1, "taint shovel TOOL cost");
         helper.assertValueEqual(taintShovel.parents(), List.of("THAUMIUM", "INFUSION", "ETHEREALBLOOM"), "taint shovel parents");
-    
+
         ResearchItem wrathCage = ResearchCategories.getResearch("WRATHCAGE");
         helper.assertValueEqual(wrathCage.parents(), List.of("FORK"), "Wrath Cage depends on Diabolist Fork");
         ResearchItem profaneRod = ResearchCategories.getResearch("ROD_profane");
@@ -270,7 +270,7 @@ final class RecipeParityGameTests {
         helper.assertTrue(profaneRod.isStub(), "Profane Rod research remains a stub");
         helper.succeed();
     }
-    
+
     static void warpValuesMatchOriginal(GameTestHelper helper) {
         helper.assertValueEqual(ResearchCategories.getResearch("ROD_infernal").warp(), 2, "infernal rod research warp");
         helper.assertValueEqual(ResearchCategories.getResearch("TAINTPICK").warp(), 0, "taint pick research has no warp");
@@ -283,7 +283,7 @@ final class RecipeParityGameTests {
         helper.assertValueEqual(Warp.getItemWarp(new ItemStack(FmBlocks.TAINT_SAPLING.get())), 1, "taint sapling item warp");
         helper.succeed();
     }
-    
+
     static void subcollarMatchesOriginal(GameTestHelper helper) {
         if (FmConfig.lustDisabled()) {
             helper.assertTrue(BuiltInRegistries.ITEM.getOptional(ForbiddenMagic.id("sub_collar")).isEmpty(), "no_lust leaves out the collar item");
@@ -309,7 +309,7 @@ final class RecipeParityGameTests {
         helper.assertValueEqual((int) lustShards, 3, "three lust shards");
         helper.assertTrue(recipe.components().stream().anyMatch(ingredient -> ingredient.test(new ItemStack(Items.LEAD))), "lead is a component");
         helper.assertTrue(recipe.components().stream().anyMatch(ingredient -> ingredient.test(new ItemStack(ModItems.MUNDANE_BELT.get()))), "a mundane belt is a component");
-    
+
         ResearchItem research = ResearchCategories.getResearch("SUBCOLLAR");
         helper.assertTrue(research != null, "collar research exists");
         helper.assertValueEqual(research.pages().size(), 2, "collar has text and infusion pages");
@@ -319,19 +319,19 @@ final class RecipeParityGameTests {
         helper.succeed();
     }
 
-    private static void checkIngredient(TcIngredient ingredient, List<String> missing) {
+    static void checkIngredient(TcIngredient ingredient, List<String> missing) {
         if (!ingredient.exists()) {
-        missing.add(ingredient.toString());
+            missing.add(ingredient.toString());
         }
     }
 
-    private static void checkStack(TcStack stack, List<String> missing) {
+    static void checkStack(TcStack stack, List<String> missing) {
         if (!stack.exists()) {
-        missing.add(stack.item().toString());
+            missing.add(stack.item().toString());
         }
     }
 
-    private static void assertResearchLayout(GameTestHelper helper, String id, int column, int row, int complexity) {
+    static void assertResearchLayout(GameTestHelper helper, String id, int column, int row, int complexity) {
         ResearchItem research = ResearchCategories.getResearch(id);
         helper.assertTrue(research != null, id + " research exists");
         helper.assertValueEqual(research.column(), column, id + " column");

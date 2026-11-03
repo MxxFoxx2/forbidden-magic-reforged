@@ -42,7 +42,7 @@ final class ItemRegistrationGameTests {
         helper.assertTrue(stack.has(DataComponents.COOKING_FUEL), "taint coal is a fuel");
         helper.succeed();
     }
-    
+
     static void taintCoalBurnTimeVariesWithinOriginalRange(GameTestHelper helper) {
         ItemStack stack = new ItemStack(FmItems.TAINT_COAL.get());
         CookingFuel fuel = stack.get(DataComponents.COOKING_FUEL);
@@ -60,21 +60,21 @@ final class ItemRegistrationGameTests {
         helper.assertTrue(ItemStack.CODEC.encodeStart(NbtOps.INSTANCE, stack).result().isPresent(), "taint coal must serialize its fuel component");
         helper.succeed();
     }
-    
+
     static void emeraldFragmentIsRegistered(GameTestHelper helper) {
         ItemStack stack = new ItemStack(FmItems.EMERALD_FRAGMENT.get());
         helper.assertFalse(stack.isEmpty(), "emerald fragment must exist");
         helper.assertValueEqual(BuiltInRegistries.ITEM.getKey(stack.getItem()), Identifier.parse("forbiddenmagic:emerald_fragment"), "emerald fragment id");
         helper.succeed();
     }
-    
+
     static void ridingCropIsRegisteredAsSword(GameTestHelper helper) {
         Item crop = BuiltInRegistries.ITEM.getValue(Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, "riding_crop"));
         helper.assertTrue(crop != Items.AIR, "riding crop must be registered");
         helper.assertTrue(crop instanceof RidingCropItem, "riding crop must be RidingCropItem");
         helper.succeed();
     }
-    
+
     static void creativeTabIsRegisteredWithForkIcon(GameTestHelper helper) {
         CreativeModeTab tab = BuiltInRegistries.CREATIVE_MODE_TAB.get(ForbiddenMagic.id("forbidden"))
             .map(holder -> holder.value())
@@ -83,7 +83,7 @@ final class ItemRegistrationGameTests {
         helper.assertValueEqual(tab.getIconItem().getItem(), FmItems.DIABOLIST_FORK.get(), "the tab icon is the diabolist fork");
         helper.succeed();
     }
-    
+
     static void creativeTabListsEveryRegisteredItem(GameTestHelper helper) {
         List<ItemStack> stacks = dev.visfox.forbiddenreforged.FmCreativeTab.stacks();
         java.util.Set<Item> listed = new java.util.HashSet<>();
@@ -106,7 +106,7 @@ final class ItemRegistrationGameTests {
         helper.assertValueEqual(stacks.size(), (int) unique, "no duplicate entries in the tab list");
         helper.succeed();
     }
-    
+
     static void orichalcumCapIsRegistered(GameTestHelper helper) {
         thaumcraft.wand.WandCap cap = WandRegistry.findCap("orichalcum");
         helper.assertTrue(cap != null, "the creative orichalcum cap is registered");
@@ -115,7 +115,7 @@ final class ItemRegistrationGameTests {
         helper.assertTrue(cap.specialAspects().isEmpty(), "orichalcum has no special aspects");
         helper.succeed();
     }
-    
+
     static void diabolistForkSwitchesToTheSporkModel(GameTestHelper helper) {
         JsonObject definition = GameTestResources.readJson(helper, "/assets/forbiddenmagic/items/diabolist_fork.json");
         JsonObject model = definition.getAsJsonObject("model");
@@ -128,7 +128,7 @@ final class ItemRegistrationGameTests {
         helper.assertTrue(ForbiddenMagic.class.getResourceAsStream("/assets/forbiddenmagic/textures/item/spork.png") != null, "spork texture ships with the mod");
         helper.succeed();
     }
-    
+
     static void lustShardSwitchesToTheDespairModel(GameTestHelper helper) {
         JsonObject definition = GameTestResources.readJson(helper, "/assets/forbiddenmagic/items/lust_shard.json");
         JsonObject model = definition.getAsJsonObject("model");
@@ -141,7 +141,7 @@ final class ItemRegistrationGameTests {
         helper.assertTrue(ForbiddenMagic.class.getResourceAsStream("/assets/forbiddenmagic/textures/item/despair_shard.png") != null, "despair texture ships with the mod");
         helper.succeed();
     }
-    
+
     static void ringOfNutritionOnlyWorksInRingSlots(GameTestHelper helper) {
         ServerPlayer player = GameTestPlayers.connected(helper);
         for (int slot = 0; slot < Baubles.slotCount(); slot++) {

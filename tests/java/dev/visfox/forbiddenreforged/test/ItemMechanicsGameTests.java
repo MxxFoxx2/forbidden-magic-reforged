@@ -59,7 +59,7 @@ final class ItemMechanicsGameTests {
         helper.assertValueEqual(recipe.components().size(), 4, "four components");
         helper.succeed();
     }
-    
+
     static void morphPhaseTintsMatchOriginal(GameTestHelper helper) {
         MorphState state = MorphState.EMPTY;
         int[] colors = {0xFF980000, 0xFF0010CC, 0xFFE5DA00};
@@ -78,19 +78,19 @@ final class ItemMechanicsGameTests {
         }
         helper.succeed();
     }
-    
+
     static void toolAndSkullAxeChanceRulesPreserveOriginalBoundaries(GameTestHelper helper) {
         helper.assertValueEqual(FmToolEvents.taintPickaxeSpeed(0.0F), 0.0F, "zero-hardness blocks remain instant");
         helper.assertValueEqual(FmToolEvents.taintPickaxeSpeed(2.0F), 0.1F, "hardness below five uses the original slow speed");
         helper.assertValueEqual(FmToolEvents.taintPickaxeSpeed(10.0F), 5.0F, "hardness below twenty is halved");
         helper.assertValueEqual(FmToolEvents.taintPickaxeSpeed(20.0F), 25.0F, "hardness twenty and above adds five");
-    
+
         helper.assertTrue(FmToolEvents.taintShardRoll(1, 0, false), "taint shard roll succeeds at base threshold");
         helper.assertFalse(FmToolEvents.taintShardRoll(2, 0, false), "taint shard roll fails above base threshold");
         helper.assertTrue(FmToolEvents.taintShardRoll(7, 0, true), "silk touch adds six to taint shard threshold");
         helper.assertTrue(FmToolEvents.taintShardRoll(3, 1, false), "Fortune adds two per level to taint shard threshold");
         helper.assertFalse(FmToolEvents.taintShardRoll(4, 1, false), "taint shard threshold excludes the next roll");
-    
+
         helper.assertTrue(FmEnchantmentEffects.skullAxeRoll(3, 0, 3, 1), "skeleton threshold includes roll three");
         helper.assertFalse(FmEnchantmentEffects.skullAxeRoll(4, 0, 3, 1), "skeleton threshold excludes roll four");
         helper.assertTrue(FmEnchantmentEffects.skullAxeRoll(4, 1, 3, 1), "Looting adds one to skeleton threshold");
@@ -99,7 +99,7 @@ final class ItemMechanicsGameTests {
         helper.assertTrue(FmEnchantmentEffects.skullAxeRoll(4, 1, 2, 2), "Looting II raises zombie threshold by four");
         helper.assertTrue(FmEnchantmentEffects.skullAxeRoll(1, 0, 1, 1), "player head threshold includes roll one");
         helper.assertFalse(FmEnchantmentEffects.skullAxeRoll(3, 1, 1, 1), "player head threshold excludes roll three at Looting I");
-    
+
         WandRod infernalRod = WandRegistry.findRod("infernal");
         helper.assertTrue(infernalRod != null, "infernal rod must be registered");
         ItemStack infernalWand = Wands.create(WandRegistry.CAP_IRON, infernalRod, false);
@@ -115,20 +115,20 @@ final class ItemMechanicsGameTests {
             "ordinary items do not cancel fire damage");
         helper.succeed();
     }
-    
+
     static void silverfishEmeraldDropThresholdsMatchOriginal(GameTestHelper helper) {
         helper.assertTrue(FmEnchantmentEffects.silverfishEmeraldRoll(true, 2, 0), "Windswept Hills includes roll 2 at Looting 0");
         helper.assertFalse(FmEnchantmentEffects.silverfishEmeraldRoll(true, 3, 0), "Windswept Hills excludes roll 3 at Looting 0");
         helper.assertTrue(FmEnchantmentEffects.silverfishEmeraldRoll(true, 4, 1), "Windswept Hills adds two per Looting level");
         helper.assertFalse(FmEnchantmentEffects.silverfishEmeraldRoll(true, 5, 1), "Windswept Hills excludes the next roll");
-    
+
         helper.assertTrue(FmEnchantmentEffects.silverfishEmeraldRoll(false, 1, 0), "other biomes include roll 1 at Looting 0");
         helper.assertFalse(FmEnchantmentEffects.silverfishEmeraldRoll(false, 2, 0), "other biomes exclude roll 2 at Looting 0");
         helper.assertTrue(FmEnchantmentEffects.silverfishEmeraldRoll(false, 4, 1), "other biomes add three per Looting level");
         helper.assertFalse(FmEnchantmentEffects.silverfishEmeraldRoll(false, 5, 1), "other biomes exclude the next roll");
         helper.succeed();
     }
-    
+
     static void subcollarPlacesOnAnotherPlayerAndStoresDamageVis(GameTestHelper helper) {
         if (FmConfig.lustDisabled()) {
             helper.succeed();
@@ -146,50 +146,50 @@ final class ItemMechanicsGameTests {
         helper.assertTrue(worn.is(item), "the target wears the collar in the amulet slot");
         helper.assertValueEqual(worn.get(FmComponents.COLLAR_OWNER.get()), owner.getDisplayName().getString(), "the collar records its owner");
         helper.assertTrue(collar.isEmpty(), "placing consumes the collar");
-    
+
         FmToolEvents.collarDamage(target, 2.0F, null);
         helper.assertValueEqual(VisStorage.getAllVis(worn).visSize(), 6, "two damage stores six vis");
-    
+
         ServerPlayer attacker = GameTestPlayers.connected(helper);
         attacker.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(FmItems.RIDING_CROP.get()));
         FmToolEvents.collarDamage(target, 2.0F, attacker);
         helper.assertValueEqual(VisStorage.getAllVis(worn).visSize(), 15, "a crop attacker adds three more doses");
         helper.succeed();
     }
-    
+
     static void ridingCropEffectsMatchOriginal(GameTestHelper helper) {
         ItemStack crop = new ItemStack(FmItems.RIDING_CROP.get());
         ServerPlayer attacker = GameTestPlayers.connected(helper);
-    
+
         Horse horse = helper.spawn(EntityTypes.HORSE, new BlockPos(2, 4, 2));
         crop.getItem().hurtEnemy(crop, horse, attacker);
         MobEffectInstance horseSpeed = horse.getEffect(MobEffects.SPEED);
         helper.assertTrue(horseSpeed != null && horseSpeed.getDuration() == 200 && horseSpeed.getAmplifier() == 5, "a horse gets speed 200 at amplifier 5");
-    
+
         Pig pig = helper.spawn(EntityTypes.PIG, new BlockPos(4, 4, 4));
         crop.getItem().hurtEnemy(crop, pig, attacker);
         MobEffectInstance pigSpeed = pig.getEffect(MobEffects.SPEED);
         helper.assertTrue(pigSpeed != null && pigSpeed.getDuration() == 200 && pigSpeed.getAmplifier() == 5, "a pig gets speed 200 at amplifier 5");
-    
+
         ServerPlayer victim = GameTestPlayers.connected(helper);
         crop.getItem().hurtEnemy(crop, victim, attacker);
         helper.assertTrue(victim.hasEffect(MobEffects.SPEED) && victim.hasEffect(MobEffects.HASTE) && victim.hasEffect(MobEffects.STRENGTH), "players get speed, haste and strength");
-    
+
         var golem = helper.spawn(ModEntities.GOLEM.get(), new BlockPos(7, 4, 7));
         crop.getItem().hurtEnemy(crop, golem, attacker);
         helper.assertTrue(golem.hasEffect(MobEffects.SPEED) && golem.hasEffect(MobEffects.HASTE)
             && golem.hasEffect(MobEffects.STRENGTH), "TC4 golems get speed, haste and strength");
-    
+
         helper.assertTrue(RidingCropItem.dropsLustShard(1), "roll 1 drops a shard");
         helper.assertFalse(RidingCropItem.dropsLustShard(0) || RidingCropItem.dropsLustShard(2) || RidingCropItem.dropsLustShard(14), "only roll 1 of 15 drops a shard");
-    
+
         helper.assertValueEqual(crop.getMaxDamage(), 59, "the crop uses the wooden sword durability");
         net.minecraft.tags.TagKey<Item> repair = net.minecraft.tags.TagKey.create(Registries.ITEM, ForbiddenMagic.id("riding_crop_repair"));
         helper.assertTrue(new ItemStack(Items.LEATHER).is(repair), "leather repairs the crop");
         helper.assertTrue(new ItemStack(Items.OAK_PLANKS).is(repair), "wooden planks repair the crop");
         helper.assertValueEqual(crop.getRarity(), Rarity.COMMON, "the crop keeps the original common rarity");
         helper.assertValueEqual(crop.getItem().getDestroySpeed(crop, Blocks.STONE.defaultBlockState()), 1.0F, "the crop always digs at speed 1");
-    
+
         Horse mount = helper.spawn(EntityTypes.HORSE, new BlockPos(6, 4, 6));
         float health = mount.getHealth();
         attacker.startRiding(mount);
@@ -199,7 +199,7 @@ final class ItemMechanicsGameTests {
         helper.assertValueEqual(mount.getHealth(), health - 1.0F, "right-click while riding deals one damage to the mount");
         helper.succeed();
     }
-    
+
     static void hereticTradesMatchOriginalListing(GameTestHelper helper) {
         JsonObject level1 = GameTestResources.readJson(helper, "/data/forbiddenmagic/trade_set/heretic/level_1.json");
         helper.assertValueEqual(level1.get("amount").getAsInt(), 9, "all nine heretic offers are available from the first level");
@@ -207,7 +207,7 @@ final class ItemMechanicsGameTests {
             JsonObject set = GameTestResources.readJson(helper, "/data/forbiddenmagic/trade_set/heretic/level_" + level + ".json");
             helper.assertValueEqual(set.get("amount").getAsInt(), 0, "level " + level + " adds no extra offers");
         }
-    
+
         JsonArray pool = GameTestResources.readJson(helper, "/data/forbiddenmagic/tags/villager_trade/heretic/pool.json").getAsJsonArray("values");
         helper.assertValueEqual(pool.size(), 9, "the lust pool lists nine offers");
         Set<String> unique = new HashSet<>();
@@ -223,7 +223,7 @@ final class ItemMechanicsGameTests {
             JsonObject set = GameTestResources.readJson(helper, "/data/forbiddenmagic/trade_set/heretic/no_lust/level_" + level + ".json");
             helper.assertValueEqual(set.get("amount").getAsInt(), 0, "no_lust level " + level + " adds no extra offers");
         }
-    
+
         String[] normal = {
             "emerald_greed_shard", "lust_shard_emerald", "wrath_shard_emerald", "gluttony_shard_emerald",
             "emerald_skull", "emerald_ghast_tear", "emerald_glowstone"
@@ -241,7 +241,7 @@ final class ItemMechanicsGameTests {
         }
         helper.succeed();
     }
-    
+
     static void wrathShardFormulaMatchesOriginal(GameTestHelper helper) {
         helper.assertValueEqual(FmDrops.heldWrathDamage(new ItemStack(Items.WOODEN_SWORD)), 4, "wooden sword adds four wrath");
         helper.assertValueEqual(FmDrops.heldWrathDamage(new ItemStack(Items.IRON_SWORD)), 6, "iron sword adds six wrath");
@@ -255,7 +255,7 @@ final class ItemMechanicsGameTests {
         helper.assertFalse(FmDrops.wrathEligible(helper.spawn(EntityTypes.PIG, new BlockPos(4, 4, 4))), "passive animals are not eligible");
         helper.succeed();
     }
-    
+
     static void witchwoodRequiresArsMagica(GameTestHelper helper) {
         boolean am2 = ModList.get().isLoaded("arsmagica2");
         helper.assertValueEqual(BuiltInRegistries.ITEM.getOptional(ForbiddenMagic.id("witchwood_rod")).isPresent(), am2, "the witchwood rod exists only with Ars Magica 2");
