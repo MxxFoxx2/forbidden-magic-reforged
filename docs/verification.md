@@ -14,7 +14,7 @@
 ## Состояние rolling release
 
 - [2.0.3 (NeoForge 26.3)](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/release/26.3) опубликован из исходного commit [`64fabaaf`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/64fabaaf5bba2c6adbfeb65c4c2887a07dd964c7); JAR: [`forbidden-magic-2.0.3-26.3.jar`](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/download/release/26.3/forbidden-magic-2.0.3-26.3.jar).
-- [2.0.1 (NeoForge 26.3)](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/release/26.3) был опубликован из исходного commit [`50a91ed`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/50a91edc39c0ad0edeaf14cf3b50f53c28e0e557).
+- Первый rolling release после перехода на 26.3 — **2.0.1**, собранный из исходного commit [`50a91ed`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/50a91edc39c0ad0edeaf14cf3b50f53c28e0e557); текущий тег `release/26.3` теперь указывает на 2.0.3.
 - Старый path filter ошибочно запустил release workflow для test/tooling-only commit [`d540ec7`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/d540ec7278e002b97799716d98129fe9447f8d25), после чего rolling release обновился до 2.0.2. В production Java sources этого commit изменений не было.
 - Фильтр release workflow исправлен в [`b7ae154`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/b7ae154e93b413816df0865c60e9c43c4a67162a): test/docs/tooling-only changes не инициируют публикацию JAR. Production Java changes по-прежнему проходят release workflow.
 
