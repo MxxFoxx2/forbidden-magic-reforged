@@ -46,7 +46,7 @@ class ReleaseNotesTests(unittest.TestCase):
             [
                 "Version 2.0.5 for Minecraft 26.3",
                 "",
-                f"{chr(96)}{self.source_sha[:7]}{chr(96)}: Fix release notes",
+                f"\x60{self.source_sha[:7]}\x60: Fix release notes",
                 "",
                 f"[Changes since previous build](https://github.com/{self.repo}/compare/{self.previous_sha}...{self.source_sha})",
                 "",
