@@ -121,6 +121,38 @@ public final class AspectGameTests {
     }
 
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
+    public static void baconAspectTagIsRegisteredAndAppliedToMembers(GameTestHelper helper) {
+        TagKey<Item> baconTag = TagKey.create(
+            Registries.ITEM,
+            ResourceLocation.parse("forbiddenmagic:item_bacon")
+        );
+        var members = BuiltInRegistries.ITEM.getTag(baconTag);
+        helper.assertTrue(members.isPresent(), "the extensible item_bacon tag must exist even when empty");
+        helper.assertTrue(
+            Tc4AspectTagAdapter.declaredTargets().contains("#forbiddenmagic:item_bacon"),
+            "the TC4 aspect adapter must register item_bacon"
+        );
+        if (members.isPresent()) {
+            for (Holder<Item> holder : members.get()) {
+                AspectList aspects = AspectRegistry.active().getObjectTags(holder.value());
+                helper.assertTrue(aspects != null, "tagged bacon item must receive an aspect list: " + holder.getRegisteredName());
+                if (aspects != null) {
+                    helper.assertValueEqual(aspects.getAmount(Aspect.FLESH), 6, "bacon carries flesh 6");
+                    helper.assertValueEqual(aspects.getAmount(Aspect.LIFE), 6, "bacon carries life 6");
+                    helper.assertValueEqual(aspects.getAmount(Aspect.ENERGY), 6, "bacon carries energy 6");
+                    helper.assertValueEqual(aspects.getAmount(Aspect.BEAST), 4, "bacon carries beast 4");
+                    helper.assertValueEqual(
+                        aspects.getAmount(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.GULA)),
+                        6,
+                        "bacon carries gula 6"
+                    );
+                }
+            }
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void entityAspectTagsMergeWithExisting(GameTestHelper helper) {
         EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.getOptional(ResourceLocation.parse("thaumcraft:brainy_zombie")).orElse(null);
         helper.assertTrue(type != null, "brainy zombie type must exist");
@@ -146,12 +178,7 @@ public final class AspectGameTests {
                 }
             } else if (target.startsWith("#")) {
                 TagKey<Item> tag = TagKey.create(Registries.ITEM, ResourceLocation.parse(target.substring(1)));
-                boolean found = false;
-                for (Holder<Item> holder : BuiltInRegistries.ITEM.getTagOrEmpty(tag)) {
-                    found = true;
-                    break;
-                }
-                if (!found) {
+                if (BuiltInRegistries.ITEM.getTag(tag).isEmpty()) {
                     unresolved.add(target);
                 }
             } else if (BuiltInRegistries.ITEM.getOptional(ResourceLocation.parse(target)).isEmpty()) {
