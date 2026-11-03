@@ -1,14 +1,20 @@
 # Verification status
 
-## Последний успешный CI и релиз — 4 ноября 2026
+## Последний успешный CI — 4 ноября 2026
 
-- Проверенный HEAD main: [`baf4935`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/baf49355a7e6d238e4fd194474dd2b06f2fa591a). После runtime-проверки `a467bf2` были внесены только документационные изменения README.
-- [Java CI with Gradle #638](https://github.com/MxxFoxx2/forbidden-magic-reforged/actions/runs/41730932399) завершился успешно: подготовка и сборка закреплённого хоста, сборка аддона, artifact provenance, generated-resource freshness и GameTests.
+- Проверенный HEAD main: [`e82ea2b`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/e82ea2b8b9ec6d4158681dcf4bb29869f0e61882).
+- [Java CI with Gradle #656](https://github.com/MxxFoxx2/forbidden-magic-reforged/actions/runs/41735463962) завершился успешно: проверка host API boundaries, подготовка и сборка закреплённого хоста, сборка аддона, artifact provenance, generated-resource freshness и загрузка CI JAR.
 - С `no_lust=false`: **111/111** required GameTests passed.
 - С `no_lust=true`: **111/111** required GameTests passed.
-- [Release workflow #66](https://github.com/MxxFoxx2/forbidden-magic-reforged/actions/runs/41730793206) завершился успешно; опубликован [`2.0.1 (NeoForge 26.3)`](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/release/26.3) с JAR `forbidden-magic-2.0.1-26.3.jar`. Release был собран и протестирован с исходного commit [`50a91ed`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/50a91edc39c0ad0edeaf14cf3b50f53c28e0e557); последующие коммиты меняют только `.gitignore` и документацию.
-- В рефакторинге генератора тела всех перенесённых функций были сравнены с исходным `tools/gen_resources.py`; они совпадают. CI подтвердил, что повторная генерация не меняет `src/generated`.
-- Проверки headless не заменяют оставшиеся ручные визуальные и игровые проверки клиента, перечисленные ниже.
+- Рефакторинг тестов сохранил все **61** исходный тест и их регистрационные идентификаторы: 40 item-тестов и 21 recipe/host-тест. Тела тестовых методов сравнивались с исходным кодом; единственная замена вызовов — общий `GameTestResources.readJson`.
+- Архитектурный checker сокращён с 619 до 130 строк и проверяет границы пакетов/импортов, не диктуя названия внутренних методов и файлов.
+- Перед публикацией всё ещё необходимы ручные визуальные и игровые проверки клиента, перечисленные ниже. Headless CI их не заменяет.
+
+## Состояние rolling release
+
+- [2.0.1 (NeoForge 26.3)](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/release/26.3) был опубликован из исходного commit [`50a91ed`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/50a91edc39c0ad0edeaf14cf3b50f53c28e0e557).
+- Позднее старый path filter ошибочно запустил release workflow для test/tooling-only commit [`d540ec7`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/d540ec7278e002b97799716d98129fe9447f8d25), после чего rolling release обновился до [2.0.2](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/release/26.3). Этот commit не менял production Java sources.
+- Фильтр release workflow исправлен в [`b7ae154`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/b7ae154e93b413816df0865c60e9c43c4a67162a): тесты и проверки запускают CI, но больше не инициируют публикацию JAR сами по себе. Рефакторинг тестов на `e82ea2b` не запускал release workflow.
 
 ## Предыдущий runtime CI
 
