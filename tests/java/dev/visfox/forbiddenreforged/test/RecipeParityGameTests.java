@@ -25,6 +25,8 @@ import thaumcraft.aspect.Aspect;
 import thaumcraft.aspect.AspectList;
 import thaumcraft.aspect.AspectRegistry;
 import thaumcraft.crafting.CraftingRecipeRef;
+import thaumcraft.crafting.TcIngredient;
+import thaumcraft.crafting.TcStack;
 import thaumcraft.crafting.CrucibleRecipe;
 import thaumcraft.crafting.InfusionEnchantmentRecipe;
 import thaumcraft.crafting.InfusionRecipe;
