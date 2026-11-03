@@ -1,0 +1,26 @@
+name: Temporary texture export
+
+on:
+  push:
+    branches: ["feature/1.21.1-tainted-blood-shard"]
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source asset
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: source
+          sparse-checkout: |
+            src/main/resources/assets/forbiddenmagic/textures/item/tainted_blood_shard.png
+      - name: Print exact asset bytes
+        run: |
+          echo "TAINTED_BLOOD_SHARD_BASE64_BEGIN"
+          base64 -w0 source/src/main/resources/assets/forbiddenmagic/textures/item/tainted_blood_shard.png
+          echo
+          echo "TAINTED_BLOOD_SHARD_BASE64_END"
