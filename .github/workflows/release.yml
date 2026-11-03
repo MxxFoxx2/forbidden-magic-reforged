@@ -108,7 +108,6 @@ jobs:
             exit 1
           fi
 
-          build_version="$GITHUB_RUN_NUMBER.$GITHUB_RUN_ATTEMPT"
           base_version="$(tr -d '[:space:]' < "$repo_dir/release-version.txt")"
           previous_version=""
           if gh release view "release/$channel" --repo "$REPO" >/dev/null 2>&1; then
@@ -123,7 +122,6 @@ jobs:
             echo "expected_mc=$expected_mc"
             echo "java_version=$java_version"
             echo "source_sha=$source_sha"
-            echo "build_version=$build_version"
             echo "release_version=$release_version"
             echo "mod_version=$mod_version"
           } >> "$GITHUB_OUTPUT"
