@@ -212,5 +212,6 @@
   "tc.research_text.WRATH": "When every problem is a nail, all you want is a bigger hammer.",
   "tc.research_text.WRATHCAGE": "Neverending battle",
   "tooltip.creativeonly": "Creative Only",
-  "tooltip.profane_contract": "Contract: %s"
+  "tooltip.profane_contract": "Contract: %s",
+  "item.forbiddenmagic.tainted_blood_shard": "Tainted Blood Shard"
 }
