@@ -114,42 +114,8 @@ jobs:
           if gh release view "release/$channel" --repo "$REPO" >/dev/null 2>&1; then
             previous_version="$(gh release view "release/$channel" --repo "$REPO" --json name,body               | python3 -c 'import json,re,sys; d=json.load(sys.stdin); m=re.search(r"<!-- release-version: ([0-9]+\.[0-9]+\.[0-9]+) -->", d.get("body") or ""); print(m.group(1) if m else (re.match(r"([0-9]+\.[0-9]+\.[0-9]+)", d.get("name") or "") or [None,""])[1])')"
           fi
-          release_version="$(python3 - "$base_version" "$previous_version" <<'PY'
-          import sys
-          base, previous = sys.argv[1], sys.argv[2]
-
-          def parse(value):
-              try:
-                  return tuple(int(part) for part in value.split("."))
-              except ValueError:
-                  return None
-
-          base_parts = parse(base) or (1, 0, 0)
-          previous_parts = parse(previous)
-          if previous_parts is None:
-              chosen = base_parts
-          elif base_parts > previous_parts:
-              chosen = base_parts
-          else:
-              chosen = (previous_parts[0], previous_parts[1], previous_parts[2] + 1)
-          print(".".join(str(part) for part in chosen))
-          PY
-          )"
+          release_version="$(python3 tools/prepare_release_version.py "$base_version" "$previous_version" "$repo_dir/gradle.properties" "$channel")"
           mod_version="$release_version-$channel"
-          python3 - "$repo_dir/gradle.properties" "$mod_version" <<'PY'
-          import re
-          import sys
-          from pathlib import Path
-          path = Path(sys.argv[1])
-          content, count = re.subn(
-              r"(?m)^mod_version=.*$",
-              f"mod_version={sys.argv[2]}",
-              path.read_text(encoding="utf-8"),
-          )
-          if count != 1:
-              raise SystemExit(f"Expected one mod_version entry; found {count}")
-          path.write_text(content, encoding="utf-8")
-          PY
 
           {
             echo "channel=$channel"
