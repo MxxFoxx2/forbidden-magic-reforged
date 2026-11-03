@@ -48,6 +48,23 @@
 - **Урон мечей:** морф-меч получает полный элементальный урон (7, как скелетный топор и вилка): раньше базовое значение было на единицу меньше. Все четыре мечеподобных предмета добавлены в тег `minecraft:swords`.
 - **Локализация:** исправлена структура TOML-таблиц для item names и исследовательских текстов; сгенерированные JSON-ключи выровнены с ключами, используемыми кодом.
 
+## Wrath Cage: сверка spawn/essentia с оригиналом
+
+Сверено с исходными [`TileEntityWrathCage`](https://github.com/SpitefulFox/ForbiddenMagic/blob/master/src/main/java/fox/spiteful/forbidden/tiles/TileEntityWrathCage.java), [`WrathSpawnerLogic`](https://github.com/SpitefulFox/ForbiddenMagic/blob/master/src/main/java/fox/spiteful/forbidden/tiles/WrathSpawnerLogic.java) и [`BlockWrathCage`](https://github.com/SpitefulFox/ForbiddenMagic/blob/master/src/main/java/fox/spiteful/forbidden/blocks/BlockWrathCage.java). Подтверждённые отличия исправлены в production commit [`e45e191`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/e45e191703e11715aedcf010fbefa6eebafd2537) и последующем bridge commit [`582285d`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/582285d046af2c4d9f94d9b267625253f6cf22b3):
+
+- **Essentia draw gate:** пополнение отключается, если любой из каналов `Special`, `Wrath` или `Sloth` достиг 64; для возобновления все три канала должны иметь свободное место.
+- **Mob-specific reserve:** при смене отпечатанного моба запас `Special` сбрасывается только когда меняется его аспект, а не при любом отличии entity ID.
+- **Порядок тика:** сначала выполняется серверная логика спавнера (если клетка включена и не запитана редстоуном), затем выполняется одна попытка втянуть эссенцию. Само втягивание не блокируется сигналом редстоуна или выключенной конфигурацией клетки, как и в исходнике.
+- **Suction:** сила — 256; минимальный порог suction для извлечения из клетки — 9000.
+- **Соседние трубы:** перед `takeEssentia` проверяются `isConnectable`, `canOutputTo`, совпадение типа эссенции и положительное количество у источника.
+- **Spawn activation/cap:** близость игрока не является условием активации (поле `activatingRangeFromPlayer=16` в оригинале не использовалось). Ограничение шести мобов проверяется по runtime-классу сущности в AABB исходного спавнера: диапазон 8 блоков по X/Z и 4 по Y от блока.
+- **Spawn positions/delay:** X/Z смещения не добавляют `+0.5`; задержка обновляется после каждого успешного появления, а сохранённое значение `-1` приводит к генерации нового delay перед спавном.
+- **Spawn event:** при успешном появлении вызывается стандартное событие spawner level event `2004`. Расход топлива и приоритет каналов `Special → Wrath → Sloth` сохранены.
+
+GameTests покрывают capacity gate, приоритет топлива, spawn AABB, силы suction, смену мобов с одинаковым/разным аспектом и TC4 transport bridge. На commit `582285d` CI #661 и release #73 успешно прошли обе конфигурации по **114/114** required GameTests.
+
+**Оставшаяся визуальная проверка:** старый клиентский sparkle `Thaumcraft.proxy.sparkle(0x870404)` и `EntityLiving.spawnExplosionParticle()` пока отдельно не восстановлены/не подтверждены в современном клиентском renderer. Headless GameTests не подтверждают визуальный паритет этих эффектов; для закрытия пункта нужен `runClient`.
+
 ## Визуальная проверка ещё нужна
 
 - **Цвета фаз Morph Tools:** в порте добавлен динамический tint-source с исходными цветами `0x980000`, `0x0010CC`, `0xE5DA00`. GameTest проверяет таблицу значений и JSON-модели; нужен визуальный `runClient`.
