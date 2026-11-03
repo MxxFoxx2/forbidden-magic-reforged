@@ -5,6 +5,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_ROOT = ROOT / "src/main/java/dev/visfox/forbiddenreforged"
 CORE_ROOT = SOURCE_ROOT / "core"
+PURE_CORE_ROOTS = tuple(CORE_ROOT / name for name in ("model", "aspect", "recipe", "research"))
 API_ROOT = SOURCE_ROOT / "integration/api"
 RUNTIME_ROOT = SOURCE_ROOT / "integration/runtime"
 TC4_ROOT = SOURCE_ROOT / "integration/tc4"
@@ -15,6 +16,10 @@ HOST_PACKAGES = (
     "com.leclowndu93150.thaumaturge",
 )
 CORE_FORBIDDEN_PACKAGES = (
+    "net.neoforged",
+    *HOST_PACKAGES,
+)
+API_FORBIDDEN_PACKAGES = (
     "net.minecraft",
     "net.neoforged",
     *HOST_PACKAGES,
@@ -57,14 +62,21 @@ def main() -> int:
         if not root.exists():
             failures.append(f"Missing source boundary: {root.relative_to(ROOT)}")
 
-    # Shared models and behaviors must not depend on Minecraft, NeoForge or a host.
+    # Shared models and catalogs are independent of Minecraft, NeoForge and hosts.
+    # Gameplay code in core may use Minecraft types, but not a concrete host or NeoForge.
     for source in java_files(CORE_ROOT):
         checked += 1
         content = source.read_text(encoding="utf-8")
+        is_pure_core = any(belongs_to(source, root) for root in PURE_CORE_ROOTS)
+
         for imported in imported_names(content):
             if any(has_package_prefix(imported, package) for package in CORE_FORBIDDEN_PACKAGES):
                 failures.append(
                     f"{source.relative_to(ROOT)} imports forbidden core dependency: {imported}"
+                )
+            if is_pure_core and has_package_prefix(imported, "net.minecraft"):
+                failures.append(
+                    f"{source.relative_to(ROOT)} imports game types from a pure core package: {imported}"
                 )
             if has_package_prefix(imported, "dev.visfox.forbiddenreforged") and not has_package_prefix(
                 imported, "dev.visfox.forbiddenreforged.core"
@@ -72,28 +84,42 @@ def main() -> int:
                 failures.append(
                     f"{source.relative_to(ROOT)} depends on mod composition code: {imported}"
                 )
+
         if HOST_REFERENCE_RE.search(content):
             failures.append(
                 f"{source.relative_to(ROOT)} contains a concrete host namespace or package"
             )
 
-    # Public integration contracts may use game types, but must not expose host APIs.
-    for boundary in (API_ROOT, RUNTIME_ROOT):
-        for source in java_files(boundary):
-            checked += 1
-            content = source.read_text(encoding="utf-8")
-            for imported in imported_names(content):
-                if any(has_package_prefix(imported, package) for package in HOST_PACKAGES):
-                    failures.append(
-                        f"{source.relative_to(ROOT)} exposes a concrete host import: {imported}"
-                    )
-            if HOST_REFERENCE_RE.search(content):
+    # The public integration API remains independent of game and host implementation types.
+    for source in java_files(API_ROOT):
+        checked += 1
+        content = source.read_text(encoding="utf-8")
+        for imported in imported_names(content):
+            if any(has_package_prefix(imported, package) for package in API_FORBIDDEN_PACKAGES):
                 failures.append(
-                    f"{source.relative_to(ROOT)} contains a concrete host namespace or package"
+                    f"{source.relative_to(ROOT)} imports forbidden integration API dependency: {imported}"
                 )
+        if HOST_REFERENCE_RE.search(content):
+            failures.append(
+                f"{source.relative_to(ROOT)} contains a concrete host namespace or package"
+            )
 
-    # Production host references belong in integration/tc4. The composition root
-    # is the single intentional place that selects the active adapter.
+    # Runtime capabilities can use Minecraft types, but must not expose concrete host APIs.
+    for source in java_files(RUNTIME_ROOT):
+        checked += 1
+        content = source.read_text(encoding="utf-8")
+        for imported in imported_names(content):
+            if any(has_package_prefix(imported, package) for package in HOST_PACKAGES):
+                failures.append(
+                    f"{source.relative_to(ROOT)} exposes a concrete host import: {imported}"
+                )
+        if HOST_REFERENCE_RE.search(content):
+            failures.append(
+                f"{source.relative_to(ROOT)} contains a concrete host namespace or package"
+            )
+
+    # Production host imports belong in integration/tc4. The composition root is the
+    # single intentional place that selects the active adapter.
     checked_boundaries = (CORE_ROOT, API_ROOT, RUNTIME_ROOT, TC4_ROOT)
     for source in java_files(SOURCE_ROOT):
         if any(belongs_to(source, boundary) for boundary in checked_boundaries):
@@ -111,11 +137,6 @@ def main() -> int:
                     failures.append(
                         f"{source.relative_to(ROOT)} selects a concrete TC4 adapter outside the composition root"
                     )
-
-        if HOST_REFERENCE_RE.search(content):
-            failures.append(
-                f"{source.relative_to(ROOT)} references a concrete host outside integration/tc4"
-            )
 
     if failures:
         print("\n".join(failures), file=sys.stderr)
