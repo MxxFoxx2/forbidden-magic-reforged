@@ -1,0 +1,86 @@
+From 8c70d6f6e7d6e6f0d4a8c96e33e0c953e10b3b7f Mon Sep 17 00:00:00 2001
+From: Forbidden Magic Port Build <port-build@example.invalid>
+Date: Tue, 3 Nov 2026 17:30:00 +0300
+Subject: [PATCH] feat: add opt-in taint origin registration
+
+---
+ .../java/thaumcraft/taint/TaintOriginRegistry.java | 57 ++++++++++++++++++++++
+ .../java/thaumcraft/taint/TaintSpread.java         |  3 +-
+ 2 files changed, 59 insertions(+), 1 deletion(-)
+ create mode 100644 src/main/java/thaumcraft/taint/TaintOriginRegistry.java
+
+diff --git a/src/main/java/thaumcraft/taint/TaintOriginRegistry.java b/src/main/java/thaumcraft/taint/TaintOriginRegistry.java
+new file mode 100644
+index 0000000..aa2c3f1
+--- /dev/null
++++ b/src/main/java/thaumcraft/taint/TaintOriginRegistry.java
+@@ -0,0 +1,57 @@
++package thaumcraft.taint;
++
++import java.util.Objects;
++import java.util.Set;
++import java.util.concurrent.ConcurrentHashMap;
++import net.minecraft.core.BlockPos;
++import net.minecraft.server.level.ServerLevel;
++import net.minecraft.world.level.block.Block;
++import net.minecraft.world.level.block.state.BlockState;
++
++/**
++ * Opt-in extension point for add-ons that provide their own taint source blocks.
++ *
++ * <p>Origin blocks participate in the host taint adjacency checks. Their own
++ * random-tick or block-entity logic can call {@link #spread(ServerLevel, BlockPos, BlockPos)}
++ * to ask the host to place fibres in one adjacent position.</p>
++ */
++public final class TaintOriginRegistry {
++    private static final Set<Block> ORIGINS = ConcurrentHashMap.newKeySet();
++
++    private TaintOriginRegistry() {
++    }
++
++    public static void register(Block origin) {
++        ORIGINS.add(Objects.requireNonNull(origin, "origin"));
++    }
++
++    public static void unregister(Block origin) {
++        ORIGINS.remove(Objects.requireNonNull(origin, "origin"));
++    }
++
++    public static boolean isOrigin(BlockState state) {
++        return state != null && ORIGINS.contains(state.getBlock());
++    }
++
++    public static boolean spread(ServerLevel level, BlockPos origin, BlockPos target) {
++        Objects.requireNonNull(level, "level");
++        Objects.requireNonNull(origin, "origin");
++        Objects.requireNonNull(target, "target");
++        if (!level.hasChunkAt(origin) || !level.hasChunkAt(target)
++            || !isOrigin(level.getBlockState(origin))) {
++            return false;
++        }
++        int distance = Math.abs(origin.getX() - target.getX())
++            + Math.abs(origin.getY() - target.getY())
++            + Math.abs(origin.getZ() - target.getZ());
++        if (distance != 1 || !TaintSpread.spreadFibres(level, target)) {
++            return false;
++        }
++        TaintBiomes.set(level, target, TaintBiomes.TAINTED_LAND);
++        return true;
++    }
++}
+diff --git a/src/main/java/thaumcraft/taint/TaintSpread.java b/src/main/java/thaumcraft/taint/TaintSpread.java
+index ab43fe6..d389cb8 100644
+--- a/src/main/java/thaumcraft/taint/TaintSpread.java
++++ b/src/main/java/thaumcraft/taint/TaintSpread.java
+@@ -93,7 +93,8 @@ public final class TaintSpread {
+     public static boolean isTaintBlock(BlockState state) {
+         return state.is(ModBlocks.CRUSTED_TAINT.get()) || state.is(ModBlocks.TAINTED_SOIL.get()) || state.is(ModBlocks.FLESH_BLOCK.get())
+             || state.is(ModBlocks.FIBROUS_TAINT.get()) || state.is(ModBlocks.TAINTED_GRASS.get()) || state.is(ModBlocks.TAINTED_PLANT.get())
+-            || state.is(ModBlocks.SPORE_STALK.get()) || state.is(ModBlocks.MATURE_SPORE_STALK.get());
++            || state.is(ModBlocks.SPORE_STALK.get()) || state.is(ModBlocks.MATURE_SPORE_STALK.get())
++            || TaintOriginRegistry.isOrigin(state);
+     }
+ 
+     private static boolean isLogGourdOrCactus(BlockState state) {
+-- 
+2.43.0

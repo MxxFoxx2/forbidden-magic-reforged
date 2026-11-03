@@ -166,11 +166,16 @@ public final class EnchantmentGameTests {
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void tinkererIntegrationIsOptional(GameTestHelper helper) {
         boolean loaded = ModList.get().isLoaded("thaumictinkerer");
+        int firstRegistration = FmTinkerer.registeredCount();
         if (!loaded) {
-            helper.assertValueEqual(FmTinkerer.registeredCount(), 0, "no TT means no registered costs");
+            helper.assertValueEqual(firstRegistration, 0, "no TT means no registered costs");
         } else {
-            helper.assertValueEqual(FmTinkerer.registeredCount(), 8, "TT receives eight enchantment costs");
+            helper.assertValueEqual(firstRegistration, 8, "TT receives eight enchantment costs");
         }
+
+        FmTinkerer.register();
+        helper.assertValueEqual(FmTinkerer.registeredCount(), firstRegistration,
+            "repeated optional registration is idempotent and does not inflate the count");
         helper.succeed();
     }
 

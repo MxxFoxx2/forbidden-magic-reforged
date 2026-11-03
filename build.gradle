@@ -104,10 +104,64 @@ if (file('host').isDirectory()) {
     }
 }
 
+def tinkererApiJar = layout.buildDirectory.file(
+    "optional-api/thaumic-tinkerer-reforged-1.1-1.21.1.jar"
+)
+def tinkererApiUrl = "https://github.com/notlikethiss/thaumic-tinkerer-reforged/releases/download/1.21.1/thaumic-tinkerer-reforged-1.1-1.21.1.jar"
+def tinkererApiSha256 = "f38c4ec9791b96a195953ed7cdfd59324f978c0bae4f830f7f2ff59e9aed9736"
+
+def downloadTinkererCompileApi = tasks.register("downloadTinkererCompileApi") {
+    outputs.file(tinkererApiJar)
+    outputs.upToDateWhen { false }
+    doLast {
+        File destination = tinkererApiJar.get().asFile
+        destination.parentFile.mkdirs()
+
+        def digest = { File file ->
+            java.security.MessageDigest.getInstance("SHA-256")
+                .digest(file.bytes)
+                .encodeHex()
+                .toString()
+        }
+
+        if (destination.isFile() && digest(destination) == tinkererApiSha256) {
+            return
+        }
+
+        File temporary = new File(destination.parentFile, destination.name + ".part")
+        if (temporary.exists()) {
+            temporary.delete()
+        }
+        new URL(tinkererApiUrl).withInputStream { input ->
+            temporary.withOutputStream { output ->
+                output << input
+            }
+        }
+
+        String actualSha256 = digest(temporary)
+        if (actualSha256 != tinkererApiSha256) {
+            temporary.delete()
+            throw new GradleException(
+                "Thaumic Tinkerer compile API checksum mismatch: expected ${tinkererApiSha256}, got ${actualSha256}"
+            )
+        }
+
+        if (destination.exists() && !destination.delete()) {
+            temporary.delete()
+            throw new GradleException("Could not replace stale Thaumic Tinkerer compile API at ${destination}")
+        }
+        if (!temporary.renameTo(destination)) {
+            destination.bytes = temporary.bytes
+            temporary.delete()
+        }
+    }
+}
+
 dependencies {
     implementation "com.github.glitchfiend:TerraBlender-neoforge:${terrablender_version}"
 
     compileOnly "thaumcraft:thaumcraft:${thaumcraft_version}"
+    compileOnly files(tinkererApiJar)
     localRuntime "thaumcraft:thaumcraft:${thaumcraft_version}"
     // Thaumcraft 1.21.1 has a mandatory Curios runtime dependency; include it in GameTest runs.
     localRuntime "top.theillusivec4.curios:curios-neoforge:${curios_version}"
@@ -117,8 +171,34 @@ dependencies {
     clientRuntimeOnly "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
 }
 
+tasks.named('compileJava') {
+    dependsOn(downloadTinkererCompileApi)
+}
+
 tasks.named('jar', Jar) {
     archiveFileName = "forbidden-magic-${mod_version}.jar"
+}
+
+def verifyTinkererCompileOnly = tasks.register("verifyTinkererCompileOnly") {
+    dependsOn(tasks.named('jar'))
+    doLast {
+        File modJar = tasks.named('jar', Jar).get().archiveFile.get().asFile
+        new java.util.jar.JarFile(modJar).withCloseable { archive ->
+            def entries = archive.entries()
+            while (entries.hasMoreElements()) {
+                def entry = entries.nextElement()
+                if (entry.name.startsWith("thaumictinkerer/")) {
+                    throw new GradleException(
+                        "Optional Thaumic Tinkerer API leaked into the Forbidden Magic JAR: ${entry.name}"
+                    )
+                }
+            }
+        }
+    }
+}
+
+tasks.named('build') {
+    dependsOn(verifyTinkererCompileOnly)
 }
 
 sourceSets.main.resources {

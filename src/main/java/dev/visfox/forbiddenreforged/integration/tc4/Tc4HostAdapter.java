@@ -23,6 +23,7 @@ import dev.visfox.forbiddenreforged.integration.runtime.HostItemFactoryServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostItemPropertyServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostScribingServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostTaintBlockServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostTaintOriginServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandInspectionServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandVisServices;
 import dev.visfox.forbiddenreforged.core.wand.WandVisAccess;
@@ -67,7 +68,7 @@ import thaumcraft.wand.focus.FocusItem;
  * 1.21.1 gameplay integrations remain intact while their extraction into
  * focused host capabilities proceeds incrementally.
  */
-public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, HostWarpServices, HostMorphToolServices, HostBlockEntityServices, HostWandInspectionServices, HostWandVisServices, HostWandPartsServices, HostFocusServices, HostEssentiaTransportServices, HostAccessoryServices, HostTaintBlockServices, HostEnchantmentEffectServices, HostScribingServices, HostEntityAspectServices, HostEntityClassificationServices, HostItemFactoryServices, HostItemPropertyServices, HostWandRegistrationServices, HostOptionalEnchantmentServices, HostCreativeContentServices, HostVillagerTradeServices {
+public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, HostWarpServices, HostMorphToolServices, HostBlockEntityServices, HostWandInspectionServices, HostWandVisServices, HostWandPartsServices, HostFocusServices, HostEssentiaTransportServices, HostAccessoryServices, HostTaintBlockServices, HostTaintOriginServices, HostEnchantmentEffectServices, HostScribingServices, HostEntityAspectServices, HostEntityClassificationServices, HostItemFactoryServices, HostItemPropertyServices, HostWandRegistrationServices, HostOptionalEnchantmentServices, HostCreativeContentServices, HostVillagerTradeServices {
     private static final WandVisAccess WAND_VIS = new Tc4WandVisAdapter();
     private static final WandPartsAccess WAND_PARTS = new Tc4WandPartsAdapter();
 
@@ -95,8 +96,8 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
             "Registers scan targets through the existing 1.21.1 AspectSync implementation");
         adapted(support, HostProfile.Feature.RESEARCH_ENTRIES,
             "Translates shared research definitions, including sibling links and item/entity/aspect unlock triggers, to TC4 ResearchItem entries");
-        support.put(HostProfile.Feature.RESEARCH_STAGES,
-            HostProfile.FeatureSupport.partial("The TC4 adapter accepts one page group; multi-stage definitions are rejected"));
+        adapted(support, HostProfile.Feature.RESEARCH_STAGES,
+            "Lowers each semantic stage into a sequential native ResearchItem; intermediate keys are adapter-owned and the final stage keeps the canonical key");
         adapted(support, HostProfile.Feature.ARCANE_RECIPES, "Translates shared arcane recipe definitions");
         adapted(support, HostProfile.Feature.CRAFTING_RECIPE_REFERENCES,
             "Translates shared crafting recipe references");
@@ -123,8 +124,8 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
             "Shared Hellfire trigger rules and costs are wired to the TC4 WandTriggers registry and callback API");
         adapted(support, HostProfile.Feature.FOCI_OR_SPELLS,
             "Shared Blink Focus behavior, progression, costs and presentation are materialized through the native TC4 FocusItem lifecycle");
-        support.put(HostProfile.Feature.OPTIONAL_ENCHANTMENT_INTEGRATION,
-            HostProfile.FeatureSupport.partial("Thaumic Tinkerer is optional; its reflective enchantment-cost bridge is skipped when the mod or expected API is unavailable"));
+        adapted(support, HostProfile.Feature.OPTIONAL_ENCHANTMENT_INTEGRATION,
+            "Links the pinned Thaumic Tinkerer 1.21.1 public Data record through an isolated optional compileOnly adapter; missing mod is a no-op");
         adapted(support, HostProfile.Feature.CREATIVE_CONTENT,
             "Contributes catalogued TC4 wand stacks through a dedicated creative-content capability");
         adapted(support, HostProfile.Feature.ACCESSORY_INTEGRATION,
@@ -151,8 +152,8 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
             "Provides TC4 tool stats, rarity, food and focus properties");
         adapted(support, HostProfile.Feature.ITEM_FACTORIES,
             "Creates TC4-bound morph, ring, scribing and accessory items behind the host factory");
-        support.put(HostProfile.Feature.TAINT_ORIGINS,
-            HostProfile.FeatureSupport.unsupported("No TC4 taint-origin registration or propagation adapter exists"));
+        adapted(support, HostProfile.Feature.TAINT_ORIGINS,
+            "Exposes opt-in origin block registration and adjacent fibre propagation through the pinned TC4 taint engine");
 
         return new HostProfile(
             ContentId.parse("host:tc4-reforged"),
@@ -387,6 +388,26 @@ public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, Ho
     @Override
     public void playTaintShovelSound(Level level, BlockPos pos) {
         Tc4TaintAdapter.playTaintShovelSound(level, pos);
+    }
+
+    @Override
+    public void registerOrigin(net.minecraft.world.level.block.Block originBlock) {
+        Tc4TaintOriginAdapter.register(originBlock);
+    }
+
+    @Override
+    public void unregisterOrigin(net.minecraft.world.level.block.Block originBlock) {
+        Tc4TaintOriginAdapter.unregister(originBlock);
+    }
+
+    @Override
+    public boolean isOrigin(BlockState state) {
+        return Tc4TaintOriginAdapter.isOrigin(state);
+    }
+
+    @Override
+    public boolean spreadFromOrigin(ServerLevel level, BlockPos origin, BlockPos target) {
+        return Tc4TaintOriginAdapter.spread(level, origin, target);
     }
 
     @Override

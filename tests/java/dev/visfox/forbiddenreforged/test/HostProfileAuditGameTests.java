@@ -61,6 +61,8 @@ public final class HostProfileAuditGameTests {
             "accessory slot access is exposed through HostAccessoryServices");
         helper.assertTrue(HostAdapterRegistry.requireTaintBlocks() != null,
             "taint material and purification operations are exposed through HostTaintBlockServices");
+        helper.assertTrue(HostAdapterRegistry.requireTaintOrigins() != null,
+            "origin registration and host spread are exposed through HostTaintOriginServices");
         helper.assertTrue(HostAdapterRegistry.requireEnchantmentEffects() != null,
             "host-dependent enchantment effects are exposed through HostEnchantmentEffectServices");
         helper.assertTrue(HostAdapterRegistry.requireScribing() != null,
@@ -94,14 +96,13 @@ public final class HostProfileAuditGameTests {
             Feature.WAND_VIS_STORAGE, Feature.WAND_PARTS, Feature.FOCI_OR_SPELLS,
             Feature.ESSENTIA_STORAGE, Feature.ESSENTIA_TRANSPORT, Feature.WARP_POOLS,
             Feature.STICKY_WARP, Feature.ENTITY_ASPECTS, Feature.ENTITY_CLASSIFICATION,
-            Feature.VILLAGER_TRADES, Feature.CREATIVE_CONTENT);
+            Feature.VILLAGER_TRADES, Feature.CREATIVE_CONTENT, Feature.RESEARCH_STAGES,
+            Feature.OPTIONAL_ENCHANTMENT_INTEGRATION, Feature.TAINT_ORIGINS);
         helper.succeed();
     }
 
     private static SupportLevel expectedLevel(Feature feature) {
         return switch (feature) {
-            case RESEARCH_STAGES, OPTIONAL_ENCHANTMENT_INTEGRATION -> SupportLevel.PARTIAL;
-            case TAINT_ORIGINS -> SupportLevel.UNSUPPORTED;
             default -> SupportLevel.ADAPTED;
         };
     }
