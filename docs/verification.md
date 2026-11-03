@@ -2,7 +2,7 @@
 
 ## Последний успешный CI — 4 ноября 2026
 
-- Проверенный HEAD main: [`64fabaaf`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/64fabaaf5bba2c6adbfeb65c4c2887a07dd964c7).
+- Проверенный production/runtime commit: [`64fabaaf`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/64fabaaf5bba2c6adbfeb65c4c2887a07dd964c7); последующие коммиты обновляют только `docs/verification.md`.
 - [Java CI with Gradle #658](https://github.com/MxxFoxx2/forbidden-magic-reforged/actions/runs/41737512523) завершился успешно: host-agnostic boundary check, подготовка и сборка закреплённого хоста, сборка аддона, provenance, generated-resource freshness и обе конфигурации GameTests.
 - С `no_lust=false`: **111/111** required GameTests passed.
 - С `no_lust=true`: **111/111** required GameTests passed.
