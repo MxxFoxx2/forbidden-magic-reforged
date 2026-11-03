@@ -1,6 +1,5 @@
 package dev.visfox.forbiddenreforged.test;
 
-import io.netty.channel.embedded.EmbeddedChannel;
 import net.minecraft.util.RandomSource;
 import java.util.List;
 import java.util.Set;
@@ -15,14 +14,9 @@ import net.minecraft.gametest.framework.FunctionGameTestInstance;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestData;
 import net.minecraft.gametest.framework.TestEnvironmentDefinition;
-import net.minecraft.network.Connection;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.CommonListenerCookie;
-import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -31,7 +25,6 @@ import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
-import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
@@ -110,19 +103,7 @@ public final class EnchantmentGameTests {
         }
     }
 
-    private static ServerPlayer mockPlayer(GameTestHelper helper) {
-        ServerPlayer player = (ServerPlayer) helper.makeMockServerPlayer(GameType.SURVIVAL);
-        CommonListenerCookie cookie = CommonListenerCookie.createInitial(player.getGameProfile(), false);
-        Connection connection = new Connection(PacketFlow.SERVERBOUND);
-        new EmbeddedChannel(connection);
-        new ServerGamePacketListenerImpl(helper.getLevel().getServer(), connection, player, cookie) {
-            @Override
-            public void send(Packet<?> packet) {
-            }
-        };
-        player.connection.markClientLoaded();
-        return player;
-    }
+    
 
     private static void enchantmentsResolveWithExpectedShape(GameTestHelper helper) {
         var registry = helper.getLevel().registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
@@ -243,7 +224,7 @@ public final class EnchantmentGameTests {
     }
 
     private static void impactCoversAThreeByThreePlane(GameTestHelper helper) {
-        ServerPlayer player = mockPlayer(helper);
+        ServerPlayer player = GameTestPlayers.connected(helper);
         BlockPos center = helper.absolutePos(new BlockPos(3, 3, 3));
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(FmItems.MORPH_PICKAXE.get()));
         ItemStack stack = player.getMainHandItem();
@@ -292,7 +273,7 @@ public final class EnchantmentGameTests {
 
     private static void voidtouchedRepairsAndWarps(GameTestHelper helper) {
         ItemStack stack = new ItemStack(FmItems.MORPH_PICKAXE.get());
-        ServerPlayer player = mockPlayer(helper);
+        ServerPlayer player = GameTestPlayers.connected(helper);
         Tc4MorphToolItem item = (Tc4MorphToolItem) stack.getItem();
         helper.assertValueEqual(item.getWarp(stack, player), 0, "plain morph tool carries no warp");
         stack.enchant(helper.getLevel().registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(FmEnchantments.VOIDTOUCHED), 1);

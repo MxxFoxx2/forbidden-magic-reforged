@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import io.netty.channel.embedded.EmbeddedChannel;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -22,18 +21,12 @@ import net.minecraft.gametest.framework.FunctionGameTestInstance;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestData;
 import net.minecraft.gametest.framework.TestEnvironmentDefinition;
-import net.minecraft.network.Connection;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.CommonListenerCookie;
-import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
@@ -108,19 +101,7 @@ public final class BlockGameTests {
         }
     }
 
-    private static ServerPlayer mockPlayer(GameTestHelper helper) {
-        ServerPlayer player = (ServerPlayer) helper.makeMockServerPlayer(GameType.SURVIVAL);
-        CommonListenerCookie cookie = CommonListenerCookie.createInitial(player.getGameProfile(), false);
-        Connection connection = new Connection(PacketFlow.SERVERBOUND);
-        new EmbeddedChannel(connection);
-        new ServerGamePacketListenerImpl(helper.getLevel().getServer(), connection, player, cookie) {
-            @Override
-            public void send(Packet<?> packet) {
-            }
-        };
-        player.connection.markClientLoaded();
-        return player;
-    }
+    
 
     private static void tc4TaintMaterialClassificationIsBehindAdapter(GameTestHelper helper) {
         helper.assertTrue(Tc4TaintAdapter.isHostTaintMaterial(ModBlocks.FLUX_GOO.get().defaultBlockState()),
@@ -294,7 +275,7 @@ public final class BlockGameTests {
         level.setBlockAndUpdate(pos, FmBlocks.ARCANE_CAKE.get().defaultBlockState());
         helper.assertTrue(ResearchCategories.getResearch("ARCANECAKE") != null, "cake research exists");
         helper.assertTrue(TcRecipes.get("ARCANECAKE") instanceof InfusionRecipe, "cake recipe exists");
-        ServerPlayer player = mockPlayer(helper);
+        ServerPlayer player = GameTestPlayers.connected(helper);
         player.getFoodData().setFoodLevel(10);
         ArcaneCakeBlock.eat(level, pos, level.getBlockState(pos), player);
         helper.assertValueEqual(level.getBlockState(pos).getValue(ArcaneCakeBlock.SLICE), 1, "one slice eaten");

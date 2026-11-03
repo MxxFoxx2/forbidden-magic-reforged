@@ -1,6 +1,5 @@
 package dev.visfox.forbiddenreforged.test;
 
-import io.netty.channel.embedded.EmbeddedChannel;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -14,19 +13,13 @@ import net.minecraft.gametest.framework.FunctionGameTestInstance;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestData;
 import net.minecraft.gametest.framework.TestEnvironmentDefinition;
-import net.minecraft.network.Connection;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.CommonListenerCookie;
-import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -52,7 +45,6 @@ import dev.visfox.forbiddenreforged.core.wand.WandBehaviors;
 import dev.visfox.forbiddenreforged.core.wand.WandPartsAccess;
 import dev.visfox.forbiddenreforged.core.wand.WandVisAccess;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4WarpAdapter;
-import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.core.model.HostContent;
 import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 import dev.visfox.forbiddenreforged.integration.api.HostProfile;
@@ -508,7 +500,7 @@ public final class RecipeGameTests {
     }
 
     private static void profaneWandBehaviorUsesCorePorts(GameTestHelper helper) {
-        ServerPlayer player = mockPlayer(helper);
+        ServerPlayer player = GameTestPlayers.connected(helper);
         player.tickCount = 20;
         ItemStack wand = new ItemStack(Items.STICK);
         int[] restoredVis = {0};
@@ -722,7 +714,7 @@ public final class RecipeGameTests {
             "Wrath Cage item must keep five warp");
         helper.assertValueEqual(Warp.getItemWarp(new ItemStack(FmBlocks.TAINT_SAPLING.get().asItem())), 1,
             "Tainted Sapling item must keep one warp");
-        ServerPlayer player = mockPlayer(helper);
+        ServerPlayer player = GameTestPlayers.connected(helper);
         int stickyBefore = Warp.get(player, WarpType.STICKY);
         HostAdapterRegistry.requireWarp().changeWarp(player, 0, WarpKind.STICKY);
         helper.assertValueEqual(Warp.get(player, WarpType.STICKY), stickyBefore,
@@ -733,19 +725,7 @@ public final class RecipeGameTests {
         helper.succeed();
     }
 
-    private static ServerPlayer mockPlayer(GameTestHelper helper) {
-        ServerPlayer player = (ServerPlayer) helper.makeMockServerPlayer(GameType.SURVIVAL);
-        CommonListenerCookie cookie = CommonListenerCookie.createInitial(player.getGameProfile(), false);
-        Connection connection = new Connection(PacketFlow.SERVERBOUND);
-        new EmbeddedChannel(connection);
-        new ServerGamePacketListenerImpl(helper.getLevel().getServer(), connection, player, cookie) {
-            @Override
-            public void send(Packet<?> packet) {
-            }
-        };
-        player.connection.markClientLoaded();
-        return player;
-    }
+    
 
     private static void everyPortedRecipeResolvesItsInputs(GameTestHelper helper) {
         List<String> missing = new ArrayList<>();
@@ -776,7 +756,7 @@ public final class RecipeGameTests {
     }
 
     private static void chainFromNetherrackToWrathShard(GameTestHelper helper) {
-        ServerPlayer player = mockPlayer(helper);
+        ServerPlayer player = GameTestPlayers.connected(helper);
         AspectList tags = AspectRegistry.active().getObjectTags(Items.NETHERRACK);
         helper.assertTrue(tags != null && tags.getAmount(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER)) >= 1, "netherrack yields infernus");
         helper.assertTrue(ResearchCategories.getResearch("NETHERSHARDS") != null, "shard research exists");

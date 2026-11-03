@@ -17,7 +17,6 @@ import thaumcraft.registry.ModEntities;
 import thaumcraft.registry.ModItems;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import io.netty.channel.embedded.EmbeddedChannel;
 import java.util.ArrayList;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,14 +38,9 @@ import net.minecraft.gametest.framework.FunctionGameTestInstance;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestData;
 import net.minecraft.gametest.framework.TestEnvironmentDefinition;
-import net.minecraft.network.Connection;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.CommonListenerCookie;
-import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -391,7 +385,7 @@ public final class ItemGameTests {
     }
 
     private static void ringOfNutritionOnlyWorksInRingSlots(GameTestHelper helper) {
-        ServerPlayer player = mockConnectedPlayer(helper);
+        ServerPlayer player = GameTestPlayers.connected(helper);
         for (int slot = 0; slot < Baubles.slotCount(); slot++) {
             Baubles.set(player, slot, ItemStack.EMPTY);
         }
@@ -959,8 +953,8 @@ public final class ItemGameTests {
         }
         Item item = BuiltInRegistries.ITEM.getValue(ForbiddenMagic.id("sub_collar"));
         helper.assertTrue(item != Items.AIR, "the collar item exists");
-        ServerPlayer owner = mockConnectedPlayer(helper);
-        ServerPlayer target = mockConnectedPlayer(helper);
+        ServerPlayer owner = GameTestPlayers.connected(helper);
+        ServerPlayer target = GameTestPlayers.connected(helper);
         ItemStack collar = new ItemStack(item);
         helper.assertTrue(item instanceof VisAmuletItem, "Sub Collar is a TC4 vis amulet item");
         helper.assertTrue(((VisAmuletItem) item).canEquip(collar, target), "Sub Collar permits equipping on another player");
@@ -973,7 +967,7 @@ public final class ItemGameTests {
         FmToolEvents.collarDamage(target, 2.0F, null);
         helper.assertValueEqual(VisStorage.getAllVis(worn).visSize(), 6, "two damage stores six vis");
 
-        ServerPlayer attacker = mockConnectedPlayer(helper);
+        ServerPlayer attacker = GameTestPlayers.connected(helper);
         attacker.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(FmItems.RIDING_CROP.get()));
         FmToolEvents.collarDamage(target, 2.0F, attacker);
         helper.assertValueEqual(VisStorage.getAllVis(worn).visSize(), 15, "a crop attacker adds three more doses");
@@ -982,7 +976,7 @@ public final class ItemGameTests {
 
     private static void ridingCropEffectsMatchOriginal(GameTestHelper helper) {
         ItemStack crop = new ItemStack(FmItems.RIDING_CROP.get());
-        ServerPlayer attacker = mockConnectedPlayer(helper);
+        ServerPlayer attacker = GameTestPlayers.connected(helper);
 
         Horse horse = helper.spawn(EntityTypes.HORSE, new BlockPos(2, 4, 2));
         crop.getItem().hurtEnemy(crop, horse, attacker);
@@ -994,7 +988,7 @@ public final class ItemGameTests {
         MobEffectInstance pigSpeed = pig.getEffect(MobEffects.SPEED);
         helper.assertTrue(pigSpeed != null && pigSpeed.getDuration() == 200 && pigSpeed.getAmplifier() == 5, "a pig gets speed 200 at amplifier 5");
 
-        ServerPlayer victim = mockConnectedPlayer(helper);
+        ServerPlayer victim = GameTestPlayers.connected(helper);
         crop.getItem().hurtEnemy(crop, victim, attacker);
         helper.assertTrue(victim.hasEffect(MobEffects.SPEED) && victim.hasEffect(MobEffects.HASTE) && victim.hasEffect(MobEffects.STRENGTH), "players get speed, haste and strength");
 
@@ -1128,7 +1122,7 @@ public final class ItemGameTests {
             "the focal manipulator is not wired to the test node's vis network");
         helper.assertTrue(node.getCurrentVis().getAmount(Aspect.FIRE) >= 800, "test node cannot supply the Hellfire cost");
 
-        ServerPlayer player = mockConnectedPlayer(helper);
+        ServerPlayer player = GameTestPlayers.connected(helper);
         player.experienceLevel = 100;
 
         helper.assertTrue(table.startCraft(Tc4BlinkFocusItem.HELLFIRE.id(), player), "the manipulator refused the Hellfire upgrade");
@@ -1223,17 +1217,6 @@ public final class ItemGameTests {
         helper.succeed();
     }
 
-    private static ServerPlayer mockConnectedPlayer(GameTestHelper helper) {        ServerPlayer player = (ServerPlayer) helper.makeMockServerPlayer(GameType.SURVIVAL);
-        CommonListenerCookie cookie = CommonListenerCookie.createInitial(player.getGameProfile(), false);
-        Connection connection = new Connection(PacketFlow.SERVERBOUND);
-        new EmbeddedChannel(connection);
-        new ServerGamePacketListenerImpl(helper.getLevel().getServer(), connection, player, cookie) {
-            @Override
-            public void send(Packet<?> packet) {
-            }
-        };
-        player.connection.markClientLoaded();
-        return player;
-    }
+    
 
 }
