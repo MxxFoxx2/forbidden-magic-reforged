@@ -1,5 +1,6 @@
 package dev.visfox.forbiddenreforged;
 
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -11,11 +12,6 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import thaumcraft.aspect.Aspect;
-import thaumcraft.wand.WandCap;
-import thaumcraft.wand.WandRegistry;
-import thaumcraft.wand.WandRod;
-import thaumcraft.wand.Wands;
 
 public final class FmCreativeTab {
     private static final DeferredRegister<CreativeModeTab> TABS =
@@ -47,39 +43,7 @@ public final class FmCreativeTab {
             MobCrystalItem.setMob(crystal, mobId);
             stacks.add(crystal);
         }
-        addCreativeWands(stacks);
+        HostAdapterRegistry.requireCreativeContent().addCreativeContent(stacks);
         return stacks;
-    }
-
-    private static void addCreativeWands(List<ItemStack> stacks) {
-        addWand(stacks, WandRegistry.CAP_THAUMIUM, "tainted");
-        addWand(stacks, WandRegistry.CAP_THAUMIUM, "infernal");
-        addWand(stacks, WandRegistry.CAP_VOID, "equivalent");
-
-        WandCap orichalcum = WandRegistry.findCap("orichalcum");
-        WandRod neutronium = WandRegistry.findRod("neutronium");
-        WandRod neutroniumStaff = WandRegistry.findRod("neutronium_staff");
-        if (orichalcum != null && neutronium != null) {
-            stacks.add(Wands.create(orichalcum, neutronium, false));
-        }
-        if (orichalcum != null && neutroniumStaff != null) {
-            stacks.add(Wands.create(orichalcum, neutroniumStaff, false));
-        }
-
-        WandRod profane = WandRegistry.findRod("profane");
-        if (profane != null) {
-            ItemStack filled = Wands.create(WandRegistry.CAP_IRON, profane, false);
-            for (Aspect aspect : Aspect.getPrimalAspects()) {
-                Wands.addVis(filled, aspect, 5000, true);
-            }
-            stacks.add(filled);
-        }
-    }
-
-    private static void addWand(List<ItemStack> stacks, WandCap cap, String rodTag) {
-        WandRod rod = WandRegistry.findRod(rodTag);
-        if (rod != null) {
-            stacks.add(Wands.create(cap, rod, false));
-        }
     }
 }

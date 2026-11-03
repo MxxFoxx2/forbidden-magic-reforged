@@ -1,6 +1,9 @@
 package dev.visfox.forbiddenreforged;
 
 import com.mojang.logging.LogUtils;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4HostAdapter;
+import dev.visfox.forbiddenreforged.core.aspect.ForbiddenMagicAspectCatalog;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -15,8 +18,11 @@ public final class ForbiddenMagic {
 
     public ForbiddenMagic(IEventBus modEventBus, ModContainer modContainer) {
         FmConfig.register(modContainer);
-        FmAspects.init();
-        FmAspectTags.register();
+        HostAdapterRegistry.install(Tc4HostAdapter.INSTANCE);
+        HostAdapterRegistry.require().registerAspects(
+            ForbiddenMagicAspectCatalog.definitions(!FmConfig.lustDisabled())
+        );
+        HostAdapterRegistry.require().registerAspectTags();
         FmComponents.register(modEventBus);
         FmBlocks.register(modEventBus);
         FmItems.ITEMS.register(modEventBus);

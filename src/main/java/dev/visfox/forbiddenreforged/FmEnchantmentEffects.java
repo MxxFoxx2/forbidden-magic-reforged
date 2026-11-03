@@ -1,6 +1,8 @@
 package dev.visfox.forbiddenreforged;
 
 import java.util.List;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
+import dev.visfox.forbiddenreforged.core.wand.WandRodKind;
 import java.util.Set;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
@@ -31,9 +33,6 @@ import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import net.neoforged.neoforge.event.entity.living.LivingExperienceDropEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
-import thaumcraft.aspect.Aspect;
-import thaumcraft.damage.ModDamageTypes;
-import thaumcraft.wand.Wands;
 
 public final class FmEnchantmentEffects {
     private static final TagKey<Block> INFUSED_STONES = TagKey.create(Registries.BLOCK, ForbiddenMagic.id("infused_stones"));
@@ -107,7 +106,7 @@ public final class FmEnchantmentEffects {
             RandomSource random = event.getLevel().getRandom();
             float chance = clusterChance(cluster);
             for (ItemEntity drop : event.getDrops()) {
-                drop.setItem(thaumcraft.item.tool.SpecialMining.find(event.getState(), drop.getItem(), chance, random));
+                drop.setItem(HostAdapterRegistry.requireEnchantmentEffects().specialMiningDrop(event.getState(), drop.getItem(), chance, random));
             }
         }
         int corrupting = FmEnchantments.level(player.level().registryAccess(), tool, FmEnchantments.CORRUPTING);
@@ -246,16 +245,19 @@ public final class FmEnchantmentEffects {
         if (event.getEntity() instanceof Player wearer && !wearer.level().isClientSide()) {
             FmToolEvents.collarDamage(wearer, event.getAmount(), event.getSource().getEntity());
             ItemStack held = wearer.getMainHandItem();
-            if (Wands.isWand(held)) {
+            var wandHost = HostAdapterRegistry.requireWandInspection();
+            if (wandHost.wandRodKind(held) != WandRodKind.NONE) {
                 boolean fireOrWither = event.getSource().is(DamageTypeTags.IS_FIRE)
                     || event.getSource().is(DamageTypes.WITHER);
                 if (FmToolEvents.cancelsInfernalDamage(held, fireOrWither)) {
                     event.setCanceled(true);
                     return;
                 }
-                if (FmToolEvents.restoresTaintedVis(held, event.getSource().is(ModDamageTypes.TAINT))) {
-                    for (Aspect aspect : FmToolEvents.taintedVisRolls(wearer.getRandom())) {
-                        Wands.addVis(held, aspect, 1, true);
+                boolean taintDamage = HostAdapterRegistry.requireEnchantmentEffects()
+                    .isTaintDamage(event.getSource());
+                if (FmToolEvents.restoresTaintedVis(held, taintDamage)) {
+                    for (var aspect : FmToolEvents.taintedVisRolls(wearer.getRandom())) {
+                        HostAdapterRegistry.requireWandVis().addVis(held, aspect, 1, true);
                     }
                 }
             }

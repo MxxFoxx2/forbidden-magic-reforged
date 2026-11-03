@@ -1,5 +1,8 @@
 package dev.visfox.forbiddenreforged;
 
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
+import java.util.List;
+
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -27,15 +30,12 @@ public final class FmCommands {
 
     private static int showAspects(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
-        int fmAddonCount = FmAspectDiagnostics.addonLines().size();
+        List<String> diagnostics = HostAdapterRegistry.require().aspectDiagnostics();
         source.sendSuccess(
-            () -> Component.literal("Aspect registry: total=" + FmAspects.count()
-                + " builtin=" + FmAspects.BUILTIN_ASPECT_COUNT
-                + " registeredAddon=" + (FmAspects.count() - FmAspects.BUILTIN_ASPECT_COUNT)
-                + " fmAddon=" + fmAddonCount),
+            () -> Component.literal("Aspect registry: entries=" + diagnostics.size()),
             false
         );
-        for (String line : FmAspectDiagnostics.registryLines()) {
+        for (String line : diagnostics) {
             source.sendSuccess(() -> Component.literal(line), false);
         }
         return 1;

@@ -9,9 +9,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import dev.visfox.forbiddenreforged.core.warp.WarpKind;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 import net.minecraft.world.level.Level;
-import thaumcraft.research.Warp;
-import thaumcraft.research.WarpType;
 
 public final class TaintFruitItem extends Item {
     private static final FoodProperties FOOD = new FoodProperties.Builder()
@@ -26,7 +26,7 @@ public final class TaintFruitItem extends Item {
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
         if (!level.isClientSide() && entity instanceof ServerPlayer player) {
-            Warp.add(player, 1, WarpType.STICKY);
+            HostAdapterRegistry.requireWarp().changeWarp(player, 1, WarpKind.STICKY);
             player.addEffect(new MobEffectInstance(MobEffects.HUNGER, 600, 0, false, false));
             if (level.getRandom().nextFloat() < 0.4F) {
                 player.sendSystemMessage(Component.translatable("warp.text.15").withStyle(ChatFormatting.DARK_PURPLE));

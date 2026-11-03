@@ -1,5 +1,7 @@
 package dev.visfox.forbiddenreforged;
 
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
+
 import com.google.common.collect.ImmutableSet;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import java.util.List;
@@ -21,12 +23,6 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.village.VillagerTradesEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import thaumcraft.aspect.Aspect;
-import thaumcraft.registry.ModItems;
-import thaumcraft.wand.WandCap;
-import thaumcraft.wand.WandRegistry;
-import thaumcraft.wand.WandRod;
-import thaumcraft.wand.Wands;
 
 public final class FmVillagers {
     private static final DeferredRegister<VillagerProfession> PROFESSIONS =
@@ -94,22 +90,7 @@ public final class FmVillagers {
             Items.EMERALD, 1, null, 0,
             new ItemStack(Items.GLOWSTONE_DUST, randomCount(random, 8, 16)), 7
         )));
-        novice.add(listing(random -> {
-            WandRod rod = WandRegistry.findRod("profane");
-            if (rod == null) {
-                return null;
-            }
-            ItemStack wand = Wands.create(WandRegistry.CAP_IRON, rod, false);
-            for (Aspect aspect : Aspect.getPrimalAspects()) {
-                Wands.addVis(wand, aspect, 5000, true);
-            }
-            return offer(Items.EMERALD, randomCount(random, 8, 12), Items.STICK, 1, wand, 1);
-        }));
-        novice.add(listing(random -> offer(
-            Items.EMERALD, randomCount(random, 4, 8), Items.DIAMOND, 1,
-            new ItemStack(ModItems.FOCUS_FIRE.get()), 1
-        )));
-    }
+        HostAdapterRegistry.requireVillagerTrades().addNoviceTrades(novice);    }
 
     private static int randomCount(net.minecraft.util.RandomSource random, int min, int max) {
         return min + random.nextInt(max - min + 1);

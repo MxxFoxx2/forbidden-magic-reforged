@@ -35,14 +35,13 @@ import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
-import dev.visfox.forbiddenreforged.FmAspects;
 import dev.visfox.forbiddenreforged.FmConfig;
 import dev.visfox.forbiddenreforged.FmEnchantmentEffects;
 import dev.visfox.forbiddenreforged.FmEnchantments;
 import dev.visfox.forbiddenreforged.FmItems;
 import dev.visfox.forbiddenreforged.FmTinkerer;
 import dev.visfox.forbiddenreforged.MorphState;
-import dev.visfox.forbiddenreforged.MorphToolItem;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4MorphToolItem;
 import thaumcraft.test.TestSupport;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.research.ResearchCategories;
@@ -251,7 +250,7 @@ public final class EnchantmentGameTests {
     public static void voidtouchedRepairsAndWarps(GameTestHelper helper) {
         ItemStack stack = new ItemStack(FmItems.MORPH_PICKAXE.get());
         ServerPlayer player = mockPlayer(helper);
-        MorphToolItem item = (MorphToolItem) stack.getItem();
+        Tc4MorphToolItem item = (Tc4MorphToolItem) stack.getItem();
         helper.assertValueEqual(item.getWarp(stack, player), 0, "plain morph tool carries no warp");
         stack.enchant(helper.getLevel().registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(FmEnchantments.VOIDTOUCHED), 1);
         helper.assertValueEqual(item.getWarp(stack, player), 1, "voidtouched morph tool carries warp 1");

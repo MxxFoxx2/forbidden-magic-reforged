@@ -13,13 +13,16 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
-import dev.visfox.forbiddenreforged.FmAspects;
+import dev.visfox.forbiddenreforged.core.aspect.ForbiddenMagicAspectCatalog;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectAdapter;
 import dev.visfox.forbiddenreforged.FmBlocks;
 import dev.visfox.forbiddenreforged.FmItems;
 import dev.visfox.forbiddenreforged.FmSpawnerMobs;
+import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.MobCrystalItem;
 import dev.visfox.forbiddenreforged.WrathCageBlock;
-import dev.visfox.forbiddenreforged.WrathCageBlockEntity;
+import dev.visfox.forbiddenreforged.core.block.WrathCageBehavior;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.crafting.CrucibleRecipe;
 import thaumcraft.crafting.InfusionRecipe;
@@ -38,12 +41,15 @@ public final class EntityGameTests {
 
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void mobCrystalAndSpawnTable(GameTestHelper helper) {
-        helper.assertTrue(FmSpawnerMobs.aspect("minecraft:zombie") == Aspect.FLESH, "zombie carries flesh");
-        helper.assertTrue(FmSpawnerMobs.aspect("thaumcraft:brainy_zombie") == Aspect.MIND, "brainy zombie carries mind");
-        helper.assertTrue(FmSpawnerMobs.aspect("minecraft:pig") == Aspect.BEAST, "pig carries beast");
+        helper.assertValueEqual(FmSpawnerMobs.aspectId("minecraft:zombie"),
+            ContentId.parse("thaumcraft:corpus"), "zombie carries the semantic flesh aspect");
+        helper.assertValueEqual(FmSpawnerMobs.aspectId("thaumcraft:brainy_zombie"),
+            ContentId.parse("thaumcraft:cognitio"), "brainy zombie carries the semantic mind aspect");
+        helper.assertValueEqual(FmSpawnerMobs.aspectId("minecraft:pig"),
+            ContentId.parse("thaumcraft:bestia"), "pig carries the semantic beast aspect");
         helper.assertValueEqual(FmSpawnerMobs.ids().size(), 42, "the table keeps exactly the original 42 mobs");
         for (String id : FmSpawnerMobs.ids()) {
-            helper.assertTrue(FmSpawnerMobs.aspect(id) != null, id + " must map to an aspect");
+            helper.assertTrue(FmSpawnerMobs.aspectId(id) != null, id + " must map to a semantic aspect ID");
         }
         helper.assertTrue(FmSpawnerMobs.isBoss(EntityType.ENDER_DRAGON), "the ender dragon is a boss");
         helper.assertFalse(FmSpawnerMobs.isBoss(EntityType.ZOMBIE), "a zombie is not a boss");
@@ -60,20 +66,21 @@ public final class EntityGameTests {
     public static void wrathCageBlockAndEntity(GameTestHelper helper) {
         BlockPos pos = new BlockPos(5, 4, 5);
         helper.setBlock(pos, FmBlocks.WRATH_CAGE.get().defaultBlockState());
-        WrathCageBlockEntity cage = (WrathCageBlockEntity) helper.getBlockEntity(pos);
+        var cage = helper.getBlockEntity(pos);
         helper.assertTrue(cage != null, "cage creates its block entity");
-        helper.assertTrue(cage != null && cage.getMobId() == null, "a fresh cage is unattuned");
+        var host = HostAdapterRegistry.requireBlockEntities();
+        helper.assertTrue(host.wrathCageMobId(cage) == null, "a fresh cage is unattuned");
         ItemStack zombieCrystal = new ItemStack(FmItems.MOB_CRYSTAL.get());
         MobCrystalItem.setMob(zombieCrystal, "minecraft:zombie");
         helper.assertTrue(WrathCageBlock.attune(cage, zombieCrystal), "a zombie crystal attunes the cage");
-        helper.assertValueEqual(cage.getMobId(), "minecraft:zombie", "the cage keeps the mob id");
+        helper.assertValueEqual(host.wrathCageMobId(cage), "minecraft:zombie", "the cage keeps the mob id");
         helper.assertTrue(MobCrystalItem.mob(zombieCrystal) == null, "attuning an empty cage blanks the crystal");
         ItemStack skeletonCrystal = new ItemStack(FmItems.MOB_CRYSTAL.get());
         MobCrystalItem.setMob(skeletonCrystal, "minecraft:skeleton");
         helper.assertTrue(WrathCageBlock.attune(cage, skeletonCrystal), "a skeleton crystal re-attunes the cage");
-        helper.assertValueEqual(cage.getMobId(), "minecraft:skeleton", "the cage swaps to the new mob");
+        helper.assertValueEqual(host.wrathCageMobId(cage), "minecraft:skeleton", "the cage swaps to the new mob");
         helper.assertValueEqual(MobCrystalItem.mob(skeletonCrystal), "minecraft:zombie", "the held crystal gets the previous mob");
-        ItemStack crystal = WrathCageBlockEntity.crystalForBreak(cage);
+        ItemStack crystal = WrathCageBlock.crystalForBreak(cage);
         helper.assertValueEqual(MobCrystalItem.mob(crystal), "minecraft:skeleton", "breaking the cage yields the attuned crystal");
         helper.destroyBlock(pos);
         ItemEntity dropped = helper.getEntities(EntityType.ITEM, pos, 1.0).stream().findFirst().orElse(null);
@@ -83,12 +90,12 @@ public final class EntityGameTests {
 
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void wrathCageCrystalAndSpawnRules(GameTestHelper helper) {
-        helper.assertFalse(WrathCageBlockEntity.shouldSpawn(true, true, 10, 5, 0), "a powered cage waits");
-        helper.assertTrue(WrathCageBlockEntity.shouldSpawn(false, true, 10, 5, 0), "an attuned fuelled cage spawns");
-        helper.assertFalse(WrathCageBlockEntity.shouldSpawn(false, true, 0, 5, 4), "no fuel and too little essentia waits");
-        helper.assertTrue(WrathCageBlockEntity.shouldSpawn(false, true, 0, 5, 5), "enough essentia starts a fuel cycle");
-        helper.assertFalse(WrathCageBlockEntity.shouldSpawn(false, false, 10, 5, 0), "an unattuned cage waits");
-        helper.assertTrue(WrathCageBlockEntity.shouldSpawn(false, true, 0, 0, 0), "cost 0 needs no fuel");
+        helper.assertFalse(WrathCageBehavior.shouldSpawn(true, true, 10, 5, 0), "a powered cage waits");
+        helper.assertTrue(WrathCageBehavior.shouldSpawn(false, true, 10, 5, 0), "an attuned fuelled cage spawns");
+        helper.assertFalse(WrathCageBehavior.shouldSpawn(false, true, 0, 5, 4), "no fuel and too little essentia waits");
+        helper.assertTrue(WrathCageBehavior.shouldSpawn(false, true, 0, 5, 5), "enough essentia starts a fuel cycle");
+        helper.assertFalse(WrathCageBehavior.shouldSpawn(false, false, 10, 5, 0), "an unattuned cage waits");
+        helper.assertTrue(WrathCageBehavior.shouldSpawn(false, true, 0, 0, 0), "cost 0 needs no fuel");
         helper.succeed();
     }
 
@@ -100,7 +107,7 @@ public final class EntityGameTests {
         helper.assertValueEqual(cage.pages().size(), 5, "wrath cage has 5 pages");
         InfusionRecipe cageRecipe = (InfusionRecipe) TcRecipes.get("WRATHCAGE");
         helper.assertTrue(cageRecipe != null, "wrath cage infusion recipe exists");
-        helper.assertTrue(cageRecipe.aspects().getAmount(FmAspects.WRATH) >= 32, "wrath cage recipe needs WRATH 32");
+        helper.assertTrue(cageRecipe.aspects().getAmount(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.IRA)) >= 32, "wrath cage recipe needs WRATH 32");
         CrucibleRecipe crystalRecipe = (CrucibleRecipe) TcRecipes.get("MOBCRYSTAL");
         helper.assertTrue(crystalRecipe != null, "mob crystal crucible recipe exists");
         helper.assertTrue(crystalRecipe.aspects().getAmount(Aspect.MIND) >= 10, "mob crystal recipe needs MIND 10");

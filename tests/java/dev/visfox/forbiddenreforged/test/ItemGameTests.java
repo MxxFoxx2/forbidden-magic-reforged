@@ -1,10 +1,10 @@
 package dev.visfox.forbiddenreforged.test;
 
 import com.google.gson.JsonArray;
-import dev.visfox.forbiddenreforged.BlinkFocusItem;
-import dev.visfox.forbiddenreforged.CrystalwellItem;
+import dev.visfox.forbiddenreforged.core.wand.BlinkFocusBehavior;
+import dev.visfox.forbiddenreforged.core.wand.WandRodKind;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4BlinkFocusItem;
 import dev.visfox.forbiddenreforged.FmVillagers;
-import dev.visfox.forbiddenreforged.PrimewellItem;
 import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.item.Rarity;
@@ -68,13 +68,16 @@ import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.neoforged.fml.ModList;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
-import dev.visfox.forbiddenreforged.FmAspects;
+import dev.visfox.forbiddenreforged.core.aspect.ForbiddenMagicAspectCatalog;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectAdapter;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4CrystalwellItem;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4PrimewellItem;
 import dev.visfox.forbiddenreforged.FmComponents;
 import dev.visfox.forbiddenreforged.FmDrops;
 import dev.visfox.forbiddenreforged.FmItems;
 import dev.visfox.forbiddenreforged.FmCreativeTab;
 import dev.visfox.forbiddenreforged.FmConfig;
-import dev.visfox.forbiddenreforged.FmResearchItem;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4ResearchItem;
 import dev.visfox.forbiddenreforged.MorphState;
 import dev.visfox.forbiddenreforged.FmEnchantmentEffects;
 import dev.visfox.forbiddenreforged.FmToolEvents;
@@ -115,9 +118,9 @@ public final class ItemGameTests {
         InfusionRecipe recipe = (InfusionRecipe) TcRecipes.get("SKULLAXE");
         helper.assertTrue(recipe != null, "skull axe recipe must be registered");
         helper.assertValueEqual(recipe.instability(), 1, "instability");
-        helper.assertValueEqual(recipe.aspects().getAmount(FmAspects.WRATH), 8, "wrath cost");
+        helper.assertValueEqual(recipe.aspects().getAmount(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.IRA)), 8, "wrath cost");
         helper.assertValueEqual(recipe.aspects().getAmount(Aspect.WEAPON), 8, "weapon cost");
-        helper.assertValueEqual(recipe.aspects().getAmount(FmAspects.NETHER), 8, "nether cost");
+        helper.assertValueEqual(recipe.aspects().getAmount(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INFERNUS)), 8, "nether cost");
         helper.assertValueEqual(recipe.components().size(), 4, "four components");
         helper.succeed();
     }
@@ -129,7 +132,7 @@ public final class ItemGameTests {
         helper.assertTrue(fork.isSecondary(), "FORK is secondary");
         helper.assertTrue(fork.isConcealed(), "FORK is concealed");
         helper.assertValueEqual(fork.warp(), 0, "FORK has no warp");
-        helper.assertValueEqual(fork.tags().getAmount(FmAspects.NETHER), 3, "FORK research NETHER cost");
+        helper.assertValueEqual(fork.tags().getAmount(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INFERNUS)), 3, "FORK research NETHER cost");
         helper.assertValueEqual(fork.tags().getAmount(Aspect.MECHANISM), 1, "FORK research MECHANISM cost");
         helper.assertValueEqual(fork.tags().getAmount(Aspect.TOOL), 1, "FORK research TOOL cost");
         helper.assertValueEqual(fork.tags().getAmount(Aspect.FIRE), 0, "FORK research has no FIRE cost");
@@ -137,7 +140,7 @@ public final class ItemGameTests {
         InfusionRecipe recipe = (InfusionRecipe) TcRecipes.get("FORK");
         helper.assertTrue(recipe != null, "FORK infusion recipe exists");
         helper.assertValueEqual(recipe.instability(), 1, "FORK instability");
-        helper.assertValueEqual(recipe.aspects().getAmount(FmAspects.NETHER), 8, "FORK NETHER cost");
+        helper.assertValueEqual(recipe.aspects().getAmount(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INFERNUS)), 8, "FORK NETHER cost");
         helper.assertValueEqual(recipe.aspects().getAmount(Aspect.FIRE), 0, "FORK has no FIRE cost");
         helper.assertValueEqual(recipe.aspects().getAmount(Aspect.MECHANISM), 8, "FORK mechanism cost");
         helper.assertValueEqual(recipe.aspects().getAmount(Aspect.ENERGY), 8, "FORK energy cost");
@@ -301,9 +304,11 @@ public final class ItemGameTests {
 
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void blinkFocusUpgradesUseOriginalIconAssets(GameTestHelper helper) {
-        helper.assertValueEqual(dev.visfox.forbiddenreforged.BlinkFocusItem.HELLFIRE.icon(),
+        helper.assertTrue(FmItems.BLINK_FOCUS.get() instanceof Tc4BlinkFocusItem,
+            "Blink Focus is created by the selected TC4 item factory");
+        helper.assertValueEqual(Tc4BlinkFocusItem.HELLFIRE.icon(),
             ForbiddenMagic.id("textures/misc/hellfire.png"), "Hellfire uses the bundled original icon");
-        helper.assertValueEqual(dev.visfox.forbiddenreforged.BlinkFocusItem.PANDEMONIUM.icon(),
+        helper.assertValueEqual(Tc4BlinkFocusItem.PANDEMONIUM.icon(),
             ForbiddenMagic.id("textures/misc/pandemonium.png"), "Pandemonium uses the bundled original icon");
         helper.assertTrue(ForbiddenMagic.class.getResourceAsStream("/assets/forbiddenmagic/textures/misc/hellfire.png") != null,
             "Hellfire icon asset is bundled");
@@ -478,15 +483,15 @@ public final class ItemGameTests {
 
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void wandTooltipKindsPreserveOriginalHints(GameTestHelper helper) {
-        helper.assertValueEqual(FmToolEvents.wandTooltipKind("neutronium"), "creativeonly",
+        helper.assertValueEqual(FmToolEvents.wandTooltipKind(WandRodKind.NEUTRONIUM), "creativeonly",
             "neutronium wand exposes the creative-only tooltip");
-        helper.assertValueEqual(FmToolEvents.wandTooltipKind("neutronium_staff"), "creativeonly",
+        helper.assertValueEqual(FmToolEvents.wandTooltipKind(WandRodKind.NEUTRONIUM), "creativeonly",
             "neutronium staff exposes the creative-only tooltip");
-        helper.assertValueEqual(FmToolEvents.wandTooltipKind("profane"), "profane_contract",
+        helper.assertValueEqual(FmToolEvents.wandTooltipKind(WandRodKind.PROFANE), "profane_contract",
             "profane wand exposes its contract tooltip");
-        helper.assertValueEqual(FmToolEvents.wandTooltipKind("profaned"), "profane_contract",
+        helper.assertValueEqual(FmToolEvents.wandTooltipKind(WandRodKind.PROFANE), "profane_contract",
             "profaned wand exposes the contract tooltip");
-        helper.assertValueEqual(FmToolEvents.wandTooltipKind("greatwood"), "",
+        helper.assertValueEqual(FmToolEvents.wandTooltipKind(WandRodKind.OTHER), "",
             "ordinary rods do not receive special wand tooltips");
         helper.assertValueEqual(FmToolEvents.wandTooltipKind(new ItemStack(Items.STICK)), "",
             "non-wand items do not receive wand-specific tooltips");
@@ -496,7 +501,7 @@ public final class ItemGameTests {
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void crystalwellIsAScribingToolWithOriginalDurability(GameTestHelper helper) {
         ItemStack stack = new ItemStack(FmItems.CRYSTALWELL.get());
-        helper.assertTrue(stack.getItem() instanceof CrystalwellItem, "crystalwell uses its behavior item");
+        helper.assertTrue(stack.getItem() instanceof Tc4CrystalwellItem, "crystalwell uses its behavior item");
         helper.assertTrue(stack.getItem() instanceof ScribingToolsItem, "crystalwell can occupy the research table scribe slot");
         int expectedMaxDamage = ResearchConfig.RESEARCH_DIFFICULTY == -1 ? 50 : 100;
         helper.assertValueEqual(stack.getMaxDamage(), expectedMaxDamage, "crystalwell durability follows research difficulty");
@@ -507,7 +512,7 @@ public final class ItemGameTests {
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void primewellIsAPermanentEpicScribingTool(GameTestHelper helper) {
         ItemStack stack = new ItemStack(FmItems.PRIMEWELL.get());
-        helper.assertTrue(stack.getItem() instanceof PrimewellItem, "primewell uses its behavior item");
+        helper.assertTrue(stack.getItem() instanceof Tc4PrimewellItem, "primewell uses its behavior item");
         helper.assertTrue(stack.getItem() instanceof ScribingToolsItem, "primewell can occupy the research table scribe slot");
         helper.assertValueEqual(stack.getRarity(), Rarity.EPIC, "primewell retains epic rarity");
         helper.assertTrue(stack.getMaxDamage() > 1_000_000_000, "primewell does not wear out during research");
@@ -691,10 +696,22 @@ public final class ItemGameTests {
         helper.assertFalse(FmToolEvents.restoresTaintedVis(infernalWand, true),
             "Infernal Wand does not use the Tainted Wand reaction");
 
-        List<Aspect> restored = FmToolEvents.taintedVisRolls(RandomSource.create(42L));
+        List<dev.visfox.forbiddenreforged.core.model.ContentId> restored =
+            FmToolEvents.taintedVisRolls(RandomSource.create(42L));
         helper.assertValueEqual(restored.size(), 3, "taint damage makes three independent primal-aspect rolls");
-        for (Aspect aspect : restored) {
-            helper.assertTrue(aspect.isPrimal(), "every restored aspect must be primal");
+        List<dev.visfox.forbiddenreforged.core.model.ContentId> semanticPrimals = List.of(
+            dev.visfox.forbiddenreforged.core.model.ContentId.parse("forbiddenmagic:concept/entropy"),
+            dev.visfox.forbiddenreforged.core.model.ContentId.parse("forbiddenmagic:concept/order"),
+            dev.visfox.forbiddenreforged.core.model.ContentId.parse("forbiddenmagic:concept/fire"),
+            dev.visfox.forbiddenreforged.core.model.ContentId.parse("forbiddenmagic:concept/water"),
+            dev.visfox.forbiddenreforged.core.model.ContentId.parse("forbiddenmagic:concept/earth"),
+            dev.visfox.forbiddenreforged.core.model.ContentId.parse("forbiddenmagic:concept/air")
+        );
+        for (var aspect : restored) {
+            helper.assertTrue(semanticPrimals.contains(aspect),
+                "taint damage emits only canonical semantic primal identifiers");
+            helper.assertTrue(Aspect.getPrimalAspects().contains(Tc4AspectAdapter.resolveAspect(aspect)),
+                "every semantic restored aspect resolves to a native TC4 primal aspect");
         }
         helper.succeed();
     }
@@ -723,7 +740,7 @@ public final class ItemGameTests {
     
     @GameTest(template = "empty", templateNamespace = "forbiddenmagic")
     public static void researchPrefixRespectsTagResearch(GameTestHelper helper) {
-        ResearchItem item = new FmResearchItem("TEST", "FORBIDDEN", new AspectList(), 0, 0, 1,
+        ResearchItem item = new Tc4ResearchItem("TEST", "FORBIDDEN", new AspectList(), 0, 0, 1,
             ForbiddenMagic.id("textures/misc/forbidden.png"));
         String expected = FmConfig.tagResearchEnabled()
             ? "forbiddenmagic.research_text.TEST"
@@ -892,7 +909,7 @@ public final class ItemGameTests {
         ServerPlayer player = mockConnectedPlayer(helper);
         player.experienceLevel = 100;
 
-        helper.assertTrue(table.startCraft(BlinkFocusItem.HELLFIRE.id(), player), "the manipulator refused the Hellfire upgrade");
+        helper.assertTrue(table.startCraft(Tc4BlinkFocusItem.HELLFIRE.id(), player), "the manipulator refused the Hellfire upgrade");
         helper.assertValueEqual(table.getSize(), 2000, "Hellfire rank 2 pending vis");
         helper.assertValueEqual(table.getAspects().getAmount(Aspect.FIRE), 800, "Hellfire FIRE cost");
         helper.assertValueEqual(table.getAspects().getAmount(Aspect.AIR), 400, "Hellfire AIR cost");
@@ -905,7 +922,7 @@ public final class ItemGameTests {
 
         helper.assertValueEqual(table.getSize(), 0, "Hellfire craft never finished");
         FocusItem focusItem = (FocusItem) focus.getItem();
-        helper.assertTrue(focusItem.isUpgradedWith(focus, BlinkFocusItem.HELLFIRE), "Hellfire was not stored on the focus");
+        helper.assertTrue(focusItem.isUpgradedWith(focus, Tc4BlinkFocusItem.HELLFIRE), "Hellfire was not stored on the focus");
         helper.succeed();
     }
 
@@ -926,13 +943,13 @@ public final class ItemGameTests {
         helper.assertTrue(player.pick(4.5, 1.0F, false).getType() != HitResult.Type.BLOCK,
             "the test target must sit beyond the vanilla wand reach");
 
-        HitResult hit = BlinkFocusItem.target(player);
+        HitResult hit = BlinkFocusBehavior.target(player);
         helper.assertTrue(hit instanceof BlockHitResult blockHit && blockHit.getType() == HitResult.Type.BLOCK,
             "the blink focus must reach a block beyond the wand's own reach");
         BlockHitResult blockHit = (BlockHitResult) hit;
         helper.assertValueEqual(blockHit.getBlockPos(), targetBlock, "blink target block");
 
-        Vec3 landing = BlinkFocusItem.destination(blockHit);
+        Vec3 landing = BlinkFocusBehavior.destination(blockHit);
         helper.assertTrue(Math.abs(landing.x - (targetBlock.getX() - 0.5)) < 0.001, "blink lands half a block outside the west face");
         helper.assertTrue(Math.abs(landing.z - pz) < 0.001, "blink keeps the hit depth on Z");
         helper.assertTrue(Math.abs(landing.y - (py + 1.62)) < 0.01, "blink keeps the hit height on a side face");
