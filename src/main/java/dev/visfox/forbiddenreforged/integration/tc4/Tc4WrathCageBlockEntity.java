@@ -49,11 +49,14 @@ public final class Tc4WrathCageBlockEntity extends WrathCageBlockEntity implemen
             }
             Direction side = direction.getOpposite();
             if (transport.isConnectable(side) && transport.canOutputTo(side)) {
-                inputs.add((aspect, amount) -> transport.takeEssentia(
-                    Tc4AspectAdapter.resolveAspect(aspect),
-                    amount,
-                    side
-                ));
+                inputs.add((aspect, amount) -> {
+                    Aspect hostAspect = Tc4AspectAdapter.resolveAspect(aspect);
+                    if (transport.getEssentiaType(side) != hostAspect
+                        || transport.getEssentiaAmount(side) <= 0) {
+                        return 0;
+                    }
+                    return transport.takeEssentia(hostAspect, amount, side);
+                });
             }
         }
         return List.copyOf(inputs);
