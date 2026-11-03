@@ -10,6 +10,7 @@ import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.EntityType;
@@ -20,6 +21,7 @@ import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.monster.ZombifiedPiglin;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -41,6 +43,7 @@ public final class FmDrops {
 
     public static void register() {
         NeoForge.EVENT_BUS.addListener(FmDrops::onLivingDrops);
+        NeoForge.EVENT_BUS.addListener(FmDrops::onTaintedBloodShardDrop);
         NeoForge.EVENT_BUS.addListener(FmDrops::onFoodFinished);
         NeoForge.EVENT_BUS.addListener(FmDrops::onQuartzOreDrops);
         NeoForge.EVENT_BUS.addListener(FmDrops::onEntityJoinLevel);
@@ -132,6 +135,31 @@ public final class FmDrops {
         if (entity instanceof ZombifiedPiglin pig && pig.getMainHandItem().is(FmItems.DEADLY_SHARDS.get("envy").get())) {
             addDrop(event, FmItems.DEADLY_SHARDS.get("envy").get(), 1);
         }
+    }
+
+    private static void onTaintedBloodShardDrop(LivingDropsEvent event) {
+        LivingEntity entity = event.getEntity();
+        if (!HostAdapterRegistry.requireEntityClassification().isTaintedMob(entity)
+            || !event.getSource().is(DamageTypes.PLAYER_ATTACK)) {
+            return;
+        }
+
+        var weakness = entity.getEffect(MobEffects.WEAKNESS);
+        int weaknessAmplifier = weakness == null ? -1 : weakness.getAmplifier();
+        if (!taintedBloodShardRoll(true, true, weaknessAmplifier, entity.getRandom().nextDouble())) {
+            return;
+        }
+
+        addDrop(event, FmItems.TAINTED_BLOOD_SHARD.get(), 1);
+    }
+
+    public static boolean taintedBloodShardRoll(
+        boolean taintedMob,
+        boolean playerAttack,
+        int weaknessAmplifier,
+        double random
+    ) {
+        return taintedMob && playerAttack && weaknessAmplifier >= 2 && random < 0.5D;
     }
 
     private static void onFoodFinished(LivingEntityUseItemEvent.Finish event) {

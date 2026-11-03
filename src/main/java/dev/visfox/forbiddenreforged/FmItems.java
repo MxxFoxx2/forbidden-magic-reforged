@@ -23,6 +23,7 @@ public final class FmItems {
     public static final DeferredItem<Item> GLUTTONY_SHARD;
     public static final DeferredItem<Item> SKULL_AXE;
     public static final DeferredItem<Item> EMERALD_FRAGMENT;
+    public static final DeferredItem<Item> TAINTED_BLOOD_SHARD;
     public static final DeferredItem<Item> MORPH_PICKAXE;
     public static final DeferredItem<Item> MORPH_SWORD;
     public static final DeferredItem<Item> MORPH_SHOVEL;
@@ -61,6 +62,7 @@ public final class FmItems {
             () -> new Item(properties.gluttonyFoodProperties(new Item.Properties())));
         SKULL_AXE = register("skull_axe", SkullAxeItem::new, properties::skullAxeProperties);
         EMERALD_FRAGMENT = ITEMS.registerSimpleItem("emerald_fragment");
+        TAINTED_BLOOD_SHARD = ITEMS.registerSimpleItem("tainted_blood_shard");
         MORPH_PICKAXE = register("morph_pickaxe", factories::createMorphTool, properties::morphPickaxeProperties);
         MORPH_SWORD = register("morph_sword", factories::createMorphTool, properties::morphSwordProperties);
         MORPH_SHOVEL = register("morph_shovel", factories::createMorphTool, properties::morphShovelProperties);
