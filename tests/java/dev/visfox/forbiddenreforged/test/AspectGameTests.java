@@ -135,7 +135,7 @@ public final class AspectGameTests {
         if (members.isPresent()) {
             for (Holder<Item> holder : members.get()) {
                 AspectList aspects = AspectRegistry.active().getObjectTags(holder.value());
-                helper.assertTrue(aspects != null, "tagged bacon item must receive an aspect list: " + holder.getRegisteredName());
+                helper.assertTrue(aspects != null, "tagged bacon item must receive an aspect list: " + holder.value());
                 if (aspects != null) {
                     helper.assertValueEqual(aspects.getAmount(Aspect.FLESH), 6, "bacon carries flesh 6");
                     helper.assertValueEqual(aspects.getAmount(Aspect.LIFE), 6, "bacon carries life 6");
