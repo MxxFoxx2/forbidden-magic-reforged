@@ -308,6 +308,7 @@ heretic = "Еретик"
 
 [itemGroup]
 forbiddenmagic = "Forbidden Magic"
+mobcrystal = "Кристаллы существ"
 
 [tooltip]
 creativeonly = "Только для творческого режима"

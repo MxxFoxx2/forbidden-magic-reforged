@@ -56,6 +56,13 @@ public final class Tc4AspectTagAdapter {
             if (registerBlock("minecraft:nether_portal", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INFERNUS), 4))) {
                 DECLARED.add("block:minecraft:nether_portal");
             }
+            DECLARED.add("#forbiddenmagic:item_bacon");
+            register("#forbiddenmagic:item_bacon", tags()
+                .add(Aspect.FLESH, 6)
+                .add(Aspect.LIFE, 6)
+                .add(Aspect.ENERGY, 6)
+                .add(Aspect.BEAST, 4)
+                .add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.GULA), 6));
             DECLARED.add("#c:ores/quartz");
             register("#c:ores/quartz", tags().add(Aspect.CRYSTAL, 3).add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INFERNUS), 2));
             merge("minecraft:nether_star", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INFERNUS), 8).add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.SUPERBIA), 8));

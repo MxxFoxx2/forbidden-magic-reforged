@@ -310,6 +310,7 @@ heretic = "Heretic"
 
 [itemGroup]
 forbiddenmagic = "Forbidden Magic"
+mobcrystal = "Mob Crystals"
 
 [tooltip]
 creativeonly = "Creative Only"
