@@ -8,7 +8,7 @@
 
 | Minecraft | NeoForge | Thaumcraft 4: Reforged | Релиз |
 | --- | --- | --- | --- |
-| **26.3** | 26.3.0.57-beta | 1.1.2 | [2.0.0](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/release%2F26.3) |
+| **26.3** | 26.3.0.57-beta | 1.1.2 | [2.0.1](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/release%2F26.3) |
 | **26.1.2** | 26.1.2.122 | 1.1.2 | [1.0.2](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/release%2F26.1.2) |
 | **1.21.1** | 21.1.256 | 1.1.2 | [1.0.47](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/release%2F1.21.1) |
 
