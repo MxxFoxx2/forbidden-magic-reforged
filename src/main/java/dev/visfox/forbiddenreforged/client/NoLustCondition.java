@@ -1,7 +1,7 @@
 package dev.visfox.forbiddenreforged.client;
 
 import com.mojang.serialization.MapCodec;
-import dev.visfox.forbiddenreforged.FmConfig;
+import dev.visfox.forbiddenreforged.common.FmConfig;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.item.properties.conditional.ConditionalItemModelProperty;
 import net.minecraft.world.entity.LivingEntity;

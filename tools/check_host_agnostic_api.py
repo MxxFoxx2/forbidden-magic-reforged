@@ -9,6 +9,8 @@ PURE_CORE_ROOTS = tuple(CORE_ROOT / name for name in ("model", "aspect", "recipe
 API_ROOT = SOURCE_ROOT / "integration/api"
 RUNTIME_ROOT = SOURCE_ROOT / "integration/runtime"
 TC4_ROOT = SOURCE_ROOT / "integration/tc4"
+COMMON_ROOT = SOURCE_ROOT / "common"
+CLIENT_ROOT = SOURCE_ROOT / "client"
 COMPOSITION_ROOT = SOURCE_ROOT / "ForbiddenMagic.java"
 
 HOST_PACKAGES = (
@@ -56,7 +58,7 @@ def main() -> int:
     failures = []
     checked = 0
 
-    required_roots = (SOURCE_ROOT, CORE_ROOT, API_ROOT, RUNTIME_ROOT, TC4_ROOT)
+    required_roots = (SOURCE_ROOT, CORE_ROOT, COMMON_ROOT, CLIENT_ROOT, API_ROOT, RUNTIME_ROOT, TC4_ROOT)
     for root in required_roots:
         if not root.exists():
             failures.append(f"Missing source boundary: {root.relative_to(ROOT)}")
@@ -119,7 +121,7 @@ def main() -> int:
 
     # Production host imports belong in integration/tc4. The composition root is the
     # single intentional place that selects the active adapter.
-    checked_boundaries = (CORE_ROOT, API_ROOT, RUNTIME_ROOT, TC4_ROOT)
+    checked_boundaries = (CORE_ROOT, COMMON_ROOT, CLIENT_ROOT, API_ROOT, RUNTIME_ROOT, TC4_ROOT)
     for source in java_files(SOURCE_ROOT):
         if any(belongs_to(source, boundary) for boundary in checked_boundaries):
             continue
@@ -136,6 +138,33 @@ def main() -> int:
                     failures.append(
                         f"{source.relative_to(ROOT)} selects a concrete TC4 adapter outside the composition root"
                     )
+
+    # The composition root must not be referenced from shared code; use common.FmIds.
+    for source in java_files(SOURCE_ROOT):
+        if source == COMPOSITION_ROOT or any(belongs_to(source, boundary) for boundary in (TC4_ROOT,)):
+            continue
+        content = source.read_text(encoding="utf-8")
+        if any(imported == "dev.visfox.forbiddenreforged.ForbiddenMagic" for imported in imported_names(content)):
+            failures.append(
+                f"{source.relative_to(ROOT)} imports the composition root; use common.FmIds instead"
+            )
+
+    # The concrete host layer must not depend on the root package (composition root);
+    # depending on shared common/ classes is the intended acyclic direction (tc4 -> common -> api).
+    for source in java_files(TC4_ROOT):
+        checked += 1
+        content = source.read_text(encoding="utf-8")
+        for imported in imported_names(content):
+            parts = imported.split(".")
+            is_root_class = (
+                len(parts) == 4
+                and parts[:3] == ["dev", "visfox", "forbiddenreforged"]
+                and parts[3][:1].isupper()
+            )
+            if is_root_class:
+                failures.append(
+                    f"{source.relative_to(ROOT)} integration/tc4 depends on the root package: {imported}"
+                )
 
     if failures:
         print("\n".join(failures), file=sys.stderr)

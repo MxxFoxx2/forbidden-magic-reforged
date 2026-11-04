@@ -21,7 +21,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import dev.visfox.forbiddenreforged.ForbiddenMagic;
+import dev.visfox.forbiddenreforged.common.FmIds;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.core.wand.WandPartsAccess;
 import dev.visfox.forbiddenreforged.core.wand.WandVisAccess;
@@ -29,9 +29,9 @@ import dev.visfox.forbiddenreforged.integration.tc4.Tc4WandPartsAdapter;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4WandVisAdapter;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4WandRuntimeAdapter;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectAdapter;
-import dev.visfox.forbiddenreforged.FmItems;
-import dev.visfox.forbiddenreforged.FmCreativeTab;
-import dev.visfox.forbiddenreforged.FmToolEvents;
+import dev.visfox.forbiddenreforged.common.FmItems;
+import dev.visfox.forbiddenreforged.common.FmCreativeTab;
+import dev.visfox.forbiddenreforged.common.FmToolEvents;
 import thaumcraft.arcane.FocalManipulatorBlockEntity;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.node.EnergizedNodeBlockEntity;
@@ -75,9 +75,9 @@ final class WandGameTests {
 
     static void blinkFocusUpgradesUseOriginalIconAssets(GameTestHelper helper) {
         helper.assertValueEqual(Tc4BlinkFocusItem.HELLFIRE.icon(),
-            ForbiddenMagic.id("textures/misc/hellfire.png"), "Hellfire uses the bundled original icon");
+            FmIds.id("textures/misc/hellfire.png"), "Hellfire uses the bundled original icon");
         helper.assertValueEqual(Tc4BlinkFocusItem.PANDEMONIUM.icon(),
-            ForbiddenMagic.id("textures/misc/pandemonium.png"), "Pandemonium uses the bundled original icon");
+            FmIds.id("textures/misc/pandemonium.png"), "Pandemonium uses the bundled original icon");
         helper.assertTrue(ForbiddenMagic.class.getResourceAsStream("/assets/forbiddenmagic/textures/misc/hellfire.png") != null,
             "Hellfire icon asset is bundled");
         helper.assertTrue(ForbiddenMagic.class.getResourceAsStream("/assets/forbiddenmagic/textures/misc/pandemonium.png") != null,
@@ -93,8 +93,8 @@ final class WandGameTests {
             helper.assertTrue(cap.specialAspects().contains(Aspect.WATER), "water has the special alchemical discount");
             helper.assertValueEqual(cap.getCostModifier(Aspect.WATER), 0.8F, "alchemical water discount");
             helper.assertValueEqual(cap.craftCost(), 7, "alchemical cap craft cost");
-            helper.assertValueEqual(cap.item(), ForbiddenMagic.id("alchemical_cap"), "alchemical cap uses its component item");
-            helper.assertValueEqual(cap.texture(), ForbiddenMagic.id("textures/model/wand_cap_alchemical.png"), "alchemical cap texture");
+            helper.assertValueEqual(cap.item(), FmIds.id("alchemical_cap"), "alchemical cap uses its component item");
+            helper.assertValueEqual(cap.texture(), FmIds.id("textures/model/wand_cap_alchemical.png"), "alchemical cap texture");
         }
 
         var equivalent = WandRegistry.findRod("equivalent");
@@ -102,10 +102,10 @@ final class WandGameTests {
         if (equivalent != null) {
             helper.assertValueEqual(equivalent.capacity(), 100, "equivalent rod capacity");
             helper.assertValueEqual(equivalent.craftCost(), 12, "equivalent rod craft cost");
-            helper.assertValueEqual(equivalent.item(), ForbiddenMagic.id("equivalent_rod"), "equivalent rod has a stable component item");
+            helper.assertValueEqual(equivalent.item(), FmIds.id("equivalent_rod"), "equivalent rod has a stable component item");
             helper.assertFalse(equivalent.staff(), "equivalent rod is not a staff");
             helper.assertFalse(equivalent.glowing(), "equivalent rod does not glow");
-            helper.assertValueEqual(equivalent.texture(), ForbiddenMagic.id("textures/model/wand_rod_equivalent.png"), "equivalent rod texture");
+            helper.assertValueEqual(equivalent.texture(), FmIds.id("textures/model/wand_rod_equivalent.png"), "equivalent rod texture");
         }
 
         helper.assertTrue(FmItems.ALCHEMICAL_CAP.isBound() && FmItems.EQUIVALENT_ROD.isBound(),
@@ -462,8 +462,8 @@ final class WandGameTests {
         helper.assertValueEqual(cap.tag(), tag, tag + " cap tag");
         helper.assertValueEqual(cap.baseCostModifier(), baseCostModifier, tag + " cap base vis cost modifier");
         helper.assertValueEqual(cap.craftCost(), craftCost, tag + " cap craft cost");
-        helper.assertValueEqual(cap.item(), ForbiddenMagic.id(tag + "_cap"), tag + " cap component item");
-        helper.assertValueEqual(cap.texture(), ForbiddenMagic.id("textures/model/wand_cap_" + tag + ".png"), tag + " cap texture");
+        helper.assertValueEqual(cap.item(), FmIds.id(tag + "_cap"), tag + " cap component item");
+        helper.assertValueEqual(cap.texture(), FmIds.id("textures/model/wand_cap_" + tag + ".png"), tag + " cap texture");
         helper.assertTrue(cap.specialAspects().isEmpty(), tag + " cap has no special aspect discounts");
         helper.assertValueEqual(cap.specialCostModifier(), 0.0F, tag + " cap special cost modifier");
         helper.assertValueEqual(cap.getCostModifier(Aspect.FIRE), baseCostModifier, tag + " cap applies its base modifier to a plain aspect");

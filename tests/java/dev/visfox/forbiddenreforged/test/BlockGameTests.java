@@ -36,12 +36,12 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import dev.visfox.forbiddenreforged.ForbiddenMagic;
-import dev.visfox.forbiddenreforged.FmItems;
-import dev.visfox.forbiddenreforged.ArcaneCakeBlock;
-import dev.visfox.forbiddenreforged.FmBlocks;
-import dev.visfox.forbiddenreforged.TaintTree;
-import dev.visfox.forbiddenreforged.TaintLogTextureVariant;
+import dev.visfox.forbiddenreforged.common.FmIds;
+import dev.visfox.forbiddenreforged.common.FmItems;
+import dev.visfox.forbiddenreforged.common.ArcaneCakeBlock;
+import dev.visfox.forbiddenreforged.common.FmBlocks;
+import dev.visfox.forbiddenreforged.common.TaintTree;
+import dev.visfox.forbiddenreforged.common.TaintLogTextureVariant;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4TaintAdapter;
 import thaumcraft.crafting.CrucibleRecipe;
 import thaumcraft.crafting.InfusionRecipe;
@@ -52,10 +52,10 @@ import thaumcraft.research.ResearchItem;
 import thaumcraft.taint.TaintSpread;
 import thaumcraft.registry.ModBlocks;
 
-@EventBusSubscriber(modid = ForbiddenMagic.MODID)
+@EventBusSubscriber(modid = FmIds.MODID)
 public final class BlockGameTests {
     public static final DeferredRegister<Consumer<GameTestHelper>> FUNCTIONS =
-        DeferredRegister.create(Registries.TEST_FUNCTION, ForbiddenMagic.MODID);
+        DeferredRegister.create(Registries.TEST_FUNCTION, FmIds.MODID);
 
     private static final String[] TESTS = {
         "taint_material_blocks_are_registered",
@@ -90,12 +90,12 @@ public final class BlockGameTests {
     @SubscribeEvent
     static void registerTests(RegisterGameTestsEvent event) {
         Holder<TestEnvironmentDefinition<?>> environment = event.registerEnvironment(
-            Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, "fm_blocks"), new TestEnvironmentDefinition.AllOf());
+            Identifier.fromNamespaceAndPath(FmIds.MODID, "fm_blocks"), new TestEnvironmentDefinition.AllOf());
         for (String name : TESTS) {
             ResourceKey<Consumer<GameTestHelper>> function =
-                ResourceKey.create(Registries.TEST_FUNCTION, Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, name));
+                ResourceKey.create(Registries.TEST_FUNCTION, Identifier.fromNamespaceAndPath(FmIds.MODID, name));
             event.registerTest(
-                Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, name),
+                Identifier.fromNamespaceAndPath(FmIds.MODID, name),
                 new FunctionGameTestInstance(function, new TestData<>(environment, Identifier.parse("thaumcraft:test/platform"), 100, 0, true))
             );
         }

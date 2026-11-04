@@ -1,25 +1,31 @@
 package dev.visfox.forbiddenreforged;
 
-import dev.visfox.forbiddenreforged.test.AspectGameTests;
+import dev.visfox.forbiddenreforged.common.FmAspects;
+import dev.visfox.forbiddenreforged.common.FmBlockEntities;
+import dev.visfox.forbiddenreforged.common.FmBlocks;
+import dev.visfox.forbiddenreforged.common.FmCommands;
+import dev.visfox.forbiddenreforged.common.FmComponents;
+import dev.visfox.forbiddenreforged.common.FmConfig;
+import dev.visfox.forbiddenreforged.common.FmCreativeTab;
+import dev.visfox.forbiddenreforged.common.FmDrops;
+import dev.visfox.forbiddenreforged.common.FmEnchantmentEffects;
+import dev.visfox.forbiddenreforged.common.FmIds;
+import dev.visfox.forbiddenreforged.common.FmItems;
+import dev.visfox.forbiddenreforged.common.FmVillagers;
+import dev.visfox.forbiddenreforged.common.ScribeWellEvents;
+import dev.visfox.forbiddenreforged.common.FmToolEvents;
 import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4HostAdapter;
-import dev.visfox.forbiddenreforged.test.BlockGameTests;
-import dev.visfox.forbiddenreforged.test.EnchantmentGameTests;
-import dev.visfox.forbiddenreforged.test.EntityGameTests;
-import dev.visfox.forbiddenreforged.test.ItemGameTests;
-import dev.visfox.forbiddenreforged.test.RecipeGameTests;
-import net.minecraft.resources.Identifier;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
-@Mod(ForbiddenMagic.MODID)
+/**
+ * Composition root: the only place that selects the concrete host adapter.
+ * All shared content lives in {@code common}; GameTests live in their own source set.
+ */
+@Mod(FmIds.MODID)
 public final class ForbiddenMagic {
-    public static final String MODID = "forbiddenmagic";
-    public static final Logger LOGGER = LogManager.getLogger(MODID);
-
     public ForbiddenMagic(IEventBus modEventBus, ModContainer modContainer) {
         FmConfig.register(modContainer);
         HostAdapterRegistry.install(Tc4HostAdapter.INSTANCE);
@@ -35,15 +41,5 @@ public final class ForbiddenMagic {
         FmEnchantmentEffects.register();
         FmToolEvents.register();
         ScribeWellEvents.register();
-        AspectGameTests.FUNCTIONS.register(modEventBus);
-        ItemGameTests.FUNCTIONS.register(modEventBus);
-        RecipeGameTests.FUNCTIONS.register(modEventBus);
-        EnchantmentGameTests.FUNCTIONS.register(modEventBus);
-        BlockGameTests.FUNCTIONS.register(modEventBus);
-        EntityGameTests.FUNCTIONS.register(modEventBus);
-    }
-
-    public static Identifier id(String path) {
-        return Identifier.fromNamespaceAndPath(MODID, path);
     }
 }

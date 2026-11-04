@@ -23,13 +23,13 @@ import net.minecraft.world.item.component.CookingFuel;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
-import dev.visfox.forbiddenreforged.ForbiddenMagic;
-import dev.visfox.forbiddenreforged.FmComponents;
-import dev.visfox.forbiddenreforged.MorphState;
-import dev.visfox.forbiddenreforged.FmItems;
-import dev.visfox.forbiddenreforged.FmCreativeTab;
-import dev.visfox.forbiddenreforged.FmToolEvents;
-import dev.visfox.forbiddenreforged.RidingCropItem;
+import dev.visfox.forbiddenreforged.common.FmIds;
+import dev.visfox.forbiddenreforged.common.FmComponents;
+import dev.visfox.forbiddenreforged.common.MorphState;
+import dev.visfox.forbiddenreforged.common.FmItems;
+import dev.visfox.forbiddenreforged.common.FmCreativeTab;
+import dev.visfox.forbiddenreforged.common.FmToolEvents;
+import dev.visfox.forbiddenreforged.common.RidingCropItem;
 import thaumcraft.platform.Baubles;
 import thaumcraft.platform.Bauble;
 import thaumcraft.platform.BaubleType;
@@ -75,14 +75,14 @@ final class ItemRegistrationGameTests {
     }
 
     static void ridingCropIsRegisteredAsSword(GameTestHelper helper) {
-        Item crop = BuiltInRegistries.ITEM.getValue(Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, "riding_crop"));
+        Item crop = BuiltInRegistries.ITEM.getValue(Identifier.fromNamespaceAndPath(FmIds.MODID, "riding_crop"));
         helper.assertTrue(crop != Items.AIR, "riding crop must be registered");
         helper.assertTrue(crop instanceof RidingCropItem, "riding crop must be RidingCropItem");
         helper.succeed();
     }
 
     static void creativeTabIsRegisteredWithForkIcon(GameTestHelper helper) {
-        CreativeModeTab tab = BuiltInRegistries.CREATIVE_MODE_TAB.get(ForbiddenMagic.id("forbidden"))
+        CreativeModeTab tab = BuiltInRegistries.CREATIVE_MODE_TAB.get(FmIds.id("forbidden"))
             .map(holder -> holder.value())
             .orElse(null);
         helper.assertTrue(tab != null, "the addon registers its own creative tab");
@@ -181,7 +181,7 @@ final class ItemRegistrationGameTests {
         assertItemDataComponent(helper, FmComponents.COLLAR_OWNER.get(), "forbiddenmagic:collar_owner", "Notch");
         helper.assertValueEqual(
             BuiltInRegistries.DATA_COMPONENT_TYPE.keySet().stream()
-                .filter(id -> id.getNamespace().equals(ForbiddenMagic.MODID))
+                .filter(id -> id.getNamespace().equals(FmIds.MODID))
                 .count(),
             4L,
             "the port registers exactly four item data components");

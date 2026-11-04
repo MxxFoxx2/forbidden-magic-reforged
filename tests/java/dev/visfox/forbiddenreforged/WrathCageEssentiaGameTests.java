@@ -14,7 +14,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
 
-@EventBusSubscriber(modid = ForbiddenMagic.MODID)
+@EventBusSubscriber(modid = FmIds.MODID)
 public final class WrathCageEssentiaGameTests {
     public static final net.neoforged.neoforge.registries.DeferredRegister<Consumer<GameTestHelper>> FUNCTIONS =
         EntityGameTests.FUNCTIONS;
@@ -36,16 +36,16 @@ public final class WrathCageEssentiaGameTests {
     @SubscribeEvent
     static void registerTests(RegisterGameTestsEvent event) {
         Holder<TestEnvironmentDefinition<?>> environment = event.registerEnvironment(
-            Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, "fm_wrath_cage_essentia"),
+            Identifier.fromNamespaceAndPath(FmIds.MODID, "fm_wrath_cage_essentia"),
             new TestEnvironmentDefinition.AllOf()
         );
         for (String name : TESTS) {
             ResourceKey<Consumer<GameTestHelper>> function = ResourceKey.create(
                 Registries.TEST_FUNCTION,
-                Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, name)
+                Identifier.fromNamespaceAndPath(FmIds.MODID, name)
             );
             event.registerTest(
-                Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, name),
+                Identifier.fromNamespaceAndPath(FmIds.MODID, name),
                 new FunctionGameTestInstance(
                     function,
                     new TestData<>(environment, Identifier.parse("thaumcraft:test/platform"), 100, 0, true)

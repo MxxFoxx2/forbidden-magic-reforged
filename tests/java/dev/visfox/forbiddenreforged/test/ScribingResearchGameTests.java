@@ -16,13 +16,13 @@ import java.util.Set;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
-import dev.visfox.forbiddenreforged.ForbiddenMagic;
+import dev.visfox.forbiddenreforged.common.FmIds;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectAdapter;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4ScribingAdapter;
-import dev.visfox.forbiddenreforged.FmAspects;
-import dev.visfox.forbiddenreforged.FmItems;
-import dev.visfox.forbiddenreforged.FmConfig;
+import dev.visfox.forbiddenreforged.common.FmAspects;
+import dev.visfox.forbiddenreforged.common.FmItems;
+import dev.visfox.forbiddenreforged.common.FmConfig;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4ResearchItem;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.aspect.AspectList;
@@ -255,7 +255,7 @@ final class ScribingResearchGameTests {
 
     static void researchPrefixRespectsTagResearch(GameTestHelper helper) {
         ResearchItem item = new Tc4ResearchItem("TEST", "FORBIDDEN", new AspectList(), 0, 0, 1,
-            ForbiddenMagic.id("textures/misc/forbidden.png"));
+            FmIds.id("textures/misc/forbidden.png"));
         String expected = FmConfig.tagResearchEnabled()
             ? "forbiddenmagic.research_text.TEST"
             : "tc.research_text.TEST";

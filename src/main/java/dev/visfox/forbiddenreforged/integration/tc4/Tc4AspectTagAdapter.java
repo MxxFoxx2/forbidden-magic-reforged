@@ -1,9 +1,9 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
-import dev.visfox.forbiddenreforged.FmAspects;
-import dev.visfox.forbiddenreforged.FmConfig;
-import dev.visfox.forbiddenreforged.FmItems;
-import dev.visfox.forbiddenreforged.ForbiddenMagic;
+import dev.visfox.forbiddenreforged.common.FmAspects;
+import dev.visfox.forbiddenreforged.common.FmConfig;
+import dev.visfox.forbiddenreforged.common.FmItems;
+import dev.visfox.forbiddenreforged.common.FmIds;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -45,7 +45,7 @@ public final class Tc4AspectTagAdapter {
                 blockTargets = true;
                 return true;
             } catch (NoSuchMethodError absent) {
-                ForbiddenMagic.LOGGER.info(
+                FmIds.LOGGER.info(
                     "Block aspect targets are unavailable in this Thaumcraft build; {} keeps no direct aspect", target);
                 return false;
             }

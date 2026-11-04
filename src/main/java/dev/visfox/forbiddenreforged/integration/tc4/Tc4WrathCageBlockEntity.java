@@ -1,8 +1,8 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
-import dev.visfox.forbiddenreforged.FmBlockEntities;
-import dev.visfox.forbiddenreforged.FmSpawnerMobs;
-import dev.visfox.forbiddenreforged.WrathCageBlockEntity;
+import dev.visfox.forbiddenreforged.common.FmBlockEntities;
+import dev.visfox.forbiddenreforged.common.FmSpawnerMobs;
+import dev.visfox.forbiddenreforged.common.WrathCageBlockEntity;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 import java.util.ArrayList;
 import java.util.List;

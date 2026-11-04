@@ -21,15 +21,15 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import dev.visfox.forbiddenreforged.ForbiddenMagic;
-import dev.visfox.forbiddenreforged.FmAspects;
-import dev.visfox.forbiddenreforged.FmBlocks;
-import dev.visfox.forbiddenreforged.FmItems;
-import dev.visfox.forbiddenreforged.FmSpawnerMobs;
+import dev.visfox.forbiddenreforged.common.FmIds;
+import dev.visfox.forbiddenreforged.common.FmAspects;
+import dev.visfox.forbiddenreforged.common.FmBlocks;
+import dev.visfox.forbiddenreforged.common.FmItems;
+import dev.visfox.forbiddenreforged.common.FmSpawnerMobs;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
-import dev.visfox.forbiddenreforged.MobCrystalItem;
-import dev.visfox.forbiddenreforged.WrathCageBlock;
-import dev.visfox.forbiddenreforged.WrathCageBlockEntity;
+import dev.visfox.forbiddenreforged.common.MobCrystalItem;
+import dev.visfox.forbiddenreforged.common.WrathCageBlock;
+import dev.visfox.forbiddenreforged.common.WrathCageBlockEntity;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4EntityAdapter;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectAdapter;
 import thaumcraft.aspect.Aspect;
@@ -43,10 +43,10 @@ import thaumcraft.crafting.TcRecipes;
 import thaumcraft.research.ResearchCategories;
 import thaumcraft.research.ResearchItem;
 
-@EventBusSubscriber(modid = ForbiddenMagic.MODID)
+@EventBusSubscriber(modid = FmIds.MODID)
 public final class EntityGameTests {
     public static final DeferredRegister<Consumer<GameTestHelper>> FUNCTIONS =
-        DeferredRegister.create(Registries.TEST_FUNCTION, ForbiddenMagic.MODID);
+        DeferredRegister.create(Registries.TEST_FUNCTION, FmIds.MODID);
 
     private static final String[] TESTS = {
         "mob_crystal_and_spawn_table",
@@ -71,12 +71,12 @@ public final class EntityGameTests {
     @SubscribeEvent
     static void registerTests(RegisterGameTestsEvent event) {
         Holder<TestEnvironmentDefinition<?>> environment = event.registerEnvironment(
-            Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, "fm_entities"), new TestEnvironmentDefinition.AllOf());
+            Identifier.fromNamespaceAndPath(FmIds.MODID, "fm_entities"), new TestEnvironmentDefinition.AllOf());
         for (String name : TESTS) {
             ResourceKey<Consumer<GameTestHelper>> function =
-                ResourceKey.create(Registries.TEST_FUNCTION, Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, name));
+                ResourceKey.create(Registries.TEST_FUNCTION, Identifier.fromNamespaceAndPath(FmIds.MODID, name));
             event.registerTest(
-                Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, name),
+                Identifier.fromNamespaceAndPath(FmIds.MODID, name),
                 new FunctionGameTestInstance(function, new TestData<>(environment, Identifier.parse("thaumcraft:test/platform"), 100, 0, true))
             );
         }

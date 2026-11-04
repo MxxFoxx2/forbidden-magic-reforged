@@ -13,13 +13,13 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.neoforged.fml.ModList;
-import dev.visfox.forbiddenreforged.ForbiddenMagic;
-import dev.visfox.forbiddenreforged.FmAspects;
-import dev.visfox.forbiddenreforged.FmBlocks;
-import dev.visfox.forbiddenreforged.FmConfig;
-import dev.visfox.forbiddenreforged.FmDrops;
-import dev.visfox.forbiddenreforged.FmItems;
-import dev.visfox.forbiddenreforged.FmRecipes;
+import dev.visfox.forbiddenreforged.common.FmIds;
+import dev.visfox.forbiddenreforged.common.FmAspects;
+import dev.visfox.forbiddenreforged.common.FmBlocks;
+import dev.visfox.forbiddenreforged.common.FmConfig;
+import dev.visfox.forbiddenreforged.common.FmDrops;
+import dev.visfox.forbiddenreforged.common.FmItems;
+import dev.visfox.forbiddenreforged.common.FmRecipes;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectAdapter;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.aspect.AspectList;
@@ -130,11 +130,11 @@ final class RecipeParityGameTests {
         TcRecipe inkRef = TcRecipes.get("BlackInk");
         helper.assertTrue(inkRef instanceof CraftingRecipeRef, "black flower ink recipe is exposed in research");
         CraftingRecipeRef ink = (CraftingRecipeRef) inkRef;
-        helper.assertValueEqual(ink.recipe(), ForbiddenMagic.id("ink_from_rose"), "ink research page points to the rose crafting recipe");
+        helper.assertValueEqual(ink.recipe(), FmIds.id("ink_from_rose"), "ink research page points to the rose crafting recipe");
         ItemStack inkResult = ink.result().create();
         helper.assertTrue(inkResult.is(FmItems.BLACK_DYE.get()), "rose petals yield the legacy black dye resource");
         helper.assertValueEqual(inkResult.getCount(), 2, "black ink recipe yields two dye items");
-        var inkRecipeKey = ResourceKey.create(Registries.RECIPE, ForbiddenMagic.id("ink_from_rose"));
+        var inkRecipeKey = ResourceKey.create(Registries.RECIPE, FmIds.id("ink_from_rose"));
         helper.assertTrue(helper.getLevel().getServer().getRecipeManager().byKey(inkRecipeKey).isPresent(),
             "the linked black ink crafting recipe loads");
 
@@ -180,7 +180,7 @@ final class RecipeParityGameTests {
 
         TcRecipe brick = TcRecipes.get("TaintBrick");
         helper.assertTrue(brick instanceof CraftingRecipeRef ref, "brick recipe is registered as a reference");
-        helper.assertValueEqual(((CraftingRecipeRef) brick).recipe(), ForbiddenMagic.id("taint_stone_brick"), "brick recipe id");
+        helper.assertValueEqual(((CraftingRecipeRef) brick).recipe(), FmIds.id("taint_stone_brick"), "brick recipe id");
         helper.succeed();
     }
 
@@ -286,13 +286,13 @@ final class RecipeParityGameTests {
 
     static void subcollarMatchesOriginal(GameTestHelper helper) {
         if (FmConfig.lustDisabled()) {
-            helper.assertTrue(BuiltInRegistries.ITEM.getOptional(ForbiddenMagic.id("sub_collar")).isEmpty(), "no_lust leaves out the collar item");
+            helper.assertTrue(BuiltInRegistries.ITEM.getOptional(FmIds.id("sub_collar")).isEmpty(), "no_lust leaves out the collar item");
             helper.assertTrue(TcRecipes.get("SUBCOLLAR") == null, "no_lust leaves out the collar recipe");
             helper.assertTrue(ResearchCategories.getResearch("SUBCOLLAR") == null, "no_lust leaves out the collar research");
             helper.succeed();
             return;
         }
-        helper.assertTrue(BuiltInRegistries.ITEM.getOptional(ForbiddenMagic.id("sub_collar")).isPresent(), "lust mode registers the collar item");
+        helper.assertTrue(BuiltInRegistries.ITEM.getOptional(FmIds.id("sub_collar")).isPresent(), "lust mode registers the collar item");
         TcRecipe raw = TcRecipes.get("SUBCOLLAR");
         helper.assertTrue(raw instanceof InfusionRecipe, "the collar is an infusion recipe");
         InfusionRecipe recipe = (InfusionRecipe) raw;

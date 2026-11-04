@@ -24,17 +24,17 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.fml.ModList;
-import dev.visfox.forbiddenreforged.ForbiddenMagic;
+import dev.visfox.forbiddenreforged.common.FmIds;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectAdapter;
-import dev.visfox.forbiddenreforged.FmAspects;
-import dev.visfox.forbiddenreforged.FmComponents;
-import dev.visfox.forbiddenreforged.FmDrops;
-import dev.visfox.forbiddenreforged.FmItems;
-import dev.visfox.forbiddenreforged.FmConfig;
-import dev.visfox.forbiddenreforged.MorphState;
-import dev.visfox.forbiddenreforged.FmEnchantmentEffects;
-import dev.visfox.forbiddenreforged.FmToolEvents;
-import dev.visfox.forbiddenreforged.RidingCropItem;
+import dev.visfox.forbiddenreforged.common.FmAspects;
+import dev.visfox.forbiddenreforged.common.FmComponents;
+import dev.visfox.forbiddenreforged.common.FmDrops;
+import dev.visfox.forbiddenreforged.common.FmItems;
+import dev.visfox.forbiddenreforged.common.FmConfig;
+import dev.visfox.forbiddenreforged.common.MorphState;
+import dev.visfox.forbiddenreforged.common.FmEnchantmentEffects;
+import dev.visfox.forbiddenreforged.common.FmToolEvents;
+import dev.visfox.forbiddenreforged.common.RidingCropItem;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.crafting.InfusionRecipe;
 import thaumcraft.crafting.TcRecipes;
@@ -134,7 +134,7 @@ final class ItemMechanicsGameTests {
             helper.succeed();
             return;
         }
-        Item item = BuiltInRegistries.ITEM.getValue(ForbiddenMagic.id("sub_collar"));
+        Item item = BuiltInRegistries.ITEM.getValue(FmIds.id("sub_collar"));
         helper.assertTrue(item != Items.AIR, "the collar item exists");
         ServerPlayer owner = GameTestPlayers.connected(helper);
         ServerPlayer target = GameTestPlayers.connected(helper);
@@ -184,7 +184,7 @@ final class ItemMechanicsGameTests {
         helper.assertFalse(RidingCropItem.dropsLustShard(0) || RidingCropItem.dropsLustShard(2) || RidingCropItem.dropsLustShard(14), "only roll 1 of 15 drops a shard");
 
         helper.assertValueEqual(crop.getMaxDamage(), 59, "the crop uses the wooden sword durability");
-        net.minecraft.tags.TagKey<Item> repair = net.minecraft.tags.TagKey.create(Registries.ITEM, ForbiddenMagic.id("riding_crop_repair"));
+        net.minecraft.tags.TagKey<Item> repair = net.minecraft.tags.TagKey.create(Registries.ITEM, FmIds.id("riding_crop_repair"));
         helper.assertTrue(new ItemStack(Items.LEATHER).is(repair), "leather repairs the crop");
         helper.assertTrue(new ItemStack(Items.OAK_PLANKS).is(repair), "wooden planks repair the crop");
         helper.assertValueEqual(crop.getRarity(), Rarity.COMMON, "the crop keeps the original common rarity");
@@ -258,8 +258,8 @@ final class ItemMechanicsGameTests {
 
     static void witchwoodRequiresArsMagica(GameTestHelper helper) {
         boolean am2 = ModList.get().isLoaded("arsmagica2");
-        helper.assertValueEqual(BuiltInRegistries.ITEM.getOptional(ForbiddenMagic.id("witchwood_rod")).isPresent(), am2, "the witchwood rod exists only with Ars Magica 2");
-        helper.assertValueEqual(BuiltInRegistries.ITEM.getOptional(ForbiddenMagic.id("witchwood_staff_rod")).isPresent(), am2, "the witchwood staff rod exists only with Ars Magica 2");
+        helper.assertValueEqual(BuiltInRegistries.ITEM.getOptional(FmIds.id("witchwood_rod")).isPresent(), am2, "the witchwood rod exists only with Ars Magica 2");
+        helper.assertValueEqual(BuiltInRegistries.ITEM.getOptional(FmIds.id("witchwood_staff_rod")).isPresent(), am2, "the witchwood staff rod exists only with Ars Magica 2");
         helper.assertValueEqual(ResearchCategories.getResearch("ROD_witchwood") != null, am2, "the witchwood research exists only with Ars Magica 2");
         helper.assertValueEqual(ResearchCategories.getResearch("ROD_witchwood_staff") != null, am2, "the witchwood staff research exists only with Ars Magica 2");
         helper.succeed();

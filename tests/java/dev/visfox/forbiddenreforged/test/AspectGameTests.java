@@ -40,19 +40,19 @@ import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import dev.visfox.forbiddenreforged.ForbiddenMagic;
+import dev.visfox.forbiddenreforged.common.FmIds;
 import dev.visfox.forbiddenreforged.core.aspect.AspectDefinition;
 import dev.visfox.forbiddenreforged.core.aspect.ForbiddenMagicAspectCatalog;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectDiagnostics;
-import dev.visfox.forbiddenreforged.FmAspects;
+import dev.visfox.forbiddenreforged.common.FmAspects;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectAdapter;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectTagAdapter;
-import dev.visfox.forbiddenreforged.FmConfig;
-import dev.visfox.forbiddenreforged.FmCreativeTab;
-import dev.visfox.forbiddenreforged.FmDrops;
-import dev.visfox.forbiddenreforged.FmBlocks;
-import dev.visfox.forbiddenreforged.FmItems;
+import dev.visfox.forbiddenreforged.common.FmConfig;
+import dev.visfox.forbiddenreforged.common.FmCreativeTab;
+import dev.visfox.forbiddenreforged.common.FmDrops;
+import dev.visfox.forbiddenreforged.common.FmBlocks;
+import dev.visfox.forbiddenreforged.common.FmItems;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.aspect.AspectList;
 import thaumcraft.aspect.AspectRegistry;
@@ -60,10 +60,10 @@ import thaumcraft.research.ResearchCategories;
 import thaumcraft.research.ResearchItem;
 import thaumcraft.research.ScanManager;
 
-@EventBusSubscriber(modid = ForbiddenMagic.MODID)
+@EventBusSubscriber(modid = FmIds.MODID)
 public final class AspectGameTests {
     public static final DeferredRegister<Consumer<GameTestHelper>> FUNCTIONS =
-        DeferredRegister.create(Registries.TEST_FUNCTION, ForbiddenMagic.MODID);
+        DeferredRegister.create(Registries.TEST_FUNCTION, FmIds.MODID);
 
     private static final String[] TESTS = {
         "mod_loads_and_host_is_present",
@@ -114,12 +114,12 @@ public final class AspectGameTests {
     @SubscribeEvent
     static void registerTests(RegisterGameTestsEvent event) {
         Holder<TestEnvironmentDefinition<?>> environment = event.registerEnvironment(
-            Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, "fm_aspects"), new TestEnvironmentDefinition.AllOf());
+            Identifier.fromNamespaceAndPath(FmIds.MODID, "fm_aspects"), new TestEnvironmentDefinition.AllOf());
         for (String name : TESTS) {
             ResourceKey<Consumer<GameTestHelper>> function =
-                ResourceKey.create(Registries.TEST_FUNCTION, Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, name));
+                ResourceKey.create(Registries.TEST_FUNCTION, Identifier.fromNamespaceAndPath(FmIds.MODID, name));
             event.registerTest(
-                Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, name),
+                Identifier.fromNamespaceAndPath(FmIds.MODID, name),
                 new FunctionGameTestInstance(function, new TestData<>(environment, Identifier.parse("thaumcraft:test/platform"), 100, 0, true))
             );
         }
@@ -131,9 +131,9 @@ public final class AspectGameTests {
         helper.assertValueEqual(enabled.size(), 7, "full catalog must define seven Forbidden Magic aspects");
         helper.assertValueEqual(disabled.size(), 6, "no-lust catalog must define six aspects");
         helper.assertTrue(enabled.stream().allMatch(definition ->
-            definition.id().namespace().equals(ForbiddenMagic.MODID)
+            definition.id().namespace().equals(FmIds.MODID)
                 && definition.components().stream().allMatch(component ->
-                    component.namespace().equals(ForbiddenMagic.MODID)
+                    component.namespace().equals(FmIds.MODID)
                         && component.path().startsWith("concept/"))),
             "catalog component references must use semantic IDs, not host aspect IDs");
 
@@ -225,7 +225,7 @@ public final class AspectGameTests {
         helper.assertValueEqual(definition.color(), color, id.path() + " color must match the original hex literal");
         helper.assertValueEqual(definition.components(), components, id.path() + " components must match the original pair");
         helper.assertValueEqual(definition.blendMode(), blendMode, id.path() + " blend mode must match the original");
-        helper.assertValueEqual(definition.texture(), ContentId.parse(ForbiddenMagic.MODID + ":textures/aspects/" + id.path() + ".png"),
+        helper.assertValueEqual(definition.texture(), ContentId.parse(FmIds.MODID + ":textures/aspects/" + id.path() + ".png"),
             id.path() + " texture must be the original aspect icon");
         if (!registered) {
             helper.assertTrue(FmConfig.lustDisabled(), id.path() + " is only absent from the host registry under no_lust");
@@ -234,7 +234,7 @@ public final class AspectGameTests {
         Aspect aspect = Tc4AspectAdapter.resolveAspect(id);
         helper.assertValueEqual(aspect.getColor(), color, id.path() + " host aspect color");
         helper.assertValueEqual(aspect.getBlend(), blendConstant, id.path() + " host aspect blend constant");
-        helper.assertValueEqual(aspect.getImage(), Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, "textures/aspects/" + id.path() + ".png"),
+        helper.assertValueEqual(aspect.getImage(), Identifier.fromNamespaceAndPath(FmIds.MODID, "textures/aspects/" + id.path() + ".png"),
             id.path() + " host aspect texture");
         Aspect[] actual = aspect.getComponents();
         helper.assertTrue(actual != null && actual.length == hostComponents.size(),
@@ -283,7 +283,7 @@ public final class AspectGameTests {
         for (Aspect aspect : sins) {
             helper.assertTrue(aspect != null, "sin aspect must be registered");
             helper.assertTrue(aspect.ordinal() >= Tc4AspectDiagnostics.BUILTIN_ASPECT_COUNT, aspect.getSerializedName() + " must be an add-on aspect");
-            helper.assertTrue(aspect.getImage().getNamespace().equals(ForbiddenMagic.MODID), aspect.getSerializedName() + " texture must live in the add-on namespace");
+            helper.assertTrue(aspect.getImage().getNamespace().equals(FmIds.MODID), aspect.getSerializedName() + " texture must live in the add-on namespace");
         }
         Aspect ira = Aspect.combine(Aspect.WEAPON, Aspect.FIRE);
         helper.assertTrue(ira == Tc4AspectAdapter.resolveAspect(FmAspects.WRATH), "combine(WEAPON, FIRE) must resolve to the add-on ira");
@@ -347,7 +347,7 @@ public final class AspectGameTests {
         helper.assertValueEqual(FmItems.DEADLY_SHARDS.size(), 7, "the original registers seven vices");
         for (var entry : FmItems.DEADLY_SHARDS.entrySet()) {
             Item item = entry.getValue().get();
-            helper.assertTrue(BuiltInRegistries.ITEM.getKey(item).getNamespace().equals(ForbiddenMagic.MODID), entry.getKey() + " must be namespaced to the port");
+            helper.assertTrue(BuiltInRegistries.ITEM.getKey(item).getNamespace().equals(FmIds.MODID), entry.getKey() + " must be namespaced to the port");
             AspectList tags = AspectRegistry.active().getObjectTags(item);
             helper.assertTrue(tags != null && tags.size() > 0, entry.getKey() + " must carry an aspect tag");
         }
@@ -355,7 +355,7 @@ public final class AspectGameTests {
     }
 
     private static void noLustRemovesLuxuriaItems(GameTestHelper helper) {
-        ForbiddenMagic.LOGGER.info("no_lust gate: disabled={}, luxuria={}", FmConfig.lustDisabled(), Aspect.getAspect("luxuria"));
+        FmIds.LOGGER.info("no_lust gate: disabled={}, luxuria={}", FmConfig.lustDisabled(), Aspect.getAspect("luxuria"));
         if (!FmConfig.lustDisabled()) {
             helper.succeed();
             return;
