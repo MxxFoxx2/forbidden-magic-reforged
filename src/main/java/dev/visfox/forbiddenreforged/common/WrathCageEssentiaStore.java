@@ -9,7 +9,7 @@ import java.util.Map;
  *
  * World access, persistence, and client synchronization stay in the block entity.
  */
-final class WrathCageEssentiaStore {
+public final class WrathCageEssentiaStore {
     static final int SUCTION = 256;
 
     private static final int MAX_STORED = 64;
@@ -21,19 +21,19 @@ final class WrathCageEssentiaStore {
     private int sloth;
     private int mode;
 
-    void clearMobEssentia() {
+    public void clearMobEssentia() {
         special = 0;
     }
 
-    void cycleMode() {
+    public void cycleMode() {
         mode = mode >= 2 ? 0 : mode + 1;
     }
 
-    boolean hasRoom() {
+    public boolean hasRoom() {
         return special < MAX_STORED && wrath < MAX_STORED && sloth < MAX_STORED;
     }
 
-    int totalAmount() {
+    public int totalAmount() {
         return special + wrath + sloth;
     }
 
@@ -41,7 +41,7 @@ final class WrathCageEssentiaStore {
      * Pulls at most one essentia from adjacent inputs, preserving the original
      * priority and the rule that fallback channels only fill the current cost.
      */
-    boolean drawOne(
+    public boolean drawOne(
         int cost,
         ContentId mobAspect,
         List<WrathCageBlockEntity.EssentiaInput> inputs
@@ -64,7 +64,7 @@ final class WrathCageEssentiaStore {
         return false;
     }
 
-    FuelChannel consumeFuel(int cost) {
+    public FuelChannel consumeFuel(int cost) {
         if (special >= cost) {
             special -= cost;
             return FuelChannel.MOB;
@@ -88,13 +88,13 @@ final class WrathCageEssentiaStore {
         };
     }
 
-    boolean accepts(ContentId aspect, ContentId mobAspect) {
+    public boolean accepts(ContentId aspect, ContentId mobAspect) {
         return WRATH_ASPECT.equals(aspect)
             || SLOTH_ASPECT.equals(aspect)
             || mobAspect.equals(aspect);
     }
 
-    int addToContainer(ContentId aspect, int amount, ContentId mobAspect) {
+    public int addToContainer(ContentId aspect, int amount, ContentId mobAspect) {
         if (WRATH_ASPECT.equals(aspect)) {
             wrath += amount;
             return 0;
@@ -110,7 +110,7 @@ final class WrathCageEssentiaStore {
         return amount;
     }
 
-    int amount(ContentId aspect, ContentId mobAspect) {
+    public int amount(ContentId aspect, ContentId mobAspect) {
         if (WRATH_ASPECT.equals(aspect)) {
             return wrath;
         }
@@ -123,7 +123,7 @@ final class WrathCageEssentiaStore {
         return 0;
     }
 
-    int addTransport(ContentId aspect, int amount, ContentId mobAspect) {
+    public int addTransport(ContentId aspect, int amount, ContentId mobAspect) {
         int accepted = Math.min(amount, MAX_STORED);
         if (mobAspect.equals(aspect)) {
             special += accepted;
@@ -140,7 +140,7 @@ final class WrathCageEssentiaStore {
         return amount;
     }
 
-    ContentId suctionType(ContentId mobAspect) {
+    public ContentId suctionType(ContentId mobAspect) {
         return switch (mode) {
             case 0 -> mobAspect;
             case 1 -> WRATH_ASPECT;
@@ -148,7 +148,7 @@ final class WrathCageEssentiaStore {
         };
     }
 
-    int selectedAmount() {
+    public int selectedAmount() {
         return switch (mode) {
             case 0 -> special;
             case 1 -> wrath;
@@ -156,30 +156,30 @@ final class WrathCageEssentiaStore {
         };
     }
 
-    int special() {
+    public int special() {
         return special;
     }
 
-    int wrath() {
+    public int wrath() {
         return wrath;
     }
 
-    int sloth() {
+    public int sloth() {
         return sloth;
     }
 
-    int mode() {
+    public int mode() {
         return mode;
     }
 
-    void load(int special, int wrath, int sloth, int mode) {
+    public void load(int special, int wrath, int sloth, int mode) {
         this.special = special;
         this.wrath = wrath;
         this.sloth = sloth;
         this.mode = mode;
     }
 
-    enum FuelChannel {
+    public enum FuelChannel {
         MOB,
         WRATH,
         SLOTH

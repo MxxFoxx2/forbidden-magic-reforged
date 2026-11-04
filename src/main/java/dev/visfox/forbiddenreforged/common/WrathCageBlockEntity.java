@@ -172,7 +172,7 @@ public abstract class WrathCageBlockEntity extends BlockEntity {
         return essentia.selectedAmount();
     }
 
-    static AABB nearbyEntityBounds(BlockPos pos) {
+    public static AABB nearbyEntityBounds(BlockPos pos) {
         return new AABB(pos).inflate(SPAWN_RANGE * 2, 4.0, SPAWN_RANGE * 2);
     }
 

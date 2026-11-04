@@ -91,18 +91,18 @@ final class ItemRegistrationGameTests {
     }
 
     static void creativeTabListsEveryRegisteredItem(GameTestHelper helper) {
-        List<ItemStack> stacks = dev.visfox.forbiddenreforged.FmCreativeTab.stacks();
+        List<ItemStack> stacks = dev.visfox.forbiddenreforged.common.FmCreativeTab.stacks();
         java.util.Set<Item> listed = new java.util.HashSet<>();
         for (ItemStack stack : stacks) {
             listed.add(stack.getItem());
         }
-        for (ItemStack stack : dev.visfox.forbiddenreforged.FmCreativeTab.mobCrystalStacks()) {
+        for (ItemStack stack : dev.visfox.forbiddenreforged.common.FmCreativeTab.mobCrystalStacks()) {
             listed.add(stack.getItem());
         }
         for (var holder : FmItems.ITEMS.getEntries()) {
             helper.assertTrue(listed.contains(holder.get()), "the tab is missing the item " + holder.getId());
         }
-        for (var holder : dev.visfox.forbiddenreforged.FmBlocks.BLOCKS.getEntries()) {
+        for (var holder : dev.visfox.forbiddenreforged.common.FmBlocks.BLOCKS.getEntries()) {
             Item blockItem = holder.get().asItem();
             if (blockItem != Items.AIR) {
                 helper.assertTrue(listed.contains(blockItem), "the tab is missing the block " + holder.getId());
@@ -131,7 +131,7 @@ final class ItemRegistrationGameTests {
         helper.assertValueEqual(model.getAsJsonObject("on_false").get("model").getAsString(), "forbiddenmagic:item/diabolist_fork", "on_false is the ordinary fork");
         JsonObject spork = GameTestResources.readJson(helper, "/assets/forbiddenmagic/models/item/diabolist_fork_spork.json");
         helper.assertValueEqual(spork.getAsJsonObject("textures").get("layer0").getAsString(), "forbiddenmagic:item/spork", "spork model uses the spork texture");
-        helper.assertTrue(ForbiddenMagic.class.getResourceAsStream("/assets/forbiddenmagic/textures/item/spork.png") != null, "spork texture ships with the mod");
+        helper.assertTrue(FmIds.class.getResourceAsStream("/assets/forbiddenmagic/textures/item/spork.png") != null, "spork texture ships with the mod");
         helper.succeed();
     }
 
@@ -144,7 +144,7 @@ final class ItemRegistrationGameTests {
         helper.assertValueEqual(model.getAsJsonObject("on_false").get("model").getAsString(), "forbiddenmagic:item/lust_shard", "on_false is the lust shard");
         JsonObject despair = GameTestResources.readJson(helper, "/assets/forbiddenmagic/models/item/lust_shard_despair.json");
         helper.assertValueEqual(despair.getAsJsonObject("textures").get("layer0").getAsString(), "forbiddenmagic:item/despair_shard", "despair model uses the despair texture");
-        helper.assertTrue(ForbiddenMagic.class.getResourceAsStream("/assets/forbiddenmagic/textures/item/despair_shard.png") != null, "despair texture ships with the mod");
+        helper.assertTrue(FmIds.class.getResourceAsStream("/assets/forbiddenmagic/textures/item/despair_shard.png") != null, "despair texture ships with the mod");
         helper.succeed();
     }
 

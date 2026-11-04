@@ -99,7 +99,6 @@ public final class Tc4HostAdapter implements HostAdapter {
                 HostProfile.FeatureSupport.adapted("Translates common infusion enchantment definitions"))
         )
     );
-    );
 
     private Tc4HostAdapter() {
     }

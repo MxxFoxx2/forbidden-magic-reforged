@@ -13,7 +13,7 @@ final class GameTestResources {
     private GameTestResources() {
     }
 
-    static JsonObject readJson(GameTestHelper helper, String path) {        try (InputStream stream = ForbiddenMagic.class.getResourceAsStream(path)) {
+    static JsonObject readJson(GameTestHelper helper, String path) {        try (InputStream stream = FmIds.class.getResourceAsStream(path)) {
                 if (stream == null) {
                     helper.fail("missing resource " + path);
                 }

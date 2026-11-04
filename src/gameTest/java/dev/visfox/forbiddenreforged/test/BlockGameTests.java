@@ -284,7 +284,7 @@ public final class BlockGameTests {
     }
 
     private static void taintLogSelectsSideTexturesDeterministically(GameTestHelper helper) {
-        try (InputStream stream = ForbiddenMagic.class.getResourceAsStream("/assets/forbiddenmagic/blockstates/taint_log.json")) {
+        try (InputStream stream = FmIds.class.getResourceAsStream("/assets/forbiddenmagic/blockstates/taint_log.json")) {
             helper.assertTrue(stream != null, "taint log blockstate must ship with the mod");
             JsonObject root = JsonParser.parseReader(new InputStreamReader(stream, StandardCharsets.UTF_8)).getAsJsonObject();
             for (String axis : List.of("axis=x", "axis=y", "axis=z")) {

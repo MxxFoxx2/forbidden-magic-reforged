@@ -78,9 +78,9 @@ final class WandGameTests {
             FmIds.id("textures/misc/hellfire.png"), "Hellfire uses the bundled original icon");
         helper.assertValueEqual(Tc4BlinkFocusItem.PANDEMONIUM.icon(),
             FmIds.id("textures/misc/pandemonium.png"), "Pandemonium uses the bundled original icon");
-        helper.assertTrue(ForbiddenMagic.class.getResourceAsStream("/assets/forbiddenmagic/textures/misc/hellfire.png") != null,
+        helper.assertTrue(FmIds.class.getResourceAsStream("/assets/forbiddenmagic/textures/misc/hellfire.png") != null,
             "Hellfire icon asset is bundled");
-        helper.assertTrue(ForbiddenMagic.class.getResourceAsStream("/assets/forbiddenmagic/textures/misc/pandemonium.png") != null,
+        helper.assertTrue(FmIds.class.getResourceAsStream("/assets/forbiddenmagic/textures/misc/pandemonium.png") != null,
             "Pandemonium icon asset is bundled");
         helper.succeed();
     }
@@ -110,9 +110,9 @@ final class WandGameTests {
 
         helper.assertTrue(FmItems.ALCHEMICAL_CAP.isBound() && FmItems.EQUIVALENT_ROD.isBound(),
             "both wand component items are registered");
-        helper.assertTrue(ForbiddenMagic.class.getResourceAsStream("/assets/forbiddenmagic/textures/model/wand_cap_alchemical.png") != null,
+        helper.assertTrue(FmIds.class.getResourceAsStream("/assets/forbiddenmagic/textures/model/wand_cap_alchemical.png") != null,
             "alchemical cap wand texture ships with the mod");
-        helper.assertTrue(ForbiddenMagic.class.getResourceAsStream("/assets/forbiddenmagic/textures/model/wand_rod_equivalent.png") != null,
+        helper.assertTrue(FmIds.class.getResourceAsStream("/assets/forbiddenmagic/textures/model/wand_rod_equivalent.png") != null,
             "equivalent rod wand texture ships with the mod");
         ItemStack equivalentWand = equivalent == null ? ItemStack.EMPTY : Wands.create(WandRegistry.CAP_VOID, equivalent, false);
         helper.assertTrue(Wands.isWand(equivalentWand)
@@ -139,9 +139,9 @@ final class WandGameTests {
         helper.assertTrue(neutronium.onUpdate() != null && staff.onUpdate() != null, "creative rods refill vis on update");
         helper.assertValueEqual(neutronium.item(), Identifier.withDefaultNamespace("bedrock"), "creative rod uses bedrock");
         helper.assertValueEqual(staff.item(), Identifier.withDefaultNamespace("bedrock"), "creative staff uses bedrock");
-        helper.assertTrue(ForbiddenMagic.class.getResourceAsStream("/assets/forbiddenmagic/textures/model/wand_rod_neutronium.png") != null, "neutronium rod texture ships with the mod");
+        helper.assertTrue(FmIds.class.getResourceAsStream("/assets/forbiddenmagic/textures/model/wand_rod_neutronium.png") != null, "neutronium rod texture ships with the mod");
 
-        List<ItemStack> stacks = dev.visfox.forbiddenreforged.FmCreativeTab.stacks();
+        List<ItemStack> stacks = dev.visfox.forbiddenreforged.common.FmCreativeTab.stacks();
         helper.assertTrue(stacks.stream().anyMatch(stack -> Wands.isWand(stack)
             && Wands.getCap(stack).tag().equals("thaumium") && Wands.getRod(stack).tag().equals("tainted")), "tainted wand is in the creative tab");
         helper.assertTrue(stacks.stream().anyMatch(stack -> Wands.isWand(stack)

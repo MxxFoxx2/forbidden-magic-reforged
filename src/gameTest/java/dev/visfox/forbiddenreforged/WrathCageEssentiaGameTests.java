@@ -1,5 +1,8 @@
 package dev.visfox.forbiddenreforged;
 
+import dev.visfox.forbiddenreforged.common.FmIds;
+import dev.visfox.forbiddenreforged.common.WrathCageEssentiaStore;
+import dev.visfox.forbiddenreforged.common.WrathCageBlockEntity;
 import java.util.function.Consumer;
 import dev.visfox.forbiddenreforged.test.EntityGameTests;
 import net.minecraft.core.Holder;

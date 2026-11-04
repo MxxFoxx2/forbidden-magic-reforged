@@ -94,6 +94,15 @@ dependencies {
     clientRuntimeOnly "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
 }
 
+// GameTests live in their own source set (not shipped in the jar) and need the
+// same compile/runtime classpath as main, including the compileOnly host API.
+sourceSets.gameTest.compileClasspath += sourceSets.main.compileClasspath
+sourceSets.gameTest.runtimeClasspath += sourceSets.main.runtimeClasspath
+dependencies {
+    gameTestCompileOnly "thaumcraft:thaumcraft:${thaumcraft_version}"
+    gameTestImplementation "com.github.glitchfiend:TerraBlender-neoforge:${terrablender_version}"
+}
+
 tasks.named('jar', Jar) {
     archiveFileName = "forbidden-magic-${mod_version}.jar"
 }
