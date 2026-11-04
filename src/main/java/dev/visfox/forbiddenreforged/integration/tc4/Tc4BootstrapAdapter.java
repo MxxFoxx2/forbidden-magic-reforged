@@ -2,16 +2,13 @@ package dev.visfox.forbiddenreforged.integration.tc4;
 
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectDiagnostics;
 import dev.visfox.forbiddenreforged.FmConfig;
-import dev.visfox.forbiddenreforged.FmItems;
 import dev.visfox.forbiddenreforged.FmRecipes;
 import dev.visfox.forbiddenreforged.FmResearch;
 import dev.visfox.forbiddenreforged.FmWandTriggers;
 import dev.visfox.forbiddenreforged.FmWands;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
-import net.minecraft.world.item.Items;
 import thaumcraft.aspect.Aspect;
-import thaumcraft.device.SmeltingBonuses;
 
 public final class Tc4BootstrapAdapter {
     private Tc4BootstrapAdapter() {
@@ -25,7 +22,6 @@ public final class Tc4BootstrapAdapter {
         FmWandTriggers.register();
         FmRecipes.register();
         FmResearch.register();
-        SmeltingBonuses.register(Items.EMERALD, FmItems.EMERALD_FRAGMENT.get());
         Tc4TinkererAdapter.register();
     }
 
