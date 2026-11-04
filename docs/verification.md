@@ -1,5 +1,18 @@
 # Verification status
 
+## Локальная проверка ветки `refactor/simplify-architecture` — 4 ноября 2026
+
+Локальный прогон на коммите `e30b6e48` (ветка `refactor/simplify-architecture`, ещё не смержена в `main`; CI для неё не запускался):
+
+- `gradlew build` — успешно; в production JAR `forbidden-magic-0.574-26.3-port.0.1.0.jar` 183 класса, ни одного класса из `forbiddenreforged/test/**` или `*GameTests*`.
+- `runGameTestServer` с `no_lust=false` — **117/117** required GameTests passed.
+- `runGameTestServer` с `no_lust=true` — **117/117** required GameTests passed.
+- `tools/check_host_agnostic_api.py` — Host API boundaries passed (70 Java files checked).
+- `tools/check_provenance.py` — provenance ok: 2 jar(s).
+- `tools/check_host_pin.py` — host pin check passed; оба патча применяются к закреплённому `host.sha`, upstream `origin/main` опережает пин на 23 коммита.
+- `pytest tests/python` — 15 passed, 7 subtests passed.
+- Новый GameTest-бюстрап: `src/gameTest/java/dev/visfox/forbiddenreforged/test/FmGameTestBootstrap.java`. В Minecraft 26.3 `minecraft:test_function` — статический built-in реестр: `DeferredRegister` по нему не срабатывал, и все 117 функций отсутствовали в рантайме (`Trying to access missing test function`). Рабочее окно — `RegisterEvent` реестра `minecraft:test_function`, который `GameData.postRegisterEvents()` рассылает на mod bus, пока реестр разморожен; `RegisterGameTestsEvent` стреляется уже после заморозки и даёт только реестры окружений и инстансов тестов.
+
 ## Последний успешный CI — 4 ноября 2026
 
 - Проверенный production/runtime commit: [`582285d`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/582285d046af2c4d9f94d9b267625253f6cf22b3).

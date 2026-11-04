@@ -12,6 +12,30 @@ This work does **not** claim that the current JAR supports multiple magic hosts 
 
 ## Layers
 
+### 0. Shared gameplay and registries — `common/`
+
+All shared mod classes (blocks, items, `Fm*` registries, config, event handlers) live in
+`dev.visfox.forbiddenreforged.common`. The root package holds only the composition root
+`ForbiddenMagic`; `common/FmIds` owns `MODID`/`LOGGER`/`id()` so no shared class imports the
+composition root. `tools/check_host_agnostic_api.py` rejects any import of the root package
+outside `ForbiddenMagic.java` and any `integration/tc4` dependency on the root package, which
+keeps the package graph acyclic: `integration/tc4 → common → integration/api → core`.
+
+### 0b. GameTests — `src/gameTest`
+
+GameTest classes live in a dedicated `gameTest` source set (`src/gameTest/java`), wired only
+into the `gameTestServer` run and the mod's test namespace. They are not compiled into the
+production JAR, and `ForbiddenMagic` no longer references them.
+
+### 0c. Content-gating config sync — `common/FmSync`
+
+`FmConfig` stays `STARTUP` (read before registration), but the flags that change registered
+content (`no_lust`, `emerald_transmutation`, `enchanting`, `greedy_ench`, `wrath_cage`) are
+sent to clients in a play-to-client payload on login; a mismatch disconnects the client with
+an explanatory message because registries cannot be reconciled after the fact. Display-only
+flags (`tag_research`, `spork`) remain local. `tools/check_host_pin.py` (scheduled CI) verifies
+the pinned host sha and patch applicability without ever updating `host.sha`.
+
 ### 1. Shared model and catalogs — `core/`
 
 The shared layer owns semantic values and definitions:
@@ -59,11 +83,13 @@ Runtime contracts are separated by responsibility rather than combined in one se
 
 These ports may use Minecraft runtime types such as `ItemStack`, `LivingEntity`, `BlockState`, and `ServerPlayer`: this is a host-agnostic boundary within the current Minecraft/NeoForge target, not a cross-Minecraft-version abstraction. They must not expose TC4 or another magic-host's API types.
 
-The old aggregate `HostRuntimeServices`, mixed `HostEntityServices`, combined `HostItemServices`, combined `HostWandServices`, and combined `HostTaintServices` contracts were removed. Consumers request the narrow capability they need through `HostAdapterRegistry`.
+The old aggregate contracts were removed. Consumers request the narrow capability they need
+through the typed accessors of `HostAdapterRegistry` (`warp()`, `wandVis()`, `itemFactories()`, ...),
+which read the adapter's immutable `HostServices` composition.
 
 ### 4. Concrete host integration — `integration/tc4/`
 
-TC4-specific registry values, entity classes, wand APIs, Essentia types, research/recipe APIs, Baubles, and host item subclasses live in this layer. `Tc4HostAdapter` implements the host contract and capability ports by delegating to focused TC4 adapters.
+TC4-specific registry values, entity classes, wand APIs, Essentia types, research/recipe APIs, Baubles, and host item subclasses live in this layer. `Tc4HostAdapter` implements only the registration/lifecycle `HostAdapter` contract and exposes `services()`; `Tc4Services` composes every runtime port from the focused TC4 adapters in one place.
 
 The one intended production composition-root reference to a concrete adapter is the selection of `Tc4HostAdapter.INSTANCE` in `ForbiddenMagic`. Other shared production classes should use the neutral contracts.
 

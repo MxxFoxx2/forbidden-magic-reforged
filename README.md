@@ -63,6 +63,7 @@ python tools/prepare_host.py --verify # только верификация
 # Валидация
 python tools/check_host_agnostic_api.py  # проверить границы host-agnostic
 python tools/check_provenance.py         # проверить происхождение JAR
+python tools/check_host_pin.py           # проверить пин хоста и применимость патчей
 python tools/gen_resources.py            # сгенерировать ресурсы (2 раза, чистый diff)
 ```
 
@@ -101,16 +102,15 @@ src/main/java/dev/visfox/forbiddenreforged/
 │   ├── wand/        # Поведения жезлов (Hellfire, Blink Focus)
 │   └── warp/        # Абстракция доступа к варпу
 ├── integration/
-│   ├── api/         # HostAdapter, HostProfile, HostAdapterRegistry
+│   ├── api/         # HostAdapter, HostProfile, HostServices, HostAdapterRegistry
 │   ├── runtime/     # 15 capability интерфейсов (HostXxxServices)
-│   └── tc4/         # Реализация Thaumcraft 4: Reforged
+│   └── tc4/         # Реализация Thaumcraft 4: Reforged (Tc4Services + узкие адаптеры)
+├── common/          # Общие блоки, предметы, Fm*-регистрации, конфиг, синхронизация
 ├── client/          # Клиентский код (рендереры, креативные вкладки)
-├── test/            # GameTest реализации (компилируются в основной jar)
-├── FmBlocks.java    # Регистрация блоков
-├── FmItems.java     # Регистрация предметов
-├── FmResearch.java  # Регистрация исследований
-├── FmRecipes.java   # Регистрация рецептов
 └── ForbiddenMagic.java  # Главный класс мода (composition root)
+
+src/gameTest/java/dev/visfox/forbiddenreforged/
+└── test/            # GameTest реализации (отдельный source set, не попадают в JAR)
 ```
 
 ---

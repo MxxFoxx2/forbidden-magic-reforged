@@ -4,6 +4,17 @@
 
 ## Завершённая host-agnostic архитектура
 
+### Срезы ветки `refactor/simplify-architecture` (4 ноября 2026, ещё не в `main`)
+
+- **Единый `common`-слой:** все общие mod-классы (блоки, предметы, `Fm*`-регистрации, конфиг, обработчики событий) перенесены в `dev.visfox.forbiddenreforged.common`; в корневом пакете остался только composition root `ForbiddenMagic`. `common/FmIds` владеет `MODID`/`LOGGER`/`id()`, поэтому ни один общий класс не импортирует composition root. `tools/check_host_agnostic_api.py` отклоняет импорт корневого пакета вне `ForbiddenMagic.java` и зависимость `integration/tc4` от корневого пакета — граф пакетов остаётся ациклическим (`integration/tc4 → common → integration/api → core`).
+- **Отдельный source set для GameTests:** тесты живут в `src/gameTest/java` и попадают только в `gameTestServer`-run и тестовое пространство имён; в production JAR их нет, `ForbiddenMagic` больше не ссылается на тестовый код.
+- **Композиция host-портов:** `HostServices` — иммутабельный набор runtime-портов, `HostAdapterRegistry` отдаёт их через узкие типизированные аксессоры (`warp()`, `wandVis()`, `itemFactories()`, ...); `Tc4HostAdapter` реализует только контракт регистрации/lifecycle и отдаёт `services()`, а `Tc4Services` собирает все порты из узких TC4-адаптеров.
+- **Синхронизация content-gating конфигурации:** `FmConfig` остаётся `STARTUP`, но флаги, меняющие зарегистрированный контент (`no_lust`, `emerald_transmutation`, `enchanting`, `greedy_ench`, `wrath_cage`), передаются клиенту play-to-client payload при входе; расхождение приводит к disconnect с объяснением, поскольку реестры после факта не reconciliate-ятся. Display-only флаги (`tag_research`, `spork`) остаются локальными.
+- **Автопроверка пина хоста:** `tools/check_host_pin.py` и ежедневный `.github/workflows/host-pin-check.yml` проверяют, что `host.sha` существует в апстриме и что все `patches/*.patch` применяются; `host.sha` скрипт никогда не меняет.
+- **Регистрация GameTest-функций:** в Minecraft 26.3 `minecraft:test_function` — статический built-in реестр, и `DeferredRegister` по нему не срабатывал (все 117 функций отсутствовали в рантайме). Тесты регистрируются напрямую в `RegisterEvent` реестра `minecraft:test_function` из `src/gameTest/.../FmGameTestBootstrap.java` — это единственное окно, когда реестр разморожен.
+
+### Базовые срезы host-agnostic архитектуры (в `main`)
+
 - Общие модели аспектов, рецептов и исследований заведены; TC4-адаптеры переводят их в API хоста. Ингредиенты, принадлежащие хосту, представлены в core как `host:item/...` и `host:tag/...`; `Tc4ContentAdapter` разрешает их в реальные TC4 registry IDs. Boundary-check запрещает жёстко прописывать namespace хоста внутри `core`. Изменение warp проходит по цепочке `core/warp/WarpAccess` → `HostWarpServices` → `Tc4WarpAdapter`; регистрацию warp-предметов выполняет host bootstrap. `core/warp` больше не публикует NeoForge events и не зависит от event bus.
 - Wrath Cage больше не наследуется от `TcBlockEntity` и не реализует `AspectSource`/`EssentiaTransport` в общем gameplay-классе. TC4 bridge-subclass реализует эти интерфейсы, а общая логика принимает `ContentId` и callback-источники эссенции.
 - Поведения Tainted, Infernal, Profane и creative rods используют общие `WandVisAccess`/`WandPartsAccess`; Profane Contract хранится через `WandContractAccess`, а `FmWandContractAccess` связывает этот порт с общей data component вне `core`. TC4-адаптер переводит wand-операции в `Wands`/`WandKeys` и сохраняет регистрацию rods/caps. GameTest прогоняет Profane transition: 25 000 Vis, смену rod, очистку контракта и sticky warp через injected ports.
@@ -28,6 +39,8 @@
 - **Add-on aspect API влит в апстрим:** [PR #37](https://github.com/notlikethiss/thaumcraft-4-reforged/pull/37) смержен как [`d75a946`](https://github.com/notlikethiss/thaumcraft-4-reforged/commit/d75a94602100595f48bf31debab0f26c5ad521e2) и выпущен в `1.1.2`; следом автор упростил API (`7df0506`). Наши патчи реестра аспектов, хука `AddonAspects` и сканера удалены, порт собирается против стокового API. Отличие, которое осталось: `Aspect.count()`/`builtinCount()` заменены на `Aspect.values().length` и константу 48, а диагностика аддон-аспектов берёт канонический порядок хоста — апстрим сортирует аддонные аспекты по тегу, поэтому `desidia` идёт первой.
 
 **Upstream обновлён:** `host.sha` передвинут с `69a47a1` через `cf0c421` и `5ea7ba3` на `6047676` (апстрим `main`, `mod_version` по-прежнему `1.1.2`). Block aspect targets остаются единственным функциональным патчем: в апстриме `AspectRegistrar` по-прежнему принимает только item-цели. При обновлении upstream проверяй применимость `0001` и тест портала.
+
+**Автопроверка пина:** `tools/check_host_pin.py` (ежедневный `host-pin-check.yml`) проверяет, что `host.sha` существует в апстриме и все патчи `patches/*.patch` применяются поверх пина; дрейф считается, но `host.sha` скрипт никогда не меняет — bump выполняется отдельным осознанным изменением.
 
 ## Незакрытые ручные проверки
 

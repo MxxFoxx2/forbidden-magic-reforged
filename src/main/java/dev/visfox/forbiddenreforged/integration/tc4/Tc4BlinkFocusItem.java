@@ -1,7 +1,7 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
-import dev.visfox.forbiddenreforged.FmAspects;
-import dev.visfox.forbiddenreforged.ForbiddenMagic;
+import dev.visfox.forbiddenreforged.common.FmAspects;
+import dev.visfox.forbiddenreforged.common.FmIds;
 import dev.visfox.forbiddenreforged.core.wand.BlinkFocusBehavior;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionResult;
@@ -23,9 +23,9 @@ public class Tc4BlinkFocusItem extends FocusItem {
     private static final AspectList COST_PANDEMONIUM = new AspectList().add(Aspect.ENTROPY, 300).add(Aspect.ORDER, 100);
 
     public static final FocusUpgradeType HELLFIRE = new FocusUpgradeType(100, "hellfire",
-        ForbiddenMagic.id("textures/misc/hellfire.png"), new AspectList().add(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER), 1));
+        FmIds.id("textures/misc/hellfire.png"), new AspectList().add(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER), 1));
     public static final FocusUpgradeType PANDEMONIUM = new FocusUpgradeType(101, "pandemonium",
-        ForbiddenMagic.id("textures/misc/pandemonium.png"), new AspectList().add(Aspect.DARKNESS, 1));
+        FmIds.id("textures/misc/pandemonium.png"), new AspectList().add(Aspect.DARKNESS, 1));
 
     public Tc4BlinkFocusItem(Properties properties) {
         super(properties);
@@ -47,12 +47,12 @@ public class Tc4BlinkFocusItem extends FocusItem {
 
     @Override
     public @Nullable Identifier getFocusTexture(ItemStack focus) {
-        return ForbiddenMagic.id("item/blink_focus");
+        return FmIds.id("item/blink_focus");
     }
 
     @Override
     public @Nullable Identifier getOrnamentTexture(ItemStack focus) {
-        return ForbiddenMagic.id("item/blink_focus_ornament");
+        return FmIds.id("item/blink_focus_ornament");
     }
 
     @Override

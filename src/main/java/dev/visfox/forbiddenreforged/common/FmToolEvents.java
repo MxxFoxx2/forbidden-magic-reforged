@@ -1,0 +1,203 @@
+package dev.visfox.forbiddenreforged.common;
+
+import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.util.FakePlayer;
+import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
+import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.level.BlockDropsEvent;
+import dev.visfox.forbiddenreforged.core.model.ContentId;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
+import org.jspecify.annotations.Nullable;
+
+public final class FmToolEvents {
+    private static final List<ContentId> TAINTED_PRIMALS = List.of(
+        new ContentId("forbiddenmagic", "concept/entropy"),
+        new ContentId("forbiddenmagic", "concept/order"),
+        new ContentId("forbiddenmagic", "concept/fire"),
+        new ContentId("forbiddenmagic", "concept/water"),
+        new ContentId("forbiddenmagic", "concept/earth"),
+        new ContentId("forbiddenmagic", "concept/air")
+    );
+
+    private FmToolEvents() {
+    }
+
+    public static void register() {
+        NeoForge.EVENT_BUS.addListener(FmToolEvents::onBreakSpeed);
+        NeoForge.EVENT_BUS.addListener(FmToolEvents::onBlockDrops);
+        NeoForge.EVENT_BUS.addListener(FmToolEvents::onFoodFinished);
+        NeoForge.EVENT_BUS.addListener(FmToolEvents::onTooltip);
+    }
+
+    public static float taintPickaxeSpeed(float hardness) {
+        if (hardness == 0.0F) {
+            return 0.0F;
+        }
+        if (hardness < 5.0F) {
+            return 0.1F;
+        }
+        if (hardness < 20.0F) {
+            return hardness / 2.0F;
+        }
+        return 5.0F + hardness;
+    }
+
+    public static boolean taintShardRoll(int roll, int fortune, boolean silkTouch) {
+        int chance = 1 + 2 * fortune + (silkTouch ? 6 : 0);
+        return roll <= chance;
+    }
+
+    public static void collarDamage(Player wearer, float amount, Entity attacker) {
+        if (FmItems.SUB_COLLAR == null) {
+            return;
+        }
+        ItemStack collar = HostAdapterRegistry.accessories().accessory(wearer, 0);
+        if (!collar.is(FmItems.SUB_COLLAR.get())) {
+            return;
+        }
+        int doses = 3 * (int) amount;
+        RandomSource random = wearer.getRandom();
+        if (attacker instanceof Player dominator) {
+            int chance = 1;
+            if (dominator.getMainHandItem().is(FmItems.RIDING_CROP.get())) {
+                doses += 3;
+                chance += 3;
+            }
+            if (wearer.level().dimension() == Level.NETHER && random.nextInt(30) < chance) {
+                ItemEntity drop = new ItemEntity(wearer.level(), wearer.getX(), wearer.getY(), wearer.getZ(),
+                    new ItemStack(FmItems.DEADLY_SHARDS.get("lust").get()));
+                drop.setPickUpDelay(10);
+                drop.setDeltaMovement(drop.getDeltaMovement().add(
+                    random.nextFloat() * 0.05,
+                    (random.nextFloat() - random.nextFloat()) * 0.1,
+                    (random.nextFloat() - random.nextFloat()) * 0.1));
+                wearer.level().addFreshEntity(drop);
+            }
+        }
+        for (int dose = 0; dose < doses; dose++) {
+            HostAdapterRegistry.wandVis().addRealVis(collar, TAINTED_PRIMALS.get(random.nextInt(TAINTED_PRIMALS.size())), 1, true);
+        }
+    }
+
+    public static String wandTooltipKind(ItemStack stack) {
+        return wandTooltipKind(HostAdapterRegistry.wandInspection().wandRodTag(stack));
+    }
+
+    public static String wandTooltipKind(@Nullable String rodTag) {
+        if (rodTag == null) {
+            return "";
+        }
+        if (rodTag.startsWith("neutronium")) {
+            return "creativeonly";
+        }
+        if (rodTag.startsWith("profane")) {
+            return "profane_contract";
+        }
+        return "";
+    }
+
+    private static void onBreakSpeed(PlayerEvent.BreakSpeed event) {
+        Player player = event.getEntity();
+        if (!player.getMainHandItem().is(FmItems.TAINT_PICKAXE.get())) {
+            return;
+        }
+        BlockPos pos = event.getPosition().orElse(BlockPos.ZERO);
+        float hardness = event.getState().getDestroySpeed(player.level(), pos);
+        event.setNewSpeed(taintPickaxeSpeed(hardness));
+    }
+
+    private static void onBlockDrops(BlockDropsEvent event) {
+        Entity breaker = event.getBreaker();
+        if (!(breaker instanceof ServerPlayer player) || breaker instanceof FakePlayer) {
+            return;
+        }
+        ItemStack tool = event.getTool();
+        BlockState state = event.getState();
+        if (!tool.is(FmItems.TAINT_SHOVEL.get())
+            || !event.getDrops().isEmpty()
+            || !isTaintMaterial(state)
+            || state.is(FmBlocks.TAINT_LEAVES.get())) {
+            return;
+        }
+
+        int fortune = enchantmentLevel(player, tool, Enchantments.FORTUNE);
+        boolean silkTouch = enchantmentLevel(player, tool, Enchantments.SILK_TOUCH) > 0;
+        if (!taintShardRoll(event.getLevel().getRandom().nextInt(31), fortune, silkTouch)) {
+            return;
+        }
+        BlockPos pos = event.getPos();
+        ItemEntity drop = new ItemEntity(player.level(), pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
+            new ItemStack(FmItems.DEADLY_SHARDS.get("taint").get()));
+        drop.setPickUpDelay(10);
+        event.getDrops().add(drop);
+    }
+
+    public static boolean hasNutritionRingInRingSlot(Player player) {
+        return HostAdapterRegistry.accessories().accessory(player, 1).is(FmItems.RING_NUTRITION.get())
+            || HostAdapterRegistry.accessories().accessory(player, 2).is(FmItems.RING_NUTRITION.get());
+    }
+
+    public static boolean cancelsInfernalDamage(ItemStack held, boolean fireOrWither) {
+        return fireOrWither && held != null && !held.isEmpty()
+            && "infernal".equals(HostAdapterRegistry.wandInspection().wandRodTag(held));
+    }
+
+    public static boolean restoresTaintedVis(ItemStack held, boolean taintDamage) {
+        return taintDamage && held != null && !held.isEmpty()
+            && "tainted".equals(HostAdapterRegistry.wandInspection().wandRodTag(held));
+    }
+
+    public static List<ContentId> taintedVisRolls(RandomSource random) {
+        return List.of(
+            TAINTED_PRIMALS.get(random.nextInt(TAINTED_PRIMALS.size())),
+            TAINTED_PRIMALS.get(random.nextInt(TAINTED_PRIMALS.size())),
+            TAINTED_PRIMALS.get(random.nextInt(TAINTED_PRIMALS.size()))
+        );
+    }
+
+    private static void onTooltip(ItemTooltipEvent event) {
+        ItemStack stack = event.getItemStack();
+        switch (wandTooltipKind(stack)) {
+            case "creativeonly" -> event.getToolTip().add(Component.translatable("tooltip.creativeonly"));
+            case "profane_contract" -> event.getToolTip().add(Component.translatable(
+                "tooltip.profane_contract", stack.getOrDefault(FmComponents.PROFANE_CONTRACT.get(), 0)));
+            default -> {
+            }
+        }
+    }
+
+    private static void onFoodFinished(LivingEntityUseItemEvent.Finish event) {
+        if (!(event.getEntity() instanceof Player player) || player.level().isClientSide()
+            || event.getItem().get(net.minecraft.core.component.DataComponents.FOOD) == null
+            || !hasNutritionRingInRingSlot(player)) {
+            return;
+        }
+        player.getFoodData().eat(2, 2.0F);
+    }
+
+    private static boolean isTaintMaterial(BlockState state) {
+        return HostAdapterRegistry.taintBlocks().isTaintMaterial(state)
+            || state.is(FmBlocks.TAINT_LOG.get())
+            || state.is(FmBlocks.TAINT_PLANKS.get())
+            || state.is(FmBlocks.TAINT_STONE_SMOOTH.get())
+            || state.is(FmBlocks.TAINT_STONE_BRICK.get());
+    }
+
+    private static int enchantmentLevel(ServerPlayer player, ItemStack stack, net.minecraft.resources.ResourceKey<net.minecraft.world.item.enchantment.Enchantment> key) {
+        return stack.getEnchantmentLevel(player.level().registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(key));
+    }
+}
