@@ -65,7 +65,7 @@ public final class FmToolEvents {
         if (FmItems.SUB_COLLAR == null) {
             return;
         }
-        ItemStack collar = HostAdapterRegistry.requireAccessories().accessory(wearer, 0);
+        ItemStack collar = HostAdapterRegistry.accessories().accessory(wearer, 0);
         if (!collar.is(FmItems.SUB_COLLAR.get())) {
             return;
         }
@@ -89,12 +89,12 @@ public final class FmToolEvents {
             }
         }
         for (int dose = 0; dose < doses; dose++) {
-            HostAdapterRegistry.requireWandVis().addRealVis(collar, TAINTED_PRIMALS.get(random.nextInt(TAINTED_PRIMALS.size())), 1, true);
+            HostAdapterRegistry.wandVis().addRealVis(collar, TAINTED_PRIMALS.get(random.nextInt(TAINTED_PRIMALS.size())), 1, true);
         }
     }
 
     public static String wandTooltipKind(ItemStack stack) {
-        return wandTooltipKind(HostAdapterRegistry.requireWandInspection().wandRodTag(stack));
+        return wandTooltipKind(HostAdapterRegistry.wandInspection().wandRodTag(stack));
     }
 
     public static String wandTooltipKind(@Nullable String rodTag) {
@@ -147,18 +147,18 @@ public final class FmToolEvents {
     }
 
     public static boolean hasNutritionRingInRingSlot(Player player) {
-        return HostAdapterRegistry.requireAccessories().accessory(player, 1).is(FmItems.RING_NUTRITION.get())
-            || HostAdapterRegistry.requireAccessories().accessory(player, 2).is(FmItems.RING_NUTRITION.get());
+        return HostAdapterRegistry.accessories().accessory(player, 1).is(FmItems.RING_NUTRITION.get())
+            || HostAdapterRegistry.accessories().accessory(player, 2).is(FmItems.RING_NUTRITION.get());
     }
 
     public static boolean cancelsInfernalDamage(ItemStack held, boolean fireOrWither) {
         return fireOrWither && held != null && !held.isEmpty()
-            && "infernal".equals(HostAdapterRegistry.requireWandInspection().wandRodTag(held));
+            && "infernal".equals(HostAdapterRegistry.wandInspection().wandRodTag(held));
     }
 
     public static boolean restoresTaintedVis(ItemStack held, boolean taintDamage) {
         return taintDamage && held != null && !held.isEmpty()
-            && "tainted".equals(HostAdapterRegistry.requireWandInspection().wandRodTag(held));
+            && "tainted".equals(HostAdapterRegistry.wandInspection().wandRodTag(held));
     }
 
     public static List<ContentId> taintedVisRolls(RandomSource random) {
@@ -190,7 +190,7 @@ public final class FmToolEvents {
     }
 
     private static boolean isTaintMaterial(BlockState state) {
-        return HostAdapterRegistry.requireTaintBlocks().isTaintMaterial(state)
+        return HostAdapterRegistry.taintBlocks().isTaintMaterial(state)
             || state.is(FmBlocks.TAINT_LOG.get())
             || state.is(FmBlocks.TAINT_PLANKS.get())
             || state.is(FmBlocks.TAINT_STONE_SMOOTH.get())

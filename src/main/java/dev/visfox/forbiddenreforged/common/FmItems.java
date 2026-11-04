@@ -67,23 +67,23 @@ public final class FmItems {
                 ? ITEMS.registerItem("lust_shard", LustShardItem::new)
                 : ITEMS.registerSimpleItem(vice + "_shard"));
         }
-        GLUTTONY_SHARD = ITEMS.registerSimpleItem("gluttony_shard", properties -> HostAdapterRegistry.requireItemProperties().gluttonyFoodProperties(properties));
+        GLUTTONY_SHARD = ITEMS.registerSimpleItem("gluttony_shard", properties -> HostAdapterRegistry.itemProperties().gluttonyFoodProperties(properties));
         SKULL_AXE = ITEMS.registerItem("skull_axe", SkullAxeItem::new,
-            properties -> HostAdapterRegistry.requireItemProperties().skullAxeProperties(properties));
+            properties -> HostAdapterRegistry.itemProperties().skullAxeProperties(properties));
         EMERALD_FRAGMENT = ITEMS.registerSimpleItem("emerald_fragment");
         TAINTED_BLOOD_SHARD = ITEMS.registerSimpleItem("tainted_blood_shard");
-        MORPH_PICKAXE = ITEMS.registerItem("morph_pickaxe", properties -> HostAdapterRegistry.requireItemFactories().createMorphTool(properties),
-            properties -> repairable(HostAdapterRegistry.requireItemProperties().morphPickaxeProperties(properties)));
-        MORPH_SWORD = ITEMS.registerItem("morph_sword", properties -> HostAdapterRegistry.requireItemFactories().createMorphTool(properties),
-            properties -> repairable(HostAdapterRegistry.requireItemProperties().morphSwordProperties(properties)));
-        MORPH_SHOVEL = ITEMS.registerItem("morph_shovel", properties -> HostAdapterRegistry.requireItemFactories().createMorphTool(properties),
-            properties -> repairable(HostAdapterRegistry.requireItemProperties().morphShovelProperties(properties)));
-        MORPH_AXE = ITEMS.registerItem("morph_axe", properties -> HostAdapterRegistry.requireItemFactories().createMorphTool(properties),
-            properties -> repairable(HostAdapterRegistry.requireItemProperties().morphAxeProperties(properties)));
+        MORPH_PICKAXE = ITEMS.registerItem("morph_pickaxe", properties -> HostAdapterRegistry.itemFactories().createMorphTool(properties),
+            properties -> repairable(HostAdapterRegistry.itemProperties().morphPickaxeProperties(properties)));
+        MORPH_SWORD = ITEMS.registerItem("morph_sword", properties -> HostAdapterRegistry.itemFactories().createMorphTool(properties),
+            properties -> repairable(HostAdapterRegistry.itemProperties().morphSwordProperties(properties)));
+        MORPH_SHOVEL = ITEMS.registerItem("morph_shovel", properties -> HostAdapterRegistry.itemFactories().createMorphTool(properties),
+            properties -> repairable(HostAdapterRegistry.itemProperties().morphShovelProperties(properties)));
+        MORPH_AXE = ITEMS.registerItem("morph_axe", properties -> HostAdapterRegistry.itemFactories().createMorphTool(properties),
+            properties -> repairable(HostAdapterRegistry.itemProperties().morphAxeProperties(properties)));
         MOB_CRYSTAL = ITEMS.registerItem("mob_crystal", MobCrystalItem::new,
             properties -> properties.stacksTo(1).rarity(Rarity.UNCOMMON));
         DIABOLIST_FORK = ITEMS.registerItem("diabolist_fork", DiabolistForkItem::new,
-            properties -> HostAdapterRegistry.requireItemProperties().diabolistForkProperties(properties)
+            properties -> HostAdapterRegistry.itemProperties().diabolistForkProperties(properties)
                 .repairable(net.minecraft.world.item.Items.QUARTZ));
         TAINT_COAL = ITEMS.registerSimpleItem("taint_coal", properties -> properties.component(
             DataComponents.COOKING_FUEL,
@@ -99,7 +99,7 @@ public final class FmItems {
             properties -> properties.stacksTo(64));
         TAINT_FRUIT = ITEMS.registerItem("taint_fruit", TaintFruitItem::new,
             properties -> properties.stacksTo(64));
-        RING_NUTRITION = ITEMS.registerItem("ring_nutrition", properties -> HostAdapterRegistry.requireItemFactories().createRingNutrition(properties),
+        RING_NUTRITION = ITEMS.registerItem("ring_nutrition", properties -> HostAdapterRegistry.itemFactories().createRingNutrition(properties),
             properties -> properties.stacksTo(1));
         ALCHEMICAL_CAP = ITEMS.registerSimpleItem("alchemical_cap");
         VINTEUM_CAP = ITEMS.registerSimpleItem("vinteum_cap");
@@ -120,15 +120,15 @@ public final class FmItems {
         }
         PROFANE_ROD = ITEMS.registerSimpleItem("profane_rod");
         TAINT_SHOVEL = ITEMS.registerItem("taint_shovel", TaintShovelItem::new,
-            properties -> HostAdapterRegistry.requireItemProperties().taintShovelProperties(properties));
+            properties -> HostAdapterRegistry.itemProperties().taintShovelProperties(properties));
         TAINT_PICKAXE = ITEMS.registerItem("taint_pickaxe", Item::new,
-            properties -> HostAdapterRegistry.requireItemProperties().taintPickaxeProperties(properties));
-        CRYSTALWELL = ITEMS.registerItem("crystalwell", properties -> HostAdapterRegistry.requireItemFactories().createCrystalwell(properties), properties -> properties.stacksTo(1));
-        PRIMEWELL = ITEMS.registerItem("primewell", properties -> HostAdapterRegistry.requireItemFactories().createPrimewell(properties), properties -> properties.stacksTo(1).rarity(Rarity.EPIC));
-        BLINK_FOCUS = ITEMS.registerItem("blink_focus", properties -> HostAdapterRegistry.requireItemFactories().createBlinkFocus(properties),
-            properties -> HostAdapterRegistry.requireItemProperties().blinkFocusProperties(properties));
+            properties -> HostAdapterRegistry.itemProperties().taintPickaxeProperties(properties));
+        CRYSTALWELL = ITEMS.registerItem("crystalwell", properties -> HostAdapterRegistry.itemFactories().createCrystalwell(properties), properties -> properties.stacksTo(1));
+        PRIMEWELL = ITEMS.registerItem("primewell", properties -> HostAdapterRegistry.itemFactories().createPrimewell(properties), properties -> properties.stacksTo(1).rarity(Rarity.EPIC));
+        BLINK_FOCUS = ITEMS.registerItem("blink_focus", properties -> HostAdapterRegistry.itemFactories().createBlinkFocus(properties),
+            properties -> HostAdapterRegistry.itemProperties().blinkFocusProperties(properties));
         SUB_COLLAR = FmConfig.lustDisabled() ? null
-            : ITEMS.registerItem("sub_collar", properties -> HostAdapterRegistry.requireItemFactories().createSubCollar(properties), properties -> properties.stacksTo(1).rarity(Rarity.RARE));
+            : ITEMS.registerItem("sub_collar", properties -> HostAdapterRegistry.itemFactories().createSubCollar(properties), properties -> properties.stacksTo(1).rarity(Rarity.RARE));
     }
 
     private FmItems() {

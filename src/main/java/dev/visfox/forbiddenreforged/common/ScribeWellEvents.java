@@ -24,13 +24,13 @@ public final class ScribeWellEvents {
 
     private static void onPlayerTick(PlayerTickEvent.Post event) {
         if (!(event.getEntity() instanceof ServerPlayer player)
-            || !HostAdapterRegistry.requireScribing().isNoResearchDifficulty()
+            || !HostAdapterRegistry.scribing().isNoResearchDifficulty()
             || player.tickCount % 200 != 0) {
             return;
         }
 
         var inventory = player.getInventory();
-        var primals = HostAdapterRegistry.requireScribing().primalAspectIds();
+        var primals = HostAdapterRegistry.scribing().primalAspectIds();
         if (primals.isEmpty()) {
             return;
         }
@@ -42,7 +42,7 @@ public final class ScribeWellEvents {
             }
 
             ContentId aspect = primals.get(player.getRandom().nextInt(primals.size()));
-            HostAdapterRegistry.requireScribing().addAspectPool(player, aspect, player.getRandom().nextInt(4) + 1);
+            HostAdapterRegistry.scribing().addAspectPool(player, aspect, player.getRandom().nextInt(4) + 1);
             int nextDamage = stack.getDamageValue() + 1;
             if (nextDamage >= stack.getMaxDamage()) {
                 inventory.setItem(slot, ItemStack.EMPTY);
@@ -60,7 +60,7 @@ public final class ScribeWellEvents {
         }
 
         // The original Primewell crafting hook returns its primordial pearl.
-        Item pearl = HostAdapterRegistry.requireItemFactories().primordialPearlItem();
+        Item pearl = HostAdapterRegistry.itemFactories().primordialPearlItem();
         if (pearl == Items.AIR) {
             FmIds.LOGGER.warn("Could not refund Primewell's primordial pearl: the selected host did not register it");
             return;

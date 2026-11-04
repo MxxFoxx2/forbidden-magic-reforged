@@ -92,7 +92,7 @@ final class HostIntegrationGameTests {
             profile.supportOf(HostProfile.Feature.OPTIONAL_ENCHANTMENT_INTEGRATION).level() == HostProfile.SupportLevel.PARTIAL,
             "optional enchantment integration declares its conditional availability"
         );
-        var wrathCageBridge = HostAdapterRegistry.requireBlockEntities().createWrathCageBlockEntity(
+        var wrathCageBridge = HostAdapterRegistry.blockEntities().createWrathCageBlockEntity(
             net.minecraft.core.BlockPos.ZERO,
             FmBlocks.WRATH_CAGE.get().defaultBlockState()
         );
@@ -105,11 +105,11 @@ final class HostIntegrationGameTests {
             "Wrath Cage exposes the host essentia transport contract"
         );
         helper.assertFalse(
-            HostAdapterRegistry.requireWandInspection().isWand(new ItemStack(Items.AIR)),
+            HostAdapterRegistry.wandInspection().isWand(new ItemStack(Items.AIR)),
             "the host wand inspection rejects a non-wand item"
         );
         helper.assertTrue(
-            HostAdapterRegistry.requireWandInspection().wandRodTag(new ItemStack(Items.AIR)) == null,
+            HostAdapterRegistry.wandInspection().wandRodTag(new ItemStack(Items.AIR)) == null,
             "the host wand rod tag is nullable for a non-wand item"
         );
         ItemStack contractProbe = new ItemStack(Items.STICK);
@@ -134,17 +134,17 @@ final class HostIntegrationGameTests {
             "host entity aspects are resolved through the selected adapter"
         );
         helper.assertValueEqual(
-            HostAdapterRegistry.requireEntityAspects().aspectCatalog(false).get(ContentId.parse("minecraft:silverfish")),
+            HostAdapterRegistry.entityAspects().aspectCatalog(false).get(ContentId.parse("minecraft:silverfish")),
             ContentId.parse("thaumcraft:bestia"),
             "the host catalog preserves the default silverfish aspect"
         );
         helper.assertValueEqual(
-            HostAdapterRegistry.requireEntityAspects().aspectCatalog(true).get(ContentId.parse("minecraft:silverfish")),
+            HostAdapterRegistry.entityAspects().aspectCatalog(true).get(ContentId.parse("minecraft:silverfish")),
             ContentId.parse("thaumcraft:lucrum"),
             "the host catalog preserves the configured silverfish aspect alternative"
         );
         helper.assertTrue(
-            HostAdapterRegistry.requireEntityClassification().bossEntityIds().contains(ContentId.parse("thaumcraft:eldritch_warden")),
+            HostAdapterRegistry.entityClassification().bossEntityIds().contains(ContentId.parse("thaumcraft:eldritch_warden")),
             "host-specific boss identifiers come from the selected adapter"
         );
         helper.assertTrue(
@@ -157,23 +157,23 @@ final class HostIntegrationGameTests {
             "the host entity catalog produces a stable sorted Mob Crystal list"
         );
         helper.assertTrue(
-            !HostAdapterRegistry.requireScribing().primalAspectIds().isEmpty(),
+            !HostAdapterRegistry.scribing().primalAspectIds().isEmpty(),
             "scripting integrations expose primal aspects as semantic IDs"
         );
         helper.assertTrue(
-            HostAdapterRegistry.requireAspects().aspectDescription(FmAspects.NETHER) != null,
+            HostAdapterRegistry.aspects().aspectDescription(FmAspects.NETHER) != null,
             "host aspect descriptions are retrieved through runtime services"
         );
         helper.assertTrue(
-            HostAdapterRegistry.requireTaintBlocks().taintShovelMiningSpeed() > 0.0F,
+            HostAdapterRegistry.taintBlocks().taintShovelMiningSpeed() > 0.0F,
             "host taint tool properties are retrieved through runtime services"
         );
         helper.assertFalse(
-            HostAdapterRegistry.requireMorphTools().isAreaHarvesting(),
+            HostAdapterRegistry.morphTools().isAreaHarvesting(),
             "the host area-harvest state is queried through runtime services"
         );
         helper.assertTrue(
-            HostAdapterRegistry.requireItemFactories().primordialPearlItem() != Items.AIR,
+            HostAdapterRegistry.itemFactories().primordialPearlItem() != Items.AIR,
             "the host provides the Primewell remainder item through item services"
         );
         helper.assertTrue(
@@ -406,10 +406,10 @@ final class HostIntegrationGameTests {
             "Tainted Sapling item must keep one warp");
         ServerPlayer player = GameTestPlayers.connected(helper);
         int stickyBefore = Warp.get(player, WarpType.STICKY);
-        HostAdapterRegistry.requireWarp().changeWarp(player, 0, WarpKind.STICKY);
+        HostAdapterRegistry.warp().changeWarp(player, 0, WarpKind.STICKY);
         helper.assertValueEqual(Warp.get(player, WarpType.STICKY), stickyBefore,
             "zero warp changes must be ignored");
-        HostAdapterRegistry.requireWarp().changeWarp(player, 1, WarpKind.STICKY);
+        HostAdapterRegistry.warp().changeWarp(player, 1, WarpKind.STICKY);
         helper.assertValueEqual(Warp.get(player, WarpType.STICKY), stickyBefore + 1,
             "common warp request must reach the TC4 runtime adapter");
         helper.succeed();

@@ -62,6 +62,6 @@ public final class FmCreativeTab {
     }
 
     private static void addCreativeWands(List<ItemStack> stacks) {
-        HostAdapterRegistry.requireBootstrap().addCreativeWands(stacks);
+        HostAdapterRegistry.bootstrap().addCreativeWands(stacks);
     }
 }

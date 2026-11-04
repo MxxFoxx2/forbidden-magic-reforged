@@ -17,6 +17,10 @@ sourceSets {
         compileClasspath += sourceSets.main.output
         runtimeClasspath += sourceSets.main.output
     }
+    gameTest {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
 }
 
 neoForge {
@@ -30,6 +34,7 @@ neoForge {
         }
         gameTestServer {
             type = "gameTestServer"
+            sourceSet = sourceSets.gameTest
             programArgument '--tests'
             programArgument "${mod_id}:*"
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
@@ -43,6 +48,7 @@ neoForge {
     mods {
         "${mod_id}" {
             sourceSet(sourceSets.main)
+            sourceSets += sourceSets.gameTest
         }
     }
 }
@@ -92,7 +98,6 @@ tasks.named('jar', Jar) {
 }
 
 sourceSets.main.resources { srcDir('src/generated/resources') }
-sourceSets.main.java { srcDir('tests/java') }
 
 def generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
     var replaceProperties = [

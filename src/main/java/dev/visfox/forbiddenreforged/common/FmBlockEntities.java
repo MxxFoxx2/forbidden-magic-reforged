@@ -12,7 +12,7 @@ public final class FmBlockEntities {
         DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, FmIds.MODID);
     public static final Supplier<BlockEntityType<WrathCageBlockEntity>> WRATH_CAGE =
         BLOCK_ENTITIES.register("wrath_cage", () -> new BlockEntityType<>(
-            HostAdapterRegistry.requireBlockEntities()::createWrathCageBlockEntity, FmBlocks.WRATH_CAGE.get()));
+            HostAdapterRegistry.blockEntities()::createWrathCageBlockEntity, FmBlocks.WRATH_CAGE.get()));
 
     private FmBlockEntities() {
     }

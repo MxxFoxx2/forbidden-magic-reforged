@@ -8,10 +8,10 @@ public final class FmTinkerer {
     }
 
     public static void register() {
-        HostAdapterRegistry.requireBootstrap().registerOptionalEnchantments();
+        HostAdapterRegistry.bootstrap().registerOptionalEnchantments();
     }
 
     public static int registeredCount() {
-        return HostAdapterRegistry.requireBootstrap().registeredOptionalEnchantments();
+        return HostAdapterRegistry.bootstrap().registeredOptionalEnchantments();
     }
 }

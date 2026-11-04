@@ -125,7 +125,7 @@ public final class Tc4WandAdapter {
     private static final class ProfaneWandUpdate implements RodUpdate {
         @Override
         public void onUpdate(ItemStack stack, Player player) {
-            WandBehaviors.profane(stack, player, VIS, PARTS, FmWandContractAccess.INSTANCE, HostAdapterRegistry.requireWarp());
+            WandBehaviors.profane(stack, player, VIS, PARTS, FmWandContractAccess.INSTANCE, HostAdapterRegistry.warp());
         }
     }
 }

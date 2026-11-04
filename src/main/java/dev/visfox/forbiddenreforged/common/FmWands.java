@@ -7,6 +7,6 @@ public final class FmWands {
     }
 
     public static void register() {
-        HostAdapterRegistry.requireBootstrap().registerWands();
+        HostAdapterRegistry.bootstrap().registerWands();
     }
 }

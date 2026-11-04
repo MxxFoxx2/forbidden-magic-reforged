@@ -106,7 +106,7 @@ public final class FmEnchantmentEffects {
             RandomSource random = event.getLevel().getRandom();
             float chance = clusterChance(cluster);
             for (ItemEntity drop : event.getDrops()) {
-                drop.setItem(HostAdapterRegistry.requireEnchantmentEffects().specialMiningDrop(event.getState(), drop.getItem(), chance, random));
+                drop.setItem(HostAdapterRegistry.enchantmentEffects().specialMiningDrop(event.getState(), drop.getItem(), chance, random));
             }
         }
         int corrupting = FmEnchantments.level(player.level().registryAccess(), tool, FmEnchantments.CORRUPTING);
@@ -245,16 +245,16 @@ public final class FmEnchantmentEffects {
         if (event.getEntity() instanceof Player wearer && !wearer.level().isClientSide()) {
             FmToolEvents.collarDamage(wearer, event.getAmount(), event.getSource().getEntity());
             ItemStack held = wearer.getMainHandItem();
-            if (HostAdapterRegistry.requireWandInspection().isWand(held)) {
+            if (HostAdapterRegistry.wandInspection().isWand(held)) {
                 boolean fireOrWither = event.getSource().is(DamageTypeTags.IS_FIRE)
                     || event.getSource().is(DamageTypes.WITHER);
                 if (FmToolEvents.cancelsInfernalDamage(held, fireOrWither)) {
                     event.setCanceled(true);
                     return;
                 }
-                if (FmToolEvents.restoresTaintedVis(held, HostAdapterRegistry.requireEnchantmentEffects().isTaintDamage(event.getSource()))) {
+                if (FmToolEvents.restoresTaintedVis(held, HostAdapterRegistry.enchantmentEffects().isTaintDamage(event.getSource()))) {
                     for (ContentId aspect : FmToolEvents.taintedVisRolls(wearer.getRandom())) {
-                        HostAdapterRegistry.requireWandVis().addWandVis(held, aspect, 1, true);
+                        HostAdapterRegistry.wandVis().addWandVis(held, aspect, 1, true);
                     }
                 }
             }

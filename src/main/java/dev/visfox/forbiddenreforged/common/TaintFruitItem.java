@@ -24,7 +24,7 @@ public class TaintFruitItem extends Item {
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
         if (!level.isClientSide() && entity instanceof ServerPlayer player) {
-            HostAdapterRegistry.requireWarp().changeWarp(player, 1, WarpKind.STICKY);
+            HostAdapterRegistry.warp().changeWarp(player, 1, WarpKind.STICKY);
             player.addEffect(new MobEffectInstance(MobEffects.HUNGER, 600, 0, false, false));
             if (level.getRandom().nextFloat() < 0.4F) {
                 player.sendSystemMessage(net.minecraft.network.chat.Component.translatable("warp.text.15").withStyle(net.minecraft.ChatFormatting.DARK_PURPLE));

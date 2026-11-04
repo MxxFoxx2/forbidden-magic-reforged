@@ -122,7 +122,7 @@ public final class FmDrops {
                 int looting = enchant(player, held, Enchantments.LOOTING);
                 addDrop(event, FmItems.DEADLY_SHARDS.get("pride").get(), prideCount(looting, entity.getRandom().nextInt(1 + looting)));
             }
-            int greed = enchant(player, held, Enchantments.LOOTING) + HostAdapterRegistry.requireWandInspection().wandFocusTreasure(held);
+            int greed = enchant(player, held, Enchantments.LOOTING) + HostAdapterRegistry.wandInspection().wandFocusTreasure(held);
             if (rollGreed(greed, entity.getRandom().nextInt(20))) {
                 addDrop(event, FmItems.DEADLY_SHARDS.get("greed").get(), 1);
             }
@@ -134,7 +134,7 @@ public final class FmDrops {
 
     private static void onTaintedBloodShardDrop(LivingDropsEvent event) {
         LivingEntity entity = event.getEntity();
-        if (!HostAdapterRegistry.requireEntityClassification().isTaintedMob(entity)) {
+        if (!HostAdapterRegistry.entityClassification().isTaintedMob(entity)) {
             return;
         }
         DamageSource source = event.getSource();
@@ -215,7 +215,7 @@ public final class FmDrops {
     }
 
     private static boolean isBoss(LivingEntity entity) {
-        return entity instanceof WitherBoss || entity instanceof EnderDragon || HostAdapterRegistry.requireEntityClassification().isHostBoss(entity);
+        return entity instanceof WitherBoss || entity instanceof EnderDragon || HostAdapterRegistry.entityClassification().isHostBoss(entity);
     }
 
     private static int wrathBonus(ServerPlayer player, LivingEntity target) {
@@ -237,7 +237,7 @@ public final class FmDrops {
         if (isTagged(target.getType(), EntityTypeTags.SENSITIVE_TO_BANE_OF_ARTHROPODS)) {
             wrath += enchant(player, held, Enchantments.BANE_OF_ARTHROPODS);
         }
-        wrath += HostAdapterRegistry.requireWandInspection().wandFocusPotency(held);
+        wrath += HostAdapterRegistry.wandInspection().wandFocusPotency(held);
         return wrath;
     }
 
