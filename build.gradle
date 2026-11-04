@@ -17,10 +17,15 @@ sourceSets {
         compileClasspath += sourceSets.main.output
         runtimeClasspath += sourceSets.main.output
     }
+    gameTest {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
 }
 
 neoForge {
     version = project.neo_version
+    addModdingDependenciesTo sourceSets.gameTest
 
     runs {
         client {
@@ -30,6 +35,7 @@ neoForge {
         }
         gameTestServer {
             type = "gameTestServer"
+            sourceSet = sourceSets.gameTest
             programArgument '--tests'
             programArgument "${mod_id}:*"
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
@@ -42,7 +48,8 @@ neoForge {
 
     mods {
         "${mod_id}" {
-            sourceSet(sourceSets.main)
+            sourceSet sourceSets.main
+            sourceSet sourceSets.gameTest
         }
     }
 }
@@ -87,12 +94,20 @@ dependencies {
     clientRuntimeOnly "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
 }
 
+// GameTests live in their own source set (not shipped in the jar) and need the
+// same compile/runtime classpath as main, including the compileOnly host API.
+sourceSets.gameTest.compileClasspath += sourceSets.main.compileClasspath
+sourceSets.gameTest.runtimeClasspath += sourceSets.main.runtimeClasspath
+dependencies {
+    gameTestCompileOnly "thaumcraft:thaumcraft:${thaumcraft_version}"
+    gameTestImplementation "com.github.glitchfiend:TerraBlender-neoforge:${terrablender_version}"
+}
+
 tasks.named('jar', Jar) {
     archiveFileName = "forbidden-magic-${mod_version}.jar"
 }
 
 sourceSets.main.resources { srcDir('src/generated/resources') }
-sourceSets.main.java { srcDir('tests/java') }
 
 def generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
     var replaceProperties = [

@@ -1,7 +1,7 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
-import dev.visfox.forbiddenreforged.FmEnchantments;
-import dev.visfox.forbiddenreforged.MorphToolItem;
+import dev.visfox.forbiddenreforged.common.FmEnchantments;
+import dev.visfox.forbiddenreforged.common.MorphToolItem;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import thaumcraft.item.gear.WarpingGear;

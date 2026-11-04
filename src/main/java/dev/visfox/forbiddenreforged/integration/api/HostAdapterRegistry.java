@@ -1,28 +1,29 @@
 package dev.visfox.forbiddenreforged.integration.api;
 
-import dev.visfox.forbiddenreforged.integration.runtime.HostItemFactoryServices;
-import dev.visfox.forbiddenreforged.integration.runtime.HostItemPropertyServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostAccessoryServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostAspectServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostBlockEntityServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostBootstrapServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostEnchantmentEffectServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostEntityAspectServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostEntityClassificationServices;
-import dev.visfox.forbiddenreforged.integration.runtime.HostAspectServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostItemFactoryServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostItemPropertyServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostMorphToolServices;
-import dev.visfox.forbiddenreforged.integration.runtime.HostBlockEntityServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostScribingServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostTaintBlockServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandInspectionServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandVisServices;
-import dev.visfox.forbiddenreforged.integration.runtime.HostAccessoryServices;
-import dev.visfox.forbiddenreforged.integration.runtime.HostTaintBlockServices;
-import dev.visfox.forbiddenreforged.integration.runtime.HostEnchantmentEffectServices;
-import dev.visfox.forbiddenreforged.integration.runtime.HostScribingServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWarpServices;
 import java.util.Objects;
 
 /**
  * Holds the host adapter selected by the mod's composition root.
  *
- * Core catalogs depend on the HostAdapter contract rather than importing a
+ * Shared code depends on the HostAdapter contract rather than importing a
  * concrete host implementation. The selected adapter is installed exactly
- * once during mod construction, before catalog registration begins.
+ * once during mod construction, before catalog registration begins; runtime
+ * ports are read from its immutable {@link HostServices} composition.
  */
 public final class HostAdapterRegistry {
     private static volatile HostAdapter active;
@@ -50,80 +51,68 @@ public final class HostAdapterRegistry {
         return adapter;
     }
 
-    /** Returns the selected host's typed entity-to-aspect catalog. */
-    public static HostEntityAspectServices requireEntityAspects() {
-        return capability(HostEntityAspectServices.class, "entity aspect");
+    /** The selected host's typed runtime capability composition. */
+    public static HostServices services() {
+        return require().services();
     }
 
-    /** Returns host-specific entity classification predicates and boss identifiers. */
-    public static HostEntityClassificationServices requireEntityClassification() {
-        return capability(HostEntityClassificationServices.class, "entity classification");
+    public static HostEntityAspectServices entityAspects() {
+        return services().entityAspects();
     }
 
-    public static HostAspectServices requireAspects() {
-        return capability(HostAspectServices.class, "aspect");
+    public static HostEntityClassificationServices entityClassification() {
+        return services().entityClassification();
     }
 
-    public static HostMorphToolServices requireMorphTools() {
-        return capability(HostMorphToolServices.class, "morph tool");
+    public static HostAspectServices aspects() {
+        return services().aspects();
     }
 
-    public static HostBlockEntityServices requireBlockEntities() {
-        return capability(HostBlockEntityServices.class, "block entity");
+    public static HostMorphToolServices morphTools() {
+        return services().morphTools();
     }
 
-    public static HostWandInspectionServices requireWandInspection() {
-        return capability(HostWandInspectionServices.class, "wand inspection");
+    public static HostBlockEntityServices blockEntities() {
+        return services().blockEntities();
     }
 
-    public static HostWandVisServices requireWandVis() {
-        return capability(HostWandVisServices.class, "wand Vis");
+    public static HostWandInspectionServices wandInspection() {
+        return services().wandInspection();
     }
 
-    public static HostAccessoryServices requireAccessories() {
-        return capability(HostAccessoryServices.class, "accessory");
+    public static HostWandVisServices wandVis() {
+        return services().wandVis();
     }
 
-    public static HostTaintBlockServices requireTaintBlocks() {
-        return capability(HostTaintBlockServices.class, "taint block");
+    public static HostAccessoryServices accessories() {
+        return services().accessories();
     }
 
-    public static HostEnchantmentEffectServices requireEnchantmentEffects() {
-        return capability(HostEnchantmentEffectServices.class, "enchantment effect");
+    public static HostTaintBlockServices taintBlocks() {
+        return services().taintBlocks();
     }
 
-    public static HostScribingServices requireScribing() {
-        return capability(HostScribingServices.class, "scribing");
+    public static HostEnchantmentEffectServices enchantmentEffects() {
+        return services().enchantmentEffects();
     }
 
-    public static HostWarpServices requireWarp() {
-        return capability(HostWarpServices.class, "warp");
+    public static HostScribingServices scribing() {
+        return services().scribing();
     }
 
-    private static <T> T capability(Class<T> type, String name) {
-        HostAdapter adapter = require();
-        if (type.isInstance(adapter)) {
-            return type.cast(adapter);
-        }
-        throw new IllegalStateException(
-            "Selected host adapter does not expose " + name + " services: " + adapter.profile().id()
-        );
+    public static HostWarpServices warp() {
+        return services().warp();
     }
 
-    /** Returns host-specific Item.Properties customizations. */
-    public static HostItemPropertyServices requireItemProperties() {
-        return capability(HostItemPropertyServices.class, "item properties");
+    public static HostItemPropertyServices itemProperties() {
+        return services().itemProperties();
     }
 
-    /** Returns host-backed Item implementations. */
-    public static HostItemFactoryServices requireItemFactories() {
-        return capability(HostItemFactoryServices.class, "item factories");
+    public static HostItemFactoryServices itemFactories() {
+        return services().itemFactories();
     }
 
-    /**
-     * Returns host-specific startup, trigger, and creative-tab services.
-     */
-    public static HostBootstrapServices requireBootstrap() {
-        return capability(HostBootstrapServices.class, "bootstrap");
+    public static HostBootstrapServices bootstrap() {
+        return services().bootstrap();
     }
 }

@@ -2,7 +2,7 @@ package dev.visfox.forbiddenreforged.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import dev.visfox.forbiddenreforged.WrathCageBlockEntity;
+import dev.visfox.forbiddenreforged.common.WrathCageBlockEntity;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
