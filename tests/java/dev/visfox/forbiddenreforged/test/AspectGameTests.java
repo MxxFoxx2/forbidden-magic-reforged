@@ -3,7 +3,9 @@ package dev.visfox.forbiddenreforged.test;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.embedded.EmbeddedChannel;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -81,7 +83,8 @@ public final class AspectGameTests {
         "aspect_diagnostics_expose_stable_registry_table",
         "forbiddenmagic_aspects_command_is_registered",
         "addon_item_aspects_match_original_assignments",
-        "core_aspect_catalog_is_host_neutral_and_complete"
+        "core_aspect_catalog_is_host_neutral_and_complete",
+        "sin_aspect_colors_components_and_blend_match_original"
     };
 
     static {
@@ -103,6 +106,7 @@ public final class AspectGameTests {
         FUNCTIONS.register(TESTS[15], () -> AspectGameTests::forbiddenmagicAspectsCommandIsRegistered);
         FUNCTIONS.register(TESTS[16], () -> AspectGameTests::addonItemAspectsMatchOriginalAssignments);
         FUNCTIONS.register(TESTS[17], () -> AspectGameTests::coreAspectCatalogIsHostNeutralAndComplete);
+        FUNCTIONS.register(TESTS[18], () -> AspectGameTests::sinAspectColorsComponentsAndBlendMatchOriginal);
     }
 
     private AspectGameTests() {}
@@ -153,6 +157,94 @@ public final class AspectGameTests {
         helper.assertValueEqual(merged.amountOf(fire), 5, "duplicate aspect costs must merge");
         helper.assertValueEqual(merged.totalAmount(), 5, "merged cost total must remain stable");
         helper.succeed();
+    }
+
+    private static void sinAspectColorsComponentsAndBlendMatchOriginal(GameTestHelper helper) {
+        Map<ContentId, AspectDefinition> catalog = new LinkedHashMap<>();
+        for (AspectDefinition definition : ForbiddenMagicAspectCatalog.definitions(true)) {
+            catalog.put(definition.id(), definition);
+        }
+        helper.assertValueEqual(
+            catalog.keySet().stream().toList(),
+            List.of(
+                ForbiddenMagicAspectCatalog.LUXURIA,
+                ForbiddenMagicAspectCatalog.INFERNUS,
+                ForbiddenMagicAspectCatalog.SUPERBIA,
+                ForbiddenMagicAspectCatalog.GULA,
+                ForbiddenMagicAspectCatalog.INVIDIA,
+                ForbiddenMagicAspectCatalog.DESIDIA,
+                ForbiddenMagicAspectCatalog.IRA
+            ),
+            "the catalog must keep the original DarkAspects declaration order"
+        );
+
+        assertSinAspect(helper, catalog, ForbiddenMagicAspectCatalog.LUXURIA, 0xFFC1CE, 1,
+            AspectDefinition.BlendMode.ADDITIVE,
+            List.of(sinConcept("flesh"), sinConcept("hunger")),
+            List.of(Aspect.FLESH, Aspect.HUNGER), !FmConfig.lustDisabled());
+        assertSinAspect(helper, catalog, ForbiddenMagicAspectCatalog.INFERNUS, 0xFF0000, 771,
+            AspectDefinition.BlendMode.ONE_MINUS_SOURCE_COLOR,
+            List.of(sinConcept("fire"), sinConcept("magic")),
+            List.of(Aspect.FIRE, Aspect.MAGIC), true);
+        assertSinAspect(helper, catalog, ForbiddenMagicAspectCatalog.SUPERBIA, 0x9639FF, 1,
+            AspectDefinition.BlendMode.ADDITIVE,
+            List.of(sinConcept("flight"), sinConcept("void")),
+            List.of(Aspect.FLIGHT, Aspect.VOID), true);
+        assertSinAspect(helper, catalog, ForbiddenMagicAspectCatalog.GULA, 0xD59C46, 1,
+            AspectDefinition.BlendMode.ADDITIVE,
+            List.of(sinConcept("hunger"), sinConcept("void")),
+            List.of(Aspect.HUNGER, Aspect.VOID), true);
+        assertSinAspect(helper, catalog, ForbiddenMagicAspectCatalog.INVIDIA, 0x00BA00, 1,
+            AspectDefinition.BlendMode.ADDITIVE,
+            List.of(sinConcept("senses"), sinConcept("hunger")),
+            List.of(Aspect.SENSES, Aspect.HUNGER), true);
+        assertSinAspect(helper, catalog, ForbiddenMagicAspectCatalog.DESIDIA, 0x6E6E6E, 771,
+            AspectDefinition.BlendMode.ONE_MINUS_SOURCE_COLOR,
+            List.of(sinConcept("trap"), sinConcept("soul")),
+            List.of(Aspect.TRAP, Aspect.SOUL), true);
+        assertSinAspect(helper, catalog, ForbiddenMagicAspectCatalog.IRA, 0x870404, 771,
+            AspectDefinition.BlendMode.ONE_MINUS_SOURCE_COLOR,
+            List.of(sinConcept("weapon"), sinConcept("fire")),
+            List.of(Aspect.WEAPON, Aspect.FIRE), true);
+        helper.succeed();
+    }
+
+    private static ContentId sinConcept(String name) {
+        return ContentId.parse("forbiddenmagic:concept/" + name);
+    }
+
+    private static void assertSinAspect(GameTestHelper helper, Map<ContentId, AspectDefinition> catalog,
+        ContentId id, int color, int blendConstant, AspectDefinition.BlendMode blendMode,
+        List<ContentId> components, List<Aspect> hostComponents, boolean registered
+    ) {
+        AspectDefinition definition = catalog.get(id);
+        helper.assertTrue(definition != null, "the common catalog must define " + id);
+        if (definition == null) {
+            return;
+        }
+        helper.assertValueEqual(definition.color(), color, id.path() + " color must match the original hex literal");
+        helper.assertValueEqual(definition.components(), components, id.path() + " components must match the original pair");
+        helper.assertValueEqual(definition.blendMode(), blendMode, id.path() + " blend mode must match the original");
+        helper.assertValueEqual(definition.texture(), ContentId.parse(ForbiddenMagic.MODID + ":textures/aspects/" + id.path() + ".png"),
+            id.path() + " texture must be the original aspect icon");
+        if (!registered) {
+            helper.assertTrue(FmConfig.lustDisabled(), id.path() + " is only absent from the host registry under no_lust");
+            return;
+        }
+        Aspect aspect = Tc4AspectAdapter.resolveAspect(id);
+        helper.assertValueEqual(aspect.getColor(), color, id.path() + " host aspect color");
+        helper.assertValueEqual(aspect.getBlend(), blendConstant, id.path() + " host aspect blend constant");
+        helper.assertValueEqual(aspect.getImage(), Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, "textures/aspects/" + id.path() + ".png"),
+            id.path() + " host aspect texture");
+        Aspect[] actual = aspect.getComponents();
+        helper.assertTrue(actual != null && actual.length == hostComponents.size(),
+            id.path() + " host aspect must carry exactly " + hostComponents.size() + " components");
+        if (actual != null) {
+            for (int index = 0; index < hostComponents.size(); index++) {
+                helper.assertValueEqual(actual[index].getTag(), hostComponents.get(index).getTag(),
+                    id.path() + " host component " + index + " must match the original order");
+            }
+        }
     }
 
     private static void modLoadsAndHostIsPresent(GameTestHelper helper) {

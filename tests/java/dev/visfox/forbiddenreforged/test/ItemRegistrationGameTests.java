@@ -1,12 +1,16 @@
 package dev.visfox.forbiddenreforged.test;
 
 import com.google.gson.JsonObject;
+import io.netty.buffer.Unpooled;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.Identifier;
@@ -20,6 +24,8 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
+import dev.visfox.forbiddenreforged.FmComponents;
+import dev.visfox.forbiddenreforged.MorphState;
 import dev.visfox.forbiddenreforged.FmItems;
 import dev.visfox.forbiddenreforged.FmCreativeTab;
 import dev.visfox.forbiddenreforged.FmToolEvents;
@@ -166,5 +172,57 @@ final class ItemRegistrationGameTests {
         Baubles.set(player, 3, ring.copy());
         helper.assertFalse(FmToolEvents.hasNutritionRingInRingSlot(player), "belt slot does not activate Ring of Nutrition");
         helper.succeed();
+    }
+
+    private static void itemDataComponentsKeepTheirIdsAndSerialize(GameTestHelper helper) {
+        assertItemDataComponent(helper, FmComponents.MORPH_STATE.get(), "forbiddenmagic:morph_state", MorphState.EMPTY);
+        assertItemDataComponent(helper, FmComponents.MOB_ID.get(), "forbiddenmagic:mob_id", "minecraft:zombie");
+        assertItemDataComponent(helper, FmComponents.PROFANE_CONTRACT.get(), "forbiddenmagic:profane_contract", 25000);
+        assertItemDataComponent(helper, FmComponents.COLLAR_OWNER.get(), "forbiddenmagic:collar_owner", "Notch");
+        helper.assertValueEqual(
+            BuiltInRegistries.DATA_COMPONENT_TYPE.keySet().stream()
+                .filter(id -> id.getNamespace().equals(ForbiddenMagic.MODID))
+                .count(),
+            4L,
+            "the port registers exactly four item data components");
+        helper.succeed();
+    }
+
+        assertItemDataComponent(helper, FmComponents.MORPH_STATE.get(), "forbiddenmagic:morph_state", MorphState.EMPTY);
+        assertItemDataComponent(helper, FmComponents.MOB_ID.get(), "forbiddenmagic:mob_id", "minecraft:zombie");
+        assertItemDataComponent(helper, FmComponents.PROFANE_CONTRACT.get(), "forbiddenmagic:profane_contract", 25000);
+        assertItemDataComponent(helper, FmComponents.COLLAR_OWNER.get(), "forbiddenmagic:collar_owner", "Notch");
+        helper.assertValueEqual(
+            BuiltInRegistries.DATA_COMPONENT_TYPE.keySet().stream()
+                .filter(id -> id.getNamespace().equals(ForbiddenMagic.MODID))
+                .count(),
+            4L,
+            "the port registers exactly four item data components");
+        helper.succeed();
+    }
+
+    private static <T> void assertItemDataComponent(GameTestHelper helper, DataComponentType<T> type, String expectedId, T sample) {
+        helper.assertValueEqual(BuiltInRegistries.DATA_COMPONENT_TYPE.getKey(type), Identifier.parse(expectedId),
+            expectedId + " must be registered under its own data component id");
+        helper.assertFalse(type.isTransient(), expectedId + " must be persisted into item NBT");
+        helper.assertTrue(type.codec() != null, expectedId + " must expose a persistence codec");
+        helper.assertTrue(type.streamCodec() != null, expectedId + " must expose a network codec");
+
+        ItemStack stack = new ItemStack(FmItems.MOB_CRYSTAL.get());
+        stack.set(type, sample);
+        helper.assertValueEqual(stack.get(type), sample, expectedId + " must be readable from the item stack");
+
+        var ops = helper.getLevel().registryAccess().createSerializationContext(NbtOps.INSTANCE);
+        var encoded = ItemStack.CODEC.encodeStart(ops, stack).result();
+        helper.assertTrue(encoded.isPresent(), expectedId + " owning stack must encode to NBT");
+        helper.assertTrue(encoded.get() instanceof CompoundTag tag
+                && tag.getCompoundOrEmpty("components").contains(expectedId),
+            expectedId + " must be written under the item components tag: " + encoded.get());
+
+        RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(Unpooled.buffer(), helper.getLevel().registryAccess());
+        ItemStack.STREAM_CODEC.encode(buffer, stack);
+        ItemStack decoded = ItemStack.STREAM_CODEC.decode(buffer);
+        helper.assertValueEqual(decoded.get(type), sample, expectedId + " value must survive a network round trip");
+        helper.assertValueEqual(decoded.getItem(), stack.getItem(), expectedId + " round trip must keep the owning item");
     }
 }

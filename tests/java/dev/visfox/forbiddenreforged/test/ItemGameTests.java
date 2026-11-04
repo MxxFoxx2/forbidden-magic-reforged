@@ -66,7 +66,9 @@ public final class ItemGameTests {
         "blink_focus_reaches_beyond_wand_reach_and_lands_like_original",
         "wand_vis_and_parts_use_neutral_access_ports",
         "hellfire_behavior_uses_host_neutral_access",
-        "scribe_well_aspect_ids_stay_semantic"
+        "scribe_well_aspect_ids_stay_semantic",
+        "remaining_wand_caps_match_original_costs",
+        "item_data_components_keep_their_ids_and_serialize"
     };
 
     static {
@@ -110,6 +112,8 @@ public final class ItemGameTests {
         FUNCTIONS.register(TESTS[37], () -> WandGameTests::wandVisAndPartsUseNeutralAccessPorts);
         FUNCTIONS.register(TESTS[38], () -> WandGameTests::hellfireBehaviorUsesHostNeutralAccess);
         FUNCTIONS.register(TESTS[39], () -> ScribingResearchGameTests::scribeWellAspectIdsStaySemantic);
+        FUNCTIONS.register(TESTS[40], () -> WandGameTests::remainingWandCapsMatchOriginalCosts);
+        FUNCTIONS.register(TESTS[41], () -> ItemRegistrationGameTests::itemDataComponentsKeepTheirIdsAndSerialize);
     }
 
     private ItemGameTests() {}

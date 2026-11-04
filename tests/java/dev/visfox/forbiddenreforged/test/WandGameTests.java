@@ -442,4 +442,35 @@ final class WandGameTests {
             "rod replacement preserves the existing cap");
         helper.succeed();
     }
+
+    private static void remainingWandCapsMatchOriginalCosts(GameTestHelper helper) {
+        assertPlainWandCapCost(helper, "vinteum", 0.9F, 6);
+        assertPlainWandCapCost(helper, "manasteel", 0.9F, 6);
+        assertPlainWandCapCost(helper, "elementium", 0.8F, 9);
+        assertPlainWandCapCost(helper, "terrasteel", 1.8F, 1);
+        helper.succeed();
+    }
+
+        assertPlainWandCapCost(helper, "vinteum", 0.9F, 6);
+        assertPlainWandCapCost(helper, "manasteel", 0.9F, 6);
+        assertPlainWandCapCost(helper, "elementium", 0.8F, 9);
+        assertPlainWandCapCost(helper, "terrasteel", 1.8F, 1);
+        helper.succeed();
+    }
+
+    private static void assertPlainWandCapCost(GameTestHelper helper, String tag, float baseCostModifier, int craftCost) {
+        WandCap cap = WandRegistry.findCap(tag);
+        helper.assertTrue(cap != null, tag + " wand cap is registered");
+        if (cap == null) {
+            return;
+        }
+        helper.assertValueEqual(cap.tag(), tag, tag + " cap tag");
+        helper.assertValueEqual(cap.baseCostModifier(), baseCostModifier, tag + " cap base vis cost modifier");
+        helper.assertValueEqual(cap.craftCost(), craftCost, tag + " cap craft cost");
+        helper.assertValueEqual(cap.item(), ForbiddenMagic.id(tag + "_cap"), tag + " cap component item");
+        helper.assertValueEqual(cap.texture(), ForbiddenMagic.id("textures/model/wand_cap_" + tag + ".png"), tag + " cap texture");
+        helper.assertTrue(cap.specialAspects().isEmpty(), tag + " cap has no special aspect discounts");
+        helper.assertValueEqual(cap.specialCostModifier(), 0.0F, tag + " cap special cost modifier");
+        helper.assertValueEqual(cap.getCostModifier(Aspect.FIRE), baseCostModifier, tag + " cap applies its base modifier to a plain aspect");
+    }
 }
