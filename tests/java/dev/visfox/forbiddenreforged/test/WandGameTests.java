@@ -443,7 +443,7 @@ final class WandGameTests {
         helper.succeed();
     }
 
-    private static void remainingWandCapsMatchOriginalCosts(GameTestHelper helper) {
+    static void remainingWandCapsMatchOriginalCosts(GameTestHelper helper) {
         assertPlainWandCapCost(helper, "vinteum", 0.9F, 6);
         assertPlainWandCapCost(helper, "manasteel", 0.9F, 6);
         assertPlainWandCapCost(helper, "elementium", 0.8F, 9);

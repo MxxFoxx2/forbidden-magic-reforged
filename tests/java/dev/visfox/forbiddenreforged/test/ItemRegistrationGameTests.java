@@ -174,7 +174,7 @@ final class ItemRegistrationGameTests {
         helper.succeed();
     }
 
-    private static void itemDataComponentsKeepTheirIdsAndSerialize(GameTestHelper helper) {
+    static void itemDataComponentsKeepTheirIdsAndSerialize(GameTestHelper helper) {
         assertItemDataComponent(helper, FmComponents.MORPH_STATE.get(), "forbiddenmagic:morph_state", MorphState.EMPTY);
         assertItemDataComponent(helper, FmComponents.MOB_ID.get(), "forbiddenmagic:mob_id", "minecraft:zombie");
         assertItemDataComponent(helper, FmComponents.PROFANE_CONTRACT.get(), "forbiddenmagic:profane_contract", 25000);
