@@ -105,10 +105,10 @@ if (file('host').isDirectory()) {
 }
 
 def tinkererApiJar = layout.buildDirectory.file(
-    "optional-api/thaumic-tinkerer-reforged-1.1-1.21.1.jar"
+    "optional-api/thaumic-tinkerer-reforged-1.1.3-1.21.1.jar"
 )
-def tinkererApiUrl = "https://github.com/notlikethiss/thaumic-tinkerer-reforged/releases/download/1.21.1/thaumic-tinkerer-reforged-1.1-1.21.1.jar"
-def tinkererApiSha256 = "f38c4ec9791b96a195953ed7cdfd59324f978c0bae4f830f7f2ff59e9aed9736"
+def tinkererApiUrl = "https://github.com/notlikethiss/thaumic-tinkerer-reforged/releases/download/1.21.1/thaumic-tinkerer-reforged-1.1.3-1.21.1.jar"
+def tinkererApiSha256 = "8af77b4bd9ade42b1867389c7d74a48837e0a436ee9ba0ffef6c90963b26b9e8"
 
 def downloadTinkererCompileApi = tasks.register("downloadTinkererCompileApi") {
     outputs.file(tinkererApiJar)
