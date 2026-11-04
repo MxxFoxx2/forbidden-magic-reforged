@@ -8,13 +8,7 @@
           "type": "minecraft:item",
           "name": "forbiddenmagic:umbral_rose"
         }
-      ],
-      "conditions": [
-        {
-          "condition": "minecraft:survives_explosion"
-        }
       ]
     }
-  ],
-  "random_sequence": "forbiddenmagic:blocks/umbral_rose"
+  ]
 }

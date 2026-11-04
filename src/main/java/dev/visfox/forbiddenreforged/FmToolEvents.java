@@ -1,6 +1,9 @@
 package dev.visfox.forbiddenreforged;
 
 import java.util.List;
+import dev.visfox.forbiddenreforged.core.model.ContentId;
+import dev.visfox.forbiddenreforged.core.wand.WandRodKind;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.core.registries.Registries;
@@ -19,19 +22,16 @@ import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
-import dev.visfox.forbiddenreforged.core.model.ContentId;
-import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
-import org.jspecify.annotations.Nullable;
 
 public final class FmToolEvents {
-    private static final List<ContentId> TAINTED_PRIMALS = List.of(
-        new ContentId("forbiddenmagic", "concept/entropy"),
-        new ContentId("forbiddenmagic", "concept/order"),
-        new ContentId("forbiddenmagic", "concept/fire"),
-        new ContentId("forbiddenmagic", "concept/water"),
-        new ContentId("forbiddenmagic", "concept/earth"),
-        new ContentId("forbiddenmagic", "concept/air")
-    );
+    private static final ContentId[] TAINTED_PRIMALS = {
+        ContentId.parse("forbiddenmagic:concept/entropy"),
+        ContentId.parse("forbiddenmagic:concept/order"),
+        ContentId.parse("forbiddenmagic:concept/fire"),
+        ContentId.parse("forbiddenmagic:concept/water"),
+        ContentId.parse("forbiddenmagic:concept/earth"),
+        ContentId.parse("forbiddenmagic:concept/air")
+    };
 
     private FmToolEvents() {
     }
@@ -89,25 +89,20 @@ public final class FmToolEvents {
             }
         }
         for (int dose = 0; dose < doses; dose++) {
-            HostAdapterRegistry.requireWandVis().addRealVis(collar, TAINTED_PRIMALS.get(random.nextInt(TAINTED_PRIMALS.size())), 1, true);
+            HostAdapterRegistry.requireWandVis().addItemRealVis(collar, TAINTED_PRIMALS[random.nextInt(TAINTED_PRIMALS.length)], 1, true);
         }
     }
 
     public static String wandTooltipKind(ItemStack stack) {
-        return wandTooltipKind(HostAdapterRegistry.requireWandInspection().wandRodTag(stack));
+        return wandTooltipKind(HostAdapterRegistry.requireWandInspection().wandRodKind(stack));
     }
 
-    public static String wandTooltipKind(@Nullable String rodTag) {
-        if (rodTag == null) {
-            return "";
-        }
-        if (rodTag.startsWith("neutronium")) {
-            return "creativeonly";
-        }
-        if (rodTag.startsWith("profane")) {
-            return "profane_contract";
-        }
-        return "";
+    public static String wandTooltipKind(WandRodKind rodKind) {
+        return switch (rodKind) {
+            case NEUTRONIUM -> "creativeonly";
+            case PROFANE -> "profane_contract";
+            default -> "";
+        };
     }
 
     private static void onBreakSpeed(PlayerEvent.BreakSpeed event) {
@@ -147,25 +142,32 @@ public final class FmToolEvents {
     }
 
     public static boolean hasNutritionRingInRingSlot(Player player) {
-        return HostAdapterRegistry.requireAccessories().accessory(player, 1).is(FmItems.RING_NUTRITION.get())
-            || HostAdapterRegistry.requireAccessories().accessory(player, 2).is(FmItems.RING_NUTRITION.get());
+        return hasNutritionRingInRingSlots(HostAdapterRegistry.requireAccessories().accessory(player, 1),
+            HostAdapterRegistry.requireAccessories().accessory(player, 2));
+    }
+
+    public static boolean hasNutritionRingInRingSlots(ItemStack firstRingSlot, ItemStack secondRingSlot) {
+        return firstRingSlot.is(FmItems.RING_NUTRITION.get())
+            || secondRingSlot.is(FmItems.RING_NUTRITION.get());
     }
 
     public static boolean cancelsInfernalDamage(ItemStack held, boolean fireOrWither) {
+        var host = HostAdapterRegistry.requireWandInspection();
         return fireOrWither && held != null && !held.isEmpty()
-            && "infernal".equals(HostAdapterRegistry.requireWandInspection().wandRodTag(held));
+            && host.wandRodKind(held) == WandRodKind.INFERNAL;
     }
 
     public static boolean restoresTaintedVis(ItemStack held, boolean taintDamage) {
+        var host = HostAdapterRegistry.requireWandInspection();
         return taintDamage && held != null && !held.isEmpty()
-            && "tainted".equals(HostAdapterRegistry.requireWandInspection().wandRodTag(held));
+            && host.wandRodKind(held) == WandRodKind.TAINTED;
     }
 
     public static List<ContentId> taintedVisRolls(RandomSource random) {
         return List.of(
-            TAINTED_PRIMALS.get(random.nextInt(TAINTED_PRIMALS.size())),
-            TAINTED_PRIMALS.get(random.nextInt(TAINTED_PRIMALS.size())),
-            TAINTED_PRIMALS.get(random.nextInt(TAINTED_PRIMALS.size()))
+            TAINTED_PRIMALS[random.nextInt(TAINTED_PRIMALS.length)],
+            TAINTED_PRIMALS[random.nextInt(TAINTED_PRIMALS.length)],
+            TAINTED_PRIMALS[random.nextInt(TAINTED_PRIMALS.length)]
         );
     }
 

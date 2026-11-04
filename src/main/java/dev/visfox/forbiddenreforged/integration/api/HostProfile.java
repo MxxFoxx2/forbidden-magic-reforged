@@ -62,7 +62,9 @@ public record HostProfile(
         STICKY_WARP,
         TAINT_ORIGINS,
         ENTITY_ASPECTS,
-        ENTITY_CLASSIFICATION
+        ENTITY_CLASSIFICATION,
+        VILLAGER_TRADES,
+        CREATIVE_CONTENT
     }
 
     public enum SupportLevel {

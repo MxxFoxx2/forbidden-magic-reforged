@@ -5,7 +5,7 @@ import dev.visfox.forbiddenreforged.core.model.ContentId;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import thaumcraft.aspect.AddonAspects;
 import thaumcraft.aspect.Aspect;
 import thaumcraft.aspect.AspectList;
@@ -28,7 +28,7 @@ public final class Tc4AspectAdapter {
                     definition.color(),
                     components,
                     blendConstant(definition.blendMode()),
-                    Identifier.fromNamespaceAndPath(
+                    ResourceLocation.fromNamespaceAndPath(
                         definition.texture().namespace(),
                         definition.texture().path()
                     )
@@ -40,6 +40,10 @@ public final class Tc4AspectAdapter {
         registeredAspects = Map.copyOf(registered);
     }
 
+
+    public static boolean isRegistered(ContentId id) {
+        return registeredAspects.containsKey(id);
+    }
 
     public static ContentId toContentId(Aspect aspect) {
         for (Map.Entry<ContentId, Aspect> entry : registeredAspects.entrySet()) {

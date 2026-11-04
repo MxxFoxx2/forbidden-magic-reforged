@@ -1,0 +1,32 @@
+From f79e03fc3cf5d9f647064f981d2fbf7a2500f4fa Mon Sep 17 00:00:00 2001
+From: Forbidden Magic Port Build <port-build@example.invalid>
+Date: Tue, 27 Oct 2026 23:44:25 +0000
+Subject: [PATCH] fix: move extra ring slot modifier into thaumcraft namespace
+
+Co-Authored-By: Mxx Foxx <MxxFoxx2@yandex.ru>
+---
+ .../data/{curios => thaumcraft}/curios/slots/ring.json          | 0
+ tools/gen_curios.py                                             | 2 +-
+ 2 files changed, 1 insertion(+), 1 deletion(-)
+ rename src/generated/resources/data/{curios => thaumcraft}/curios/slots/ring.json (100%)
+
+diff --git a/src/generated/resources/data/curios/curios/slots/ring.json b/src/generated/resources/data/thaumcraft/curios/slots/ring.json
+similarity index 100%
+rename from src/generated/resources/data/curios/curios/slots/ring.json
+rename to src/generated/resources/data/thaumcraft/curios/slots/ring.json
+diff --git a/tools/gen_curios.py b/tools/gen_curios.py
+index 2cb0e58..0fefb69 100644
+--- a/tools/gen_curios.py
++++ b/tools/gen_curios.py
+@@ -15,7 +15,7 @@ EXTRA_RING_SLOTS = 1
+ def generate(ctx):
+     if ctx.profile.modern:
+         return
+-    ctx.write(ctx.DATA / "curios" / "curios" / "slots" / "ring.json", {"size": EXTRA_RING_SLOTS, "operation": "ADD"})
++    ctx.write(ctx.DATA / NS / "curios" / "slots" / "ring.json", {"size": EXTRA_RING_SLOTS, "operation": "ADD"})
+     ctx.write(ctx.DATA / NS / "curios" / "entities" / "player.json", {
+         "entities": ["minecraft:player"],
+         "slots": list(SLOTS),
+-- 
+2.34.1
+

@@ -1,10 +1,9 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
-import dev.visfox.forbiddenreforged.FmAspects;
+import dev.visfox.forbiddenreforged.core.aspect.ForbiddenMagicAspectCatalog;
 import dev.visfox.forbiddenreforged.FmConfig;
 import dev.visfox.forbiddenreforged.FmItems;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
-
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -53,51 +52,57 @@ public final class Tc4AspectTagAdapter {
 
         void apply() {
             DECLARED.clear();
-            merge("minecraft:netherrack", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER), 1));
-            if (registerBlock("minecraft:nether_portal", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER), 4))) {
+            merge("minecraft:netherrack", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INFERNUS), 1));
+            if (registerBlock("minecraft:nether_portal", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INFERNUS), 4))) {
                 DECLARED.add("block:minecraft:nether_portal");
             }
+            DECLARED.add("#forbiddenmagic:item_bacon");
+            register("#forbiddenmagic:item_bacon", tags()
+                .add(Aspect.FLESH, 6)
+                .add(Aspect.LIFE, 6)
+                .add(Aspect.ENERGY, 6)
+                .add(Aspect.BEAST, 4)
+                .add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.GULA), 6));
             DECLARED.add("#c:ores/quartz");
-            register("#c:ores/quartz", tags().add(Aspect.CRYSTAL, 3).add(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER), 2));
-            merge("minecraft:nether_star", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER), 8).add(Tc4AspectAdapter.resolveAspect(FmAspects.PRIDE), 8));
-            merge("minecraft:nether_wart", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER), 1));
-            merge("minecraft:nether_brick", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER), 1));
-            merge("minecraft:nether_bricks", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER), 2));
-            register("#forbiddenmagic:item_bacon", tags().add(Aspect.FLESH, 6).add(Aspect.LIFE, 6).add(Aspect.ENERGY, 6).add(Aspect.BEAST, 4).add(Tc4AspectAdapter.resolveAspect(FmAspects.GLUTTONY), 6));
-            merge("minecraft:ghast_tear", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.WRATH), 4));
-            merge("minecraft:wither_skeleton_skull", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER), 4));
-            merge("minecraft:creeper_head", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.WRATH), 2));
-            merge("minecraft:tnt", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.WRATH), 2));
-            merge("minecraft:golden_helmet", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.PRIDE), 2));
-            merge("minecraft:golden_chestplate", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.PRIDE), 1));
-            merge("minecraft:golden_leggings", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.PRIDE), 1));
-            merge("minecraft:golden_boots", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.PRIDE), 1));
-            merge("minecraft:golden_sword", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.PRIDE), 2));
+            register("#c:ores/quartz", tags().add(Aspect.CRYSTAL, 3).add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INFERNUS), 2));
+            merge("minecraft:nether_star", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INFERNUS), 8).add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.SUPERBIA), 8));
+            merge("minecraft:nether_wart", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INFERNUS), 1));
+            merge("minecraft:nether_brick", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INFERNUS), 1));
+            merge("minecraft:nether_bricks", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INFERNUS), 2));
+            merge("minecraft:ghast_tear", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.IRA), 4));
+            merge("minecraft:wither_skeleton_skull", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INFERNUS), 4));
+            merge("minecraft:creeper_head", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.IRA), 2));
+            merge("minecraft:tnt", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.IRA), 2));
+            merge("minecraft:golden_helmet", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.SUPERBIA), 2));
+            merge("minecraft:golden_chestplate", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.SUPERBIA), 1));
+            merge("minecraft:golden_leggings", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.SUPERBIA), 1));
+            merge("minecraft:golden_boots", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.SUPERBIA), 1));
+            merge("minecraft:golden_sword", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.SUPERBIA), 2));
             DECLARED.add("#minecraft:beds");
-            register("#minecraft:beds", tags().add(Aspect.CRAFT, 3).add(Aspect.CLOTH, 6).add(Tc4AspectAdapter.resolveAspect(FmAspects.SLOTH), 4));
+            register("#minecraft:beds", tags().add(Aspect.CRAFT, 3).add(Aspect.CLOTH, 6).add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.DESIDIA), 4));
             DECLARED.add("minecraft:ender_eye");
-            register("minecraft:ender_eye", tags().add(Aspect.SENSES, 4).add(Aspect.ELDRITCH, 4).add(Aspect.MAGIC, 3).add(Tc4AspectAdapter.resolveAspect(FmAspects.ENVY), 4));
-            merge("minecraft:cake", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.GLUTTONY), 7));
-            merge("minecraft:cookie", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.GLUTTONY), 1));
-            merge("minecraft:fire_charge", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.WRATH), 1));
+            register("minecraft:ender_eye", tags().add(Aspect.SENSES, 4).add(Aspect.ELDRITCH, 4).add(Aspect.MAGIC, 3).add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INVIDIA), 4));
+            merge("minecraft:cake", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.GULA), 7));
+            merge("minecraft:cookie", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.GULA), 1));
+            merge("minecraft:fire_charge", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.IRA), 1));
             DECLARED.add("minecraft:comparator");
-            register("minecraft:comparator", tags().add(Aspect.MECHANISM, 2).add(Aspect.ORDER, 2).add(Tc4AspectAdapter.resolveAspect(FmAspects.ENVY), 2));
+            register("minecraft:comparator", tags().add(Aspect.MECHANISM, 2).add(Aspect.ORDER, 2).add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INVIDIA), 2));
             if (!FmConfig.lustDisabled()) {
-                merge("minecraft:saddle", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.LUST), 2));
+                merge("minecraft:saddle", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.LUXURIA), 2));
                 DECLARED.add("minecraft:lead");
-                register("minecraft:lead", tags().add(Aspect.BEAST, 2).add(Aspect.CLOTH, 2).add(Aspect.SLIME, 1).add(Tc4AspectAdapter.resolveAspect(FmAspects.LUST), 2));
+                register("minecraft:lead", tags().add(Aspect.BEAST, 2).add(Aspect.CLOTH, 2).add(Aspect.SLIME, 1).add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.LUXURIA), 2));
             }
-            addShard("wrath", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER), 1).add(Tc4AspectAdapter.resolveAspect(FmAspects.WRATH), 2).add(Aspect.CRYSTAL, 1));
-            addShard("envy", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER), 1).add(Tc4AspectAdapter.resolveAspect(FmAspects.ENVY), 2).add(Aspect.CRYSTAL, 1));
+            addShard("wrath", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INFERNUS), 1).add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.IRA), 2).add(Aspect.CRYSTAL, 1));
+            addShard("envy", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INFERNUS), 1).add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INVIDIA), 2).add(Aspect.CRYSTAL, 1));
             addShard("taint", tags().add(Aspect.TAINT, 3).add(Aspect.CRYSTAL, 1));
-            addShard("pride", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER), 1).add(Tc4AspectAdapter.resolveAspect(FmAspects.PRIDE), 2).add(Aspect.CRYSTAL, 1));
+            addShard("pride", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INFERNUS), 1).add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.SUPERBIA), 2).add(Aspect.CRYSTAL, 1));
             if (!FmConfig.lustDisabled()) {
-                addShard("lust", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER), 1).add(Tc4AspectAdapter.resolveAspect(FmAspects.LUST), 2).add(Aspect.CRYSTAL, 1));
+                addShard("lust", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INFERNUS), 1).add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.LUXURIA), 2).add(Aspect.CRYSTAL, 1));
             } else {
                 addShard("lust", tags().add(Aspect.VOID, 1));
             }
-            addShard("sloth", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER), 1).add(Tc4AspectAdapter.resolveAspect(FmAspects.SLOTH), 2).add(Aspect.CRYSTAL, 1));
-            addShard("greed", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER), 1).add(Aspect.GREED, 2).add(Aspect.CRYSTAL, 1));
+            addShard("sloth", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INFERNUS), 1).add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.DESIDIA), 2).add(Aspect.CRYSTAL, 1));
+            addShard("greed", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INFERNUS), 1).add(Aspect.GREED, 2).add(Aspect.CRYSTAL, 1));
 
             register("forbiddenmagic:emerald_fragment", tags().add(Aspect.CRYSTAL, 1));
             register("forbiddenmagic:black_dye", tags().add(Aspect.DARKNESS, 1));
@@ -106,7 +111,7 @@ public final class Tc4AspectTagAdapter {
             register("forbiddenmagic:umbral_rose_bush", blackFlower);
             if (!FmConfig.lustDisabled()) {
                 register("forbiddenmagic:riding_crop", tags().add(Aspect.TREE, 2).add(Aspect.CLOTH, 2)
-                    .add(Aspect.BEAST, 1).add(Tc4AspectAdapter.resolveAspect(FmAspects.LUST), 1).add(Aspect.WEAPON, 1));
+                    .add(Aspect.BEAST, 1).add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.LUXURIA), 1).add(Aspect.WEAPON, 1));
             }
             register("forbiddenmagic:taint_fruit", tags().add(Aspect.TAINT, 2).add(Aspect.POISON, 1));
             register("forbiddenmagic:taint_coal", tags().add(Aspect.TAINT, 2).add(Aspect.ENTROPY, 2));
@@ -117,24 +122,24 @@ public final class Tc4AspectTagAdapter {
 
             String gluttony = FmItems.GLUTTONY_SHARD.getId().toString();
             DECLARED.add(gluttony);
-            register(gluttony, tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER), 1).add(Tc4AspectAdapter.resolveAspect(FmAspects.GLUTTONY), 2).add(Aspect.CRYSTAL, 1));
-            addEntity("thaumcraft:brainy_zombie", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.WRATH), 3));
-            addEntity("thaumcraft:giant_brainy_zombie", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.WRATH), 4));
-            addEntity("thaumcraft:firebat", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.WRATH), 1).add(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER), 2));
-            addEntity("minecraft:wither_skeleton", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER), 3));
-            addEntity("minecraft:creeper", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.WRATH), 2));
-            addEntity("minecraft:creeper", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.WRATH), 4), "powered", 1);
-            addEntity("minecraft:wither", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER), 7).add(Tc4AspectAdapter.resolveAspect(FmAspects.WRATH), 7));
-            addEntity("minecraft:ocelot", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.SLOTH), 3));
-            addEntity("minecraft:enderman", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.PRIDE), 4).add(Tc4AspectAdapter.resolveAspect(FmAspects.ENVY), 4));
-            addEntity("minecraft:ghast", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER), 3).add(Tc4AspectAdapter.resolveAspect(FmAspects.WRATH), 3));
-            addEntity("minecraft:zombified_piglin", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.WRATH), 6));
-            addEntity("minecraft:ender_dragon", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.PRIDE), 10));
+            register(gluttony, tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INFERNUS), 1).add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.GULA), 2).add(Aspect.CRYSTAL, 1));
+            addEntity("thaumcraft:brainy_zombie", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.IRA), 3));
+            addEntity("thaumcraft:giant_brainy_zombie", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.IRA), 4));
+            addEntity("thaumcraft:firebat", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.IRA), 1).add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INFERNUS), 2));
+            addEntity("minecraft:wither_skeleton", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INFERNUS), 3));
+            addEntity("minecraft:creeper", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.IRA), 2));
+            addEntity("minecraft:creeper", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.IRA), 4), "powered", 1);
+            addEntity("minecraft:wither", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INFERNUS), 7).add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.IRA), 7));
+            addEntity("minecraft:ocelot", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.DESIDIA), 3));
+            addEntity("minecraft:enderman", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.SUPERBIA), 4).add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INVIDIA), 4));
+            addEntity("minecraft:ghast", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INFERNUS), 3).add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.IRA), 3));
+            addEntity("minecraft:zombified_piglin", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.IRA), 6));
+            addEntity("minecraft:ender_dragon", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.SUPERBIA), 10));
             if (!FmConfig.lustDisabled()) {
-                addEntity("thaumcraft:taintacle", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.LUST), 3));
+                addEntity("thaumcraft:taintacle", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.LUXURIA), 3));
             }
-            addEntity("minecraft:pig", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.GLUTTONY), 3));
-            addEntity("minecraft:magma_cube", tags().add(Tc4AspectAdapter.resolveAspect(FmAspects.NETHER), 1));
+            addEntity("minecraft:pig", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.GULA), 3));
+            addEntity("minecraft:magma_cube", tags().add(Tc4AspectAdapter.resolveAspect(ForbiddenMagicAspectCatalog.INFERNUS), 1));
         }
 
         private void merge(String target, AspectList additions) {

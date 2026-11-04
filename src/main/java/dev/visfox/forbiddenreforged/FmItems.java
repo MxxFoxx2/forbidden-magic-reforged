@@ -1,31 +1,25 @@
 package dev.visfox.forbiddenreforged;
 
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
+import org.jetbrains.annotations.Nullable;
+import net.neoforged.fml.ModList;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.Identifier;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.tags.TagKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
-import net.minecraft.world.item.ToolMaterial;
-import net.minecraft.world.item.component.CookingFuel;
-import net.minecraft.world.level.storage.loot.providers.number.floats.ContextFloatProviders;
-import net.minecraft.world.level.storage.loot.providers.number.floats.ResolvableFloat;
-import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProvider;
-import net.minecraft.world.level.storage.loot.providers.number.ints.ResolvableInt;
-import net.neoforged.fml.ModList;
+import net.minecraft.world.item.SwordItem;
+import net.minecraft.world.item.Tiers;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
-import org.jspecify.annotations.Nullable;
 
 public final class FmItems {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(ForbiddenMagic.MODID);
-    private static final ResourceKey<ContextIntProvider> TAINT_COAL_BURN =
-        ResourceKey.create(Registries.CONTEXT_INT_PROVIDER, ForbiddenMagic.id("taint_coal_burn"));
     public static final Map<String, DeferredItem<Item>> DEADLY_SHARDS = new LinkedHashMap<>();
+
     public static final DeferredItem<Item> GLUTTONY_SHARD;
     public static final DeferredItem<Item> SKULL_AXE;
     public static final DeferredItem<Item> EMERALD_FRAGMENT;
@@ -34,8 +28,8 @@ public final class FmItems {
     public static final DeferredItem<Item> MORPH_SWORD;
     public static final DeferredItem<Item> MORPH_SHOVEL;
     public static final DeferredItem<Item> MORPH_AXE;
-    public static final DeferredItem<Item> MOB_CRYSTAL;
-    public static final DeferredItem<Item> DIABOLIST_FORK;
+    public static final DeferredItem<MobCrystalItem> MOB_CRYSTAL;
+    public static final DeferredItem<DiabolistForkItem> DIABOLIST_FORK;
     public static final DeferredItem<Item> TAINT_COAL;
     public static final DeferredItem<Item> RIDING_CROP;
     public static final DeferredItem<Item> BLACK_DYE;
@@ -62,45 +56,35 @@ public final class FmItems {
     public static final @Nullable DeferredItem<Item> SUB_COLLAR;
 
     static {
+        var properties = HostAdapterRegistry.requireItemProperties();
+        var factories = HostAdapterRegistry.requireItemFactories();
+
         for (String vice : new String[]{"wrath", "envy", "taint", "pride", "lust", "sloth", "greed"}) {
             DEADLY_SHARDS.put(vice, vice.equals("lust")
                 ? ITEMS.registerItem("lust_shard", LustShardItem::new)
                 : ITEMS.registerSimpleItem(vice + "_shard"));
         }
-        GLUTTONY_SHARD = ITEMS.registerSimpleItem("gluttony_shard", properties -> HostAdapterRegistry.requireItemProperties().gluttonyFoodProperties(properties));
-        SKULL_AXE = ITEMS.registerItem("skull_axe", SkullAxeItem::new,
-            properties -> HostAdapterRegistry.requireItemProperties().skullAxeProperties(properties));
+        GLUTTONY_SHARD = ITEMS.register("gluttony_shard",
+            () -> new Item(properties.gluttonyFoodProperties(new Item.Properties())));
+        SKULL_AXE = register("skull_axe", SkullAxeItem::new, properties::skullAxeProperties);
         EMERALD_FRAGMENT = ITEMS.registerSimpleItem("emerald_fragment");
         TAINTED_BLOOD_SHARD = ITEMS.registerSimpleItem("tainted_blood_shard");
-        MORPH_PICKAXE = ITEMS.registerItem("morph_pickaxe", properties -> HostAdapterRegistry.requireItemFactories().createMorphTool(properties),
-            properties -> repairable(HostAdapterRegistry.requireItemProperties().morphPickaxeProperties(properties)));
-        MORPH_SWORD = ITEMS.registerItem("morph_sword", properties -> HostAdapterRegistry.requireItemFactories().createMorphTool(properties),
-            properties -> repairable(HostAdapterRegistry.requireItemProperties().morphSwordProperties(properties)));
-        MORPH_SHOVEL = ITEMS.registerItem("morph_shovel", properties -> HostAdapterRegistry.requireItemFactories().createMorphTool(properties),
-            properties -> repairable(HostAdapterRegistry.requireItemProperties().morphShovelProperties(properties)));
-        MORPH_AXE = ITEMS.registerItem("morph_axe", properties -> HostAdapterRegistry.requireItemFactories().createMorphTool(properties),
-            properties -> repairable(HostAdapterRegistry.requireItemProperties().morphAxeProperties(properties)));
-        MOB_CRYSTAL = ITEMS.registerItem("mob_crystal", MobCrystalItem::new,
-            properties -> properties.stacksTo(1).rarity(Rarity.UNCOMMON));
-        DIABOLIST_FORK = ITEMS.registerItem("diabolist_fork", DiabolistForkItem::new,
-            properties -> HostAdapterRegistry.requireItemProperties().diabolistForkProperties(properties)
-                .repairable(net.minecraft.world.item.Items.QUARTZ));
-        TAINT_COAL = ITEMS.registerSimpleItem("taint_coal", properties -> properties.component(
-            DataComponents.COOKING_FUEL,
-            new CookingFuel(
-                ResolvableInt.fromKey(TAINT_COAL_BURN),
-                ResolvableFloat.fromKey(ContextFloatProviders.COOKING_DEFAULT_SPEED_MULTIPLIER)
-            )
-        ));
-        RIDING_CROP = ITEMS.registerItem("riding_crop", RidingCropItem::new,
-            properties -> properties.sword(ToolMaterial.WOOD, 3.0F, -2.4F)
-                .repairable(TagKey.create(Registries.ITEM, ForbiddenMagic.id("riding_crop_repair"))));
-        BLACK_DYE = ITEMS.registerItem("black_dye", BlackDyeItem::new,
-            properties -> properties.stacksTo(64));
-        TAINT_FRUIT = ITEMS.registerItem("taint_fruit", TaintFruitItem::new,
-            properties -> properties.stacksTo(64));
-        RING_NUTRITION = ITEMS.registerItem("ring_nutrition", properties -> HostAdapterRegistry.requireItemFactories().createRingNutrition(properties),
-            properties -> properties.stacksTo(1));
+        MORPH_PICKAXE = register("morph_pickaxe", factories::createMorphTool, properties::morphPickaxeProperties);
+        MORPH_SWORD = register("morph_sword", factories::createMorphTool, properties::morphSwordProperties);
+        MORPH_SHOVEL = register("morph_shovel", factories::createMorphTool, properties::morphShovelProperties);
+        MORPH_AXE = register("morph_axe", factories::createMorphTool, properties::morphAxeProperties);
+        MOB_CRYSTAL = register("mob_crystal", MobCrystalItem::new,
+            itemProperties -> itemProperties.stacksTo(1).rarity(Rarity.UNCOMMON));
+        DIABOLIST_FORK = register("diabolist_fork", DiabolistForkItem::new, properties::diabolistForkProperties);
+        TAINT_COAL = ITEMS.registerSimpleItem("taint_coal");
+        RIDING_CROP = register("riding_crop", RidingCropItem::new,
+            itemProperties -> itemProperties.durability(Tiers.WOOD.getUses())
+                .attributes(SwordItem.createAttributes(Tiers.WOOD, 3.0F, -2.4F))
+                .component(DataComponents.TOOL, SwordItem.createToolProperties()));
+        BLACK_DYE = ITEMS.registerItem("black_dye", BlackDyeItem::new);
+        TAINT_FRUIT = ITEMS.registerItem("taint_fruit", TaintFruitItem::new);
+        RING_NUTRITION = register("ring_nutrition", factories::createRingNutrition,
+            itemProperties -> itemProperties.stacksTo(1));
         ALCHEMICAL_CAP = ITEMS.registerSimpleItem("alchemical_cap");
         VINTEUM_CAP = ITEMS.registerSimpleItem("vinteum_cap");
         TERRASTEEL_CAP = ITEMS.registerSimpleItem("terrasteel_cap");
@@ -119,26 +103,30 @@ public final class FmItems {
             WITCHWOOD_STAFF_ROD = null;
         }
         PROFANE_ROD = ITEMS.registerSimpleItem("profane_rod");
-        TAINT_SHOVEL = ITEMS.registerItem("taint_shovel", TaintShovelItem::new,
-            properties -> HostAdapterRegistry.requireItemProperties().taintShovelProperties(properties));
-        TAINT_PICKAXE = ITEMS.registerItem("taint_pickaxe", Item::new,
-            properties -> HostAdapterRegistry.requireItemProperties().taintPickaxeProperties(properties));
-        CRYSTALWELL = ITEMS.registerItem("crystalwell", properties -> HostAdapterRegistry.requireItemFactories().createCrystalwell(properties), properties -> properties.stacksTo(1));
-        PRIMEWELL = ITEMS.registerItem("primewell", properties -> HostAdapterRegistry.requireItemFactories().createPrimewell(properties), properties -> properties.stacksTo(1).rarity(Rarity.EPIC));
-        BLINK_FOCUS = ITEMS.registerItem("blink_focus", properties -> HostAdapterRegistry.requireItemFactories().createBlinkFocus(properties),
-            properties -> HostAdapterRegistry.requireItemProperties().blinkFocusProperties(properties));
+        TAINT_SHOVEL = register("taint_shovel", TaintShovelItem::new, properties::taintShovelProperties);
+        TAINT_PICKAXE = register("taint_pickaxe", Item::new, properties::taintPickaxeProperties);
+        CRYSTALWELL = register("crystalwell", factories::createCrystalwell,
+            itemProperties -> itemProperties.stacksTo(1));
+        PRIMEWELL = register("primewell", factories::createPrimewell,
+            itemProperties -> itemProperties.stacksTo(1).rarity(Rarity.EPIC));
+        BLINK_FOCUS = register("blink_focus", factories::createBlinkFocus, properties::blinkFocusProperties);
         SUB_COLLAR = FmConfig.lustDisabled() ? null
-            : ITEMS.registerItem("sub_collar", properties -> HostAdapterRegistry.requireItemFactories().createSubCollar(properties), properties -> properties.stacksTo(1).rarity(Rarity.RARE));
+            : register("sub_collar", factories::createSubCollar,
+                itemProperties -> itemProperties.stacksTo(1).rarity(Rarity.RARE));
     }
 
     private FmItems() {
     }
 
-    private static Item.Properties repairable(Item.Properties properties) {
-        return properties.repairable(DEADLY_SHARDS.get("envy").get());
+    private static <T extends Item> DeferredItem<T> register(
+        String name,
+        Function<Item.Properties, ? extends T> factory,
+        UnaryOperator<Item.Properties> properties
+    ) {
+        return ITEMS.register(name, () -> factory.apply(properties.apply(new Item.Properties())));
     }
 
-    public static Identifier id(String vice) {
-        return Identifier.fromNamespaceAndPath(ForbiddenMagic.MODID, vice + "_shard");
+    public static ResourceLocation id(String vice) {
+        return ResourceLocation.fromNamespaceAndPath(ForbiddenMagic.MODID, vice + "_shard");
     }
 }

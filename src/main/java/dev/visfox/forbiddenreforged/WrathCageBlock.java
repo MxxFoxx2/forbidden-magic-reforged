@@ -1,11 +1,13 @@
 package dev.visfox.forbiddenreforged;
 
+import javax.annotation.Nullable;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -14,10 +16,8 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import org.jspecify.annotations.Nullable;
-import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 
-public class WrathCageBlock extends Block implements EntityBlock {
+public final class WrathCageBlock extends Block implements EntityBlock {
     public WrathCageBlock(Properties properties) {
         super(properties);
     }
@@ -28,54 +28,77 @@ public class WrathCageBlock extends Block implements EntityBlock {
     }
 
     @Override
-    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(
+        Level level, BlockState state, BlockEntityType<T> type
+    ) {
         if (type != FmBlockEntities.WRATH_CAGE.get()) {
             return null;
         }
-        return (tickLevel, pos, tickState, entity) -> WrathCageBlockEntity.tick(tickLevel, pos, tickState, (WrathCageBlockEntity) entity);
+        return (tickLevel, pos, tickState, entity) ->
+            HostAdapterRegistry.requireBlockEntities().tickWrathCage(tickLevel, pos, tickState, entity);
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (!(level.getBlockEntity(pos) instanceof WrathCageBlockEntity cage) || level.isClientSide()) {
-            return InteractionResult.SUCCESS;
-        }
-        if (attune(cage, player.getMainHandItem())) {
-            return InteractionResult.SUCCESS;
-        }
-        return InteractionResult.PASS;
-    }
-
-    @Override
-    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (!(level.getBlockEntity(pos) instanceof WrathCageBlockEntity cage)) {
+    protected InteractionResult useWithoutItem(
+        BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit
+    ) {
+        BlockEntity cage = level.getBlockEntity(pos);
+        if (cage == null || !attune(cage, player.getMainHandItem())) {
             return InteractionResult.PASS;
+        }
+        return InteractionResult.sidedSuccess(level.isClientSide());
+    }
+
+    @Override
+    protected ItemInteractionResult useItemOn(
+        ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
+        InteractionHand hand, BlockHitResult hit
+    ) {
+        BlockEntity cage = level.getBlockEntity(pos);
+        if (cage == null) {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
         if (attune(cage, stack)) {
-            return InteractionResult.SUCCESS;
+            return ItemInteractionResult.sidedSuccess(level.isClientSide());
         }
         if (!stack.is(FmItems.DIABOLIST_FORK.get()) || FmConfig.wrathCost() <= 0) {
-            return InteractionResult.PASS;
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
         if (!level.isClientSide()) {
-            cage.cycleMode();
+            HostAdapterRegistry.requireBlockEntities().cycleWrathCageMode(cage);
         }
-        player.swing(hand, SwingAnimation.DEFAULT, true);
-        return InteractionResult.SUCCESS;
+        player.swing(hand);
+        return ItemInteractionResult.sidedSuccess(level.isClientSide());
     }
 
-    public static boolean attune(WrathCageBlockEntity cage, ItemStack held) {
+    @Override
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+        HostAdapterRegistry.requireBlockEntities().beforeRemoveWrathCage(state, level, pos, newState);
+        super.onRemove(state, level, pos, newState, isMoving);
+    }
+
+    public static boolean attune(BlockEntity cage, ItemStack held) {
         String incoming = MobCrystalItem.mob(held);
         if (incoming == null || !FmSpawnerMobs.ids().contains(incoming)) {
             return false;
         }
-        String previous = cage.getMobId();
-        cage.setMobId(incoming);
+        var host = HostAdapterRegistry.requireBlockEntities();
+        String previous = host.wrathCageMobId(cage);
+        host.setWrathCageMobId(cage, incoming);
         if (previous == null) {
             held.remove(FmComponents.MOB_ID.get());
         } else {
             MobCrystalItem.setMob(held, previous);
         }
         return true;
+    }
+
+    public static ItemStack crystalForBreak(BlockEntity cage) {
+        ItemStack stack = new ItemStack(FmItems.MOB_CRYSTAL.get());
+        String mobId = HostAdapterRegistry.requireBlockEntities().wrathCageMobId(cage);
+        if (mobId != null) {
+            MobCrystalItem.setMob(stack, mobId);
+        }
+        return stack;
     }
 }

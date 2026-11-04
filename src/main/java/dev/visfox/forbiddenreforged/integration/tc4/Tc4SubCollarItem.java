@@ -1,8 +1,8 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
 import dev.visfox.forbiddenreforged.FmComponents;
-
-import java.util.function.Consumer;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
+import java.util.List;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -11,10 +11,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
 import thaumcraft.item.bauble.VisAmuletItem;
-import thaumcraft.platform.Baubles;
-
 public final class Tc4SubCollarItem extends VisAmuletItem {
     public Tc4SubCollarItem(Properties properties) {
         super(properties, false);
@@ -30,13 +27,13 @@ public final class Tc4SubCollarItem extends VisAmuletItem {
         if (!(target instanceof ServerPlayer sub) || player.level().isClientSide()) {
             return InteractionResult.PASS;
         }
-        if (!Baubles.get(sub, 0).isEmpty()) {
+        if (!HostAdapterRegistry.requireAccessories().accessory(sub, 0).isEmpty()) {
             player.sendSystemMessage(Component.translatable("message.collar.alreadywearing", sub.getDisplayName()));
             return InteractionResult.FAIL;
         }
         ItemStack collar = stack.copyWithCount(1);
         collar.set(FmComponents.COLLAR_OWNER.get(), player.getDisplayName().getString());
-        Baubles.set(sub, 0, collar);
+        HostAdapterRegistry.requireAccessories().setAccessory(sub, 0, collar);
         stack.shrink(1);
         sub.sendSystemMessage(Component.translatable("message.collar.placescollar", player.getDisplayName()));
         player.sendSystemMessage(Component.translatable("message.collar.youplacecollar", sub.getDisplayName()));
@@ -44,11 +41,11 @@ public final class Tc4SubCollarItem extends VisAmuletItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag flag) {
-        super.appendHoverText(stack, context, display, builder, flag);
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        super.appendHoverText(stack, context, tooltip, flag);
         String owner = stack.get(FmComponents.COLLAR_OWNER.get());
         if (owner != null && !owner.isEmpty()) {
-            builder.accept(Component.translatable("tooltip.collar.owner").append(" " + owner));
+            tooltip.add(Component.translatable("tooltip.collar.owner").append(" " + owner));
         }
     }
 }

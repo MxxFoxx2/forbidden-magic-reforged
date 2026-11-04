@@ -1,8 +1,9 @@
-From df711b8f296c9b1a2d8a89107cd80857177ac972 Mon Sep 17 00:00:00 2001
-From: MxxFoxx2 <126578124+MxxFoxx2@users.noreply.github.com>
-Date: Mon, 26 Oct 2026 18:32:05 +0300
-Subject: [PATCH 1/2] feat: support block aspect scan targets
+From 775fd4742214ce53ddbcbfdd91abaadfaab67cbe Mon Sep 17 00:00:00 2001
+From: Forbidden Magic Port Build <port-build@example.invalid>
+Date: Tue, 27 Oct 2026 23:12:57 +0000
+Subject: [PATCH] feat: support block aspect scan targets
 
+Co-Authored-By: Mxx Foxx <MxxFoxx2@yandex.ru>
 ---
  .../thaumcraft/aspect/AspectRegistrar.java    |  7 ++++++
  .../thaumcraft/aspect/AspectRegistry.java     | 23 ++++++++++++++++++-
@@ -13,7 +14,7 @@ Subject: [PATCH 1/2] feat: support block aspect scan targets
  6 files changed, 44 insertions(+), 4 deletions(-)
 
 diff --git a/src/main/java/thaumcraft/aspect/AspectRegistrar.java b/src/main/java/thaumcraft/aspect/AspectRegistrar.java
-index 2b53f17..7d0f4d0 100644
+index 2261d87..dc22bac 100644
 --- a/src/main/java/thaumcraft/aspect/AspectRegistrar.java
 +++ b/src/main/java/thaumcraft/aspect/AspectRegistrar.java
 @@ -56,6 +56,13 @@ public abstract class AspectRegistrar {
@@ -21,28 +22,28 @@ index 2b53f17..7d0f4d0 100644
      }
  
 +    protected void block(String target, AspectList aspects) {
-+        BuiltInRegistries.BLOCK.getOptional(Identifier.parse(target)).ifPresentOrElse(
++        BuiltInRegistries.BLOCK.getOptional(ResourceLocation.parse(target)).ifPresentOrElse(
 +            block -> registry.registerBlock(block, aspects.copy()),
 +            () -> Thaumcraft.LOGGER.debug("Aspect block target {} is not registered", target)
 +        );
 +    }
 +
      protected void entity(String target, AspectList aspects, Object... nbt) {
-         BuiltInRegistries.ENTITY_TYPE.getOptional(Identifier.parse(target)).ifPresentOrElse(
+         BuiltInRegistries.ENTITY_TYPE.getOptional(ResourceLocation.parse(target)).ifPresentOrElse(
              type -> registry.registerEntity(type, aspects.copy(), nbt),
 diff --git a/src/main/java/thaumcraft/aspect/AspectRegistry.java b/src/main/java/thaumcraft/aspect/AspectRegistry.java
-index e444f2e..3f5826a 100644
+index c41e5e0..0edc7a8 100644
 --- a/src/main/java/thaumcraft/aspect/AspectRegistry.java
 +++ b/src/main/java/thaumcraft/aspect/AspectRegistry.java
-@@ -18,6 +18,7 @@ import net.minecraft.world.item.ItemStackTemplate;
- import net.minecraft.world.item.Items;
- import net.minecraft.world.item.crafting.CraftingInput;
- import net.minecraft.world.item.crafting.Ingredient;
+@@ -14,6 +14,7 @@ import net.minecraft.world.entity.Entity;
+ import net.minecraft.world.entity.EntityType;
+ import net.minecraft.world.item.Item;
+ import net.minecraft.world.item.ItemStack;
 +import net.minecraft.world.level.block.Block;
- import net.minecraft.world.item.crafting.Recipe;
- import net.minecraft.world.item.crafting.RecipeHolder;
- import net.minecraft.world.item.crafting.ShapedRecipe;
-@@ -33,6 +34,7 @@ public final class AspectRegistry {
+ import net.minecraft.world.item.Items;
+ import net.minecraft.world.item.crafting.AbstractCookingRecipe;
+ import net.minecraft.world.item.crafting.Ingredient;
+@@ -30,6 +31,7 @@ public final class AspectRegistry {
      private static volatile AspectRegistry active = new AspectRegistry();
  
      private final Map<Item, AspectList> tags = new HashMap<>();
@@ -50,7 +51,7 @@ index e444f2e..3f5826a 100644
      private final Map<EntityType<?>, List<EntityAspects>> entities = new HashMap<>();
      private final Map<Item, List<CraftingSource>> craftingByOutput = new HashMap<>();
      private final Map<Item, List<CraftingSource>> processingByOutput = new HashMap<>();
-@@ -57,9 +59,10 @@ public final class AspectRegistry {
+@@ -54,9 +56,10 @@ public final class AspectRegistry {
          active = registry;
      }
  
@@ -62,7 +63,7 @@ index e444f2e..3f5826a 100644
          entities.forEach((type, list) -> registry.entities.put(type, new ArrayList<>(list)));
          return registry;
      }
-@@ -68,6 +71,14 @@ public final class AspectRegistry {
+@@ -65,6 +68,14 @@ public final class AspectRegistry {
          tags.put(item, aspects == null ? new AspectList() : aspects.copy());
      }
  
@@ -77,7 +78,7 @@ index e444f2e..3f5826a 100644
      public boolean exists(Item item) {
          return tags.containsKey(item);
      }
-@@ -170,6 +181,16 @@ public final class AspectRegistry {
+@@ -167,6 +178,16 @@ public final class AspectRegistry {
          return result;
      }
  
@@ -108,10 +109,10 @@ index 2ea28c1..71be5fa 100644
      }
  
 diff --git a/src/main/java/thaumcraft/client/ClientPayloadHandlers.java b/src/main/java/thaumcraft/client/ClientPayloadHandlers.java
-index b19d37c..8af48ce 100644
+index abe9426..d91fdfe 100644
 --- a/src/main/java/thaumcraft/client/ClientPayloadHandlers.java
 +++ b/src/main/java/thaumcraft/client/ClientPayloadHandlers.java
-@@ -116,7 +116,7 @@ public final class ClientPayloadHandlers {
+@@ -119,7 +119,7 @@ public final class ClientPayloadHandlers {
      }
  
      private static void aspectTags(AspectTagsPayload payload, Player player) {
@@ -152,10 +153,10 @@ index d4fff55..d218063 100644
              LinkedHashMap::new,
              ByteBufCodecs.registry(Registries.ENTITY_TYPE),
 diff --git a/src/main/java/thaumcraft/research/ScanManager.java b/src/main/java/thaumcraft/research/ScanManager.java
-index 1961ee7..2e0ac5d 100644
+index be7cce0..e285e84 100644
 --- a/src/main/java/thaumcraft/research/ScanManager.java
 +++ b/src/main/java/thaumcraft/research/ScanManager.java
-@@ -100,6 +100,11 @@ public final class ScanManager {
+@@ -98,6 +98,11 @@ public final class ScanManager {
          if (state.is(Blocks.LAVA)) {
              return new Target(ScanKind.OBJECT, "minecraft:lava", new AspectList().add(Aspect.FIRE, 3).add(Aspect.EARTH, 1), ItemStack.EMPTY, null);
          }
@@ -164,9 +165,9 @@ index 1961ee7..2e0ac5d 100644
 +            String key = "block:" + BuiltInRegistries.BLOCK.getKey(state.getBlock());
 +            return new Target(ScanKind.OBJECT, key, blockAspects, ItemStack.EMPTY, null);
 +        }
-         ItemStack stack = state.getCloneItemStack(level, pos, false);
+         ItemStack stack = state.getBlock().getCloneItemStack(level, pos, state);
          if (stack.isEmpty()) {
              return null;
 -- 
-2.52.0.windows.1
+2.34.1
 

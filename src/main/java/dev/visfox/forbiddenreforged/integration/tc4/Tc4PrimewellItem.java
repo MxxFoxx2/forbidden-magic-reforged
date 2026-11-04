@@ -5,10 +5,7 @@ import net.minecraft.world.item.Rarity;
 import thaumcraft.item.ScribingToolsItem;
 
 /**
- * Original Forbidden Magic Primewell: an epic scribing tool whose charge is
- * never consumed. The table API checks ScribingToolsItem and wears stacks
- * directly, so an effectively unbounded max damage plus a hidden bar preserves
- * the original permanent-use behavior without requiring a host patch.
+ * TC4 scribing-table item shell for the permanent-use Primewell.
  */
 public final class Tc4PrimewellItem extends ScribingToolsItem {
     public Tc4PrimewellItem(Properties properties) {

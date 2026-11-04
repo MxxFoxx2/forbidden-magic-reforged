@@ -8,20 +8,7 @@
           "type": "minecraft:item",
           "name": "forbiddenmagic:umbral_rose_bush"
         }
-      ],
-      "conditions": [
-        {
-          "condition": "minecraft:survives_explosion"
-        },
-        {
-          "condition": "minecraft:block_state_property",
-          "block": "forbiddenmagic:umbral_rose_bush",
-          "properties": {
-            "half": "lower"
-          }
-        }
       ]
     }
-  ],
-  "random_sequence": "forbiddenmagic:blocks/umbral_rose_bush"
+  ]
 }

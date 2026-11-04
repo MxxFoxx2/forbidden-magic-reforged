@@ -7,7 +7,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 HOST = ROOT / "host"
 UPSTREAM = ROOT.parent / "thaumcraft-4-reforged"
-UPSTREAM_URL = "https://github.com/notlikethiss/thaumcraft-4-reforged.git"
 PATCHES = ROOT / "patches"
 
 
@@ -22,8 +21,6 @@ def run(*args: str, cwd: Path | None = None) -> None:
 
 
 def clone() -> None:
-    if not UPSTREAM.exists():
-        run("git", "clone", UPSTREAM_URL, str(UPSTREAM))
     if not HOST.exists():
         subprocess.run(
             ["git", "clone", "--no-hardlinks", str(UPSTREAM), str(HOST)],
@@ -31,7 +28,8 @@ def clone() -> None:
             text=True,
         )
     run("git", "-C", str(HOST), "config", "core.autocrlf", "false")
-    run("git", "-C", str(HOST), "remote", "set-url", "origin", str(UPSTREAM))
+    run("git", "-C", str(HOST), "config", "user.name", "Forbidden Magic Port Build")
+    run("git", "-C", str(HOST), "config", "user.email", "port-build@example.invalid")
     run("git", "-C", str(HOST), "fetch", "--all")
     run("git", "-C", str(HOST), "checkout", "--force", "--detach", sha())
     run("git", "-C", str(HOST), "read-tree", "HEAD")
@@ -47,7 +45,7 @@ def apply_patches() -> None:
         )
         if check.returncode != 0:
             raise SystemExit(f"patch does not apply cleanly: {patch.name}")
-        run("git", "-C", str(HOST), "am", "--3way", "--ignore-space-change", "--no-gpg-sign", str(patch))
+        run("git", "-C", str(HOST), "am", "--ignore-space-change", "--no-gpg-sign", str(patch))
 
 
 def verify() -> None:
@@ -81,49 +79,21 @@ def verify() -> None:
     print(f"host matches sha + {patch_count} patch commit(s)")
 
 
-def export_patches() -> None:
-    if not HOST.exists():
-        raise SystemExit("host/ missing: run without --export first")
-    base = sha()
-    count = int(
-        subprocess.run(
-            ["git", "-C", str(HOST), "rev-list", "--count", f"{base}..HEAD"],
-            capture_output=True,
-            text=True,
-            check=True,
-        ).stdout.strip()
-    )
-    if count == 0:
-        raise SystemExit(f"host/ has no commits beyond the pinned sha {base}")
-    for stale in PATCHES.glob("*.patch"):
-        stale.unlink()
-    run(
-        "git", "-C", str(HOST), "format-patch", base, "-o", str(PATCHES),
-    )
-    print(f"exported {count} commit(s) to {PATCHES}")
-
-
-def rebuild() -> None:
-    wrapper = "gradlew.bat" if os.name == "nt" else "./gradlew"
-    run(wrapper, "build", cwd=HOST)
-
-
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--verify", action="store_true")
     parser.add_argument("--rebuild", action="store_true")
-    parser.add_argument("--export", action="store_true")
     arguments = parser.parse_args()
     if arguments.verify:
         verify()
         return 0
-    if arguments.export:
-        export_patches()
-        return 0
     clone()
     apply_patches()
     if arguments.rebuild:
-        rebuild()
+        if os.name == "nt":
+            run("cmd", "//c", "gradlew.bat", "build", cwd=HOST)
+        else:
+            run("./gradlew", "build", cwd=HOST)
     return 0
 
 

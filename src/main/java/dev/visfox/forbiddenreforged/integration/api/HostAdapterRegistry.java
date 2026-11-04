@@ -2,7 +2,9 @@ package dev.visfox.forbiddenreforged.integration.api;
 
 import dev.visfox.forbiddenreforged.integration.runtime.HostItemFactoryServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostItemPropertyServices;
-import dev.visfox.forbiddenreforged.integration.runtime.HostBootstrapServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostWandRegistrationServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostOptionalEnchantmentServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostCreativeContentServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostEntityAspectServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostEntityClassificationServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostAspectServices;
@@ -10,11 +12,16 @@ import dev.visfox.forbiddenreforged.integration.runtime.HostMorphToolServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostBlockEntityServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandInspectionServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandVisServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostWandPartsServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostFocusServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostEssentiaTransportServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostAccessoryServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostTaintBlockServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostTaintOriginServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostEnchantmentEffectServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostScribingServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWarpServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostVillagerTradeServices;
 import java.util.Objects;
 
 /**
@@ -80,12 +87,28 @@ public final class HostAdapterRegistry {
         return capability(HostWandVisServices.class, "wand Vis");
     }
 
+    public static HostWandPartsServices requireWandParts() {
+        return capability(HostWandPartsServices.class, "wand parts");
+    }
+
+    public static HostFocusServices requireFocus() {
+        return capability(HostFocusServices.class, "focus");
+    }
+
+    public static HostEssentiaTransportServices requireEssentiaTransport() {
+        return capability(HostEssentiaTransportServices.class, "essentia transport");
+    }
+
     public static HostAccessoryServices requireAccessories() {
         return capability(HostAccessoryServices.class, "accessory");
     }
 
     public static HostTaintBlockServices requireTaintBlocks() {
         return capability(HostTaintBlockServices.class, "taint block");
+    }
+
+    public static HostTaintOriginServices requireTaintOrigins() {
+        return capability(HostTaintOriginServices.class, "taint origins");
     }
 
     public static HostEnchantmentEffectServices requireEnchantmentEffects() {
@@ -120,10 +143,23 @@ public final class HostAdapterRegistry {
         return capability(HostItemFactoryServices.class, "item factories");
     }
 
-    /**
-     * Returns host-specific startup, trigger, and creative-tab services.
-     */
-    public static HostBootstrapServices requireBootstrap() {
-        return capability(HostBootstrapServices.class, "bootstrap");
+    /** Returns host-specific wand material and trigger registration. */
+    public static HostWandRegistrationServices requireWandRegistration() {
+        return capability(HostWandRegistrationServices.class, "wand registration");
+    }
+
+    /** Returns the optional enchantment bridge when the selected host supports it. */
+    public static HostOptionalEnchantmentServices requireOptionalEnchantments() {
+        return capability(HostOptionalEnchantmentServices.class, "optional enchantments");
+    }
+
+    /** Returns host-backed content contributed to the shared creative tab. */
+    public static HostCreativeContentServices requireCreativeContent() {
+        return capability(HostCreativeContentServices.class, "creative content");
+    }
+
+    /** Returns host-specific trades for the Forbidden Magic heretic profession. */
+    public static HostVillagerTradeServices requireVillagerTrades() {
+        return capability(HostVillagerTradeServices.class, "villager trades");
     }
 }

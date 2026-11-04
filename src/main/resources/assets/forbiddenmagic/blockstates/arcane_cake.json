@@ -1,0 +1,40 @@
+{
+  "variants": {
+    "slice=0": {
+      "model": "forbiddenmagic:block/arcane_cake_slice_0"
+    },
+    "slice=1": {
+      "model": "forbiddenmagic:block/arcane_cake_slice_1"
+    },
+    "slice=2": {
+      "model": "forbiddenmagic:block/arcane_cake_slice_2"
+    },
+    "slice=3": {
+      "model": "forbiddenmagic:block/arcane_cake_slice_3"
+    },
+    "slice=4": {
+      "model": "forbiddenmagic:block/arcane_cake_slice_4"
+    },
+    "slice=5": {
+      "model": "forbiddenmagic:block/arcane_cake_slice_5"
+    },
+    "slice=6": {
+      "model": "forbiddenmagic:block/arcane_cake_slice_6"
+    },
+    "slice=7": {
+      "model": "forbiddenmagic:block/arcane_cake_slice_7"
+    },
+    "slice=8": {
+      "model": "forbiddenmagic:block/arcane_cake_slice_8"
+    },
+    "slice=9": {
+      "model": "forbiddenmagic:block/arcane_cake_slice_9"
+    },
+    "slice=10": {
+      "model": "forbiddenmagic:block/arcane_cake_slice_10"
+    },
+    "slice=11": {
+      "model": "forbiddenmagic:block/arcane_cake_slice_11"
+    }
+  }
+}

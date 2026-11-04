@@ -2,7 +2,9 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    "forbiddenmagic:star_block"
+    {
+      "item": "forbiddenmagic:star_block"
+    }
   ],
   "result": {
     "id": "minecraft:nether_star",

@@ -1,5 +1,8 @@
 package dev.visfox.forbiddenreforged;
 
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
+import java.util.List;
+
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -7,8 +10,6 @@ import net.minecraft.network.chat.Component;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
-import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
-import java.util.List;
 
 @EventBusSubscriber(modid = ForbiddenMagic.MODID)
 public final class FmCommands {
@@ -19,7 +20,7 @@ public final class FmCommands {
     static void register(RegisterCommandsEvent event) {
         event.getDispatcher().register(
             Commands.literal(ForbiddenMagic.MODID)
-                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(
                     Commands.literal("aspects")
                         .executes(FmCommands::showAspects)
@@ -29,12 +30,12 @@ public final class FmCommands {
 
     private static int showAspects(CommandContext<CommandSourceStack> context) {
         CommandSourceStack source = context.getSource();
-        List<String> lines = HostAdapterRegistry.require().aspectDiagnostics();
+        List<String> diagnostics = HostAdapterRegistry.require().aspectDiagnostics();
         source.sendSuccess(
-            () -> Component.literal("Aspect registry: entries=" + lines.size()),
+            () -> Component.literal("Aspect registry: entries=" + diagnostics.size()),
             false
         );
-        for (String line : lines) {
+        for (String line : diagnostics) {
             source.sendSuccess(() -> Component.literal(line), false);
         }
         return 1;

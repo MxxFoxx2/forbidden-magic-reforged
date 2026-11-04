@@ -2,7 +2,7 @@ package dev.visfox.forbiddenreforged;
 
 import dev.visfox.forbiddenreforged.core.wand.WandContractAccess;
 import net.minecraft.world.item.ItemStack;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /** Maps the common Profane Contract data component to the core wand contract port. */
 public final class FmWandContractAccess implements WandContractAccess {

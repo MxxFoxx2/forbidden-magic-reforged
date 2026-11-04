@@ -1,59 +1,96 @@
 package dev.visfox.forbiddenreforged;
 
-import dev.visfox.forbiddenreforged.core.model.ContentId;
-import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 import java.util.List;
 import java.util.Set;
+import dev.visfox.forbiddenreforged.core.model.ContentId;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
-import org.jspecify.annotations.Nullable;
+import javax.annotation.Nullable;
 
 public final class FmSpawnerMobs {
-    private static final Set<ContentId> VANILLA_BOSSES = Set.of(
-        ContentId.parse("minecraft:ender_dragon"),
-        ContentId.parse("minecraft:wither")
+    private static final Set<String> MOBS = Set.of(
+        "minecraft:zombie",
+        "minecraft:skeleton",
+        "minecraft:creeper",
+        "minecraft:horse",
+        "minecraft:pig",
+        "minecraft:sheep",
+        "minecraft:cow",
+        "minecraft:mooshroom",
+        "minecraft:ocelot",
+        "minecraft:chicken",
+        "minecraft:squid",
+        "minecraft:wolf",
+        "minecraft:bat",
+        "minecraft:spider",
+        "minecraft:slime",
+        "minecraft:ghast",
+        "minecraft:zombified_piglin",
+        "minecraft:enderman",
+        "minecraft:cave_spider",
+        "minecraft:silverfish",
+        "minecraft:blaze",
+        "minecraft:magma_cube",
+        "minecraft:witch",
+        "minecraft:villager",
+        "thaumcraft:firebat",
+        "thaumcraft:wisp",
+        "thaumcraft:thaumic_slime",
+        "thaumcraft:brainy_zombie",
+        "thaumcraft:giant_brainy_zombie",
+        "thaumcraft:taint_spider",
+        "thaumcraft:taint_swarm",
+        "thaumcraft:tainted_pig",
+        "thaumcraft:tainted_sheep",
+        "thaumcraft:tainted_cow",
+        "thaumcraft:tainted_chicken",
+        "thaumcraft:tainted_villager",
+        "thaumcraft:cultist_knight",
+        "thaumcraft:cultist_cleric",
+        "thaumcraft:eldritch_crab",
+        "thaumcraft:inhabited_zombie",
+        "thaumcraft:pech",
+        "thaumcraft:eldritch_guardian"
     );
 
     private FmSpawnerMobs() {
     }
 
-    public static @Nullable ContentId aspect(@Nullable String id) {
+    public static @Nullable ContentId aspectId(@Nullable String id) {
         if (id == null) {
             return null;
         }
+        final ContentId entityId;
         try {
-            return HostAdapterRegistry.requireEntityAspects()
-                .aspectCatalog(FmConfig.silverfishEmeralds())
-                .get(ContentId.parse(id));
-        } catch (IllegalArgumentException invalidEntityId) {
+            entityId = ContentId.parse(id);
+        } catch (IllegalArgumentException invalidId) {
             return null;
         }
+        return HostAdapterRegistry.requireEntityAspects()
+            .aspectCatalog(FmConfig.silverfishEmeralds())
+            .get(entityId);
     }
 
     public static List<String> ids() {
-        return HostAdapterRegistry.requireEntityAspects()
-            .aspectCatalog(FmConfig.silverfishEmeralds())
-            .keySet()
-            .stream()
-            .sorted()
-            .map(ContentId::toString)
-            .toList();
+        return List.copyOf(MOBS);
     }
 
     public static boolean canImprint(EntityType<?> type) {
         if (!FmConfig.wrathCage()) {
             return false;
         }
-        ContentId id = ContentId.parse(BuiltInRegistries.ENTITY_TYPE.getKey(type).toString());
-        boolean hasAspect = HostAdapterRegistry.requireEntityAspects()
-            .aspectCatalog(FmConfig.silverfishEmeralds())
-            .containsKey(id);
-        return hasAspect || (FmConfig.wrathCrazy() && !isBoss(type));
+        String id = BuiltInRegistries.ENTITY_TYPE.getKey(type).toString();
+        return MOBS.contains(id) || (FmConfig.wrathCrazy() && !isBoss(type));
     }
 
     public static boolean isBoss(EntityType<?> type) {
-        ContentId id = ContentId.parse(BuiltInRegistries.ENTITY_TYPE.getKey(type).toString());
-        return VANILLA_BOSSES.contains(id)
-            || HostAdapterRegistry.requireEntityClassification().bossEntityIds().contains(id);
+        String id = BuiltInRegistries.ENTITY_TYPE.getKey(type).toString();
+        if (id.equals("minecraft:ender_dragon") || id.equals("minecraft:wither")) {
+            return true;
+        }
+        return HostAdapterRegistry.requireEntityClassification()
+            .bossEntityIds()
+            .contains(ContentId.parse(id));
     }
 }

@@ -7,6 +7,7 @@ import thaumcraft.item.gear.RunicArmor;
 import thaumcraft.platform.Bauble;
 import thaumcraft.platform.BaubleType;
 
+/** TC4 accessory and runic-armor contracts for the shared Ring Nutrition item. */
 public final class Tc4RingNutritionItem extends Item implements Bauble, RunicArmor {
     public Tc4RingNutritionItem(Properties properties) {
         super(properties.stacksTo(1));
@@ -24,8 +25,7 @@ public final class Tc4RingNutritionItem extends Item implements Bauble, RunicArm
 
     @Override
     public void onWornTick(ItemStack stack, LivingEntity wearer) {
-        // The original ring grants +2 food and +2 saturation when food is consumed;
-        // that behavior is handled by FmToolEvents.onFoodFinished.
+        // Food restoration remains handled by FmToolEvents.onFoodFinished.
     }
 
     @Override

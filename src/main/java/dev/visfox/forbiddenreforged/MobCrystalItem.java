@@ -1,16 +1,14 @@
 package dev.visfox.forbiddenreforged;
 
-import java.util.function.Consumer;
+import java.util.List;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.Util;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
-import org.jspecify.annotations.Nullable;
-import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
+
+import javax.annotation.Nullable;
 
 public class MobCrystalItem extends Item {
     public MobCrystalItem(Properties properties) {
@@ -32,14 +30,18 @@ public class MobCrystalItem extends Item {
             return Component.translatable("item.forbiddenmagic.mob_crystal.empty");
         }
         return Component.translatable("item.forbiddenmagic.mob_crystal.filled",
-            Component.translatable(Util.makeDescriptionId("entity", Identifier.parse(id))));
+            Component.translatable(entityTranslationKey(ResourceLocation.parse(id))));
+    }
+
+    private static String entityTranslationKey(ResourceLocation id) {
+        return "entity." + id.getNamespace() + "." + id.getPath().replace('/', '.');
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
-        ContentId aspect = FmSpawnerMobs.aspect(mob(stack));
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        var aspect = FmSpawnerMobs.aspectId(mob(stack));
         if (aspect != null) {
-            tooltip.accept(HostAdapterRegistry.requireAspects().aspectDescription(aspect));
+            tooltip.add(HostAdapterRegistry.requireAspects().aspectDescription(aspect));
         }
     }
 }

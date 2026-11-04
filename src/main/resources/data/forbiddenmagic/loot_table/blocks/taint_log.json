@@ -8,13 +8,7 @@
           "type": "minecraft:item",
           "name": "forbiddenmagic:taint_log"
         }
-      ],
-      "conditions": [
-        {
-          "condition": "minecraft:survives_explosion"
-        }
       ]
     }
-  ],
-  "random_sequence": "forbiddenmagic:blocks/taint_log"
+  ]
 }

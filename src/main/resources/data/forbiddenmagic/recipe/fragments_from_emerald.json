@@ -2,7 +2,9 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    "minecraft:emerald"
+    {
+      "item": "minecraft:emerald"
+    }
   ],
   "result": {
     "id": "forbiddenmagic:emerald_fragment",

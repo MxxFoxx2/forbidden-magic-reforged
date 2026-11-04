@@ -1,0 +1,14 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "forbiddenmagic:item/lust_shard"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "forbiddenmagic:no_lust": 1
+      },
+      "model": "forbiddenmagic:item/lust_shard_despair"
+    }
+  ]
+}

@@ -8,13 +8,7 @@
           "type": "minecraft:item",
           "name": "forbiddenmagic:star_block"
         }
-      ],
-      "conditions": [
-        {
-          "condition": "minecraft:survives_explosion"
-        }
       ]
     }
-  ],
-  "random_sequence": "forbiddenmagic:blocks/star_block"
+  ]
 }

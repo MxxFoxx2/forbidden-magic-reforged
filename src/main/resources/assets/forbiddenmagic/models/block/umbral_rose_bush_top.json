@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": {
+    "cross": "forbiddenmagic:block/umbral_rose_top"
+  }
+}

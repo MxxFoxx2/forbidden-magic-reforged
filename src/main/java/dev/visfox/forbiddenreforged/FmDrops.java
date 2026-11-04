@@ -4,11 +4,13 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
+import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.EntityType;
@@ -18,7 +20,8 @@ import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Enemy;
-import net.minecraft.world.entity.monster.zombie.ZombifiedPiglin;
+import net.minecraft.world.entity.monster.ZombifiedPiglin;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -32,9 +35,7 @@ import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
-import net.minecraft.world.effect.MobEffects;
 import net.neoforged.neoforge.event.level.BlockDropsEvent;
-import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 
 public final class FmDrops {
     private FmDrops() {
@@ -42,7 +43,7 @@ public final class FmDrops {
 
     public static void register() {
         NeoForge.EVENT_BUS.addListener(FmDrops::onLivingDrops);
-    NeoForge.EVENT_BUS.addListener(FmDrops::onTaintedBloodShardDrop);
+        NeoForge.EVENT_BUS.addListener(FmDrops::onTaintedBloodShardDrop);
         NeoForge.EVENT_BUS.addListener(FmDrops::onFoodFinished);
         NeoForge.EVENT_BUS.addListener(FmDrops::onQuartzOreDrops);
         NeoForge.EVENT_BUS.addListener(FmDrops::onEntityJoinLevel);
@@ -85,7 +86,11 @@ public final class FmDrops {
             return 0;
         }
         double modifier = held.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY)
-            .compute(Attributes.ATTACK_DAMAGE, 0.0, EquipmentSlot.MAINHAND);
+            .modifiers().stream()
+            .filter(entry -> entry.attribute().is(Attributes.ATTACK_DAMAGE))
+            .filter(entry -> entry.slot().test(EquipmentSlot.MAINHAND))
+            .mapToDouble(entry -> entry.modifier().amount())
+            .sum();
         return (int) (1.0 + modifier);
     }
 
@@ -134,25 +139,27 @@ public final class FmDrops {
 
     private static void onTaintedBloodShardDrop(LivingDropsEvent event) {
         LivingEntity entity = event.getEntity();
-        if (!HostAdapterRegistry.requireEntityClassification().isTaintedMob(entity)) {
+        if (!HostAdapterRegistry.requireEntityClassification().isTaintedMob(entity)
+            || !event.getSource().is(DamageTypes.PLAYER_ATTACK)) {
             return;
         }
-        DamageSource source = event.getSource();
-        Entity attacker = source.getEntity();
-        boolean playerAttack = attacker instanceof Player && !(attacker instanceof FakePlayer);
-        int weaknessAmplifier = -1;
+
         var weakness = entity.getEffect(MobEffects.WEAKNESS);
-        if (weakness != null) {
-            weaknessAmplifier = weakness.getAmplifier();
-        }
-        if (!taintedBloodShardRoll(true, playerAttack, weaknessAmplifier, entity.getRandom().nextDouble())) {
+        int weaknessAmplifier = weakness == null ? -1 : weakness.getAmplifier();
+        if (!taintedBloodShardRoll(true, true, weaknessAmplifier, entity.getRandom().nextDouble())) {
             return;
         }
+
         addDrop(event, FmItems.TAINTED_BLOOD_SHARD.get(), 1);
     }
 
-    public static boolean taintedBloodShardRoll(boolean taintedMob, boolean playerAttack, int weaknessAmplifier, double random) {
-        return taintedMob && playerAttack && weaknessAmplifier >= 2 && random < 0.5;
+    public static boolean taintedBloodShardRoll(
+        boolean taintedMob,
+        boolean playerAttack,
+        int weaknessAmplifier,
+        double random
+    ) {
+        return taintedMob && playerAttack && weaknessAmplifier >= 2 && random < 0.5D;
     }
 
     private static void onFoodFinished(LivingEntityUseItemEvent.Finish event) {
@@ -215,7 +222,8 @@ public final class FmDrops {
     }
 
     private static boolean isBoss(LivingEntity entity) {
-        return entity instanceof WitherBoss || entity instanceof EnderDragon || HostAdapterRegistry.requireEntityClassification().isHostBoss(entity);
+        return entity instanceof WitherBoss || entity instanceof EnderDragon
+            || HostAdapterRegistry.requireEntityClassification().isHostBoss(entity);
     }
 
     private static int wrathBonus(ServerPlayer player, LivingEntity target) {
