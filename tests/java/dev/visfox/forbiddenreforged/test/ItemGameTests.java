@@ -721,7 +721,11 @@ public final class ItemGameTests {
         JsonObject russian = readJson(helper, "/assets/forbiddenmagic/lang/ru_ru.json");
         List<String> researchIds = ResearchCategories.allResearch().stream()
             .filter(item -> item.category().equals("FORBIDDEN"))
-            .map(ResearchItem::key)
+            // Adapter-generated continuation entries deliberately reuse the
+            // canonical research entry's display translation keys.
+            .map(ResearchItem::nameKey)
+            .map(key -> key.substring("tc.research_name.".length()))
+            .distinct()
             .sorted()
             .toList();
         helper.assertTrue(!researchIds.isEmpty(), "Forbidden research is registered");

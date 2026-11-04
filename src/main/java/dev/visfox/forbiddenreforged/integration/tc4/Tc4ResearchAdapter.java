@@ -1,20 +1,27 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
-import dev.visfox.forbiddenreforged.integration.tc4.Tc4ResearchItem;
 import dev.visfox.forbiddenreforged.core.aspect.AspectDefinition;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.core.research.ResearchCategoryDefinition;
 import dev.visfox.forbiddenreforged.core.research.ResearchDefinition;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import net.minecraft.resources.ResourceLocation;
 import thaumcraft.aspect.Aspect;
+import thaumcraft.aspect.AspectList;
 import thaumcraft.crafting.TcStack;
 import thaumcraft.research.ResearchCategories;
 import thaumcraft.research.ResearchItem;
 import thaumcraft.research.ResearchPage;
+import thaumcraft.research.ResearchStageRegistry;
 
 public final class Tc4ResearchAdapter {
     private static final Map<String, String> LEGACY_RESEARCH_KEYS = Map.of(
@@ -56,75 +63,185 @@ public final class Tc4ResearchAdapter {
             );
         }
 
+        Set<ContentId> definitionIds = new HashSet<>();
         for (ResearchDefinition definition : definitions) {
             Objects.requireNonNull(definition, "definition");
+            if (!definitionIds.add(definition.id())) {
+                throw new IllegalArgumentException("Duplicate research definition: " + definition.id());
+            }
             if (!categoriesById.containsKey(definition.category())) {
                 throw new IllegalArgumentException(
                     "Unknown research category " + definition.category() + " for " + definition.id()
                 );
             }
-            ResearchCategories.addResearch(translate(definition));
+        }
+
+        Map<ContentId, List<Position>> positions = planPositions(definitions);
+        List<ResearchItem> translated = new ArrayList<>();
+        List<String> automaticStageKeys = new ArrayList<>();
+        for (ResearchDefinition definition : definitions) {
+            if (definition.stages().size() > 1
+                && definition.noteCost().isEmpty()
+                && (definition.flags().contains(ResearchDefinition.Flag.HIDDEN)
+                    || definition.flags().contains(ResearchDefinition.Flag.LOST))
+                && !definition.flags().contains(ResearchDefinition.Flag.AUTO_UNLOCK)) {
+                throw new IllegalArgumentException(
+                    "Multi-stage hidden research with no note cost must be AUTO_UNLOCK: " + definition.id()
+                );
+            }
+
+            List<ResearchItem> entries = translateStages(definition, positions.get(definition.id()));
+            translated.addAll(entries);
+            if (entries.size() > 1) {
+                for (int index = 1; index < entries.size(); index++) {
+                    automaticStageKeys.add(entries.get(index).key());
+                }
+                if (definition.noteCost().isEmpty()
+                    && !definition.flags().contains(ResearchDefinition.Flag.HIDDEN)
+                    && !definition.flags().contains(ResearchDefinition.Flag.LOST)) {
+                    automaticStageKeys.add(entries.get(0).key());
+                }
+            }
+        }
+
+        for (ResearchItem item : translated) {
+            ResearchCategories.addResearch(item);
+        }
+        ResearchStageRegistry.registerAutomaticStages(automaticStageKeys);
+    }
+
+    /**
+     * Compatibility view for callers that expect one ResearchItem. For a
+     * multi-stage definition this is the final entry, whose key is the
+     * definition's canonical research key.
+     */
+    public static ResearchItem translate(ResearchDefinition definition) {
+        List<ResearchItem> stages = translateStages(definition);
+        return stages.get(stages.size() - 1);
+    }
+
+    /**
+     * Lowers a semantic research definition into native TC4 entries.
+     *
+     * TC4 has no stage primitive. Each stage is therefore represented by a
+     * linked ResearchItem: intermediate entries use adapter-owned keys and
+     * the final entry keeps the original key so existing recipe and research
+     * references continue to point at the completed definition.
+     */
+    public static List<ResearchItem> translateStages(ResearchDefinition definition) {
+        Objects.requireNonNull(definition, "definition");
+        return translateStages(definition, preferredPositions(definition));
+    }
+
+    private static List<ResearchItem> translateStages(
+        ResearchDefinition definition,
+        List<Position> positions
+    ) {
+        if (positions.size() != definition.stages().size()) {
+            throw new IllegalArgumentException(
+                "Expected " + definition.stages().size() + " positions for " + definition.id()
+            );
+        }
+
+        String baseKey = researchKey(definition.id());
+        String category = categoryKey(definition.category());
+        int finalStage = definition.stages().size() - 1;
+        List<ResearchItem> translated = new ArrayList<>(definition.stages().size());
+
+        for (int index = 0; index <= finalStage; index++) {
+            ResearchDefinition.Stage stage = definition.stages().get(index);
+            boolean first = index == 0;
+            boolean last = index == finalStage;
+            String key = last ? baseKey : stageKey(baseKey, index);
+            Position position = positions.get(index);
+
+            AspectList noteCost = first
+                ? Tc4AspectAdapter.toAspectList(definition.noteCost())
+                : new AspectList();
+            ResearchItem item;
+            if (definition.icon().kind() == ResearchDefinition.IconKind.ITEM) {
+                item = new Tc4ResearchItem(
+                    key,
+                    category,
+                    noteCost,
+                    position.column(),
+                    position.row(),
+                    definition.complexity(),
+                    TcStack.of(definition.icon().value().toString(), 1),
+                    baseKey
+                );
+            } else {
+                item = new Tc4ResearchItem(
+                    key,
+                    category,
+                    noteCost,
+                    position.column(),
+                    position.row(),
+                    definition.complexity(),
+                    identifier(definition.icon().value()),
+                    baseKey
+                );
+            }
+
+            for (ResearchDefinition.Flag flag : definition.flags()) {
+                if ((flag == ResearchDefinition.Flag.HIDDEN || flag == ResearchDefinition.Flag.LOST) && !first) {
+                    continue;
+                }
+                applyFlag(item, flag);
+            }
+
+            List<String> parentKeys = new ArrayList<>();
+            if (first) {
+                definition.parents().stream().map(Tc4ResearchAdapter::researchKey).forEach(parentKeys::add);
+            } else {
+                parentKeys.add(keyForStage(baseKey, index - 1, finalStage));
+            }
+            stage.prerequisites().stream().map(Tc4ResearchAdapter::researchKey).forEach(parentKeys::add);
+            setParentKeys(item, parentKeys);
+
+            if (first) {
+                setParentsHidden(item, definition.hiddenParents());
+                setTriggers(item, definition);
+            }
+            if (last) {
+                setSiblings(item, definition.siblings());
+            }
+
+            ResearchPage[] pages = stage.pages().stream()
+                .map(Tc4ResearchAdapter::translatePage)
+                .toArray(ResearchPage[]::new);
+            item.setPages(pages);
+            item.setWarp(stage.warp());
+            translated.add(item);
+        }
+
+        return List.copyOf(translated);
+    }
+
+    private static void setParentKeys(ResearchItem item, List<String> parents) {
+        LinkedHashSet<String> keys = new LinkedHashSet<>(parents);
+        if (!keys.isEmpty()) {
+            item.setParents(keys.toArray(String[]::new));
         }
     }
 
-    public static ResearchItem translate(ResearchDefinition definition) {
-        if (definition.stages().size() != 1) {
-            throw new IllegalArgumentException(
-                "TC4 research supports one page group per entry: " + definition.id()
-            );
-        }
-
-        ResearchDefinition.Stage stage = definition.stages().get(0);
-        if (!stage.prerequisites().isEmpty()) {
-            throw new IllegalArgumentException(
-                "TC4 adapter cannot represent stage-specific prerequisites: " + definition.id()
-            );
-        }
-
-        String key = researchKey(definition.id());
-        String category = categoryKey(definition.category());
-        ResearchItem item;
-        if (definition.icon().kind() == ResearchDefinition.IconKind.ITEM) {
-            item = new Tc4ResearchItem(
-                key,
-                category,
-                Tc4AspectAdapter.toAspectList(definition.noteCost()),
-                definition.column(),
-                definition.row(),
-                definition.complexity(),
-                TcStack.of(definition.icon().value().toString(), 1)
-            );
-        } else {
-            item = new Tc4ResearchItem(
-                key,
-                category,
-                Tc4AspectAdapter.toAspectList(definition.noteCost()),
-                definition.column(),
-                definition.row(),
-                definition.complexity(),
-                identifier(definition.icon().value())
-            );
-        }
-
-        for (ResearchDefinition.Flag flag : definition.flags()) {
-            applyFlag(item, flag);
-        }
-
-        if (!definition.parents().isEmpty()) {
-            item.setParents(definition.parents().stream()
+    private static void setParentsHidden(ResearchItem item, List<ContentId> parents) {
+        if (!parents.isEmpty()) {
+            item.setParentsHidden(parents.stream()
                 .map(Tc4ResearchAdapter::researchKey)
                 .toArray(String[]::new));
         }
-        if (!definition.hiddenParents().isEmpty()) {
-            item.setParentsHidden(definition.hiddenParents().stream()
+    }
+
+    private static void setSiblings(ResearchItem item, List<ContentId> siblings) {
+        if (!siblings.isEmpty()) {
+            item.setSiblings(siblings.stream()
                 .map(Tc4ResearchAdapter::researchKey)
                 .toArray(String[]::new));
         }
-        if (!definition.siblings().isEmpty()) {
-            item.setSiblings(definition.siblings().stream()
-                .map(Tc4ResearchAdapter::researchKey)
-                .toArray(String[]::new));
-        }
+    }
+
+    private static void setTriggers(ResearchItem item, ResearchDefinition definition) {
         if (!definition.itemTriggers().isEmpty()) {
             item.setItemTriggers(definition.itemTriggers().stream()
                 .map(ContentId::toString)
@@ -141,13 +258,110 @@ public final class Tc4ResearchAdapter {
                 .toArray(Aspect[]::new);
             item.setAspectTriggers(triggers);
         }
+    }
 
-        ResearchPage[] pages = stage.pages().stream()
-            .map(Tc4ResearchAdapter::translatePage)
-            .toArray(ResearchPage[]::new);
-        item.setPages(pages);
-        item.setWarp(stage.warp());
-        return item;
+    private static Map<ContentId, List<Position>> planPositions(List<ResearchDefinition> definitions) {
+        Map<String, Set<Position>> occupied = new HashMap<>();
+        Set<String> knownKeys = new HashSet<>();
+        for (ResearchItem item : ResearchCategories.allResearch()) {
+            knownKeys.add(item.key());
+            if (!item.isVirtual()) {
+                occupied.computeIfAbsent(item.category(), ignored -> new HashSet<>())
+                    .add(new Position(item.column(), item.row()));
+            }
+        }
+
+        for (ResearchDefinition definition : definitions) {
+            String key = researchKey(definition.id());
+            if (!knownKeys.add(key)) {
+                throw new IllegalArgumentException("Research key is already registered: " + key);
+            }
+            for (int index = 0; index < definition.stages().size() - 1; index++) {
+                String intermediate = stageKey(key, index);
+                if (!knownKeys.add(intermediate)) {
+                    throw new IllegalArgumentException("Generated research stage key is already registered: " + intermediate);
+                }
+            }
+
+            if (!definition.flags().contains(ResearchDefinition.Flag.VIRTUAL)) {
+                Position canonical = new Position(definition.column(), definition.row());
+                Set<Position> categoryPositions = occupied.computeIfAbsent(
+                    categoryKey(definition.category()),
+                    ignored -> new HashSet<>()
+                );
+                if (!categoryPositions.add(canonical)) {
+                    throw new IllegalArgumentException(
+                        "Research layout collision at " + canonical + " for " + definition.id()
+                    );
+                }
+            }
+        }
+
+        Map<ContentId, List<Position>> result = new LinkedHashMap<>();
+        List<ResearchDefinition> ordered = definitions.stream()
+            .sorted(Comparator.comparing(ResearchDefinition::id))
+            .toList();
+        for (ResearchDefinition definition : ordered) {
+            List<Position> stagePositions = new ArrayList<>(preferredPositions(definition));
+            if (!definition.flags().contains(ResearchDefinition.Flag.VIRTUAL)) {
+                Set<Position> categoryPositions = occupied.get(categoryKey(definition.category()));
+                int finalStage = definition.stages().size() - 1;
+                for (int index = 0; index < finalStage; index++) {
+                    Position preferred = stagePositions.get(index);
+                    Position available = findAvailable(preferred, categoryPositions);
+                    categoryPositions.add(available);
+                    stagePositions.set(index, available);
+                }
+            }
+            result.put(definition.id(), List.copyOf(stagePositions));
+        }
+        return Map.copyOf(result);
+    }
+
+    private static List<Position> preferredPositions(ResearchDefinition definition) {
+        int finalStage = definition.stages().size() - 1;
+        List<Position> positions = new ArrayList<>(definition.stages().size());
+        for (int index = 0; index <= finalStage; index++) {
+            int column = index == finalStage
+                ? definition.column()
+                : Math.subtractExact(definition.column(), finalStage - index);
+            positions.add(new Position(column, definition.row()));
+        }
+        return List.copyOf(positions);
+    }
+
+    private static Position findAvailable(Position preferred, Set<Position> occupied) {
+        for (int distance = 0; distance < 1024; distance++) {
+            for (int rowOffset = -distance; rowOffset <= distance; rowOffset++) {
+                int columnOffset = distance - Math.abs(rowOffset);
+                int row = Math.addExact(preferred.row(), rowOffset);
+                Position left = new Position(
+                    Math.subtractExact(preferred.column(), columnOffset),
+                    row
+                );
+                if (!occupied.contains(left)) {
+                    return left;
+                }
+                if (columnOffset != 0) {
+                    Position right = new Position(
+                        Math.addExact(preferred.column(), columnOffset),
+                        row
+                    );
+                    if (!occupied.contains(right)) {
+                        return right;
+                    }
+                }
+            }
+        }
+        throw new IllegalStateException("Could not allocate a free TC4 research position near " + preferred);
+    }
+
+    private static String stageKey(String baseKey, int zeroBasedIndex) {
+        return baseKey + "_FM_STAGE_" + (zeroBasedIndex + 1);
+    }
+
+    private static String keyForStage(String baseKey, int index, int finalStage) {
+        return index == finalStage ? baseKey : stageKey(baseKey, index);
     }
 
     private static void applyFlag(ResearchItem item, ResearchDefinition.Flag flag) {
@@ -210,5 +424,8 @@ public final class Tc4ResearchAdapter {
 
     private static ResourceLocation identifier(ContentId id) {
         return ResourceLocation.fromNamespaceAndPath(id.namespace(), id.path());
+    }
+
+    private record Position(int column, int row) {
     }
 }

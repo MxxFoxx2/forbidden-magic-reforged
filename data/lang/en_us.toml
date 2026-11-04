@@ -110,6 +110,7 @@ TAINTPICK = "Pickaxe of Distortion"
 FOCUSBLINK = "Wand Focus: Blink"
 
 SUBCOLLAR = "Collar of Pain"
+STAGE_PROGRESSION_TEST = "Research Stage Progression Test"
 [tc.research_text]
 NETHERSHARDS = "Aim to misbehave."
 HELLFIRE = "Never get stranded again"
@@ -144,6 +145,7 @@ TAINTPICK = "Obsidian Buster"
 FOCUSBLINK = "Better than a stupid Ender Pearl"
 
 SUBCOLLAR = "Pain and Magic"
+STAGE_PROGRESSION_TEST = "A test-only staged research entry."
 [focus.upgrade.hellfire]
 name = "Hellfire"
 text = "This upgrade unleashes a burst of fire upon teleporting to a location."
@@ -186,6 +188,7 @@ TAINTPICK = "[FM] Obsidian Buster"
 FOCUSBLINK = "[FM] Better than a stupid Ender Pearl"
 
 SUBCOLLAR = "[FM] Pain and Magic"
+STAGE_PROGRESSION_TEST = "[Test] Sequential research stage fixture."
 [forbiddenmagic.research_page.NETHERSHARDS]
 1 = "Strange energies swirl through the Nether. On occasion, they have been known to solidify into crystal shards when certain sympathetic events occur."
 2 = "These crystals are imbued with different vices and have many uses for more unscrupulous Thaumaturges.<BR>There are seven documented types of nether shard, each attuned to a different \"deadly sin.\"<BR><BR><IMG>forbiddenmagic:textures/misc/research.png:0:0:111:16:1</IMG><BR>"
