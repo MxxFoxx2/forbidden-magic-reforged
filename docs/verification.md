@@ -40,7 +40,7 @@
 - With `no_lust=false`: **111/111** required GameTests passed (`luxuria=luxuria`).
 - With `no_lust=true`: **111/111** required GameTests passed (`luxuria=null`).
 - The architecture refactor is complete within its declared scope: shared content models/catalogs and extracted gameplay rules do not depend on TC4 APIs; host-specific behavior is behind the adapter and capability contracts.
-- Release target: Minecraft 26.3 / NeoForge 26.3 / Thaumcraft 4: Reforged 1.1.2. No second host adapter or cross-Minecraft-version binary is claimed. Thaumaturge remains an API audit, not a production adapter; manual client and gameplay checks remain separate.
+- Release target: Minecraft 26.3 / NeoForge 26.3 / Thaumcraft 4: Reforged 1.1.2. No second host adapter or cross-Minecraft-version binary is claimed. manual client and gameplay checks remain separate.
 
 ## Проверки вне CI
 

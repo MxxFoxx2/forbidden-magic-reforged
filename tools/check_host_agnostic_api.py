@@ -13,7 +13,6 @@ COMPOSITION_ROOT = SOURCE_ROOT / "ForbiddenMagic.java"
 
 HOST_PACKAGES = (
     "thaumcraft",
-    "com.leclowndu93150.thaumaturge",
 )
 CORE_FORBIDDEN_PACKAGES = (
     "net.neoforged",
@@ -29,7 +28,7 @@ IMPORT_RE = re.compile(
     re.MULTILINE,
 )
 HOST_REFERENCE_RE = re.compile(
-    r"\b(?:thaumcraft|com\.leclowndu93150\.thaumaturge)(?:\.|:)"
+    r"\bthaumcraft(?:\.|:)"
 )
 
 

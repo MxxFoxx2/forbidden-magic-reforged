@@ -8,7 +8,7 @@
 
 The goal is to keep Forbidden Magic's content definitions and shared gameplay rules independent of a particular magic-host API. Host-specific registration, runtime behavior, entity semantics, item implementations, and lifecycle hooks belong behind explicit adapter contracts.
 
-This work does **not** claim that the current JAR supports multiple magic hosts or multiple Minecraft versions. The production composition root still selects `Tc4HostAdapter`, and the current build still targets the 26.3 TC4 track. A second host needs its own compatible dependency/build track and a tested adapter. The existing Thaumaturge audit targets Minecraft 26.1.2 and explicitly records version and API blockers; it is not an implemented adapter.
+This work does **not** claim that the current JAR supports multiple magic hosts or multiple Minecraft versions. The production composition root selects `Tc4HostAdapter`, and the current build targets the 26.3 TC4 track. Support for another magic host is outside the project's current scope.
 
 ## Layers
 
@@ -89,7 +89,7 @@ Use checks that match the change:
 2. Add GameTests for changed runtime behavior, compatibility-sensitive paths, and meaningful host limitations. Do not mirror the full `HostProfile` metadata table in tests.
 3. For integration changes, run the pinned host preparation/build and the relevant GameTests. The full release CI gate remains responsible for provenance, generated-resource freshness, and both `no_lust` configurations.
 
-Static boundary checks catch unwanted dependencies; GameTests verify the current TC4 adapter. Neither is proof that a second host works. That claim requires an actual second adapter compiled and tested against its own compatible host version.
+Static boundary checks catch unwanted dependencies; GameTests verify the current TC4 adapter. They do not imply compatibility with other magic hosts or Minecraft versions.
 
 ## Rules for future changes
 
