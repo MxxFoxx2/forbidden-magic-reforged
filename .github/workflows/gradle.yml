@@ -38,6 +38,9 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Test release tooling
+        run: python -m unittest discover -s tests/python -v
+
       - name: Verify host-agnostic API boundary
         run: python tools/check_host_agnostic_api.py
 
