@@ -68,7 +68,7 @@ python tools/gen_resources.py            # сгенерировать ресур
 ```
 
 ### Definition of Done (для контрибьюторов)
-1. `python tools/prepare_host.py --verify` → `host matches sha + 2 patch commit(s)`
+1. `python tools/prepare_host.py --verify` → `host matches sha + 1 patch commit(s)`
 2. `./gradlew build` успешно
 3. `./gradlew runGameTestServer` зелёный с `no_lust=false` И `no_lust=true` (потом вернуть `false`)
 4. `python tools/check_host_agnostic_api.py` и `python tools/check_provenance.py` зелёные
