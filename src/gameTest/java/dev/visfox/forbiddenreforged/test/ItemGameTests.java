@@ -23,8 +23,6 @@ import dev.visfox.forbiddenreforged.common.FmIds;
 
 @EventBusSubscriber(modid = FmIds.MODID)
 public final class ItemGameTests {
-    public static final DeferredRegister<Consumer<GameTestHelper>> FUNCTIONS =
-        DeferredRegister.create(Registries.TEST_FUNCTION, FmIds.MODID);
 
     private static final String[] TESTS = {
         "skull_axe_infusion_recipe_matches_original",
@@ -71,49 +69,49 @@ public final class ItemGameTests {
         "item_data_components_keep_their_ids_and_serialize"
     };
 
-    static {
-        FUNCTIONS.register(TESTS[0], () -> ItemMechanicsGameTests::skullAxeInfusionRecipeMatchesOriginal);
-        FUNCTIONS.register(TESTS[1], () -> ScribingResearchGameTests::diabolistForkResearchAndRecipe);
-        FUNCTIONS.register(TESTS[2], () -> ItemRegistrationGameTests::taintCoalIsRegisteredAndIsFuel);
-        FUNCTIONS.register(TESTS[3], () -> ItemRegistrationGameTests::taintCoalBurnTimeVariesWithinOriginalRange);
-        FUNCTIONS.register(TESTS[4], () -> ItemRegistrationGameTests::emeraldFragmentIsRegistered);
-        FUNCTIONS.register(TESTS[5], () -> ItemRegistrationGameTests::ridingCropIsRegisteredAsSword);
-        FUNCTIONS.register(TESTS[6], () -> WandGameTests::wandRodsRegisterAsFunctionalCores);
-        FUNCTIONS.register(TESTS[7], () -> ItemRegistrationGameTests::creativeTabIsRegisteredWithForkIcon);
-        FUNCTIONS.register(TESTS[8], () -> ItemRegistrationGameTests::creativeTabListsEveryRegisteredItem);
-        FUNCTIONS.register(TESTS[9], () -> ItemRegistrationGameTests::orichalcumCapIsRegistered);
-        FUNCTIONS.register(TESTS[10], () -> ItemRegistrationGameTests::diabolistForkSwitchesToTheSporkModel);
-        FUNCTIONS.register(TESTS[11], () -> ItemRegistrationGameTests::lustShardSwitchesToTheDespairModel);
-        FUNCTIONS.register(TESTS[12], () -> WandGameTests::creativeWandFamilyMatchesOriginal);
-        FUNCTIONS.register(TESTS[13], () -> ItemMechanicsGameTests::morphPhaseTintsMatchOriginal);
-        FUNCTIONS.register(TESTS[14], () -> ItemMechanicsGameTests::toolAndSkullAxeChanceRulesPreserveOriginalBoundaries);
-        FUNCTIONS.register(TESTS[15], () -> ItemMechanicsGameTests::silverfishEmeraldDropThresholdsMatchOriginal);
-        FUNCTIONS.register(TESTS[16], () -> WandGameTests::wandTooltipKindsPreserveOriginalHints);
-        FUNCTIONS.register(TESTS[17], () -> ScribingResearchGameTests::crystalwellIsAScribingToolWithOriginalDurability);
-        FUNCTIONS.register(TESTS[18], () -> ScribingResearchGameTests::primewellIsAPermanentEpicScribingTool);
-        FUNCTIONS.register(TESTS[19], () -> ScribingResearchGameTests::scribeWellsKeepOriginalRecipesAndResearch);
-        FUNCTIONS.register(TESTS[20], () -> ScribingResearchGameTests::researchPrefixRespectsTagResearch);
-        FUNCTIONS.register(TESTS[21], () -> ScribingResearchGameTests::itemTranslationKeysAreNotNestedUnderResearchPages);
-        FUNCTIONS.register(TESTS[22], () -> ScribingResearchGameTests::researchTranslationKeysAreComplete);
-        FUNCTIONS.register(TESTS[23], () -> ScribingResearchGameTests::crystalwellResearchPageMatchesDifficulty);
-        FUNCTIONS.register(TESTS[24], () -> WandGameTests::infernalAndTaintedWandDamageBehaviorsMatchOriginal);
-        FUNCTIONS.register(TESTS[25], () -> WandGameTests::hellfireTriggerTargetsNetherrackAndObsidian);
-        FUNCTIONS.register(TESTS[26], () -> ItemMechanicsGameTests::subcollarPlacesOnAnotherPlayerAndStoresDamageVis);
-        FUNCTIONS.register(TESTS[27], () -> ItemMechanicsGameTests::ridingCropEffectsMatchOriginal);
-        FUNCTIONS.register(TESTS[28], () -> ItemMechanicsGameTests::hereticTradesMatchOriginalListing);
-        FUNCTIONS.register(TESTS[29], () -> ItemMechanicsGameTests::witchwoodRequiresArsMagica);
-        FUNCTIONS.register(TESTS[30], () -> ItemMechanicsGameTests::wrathShardFormulaMatchesOriginal);
-        FUNCTIONS.register(TESTS[31], () -> WandGameTests::alchemicalCapAndEquivalentRodMatchOriginal);
-        FUNCTIONS.register(TESTS[32], () -> ItemRegistrationGameTests::ringOfNutritionOnlyWorksInRingSlots);
-        FUNCTIONS.register(TESTS[33], () -> WandGameTests::blinkFocusUpgradesUseOriginalIconAssets);
-        FUNCTIONS.register(TESTS[34], () -> ScribingResearchGameTests::researchIconsResolveToRealContent);
-        FUNCTIONS.register(TESTS[35], () -> WandGameTests::blinkFocusHellfireAppliesThroughFocalManipulator);
-        FUNCTIONS.register(TESTS[36], () -> WandGameTests::blinkFocusReachesBeyondWandReachAndLandsLikeOriginal);
-        FUNCTIONS.register(TESTS[37], () -> WandGameTests::wandVisAndPartsUseNeutralAccessPorts);
-        FUNCTIONS.register(TESTS[38], () -> WandGameTests::hellfireBehaviorUsesHostNeutralAccess);
-        FUNCTIONS.register(TESTS[39], () -> ScribingResearchGameTests::scribeWellAspectIdsStaySemantic);
-        FUNCTIONS.register(TESTS[40], () -> WandGameTests::remainingWandCapsMatchOriginalCosts);
-        FUNCTIONS.register(TESTS[41], () -> ItemRegistrationGameTests::itemDataComponentsKeepTheirIdsAndSerialize);
+    public static void registerFunctions(net.minecraft.core.Registry<java.util.function.Consumer<net.minecraft.gametest.framework.GameTestHelper>> registry) {
+        FmGameTestBootstrap.register(registry, "skull_axe_infusion_recipe_matches_original", ItemMechanicsGameTests::skullAxeInfusionRecipeMatchesOriginal);
+        FmGameTestBootstrap.register(registry, "diabolist_fork_research_and_recipe", ScribingResearchGameTests::diabolistForkResearchAndRecipe);
+        FmGameTestBootstrap.register(registry, "taint_coal_is_registered_and_is_fuel", ItemRegistrationGameTests::taintCoalIsRegisteredAndIsFuel);
+        FmGameTestBootstrap.register(registry, "taint_coal_burn_time_varies_within_original_range", ItemRegistrationGameTests::taintCoalBurnTimeVariesWithinOriginalRange);
+        FmGameTestBootstrap.register(registry, "emerald_fragment_is_registered", ItemRegistrationGameTests::emeraldFragmentIsRegistered);
+        FmGameTestBootstrap.register(registry, "riding_crop_is_registered_as_sword", ItemRegistrationGameTests::ridingCropIsRegisteredAsSword);
+        FmGameTestBootstrap.register(registry, "wand_rods_register_as_functional_cores", WandGameTests::wandRodsRegisterAsFunctionalCores);
+        FmGameTestBootstrap.register(registry, "creative_tab_is_registered_with_fork_icon", ItemRegistrationGameTests::creativeTabIsRegisteredWithForkIcon);
+        FmGameTestBootstrap.register(registry, "creative_tab_lists_every_registered_item", ItemRegistrationGameTests::creativeTabListsEveryRegisteredItem);
+        FmGameTestBootstrap.register(registry, "orichalcum_cap_is_registered", ItemRegistrationGameTests::orichalcumCapIsRegistered);
+        FmGameTestBootstrap.register(registry, "diabolist_fork_switches_to_the_spork_model", ItemRegistrationGameTests::diabolistForkSwitchesToTheSporkModel);
+        FmGameTestBootstrap.register(registry, "lust_shard_switches_to_the_despair_model", ItemRegistrationGameTests::lustShardSwitchesToTheDespairModel);
+        FmGameTestBootstrap.register(registry, "creative_wand_family_matches_original", WandGameTests::creativeWandFamilyMatchesOriginal);
+        FmGameTestBootstrap.register(registry, "morph_phase_tints_match_original", ItemMechanicsGameTests::morphPhaseTintsMatchOriginal);
+        FmGameTestBootstrap.register(registry, "tool_and_skull_axe_chance_rules_preserve_original_boundaries", ItemMechanicsGameTests::toolAndSkullAxeChanceRulesPreserveOriginalBoundaries);
+        FmGameTestBootstrap.register(registry, "silverfish_emerald_drop_thresholds_match_original", ItemMechanicsGameTests::silverfishEmeraldDropThresholdsMatchOriginal);
+        FmGameTestBootstrap.register(registry, "wand_tooltip_kinds_preserve_original_hints", WandGameTests::wandTooltipKindsPreserveOriginalHints);
+        FmGameTestBootstrap.register(registry, "crystalwell_is_a_scribing_tool_with_original_durability", ScribingResearchGameTests::crystalwellIsAScribingToolWithOriginalDurability);
+        FmGameTestBootstrap.register(registry, "primewell_is_a_permanent_epic_scribing_tool", ScribingResearchGameTests::primewellIsAPermanentEpicScribingTool);
+        FmGameTestBootstrap.register(registry, "scribe_wells_keep_original_recipes_and_research", ScribingResearchGameTests::scribeWellsKeepOriginalRecipesAndResearch);
+        FmGameTestBootstrap.register(registry, "research_prefix_respects_tag_research", ScribingResearchGameTests::researchPrefixRespectsTagResearch);
+        FmGameTestBootstrap.register(registry, "item_translation_keys_are_not_nested_under_research_pages", ScribingResearchGameTests::itemTranslationKeysAreNotNestedUnderResearchPages);
+        FmGameTestBootstrap.register(registry, "research_translation_keys_are_complete", ScribingResearchGameTests::researchTranslationKeysAreComplete);
+        FmGameTestBootstrap.register(registry, "crystalwell_research_page_matches_difficulty", ScribingResearchGameTests::crystalwellResearchPageMatchesDifficulty);
+        FmGameTestBootstrap.register(registry, "infernal_and_tainted_wand_damage_behaviors_match_original", WandGameTests::infernalAndTaintedWandDamageBehaviorsMatchOriginal);
+        FmGameTestBootstrap.register(registry, "hellfire_trigger_targets_netherrack_and_obsidian", WandGameTests::hellfireTriggerTargetsNetherrackAndObsidian);
+        FmGameTestBootstrap.register(registry, "subcollar_places_on_another_player_and_stores_damage_vis", ItemMechanicsGameTests::subcollarPlacesOnAnotherPlayerAndStoresDamageVis);
+        FmGameTestBootstrap.register(registry, "riding_crop_effects_match_original", ItemMechanicsGameTests::ridingCropEffectsMatchOriginal);
+        FmGameTestBootstrap.register(registry, "heretic_trades_match_original_listing", ItemMechanicsGameTests::hereticTradesMatchOriginalListing);
+        FmGameTestBootstrap.register(registry, "witchwood_requires_ars_magica", ItemMechanicsGameTests::witchwoodRequiresArsMagica);
+        FmGameTestBootstrap.register(registry, "wrath_shard_formula_matches_original", ItemMechanicsGameTests::wrathShardFormulaMatchesOriginal);
+        FmGameTestBootstrap.register(registry, "alchemical_cap_and_equivalent_rod_match_original", WandGameTests::alchemicalCapAndEquivalentRodMatchOriginal);
+        FmGameTestBootstrap.register(registry, "ring_of_nutrition_only_works_in_ring_slots", ItemRegistrationGameTests::ringOfNutritionOnlyWorksInRingSlots);
+        FmGameTestBootstrap.register(registry, "blink_focus_upgrades_use_original_icon_assets", WandGameTests::blinkFocusUpgradesUseOriginalIconAssets);
+        FmGameTestBootstrap.register(registry, "research_icons_resolve_to_real_content", ScribingResearchGameTests::researchIconsResolveToRealContent);
+        FmGameTestBootstrap.register(registry, "blink_focus_hellfire_applies_through_focal_manipulator", WandGameTests::blinkFocusHellfireAppliesThroughFocalManipulator);
+        FmGameTestBootstrap.register(registry, "blink_focus_reaches_beyond_wand_reach_and_lands_like_original", WandGameTests::blinkFocusReachesBeyondWandReachAndLandsLikeOriginal);
+        FmGameTestBootstrap.register(registry, "wand_vis_and_parts_use_neutral_access_ports", WandGameTests::wandVisAndPartsUseNeutralAccessPorts);
+        FmGameTestBootstrap.register(registry, "hellfire_behavior_uses_host_neutral_access", WandGameTests::hellfireBehaviorUsesHostNeutralAccess);
+        FmGameTestBootstrap.register(registry, "scribe_well_aspect_ids_stay_semantic", ScribingResearchGameTests::scribeWellAspectIdsStaySemantic);
+        FmGameTestBootstrap.register(registry, "remaining_wand_caps_match_original_costs", WandGameTests::remainingWandCapsMatchOriginalCosts);
+        FmGameTestBootstrap.register(registry, "item_data_components_keep_their_ids_and_serialize", ItemRegistrationGameTests::itemDataComponentsKeepTheirIdsAndSerialize);
     }
 
     private ItemGameTests() {}

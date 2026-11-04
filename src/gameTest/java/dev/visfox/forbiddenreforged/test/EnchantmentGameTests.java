@@ -48,8 +48,6 @@ import thaumcraft.research.ResearchItem;
 
 @EventBusSubscriber(modid = FmIds.MODID)
 public final class EnchantmentGameTests {
-    public static final DeferredRegister<Consumer<GameTestHelper>> FUNCTIONS =
-        DeferredRegister.create(Registries.TEST_FUNCTION, FmIds.MODID);
 
     private static final String[] TESTS = {
         "enchantments_resolve_with_expected_shape",
@@ -69,22 +67,22 @@ public final class EnchantmentGameTests {
         "morph_research_entries_present"
     };
 
-    static {
-        FUNCTIONS.register(TESTS[0], () -> EnchantmentGameTests::enchantmentsResolveWithExpectedShape);
-        FUNCTIONS.register(TESTS[1], () -> EnchantmentGameTests::consumingDestroysGarbage);
-        FUNCTIONS.register(TESTS[2], () -> EnchantmentGameTests::corruptingYieldsSinShards);
-        FUNCTIONS.register(TESTS[3], () -> EnchantmentGameTests::greedyDropsMatchKills);
-        FUNCTIONS.register(TESTS[4], () -> EnchantmentGameTests::educationalMultipliesExperience);
-        FUNCTIONS.register(TESTS[5], () -> EnchantmentGameTests::wrathAddsDamage);
-        FUNCTIONS.register(TESTS[6], () -> EnchantmentGameTests::enchantmentResearchPresent);
-        FUNCTIONS.register(TESTS[7], () -> EnchantmentGameTests::tinkererIntegrationIsOptional);
-        FUNCTIONS.register(TESTS[8], () -> EnchantmentGameTests::morphToolsAreRegistered);
-        FUNCTIONS.register(TESTS[9], () -> EnchantmentGameTests::morphPhaseRotatesSets);
-        FUNCTIONS.register(TESTS[10], () -> EnchantmentGameTests::impactCoversAThreeByThreePlane);
-        FUNCTIONS.register(TESTS[11], () -> EnchantmentGameTests::voidtouchedRepairsAndWarps);
-        FUNCTIONS.register(TESTS[12], () -> EnchantmentGameTests::morphEnchantmentsAndExclusivity);
-        FUNCTIONS.register(TESTS[13], () -> EnchantmentGameTests::clusterReplacesDropsWithClusters);
-        FUNCTIONS.register(TESTS[14], () -> EnchantmentGameTests::morphResearchEntriesPresent);
+    public static void registerFunctions(net.minecraft.core.Registry<java.util.function.Consumer<net.minecraft.gametest.framework.GameTestHelper>> registry) {
+        FmGameTestBootstrap.register(registry, "enchantments_resolve_with_expected_shape", EnchantmentGameTests::enchantmentsResolveWithExpectedShape);
+        FmGameTestBootstrap.register(registry, "consuming_destroys_garbage", EnchantmentGameTests::consumingDestroysGarbage);
+        FmGameTestBootstrap.register(registry, "corrupting_yields_sin_shards", EnchantmentGameTests::corruptingYieldsSinShards);
+        FmGameTestBootstrap.register(registry, "greedy_drops_match_kills", EnchantmentGameTests::greedyDropsMatchKills);
+        FmGameTestBootstrap.register(registry, "educational_multiplies_experience", EnchantmentGameTests::educationalMultipliesExperience);
+        FmGameTestBootstrap.register(registry, "wrath_adds_damage", EnchantmentGameTests::wrathAddsDamage);
+        FmGameTestBootstrap.register(registry, "enchantment_research_present", EnchantmentGameTests::enchantmentResearchPresent);
+        FmGameTestBootstrap.register(registry, "tinkerer_integration_is_optional", EnchantmentGameTests::tinkererIntegrationIsOptional);
+        FmGameTestBootstrap.register(registry, "morph_tools_are_registered", EnchantmentGameTests::morphToolsAreRegistered);
+        FmGameTestBootstrap.register(registry, "morph_phase_rotates_sets", EnchantmentGameTests::morphPhaseRotatesSets);
+        FmGameTestBootstrap.register(registry, "impact_covers_a_three_by_three_plane", EnchantmentGameTests::impactCoversAThreeByThreePlane);
+        FmGameTestBootstrap.register(registry, "voidtouched_repairs_and_warps", EnchantmentGameTests::voidtouchedRepairsAndWarps);
+        FmGameTestBootstrap.register(registry, "morph_enchantments_and_exclusivity", EnchantmentGameTests::morphEnchantmentsAndExclusivity);
+        FmGameTestBootstrap.register(registry, "cluster_replaces_drops_with_clusters", EnchantmentGameTests::clusterReplacesDropsWithClusters);
+        FmGameTestBootstrap.register(registry, "morph_research_entries_present", EnchantmentGameTests::morphResearchEntriesPresent);
     }
 
     private EnchantmentGameTests() {}

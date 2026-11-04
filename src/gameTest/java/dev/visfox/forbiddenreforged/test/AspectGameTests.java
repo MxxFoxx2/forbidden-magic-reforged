@@ -62,8 +62,6 @@ import thaumcraft.research.ScanManager;
 
 @EventBusSubscriber(modid = FmIds.MODID)
 public final class AspectGameTests {
-    public static final DeferredRegister<Consumer<GameTestHelper>> FUNCTIONS =
-        DeferredRegister.create(Registries.TEST_FUNCTION, FmIds.MODID);
 
     private static final String[] TESTS = {
         "mod_loads_and_host_is_present",
@@ -87,26 +85,26 @@ public final class AspectGameTests {
         "sin_aspect_colors_components_and_blend_match_original"
     };
 
-    static {
-        FUNCTIONS.register(TESTS[0], () -> AspectGameTests::modLoadsAndHostIsPresent);
-        FUNCTIONS.register(TESTS[1], () -> AspectGameTests::aspectRegistryKeepsBuiltinOrderAndCombines);
-        FUNCTIONS.register(TESTS[2], () -> AspectGameTests::addonAspectSurvivesClientSync);
-        FUNCTIONS.register(TESTS[3], () -> AspectGameTests::sinAspectsRegisteredWithOwnTextures);
-        FUNCTIONS.register(TESTS[4], () -> AspectGameTests::sinAspectTagsMergeWithExisting);
-        FUNCTIONS.register(TESTS[5], () -> AspectGameTests::entityAspectTagsMergeWithExisting);
-        FUNCTIONS.register(TESTS[6], () -> AspectGameTests::everyTagTargetResolved);
-        FUNCTIONS.register(TESTS[7], () -> AspectGameTests::shardsAreRegisteredWithSevenIds);
-        FUNCTIONS.register(TESTS[8], () -> AspectGameTests::noLustRemovesLuxuriaItems);
-        FUNCTIONS.register(TESTS[9], () -> AspectGameTests::mobKilledByPlayerDropsWrathShard);
-        FUNCTIONS.register(TESTS[10], () -> AspectGameTests::bossDropsPrideShards);
-        FUNCTIONS.register(TESTS[11], () -> AspectGameTests::unattendedDeathDropsSlothShard);
-        FUNCTIONS.register(TESTS[12], () -> AspectGameTests::forbiddenCategoryAndShardEntriesResolve);
-        FUNCTIONS.register(TESTS[13], () -> AspectGameTests::netherShardDropRulesMatchOriginalBoundaries);
-        FUNCTIONS.register(TESTS[14], () -> AspectGameTests::aspectDiagnosticsExposeStableRegistryTable);
-        FUNCTIONS.register(TESTS[15], () -> AspectGameTests::forbiddenmagicAspectsCommandIsRegistered);
-        FUNCTIONS.register(TESTS[16], () -> AspectGameTests::addonItemAspectsMatchOriginalAssignments);
-        FUNCTIONS.register(TESTS[17], () -> AspectGameTests::coreAspectCatalogIsHostNeutralAndComplete);
-        FUNCTIONS.register(TESTS[18], () -> AspectGameTests::sinAspectColorsComponentsAndBlendMatchOriginal);
+    public static void registerFunctions(net.minecraft.core.Registry<java.util.function.Consumer<net.minecraft.gametest.framework.GameTestHelper>> registry) {
+        FmGameTestBootstrap.register(registry, "mod_loads_and_host_is_present", AspectGameTests::modLoadsAndHostIsPresent);
+        FmGameTestBootstrap.register(registry, "aspect_registry_keeps_builtin_order_and_combines", AspectGameTests::aspectRegistryKeepsBuiltinOrderAndCombines);
+        FmGameTestBootstrap.register(registry, "addon_aspect_survives_client_sync", AspectGameTests::addonAspectSurvivesClientSync);
+        FmGameTestBootstrap.register(registry, "sin_aspects_registered_with_own_textures", AspectGameTests::sinAspectsRegisteredWithOwnTextures);
+        FmGameTestBootstrap.register(registry, "sin_aspect_tags_merge_with_existing", AspectGameTests::sinAspectTagsMergeWithExisting);
+        FmGameTestBootstrap.register(registry, "entity_aspect_tags_merge_with_existing", AspectGameTests::entityAspectTagsMergeWithExisting);
+        FmGameTestBootstrap.register(registry, "every_tag_target_resolved", AspectGameTests::everyTagTargetResolved);
+        FmGameTestBootstrap.register(registry, "shards_are_registered_with_seven_ids", AspectGameTests::shardsAreRegisteredWithSevenIds);
+        FmGameTestBootstrap.register(registry, "no_lust_removes_luxuria_items", AspectGameTests::noLustRemovesLuxuriaItems);
+        FmGameTestBootstrap.register(registry, "mob_killed_by_player_drops_wrath_shard", AspectGameTests::mobKilledByPlayerDropsWrathShard);
+        FmGameTestBootstrap.register(registry, "boss_drops_pride_shards", AspectGameTests::bossDropsPrideShards);
+        FmGameTestBootstrap.register(registry, "unattended_death_drops_sloth_shard", AspectGameTests::unattendedDeathDropsSlothShard);
+        FmGameTestBootstrap.register(registry, "forbidden_category_and_shard_entries_resolve", AspectGameTests::forbiddenCategoryAndShardEntriesResolve);
+        FmGameTestBootstrap.register(registry, "nether_shard_drop_rules_match_original_boundaries", AspectGameTests::netherShardDropRulesMatchOriginalBoundaries);
+        FmGameTestBootstrap.register(registry, "aspect_diagnostics_expose_stable_registry_table", AspectGameTests::aspectDiagnosticsExposeStableRegistryTable);
+        FmGameTestBootstrap.register(registry, "forbiddenmagic_aspects_command_is_registered", AspectGameTests::forbiddenmagicAspectsCommandIsRegistered);
+        FmGameTestBootstrap.register(registry, "addon_item_aspects_match_original_assignments", AspectGameTests::addonItemAspectsMatchOriginalAssignments);
+        FmGameTestBootstrap.register(registry, "core_aspect_catalog_is_host_neutral_and_complete", AspectGameTests::coreAspectCatalogIsHostNeutralAndComplete);
+        FmGameTestBootstrap.register(registry, "sin_aspect_colors_components_and_blend_match_original", AspectGameTests::sinAspectColorsComponentsAndBlendMatchOriginal);
     }
 
     private AspectGameTests() {}

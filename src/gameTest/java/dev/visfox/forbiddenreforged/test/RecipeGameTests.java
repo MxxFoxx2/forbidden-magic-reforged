@@ -22,8 +22,6 @@ import thaumcraft.research.ResearchItem;
 
 @EventBusSubscriber(modid = FmIds.MODID)
 public final class RecipeGameTests {
-    public static final DeferredRegister<Consumer<GameTestHelper>> FUNCTIONS =
-        DeferredRegister.create(Registries.TEST_FUNCTION, FmIds.MODID);
 
     private static final String[] TESTS = {
         "every_ported_recipe_resolves_its_inputs",
@@ -49,28 +47,28 @@ public final class RecipeGameTests {
         "profane_wand_behavior_uses_core_ports"
     };
 
-    static {
-        FUNCTIONS.register(TESTS[0], () -> RecipeParityGameTests::everyPortedRecipeResolvesItsInputs);
-        FUNCTIONS.register(TESTS[1], () -> RecipeParityGameTests::chainFromNetherrackToWrathShard);
-        FUNCTIONS.register(TESTS[2], () -> RecipeParityGameTests::enchantmentRecipesCoverFive);
-        FUNCTIONS.register(TESTS[3], () -> RecipeParityGameTests::morphRecipesMatchTheOriginal);
-        FUNCTIONS.register(TESTS[4], () -> RecipeParityGameTests::materialsHaveCraftingRecipes);
-        FUNCTIONS.register(TESTS[5], () -> RecipeParityGameTests::plantResearchAndRecipes);
-        FUNCTIONS.register(TESTS[6], () -> RecipeParityGameTests::wandRodRecipesRegistered);
-        FUNCTIONS.register(TESTS[7], () -> RecipeParityGameTests::taintstoneResearchAndArcaneRecipe);
-        FUNCTIONS.register(TESTS[8], () -> RecipeParityGameTests::oreDictionaryEntriesBecameTags);
-        FUNCTIONS.register(TESTS[9], () -> RecipeParityGameTests::emeraldTransmutationMatchesOriginal);
-        FUNCTIONS.register(TESTS[10], () -> RecipeParityGameTests::ringFoodRecipeMatchesOriginal);
-        FUNCTIONS.register(TESTS[11], () -> RecipeParityGameTests::subcollarMatchesOriginal);
-        FUNCTIONS.register(TESTS[12], () -> RecipeParityGameTests::warpValuesMatchOriginal);
-        FUNCTIONS.register(TESTS[13], () -> RecipeParityGameTests::researchLayoutMatchesOriginal);
-        FUNCTIONS.register(TESTS[14], () -> HostIntegrationGameTests::commonRecipeCatalogMatchesTc4Registration);
-        FUNCTIONS.register(TESTS[15], () -> HostIntegrationGameTests::commonResearchCatalogMatchesTc4Registration);
-        FUNCTIONS.register(TESTS[16], () -> HostIntegrationGameTests::researchCatalogPreservesFlagsPagesAndProgression);
-        FUNCTIONS.register(TESTS[17], () -> HostIntegrationGameTests::tc4WarpAdapterPreservesSemanticTypesAndItemCosts);
-        FUNCTIONS.register(TESTS[18], () -> HostIntegrationGameTests::hostContentIdentifiersAreResolvedByTc4Adapter);
-        FUNCTIONS.register(TESTS[19], () -> HostIntegrationGameTests::hostAdapterRegistryExposesTc4Profile);
-        FUNCTIONS.register(TESTS[20], () -> HostIntegrationGameTests::profaneWandBehaviorUsesCorePorts);
+    public static void registerFunctions(net.minecraft.core.Registry<java.util.function.Consumer<net.minecraft.gametest.framework.GameTestHelper>> registry) {
+        FmGameTestBootstrap.register(registry, "every_ported_recipe_resolves_its_inputs", RecipeParityGameTests::everyPortedRecipeResolvesItsInputs);
+        FmGameTestBootstrap.register(registry, "chain_from_netherrack_to_wrath_shard", RecipeParityGameTests::chainFromNetherrackToWrathShard);
+        FmGameTestBootstrap.register(registry, "enchantment_recipes_cover_five", RecipeParityGameTests::enchantmentRecipesCoverFive);
+        FmGameTestBootstrap.register(registry, "morph_recipes_match_the_original", RecipeParityGameTests::morphRecipesMatchTheOriginal);
+        FmGameTestBootstrap.register(registry, "materials_have_crafting_recipes", RecipeParityGameTests::materialsHaveCraftingRecipes);
+        FmGameTestBootstrap.register(registry, "plant_research_and_recipes", RecipeParityGameTests::plantResearchAndRecipes);
+        FmGameTestBootstrap.register(registry, "wand_rod_recipes_registered", RecipeParityGameTests::wandRodRecipesRegistered);
+        FmGameTestBootstrap.register(registry, "taintstone_research_and_arcane_recipe", RecipeParityGameTests::taintstoneResearchAndArcaneRecipe);
+        FmGameTestBootstrap.register(registry, "ore_dictionary_entries_became_tags", RecipeParityGameTests::oreDictionaryEntriesBecameTags);
+        FmGameTestBootstrap.register(registry, "emerald_transmutation_matches_original", RecipeParityGameTests::emeraldTransmutationMatchesOriginal);
+        FmGameTestBootstrap.register(registry, "ring_food_recipe_matches_original", RecipeParityGameTests::ringFoodRecipeMatchesOriginal);
+        FmGameTestBootstrap.register(registry, "subcollar_matches_original", RecipeParityGameTests::subcollarMatchesOriginal);
+        FmGameTestBootstrap.register(registry, "warp_values_match_original", RecipeParityGameTests::warpValuesMatchOriginal);
+        FmGameTestBootstrap.register(registry, "research_layout_matches_original", RecipeParityGameTests::researchLayoutMatchesOriginal);
+        FmGameTestBootstrap.register(registry, "common_recipe_catalog_matches_tc4_registration", HostIntegrationGameTests::commonRecipeCatalogMatchesTc4Registration);
+        FmGameTestBootstrap.register(registry, "common_research_catalog_matches_tc4_registration", HostIntegrationGameTests::commonResearchCatalogMatchesTc4Registration);
+        FmGameTestBootstrap.register(registry, "research_catalog_preserves_flags_pages_and_progression", HostIntegrationGameTests::researchCatalogPreservesFlagsPagesAndProgression);
+        FmGameTestBootstrap.register(registry, "tc4_warp_adapter_preserves_semantic_types_and_item_costs", HostIntegrationGameTests::tc4WarpAdapterPreservesSemanticTypesAndItemCosts);
+        FmGameTestBootstrap.register(registry, "host_content_identifiers_are_resolved_by_the_tc4_adapter", HostIntegrationGameTests::hostContentIdentifiersAreResolvedByTc4Adapter);
+        FmGameTestBootstrap.register(registry, "host_adapter_registry_exposes_tc4_profile", HostIntegrationGameTests::hostAdapterRegistryExposesTc4Profile);
+        FmGameTestBootstrap.register(registry, "profane_wand_behavior_uses_core_ports", HostIntegrationGameTests::profaneWandBehaviorUsesCorePorts);
     }
 
     private RecipeGameTests() {}

@@ -5,6 +5,7 @@ import dev.visfox.forbiddenreforged.common.WrathCageEssentiaStore;
 import dev.visfox.forbiddenreforged.common.WrathCageBlockEntity;
 import java.util.function.Consumer;
 import dev.visfox.forbiddenreforged.test.EntityGameTests;
+import dev.visfox.forbiddenreforged.test.FmGameTestBootstrap;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.FunctionGameTestInstance;
@@ -19,18 +20,16 @@ import net.neoforged.neoforge.event.RegisterGameTestsEvent;
 
 @EventBusSubscriber(modid = FmIds.MODID)
 public final class WrathCageEssentiaGameTests {
-    public static final net.neoforged.neoforge.registries.DeferredRegister<Consumer<GameTestHelper>> FUNCTIONS =
-        EntityGameTests.FUNCTIONS;
     private static final String[] TESTS = {
         "wrath_cage_essentia_capacity_gate_matches_original",
         "wrath_cage_fuel_channel_priority_matches_original",
         "wrath_cage_spawn_bounds_match_original"
     };
 
-    static {
-        FUNCTIONS.register(TESTS[0], () -> WrathCageEssentiaGameTests::capacityGateMatchesOriginal);
-        FUNCTIONS.register(TESTS[1], () -> WrathCageEssentiaGameTests::fuelChannelPriorityMatchesOriginal);
-        FUNCTIONS.register(TESTS[2], () -> WrathCageEssentiaGameTests::spawnBoundsMatchOriginal);
+    public static void registerFunctions(net.minecraft.core.Registry<java.util.function.Consumer<net.minecraft.gametest.framework.GameTestHelper>> registry) {
+        FmGameTestBootstrap.register(registry, "wrath_cage_essentia_capacity_gate_matches_original", WrathCageEssentiaGameTests::capacityGateMatchesOriginal);
+        FmGameTestBootstrap.register(registry, "wrath_cage_fuel_channel_priority_matches_original", WrathCageEssentiaGameTests::fuelChannelPriorityMatchesOriginal);
+        FmGameTestBootstrap.register(registry, "wrath_cage_spawn_bounds_match_original", WrathCageEssentiaGameTests::spawnBoundsMatchOriginal);
     }
 
     private WrathCageEssentiaGameTests() {

@@ -45,8 +45,6 @@ import thaumcraft.research.ResearchItem;
 
 @EventBusSubscriber(modid = FmIds.MODID)
 public final class EntityGameTests {
-    public static final DeferredRegister<Consumer<GameTestHelper>> FUNCTIONS =
-        DeferredRegister.create(Registries.TEST_FUNCTION, FmIds.MODID);
 
     private static final String[] TESTS = {
         "mob_crystal_and_spawn_table",
@@ -57,13 +55,13 @@ public final class EntityGameTests {
         "tc4_entity_classification_is_behind_adapter"
     };
 
-    static {
-        FUNCTIONS.register(TESTS[0], () -> EntityGameTests::mobCrystalAndSpawnTable);
-        FUNCTIONS.register(TESTS[1], () -> EntityGameTests::wrathCageBlockAndEntity);
-        FUNCTIONS.register(TESTS[2], () -> EntityGameTests::wrathCageCrystalAndSpawnRules);
-        FUNCTIONS.register(TESTS[3], () -> EntityGameTests::wrathCageResearchAndRecipes);
-        FUNCTIONS.register(TESTS[4], () -> EntityGameTests::wrathCageEssentiaUsesHostBridge);
-        FUNCTIONS.register(TESTS[5], () -> EntityGameTests::tc4EntityClassificationIsBehindAdapter);
+    public static void registerFunctions(net.minecraft.core.Registry<java.util.function.Consumer<net.minecraft.gametest.framework.GameTestHelper>> registry) {
+        FmGameTestBootstrap.register(registry, "mob_crystal_and_spawn_table", EntityGameTests::mobCrystalAndSpawnTable);
+        FmGameTestBootstrap.register(registry, "wrath_cage_block_and_entity", EntityGameTests::wrathCageBlockAndEntity);
+        FmGameTestBootstrap.register(registry, "wrath_cage_crystal_and_spawn_rules", EntityGameTests::wrathCageCrystalAndSpawnRules);
+        FmGameTestBootstrap.register(registry, "wrath_cage_research_and_recipes", EntityGameTests::wrathCageResearchAndRecipes);
+        FmGameTestBootstrap.register(registry, "wrath_cage_essentia_uses_host_bridge", EntityGameTests::wrathCageEssentiaUsesHostBridge);
+        FmGameTestBootstrap.register(registry, "tc4_entity_classification_is_behind_adapter", EntityGameTests::tc4EntityClassificationIsBehindAdapter);
     }
 
     private EntityGameTests() {}

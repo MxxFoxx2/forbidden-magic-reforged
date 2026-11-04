@@ -54,8 +54,6 @@ import thaumcraft.registry.ModBlocks;
 
 @EventBusSubscriber(modid = FmIds.MODID)
 public final class BlockGameTests {
-    public static final DeferredRegister<Consumer<GameTestHelper>> FUNCTIONS =
-        DeferredRegister.create(Registries.TEST_FUNCTION, FmIds.MODID);
 
     private static final String[] TESTS = {
         "taint_material_blocks_are_registered",
@@ -71,18 +69,18 @@ public final class BlockGameTests {
         "tc4_taint_material_classification_is_behind_adapter"
     };
 
-    static {
-        FUNCTIONS.register(TESTS[0], () -> BlockGameTests::taintMaterialBlocksAreRegistered);
-        FUNCTIONS.register(TESTS[1], () -> BlockGameTests::taintBlocksCarryToolTags);
-        FUNCTIONS.register(TESTS[2], () -> BlockGameTests::taintMaterialsResistFibrousTaint);
-        FUNCTIONS.register(TESTS[3], () -> BlockGameTests::blocksDropThemselves);
-        FUNCTIONS.register(TESTS[4], () -> BlockGameTests::taintSaplingAdvancesStageBeforeGrowth);
-        FUNCTIONS.register(TESTS[5], () -> BlockGameTests::taintLeavesUseTaintLogAsDecaySupport);
-        FUNCTIONS.register(TESTS[6], () -> BlockGameTests::taintSaplingGrowsATree);
-        FUNCTIONS.register(TESTS[7], () -> BlockGameTests::umbralPlantsAreRegistered);
-        FUNCTIONS.register(TESTS[8], () -> BlockGameTests::arcaneCakeFeedsAndKeepsSlices);
-        FUNCTIONS.register(TESTS[9], () -> BlockGameTests::taintLogSelectsSideTexturesDeterministically);
-        FUNCTIONS.register(TESTS[10], () -> BlockGameTests::tc4TaintMaterialClassificationIsBehindAdapter);
+    public static void registerFunctions(net.minecraft.core.Registry<java.util.function.Consumer<net.minecraft.gametest.framework.GameTestHelper>> registry) {
+        FmGameTestBootstrap.register(registry, "taint_material_blocks_are_registered", BlockGameTests::taintMaterialBlocksAreRegistered);
+        FmGameTestBootstrap.register(registry, "taint_blocks_carry_tool_tags", BlockGameTests::taintBlocksCarryToolTags);
+        FmGameTestBootstrap.register(registry, "taint_materials_resist_fibrous_taint", BlockGameTests::taintMaterialsResistFibrousTaint);
+        FmGameTestBootstrap.register(registry, "blocks_drop_themselves", BlockGameTests::blocksDropThemselves);
+        FmGameTestBootstrap.register(registry, "taint_sapling_advances_stage_before_growth", BlockGameTests::taintSaplingAdvancesStageBeforeGrowth);
+        FmGameTestBootstrap.register(registry, "taint_leaves_use_taint_log_as_decay_support", BlockGameTests::taintLeavesUseTaintLogAsDecaySupport);
+        FmGameTestBootstrap.register(registry, "taint_sapling_grows_a_tree", BlockGameTests::taintSaplingGrowsATree);
+        FmGameTestBootstrap.register(registry, "umbral_plants_are_registered", BlockGameTests::umbralPlantsAreRegistered);
+        FmGameTestBootstrap.register(registry, "arcane_cake_feeds_and_keeps_slices", BlockGameTests::arcaneCakeFeedsAndKeepsSlices);
+        FmGameTestBootstrap.register(registry, "taint_log_selects_side_textures_deterministically", BlockGameTests::taintLogSelectsSideTexturesDeterministically);
+        FmGameTestBootstrap.register(registry, "tc4_taint_material_classification_is_behind_adapter", BlockGameTests::tc4TaintMaterialClassificationIsBehindAdapter);
     }
 
     private BlockGameTests() {}
