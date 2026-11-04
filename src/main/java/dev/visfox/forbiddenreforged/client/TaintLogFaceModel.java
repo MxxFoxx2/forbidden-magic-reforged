@@ -2,8 +2,8 @@ package dev.visfox.forbiddenreforged.client;
 
 import com.mojang.math.Quadrant;
 import com.mojang.serialization.MapCodec;
-import dev.visfox.forbiddenreforged.common.FmIds;
-import dev.visfox.forbiddenreforged.common.TaintLogTextureVariant;
+import dev.visfox.forbiddenreforged.ForbiddenMagic;
+import dev.visfox.forbiddenreforged.TaintLogTextureVariant;
 import java.util.List;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.dispatch.BlockModelRotation;
@@ -28,19 +28,19 @@ import org.jspecify.annotations.Nullable;
 public record TaintLogFaceModel(BlockStateModelPart[][] models) implements DynamicBlockStateModel {
     private static final Identifier[][] MODEL_IDS = {
         {
-            FmIds.id("block/taint_log"),
-            FmIds.id("block/taint_log_gross"),
-            FmIds.id("block/taint_log_gross2")
+            ForbiddenMagic.id("block/taint_log"),
+            ForbiddenMagic.id("block/taint_log_gross"),
+            ForbiddenMagic.id("block/taint_log_gross2")
         },
         {
-            FmIds.id("block/taint_log_horizontal"),
-            FmIds.id("block/taint_log_gross_horizontal"),
-            FmIds.id("block/taint_log_gross2_horizontal")
+            ForbiddenMagic.id("block/taint_log_horizontal"),
+            ForbiddenMagic.id("block/taint_log_gross_horizontal"),
+            ForbiddenMagic.id("block/taint_log_gross2_horizontal")
         },
         {
-            FmIds.id("block/taint_log_horizontal"),
-            FmIds.id("block/taint_log_gross_horizontal"),
-            FmIds.id("block/taint_log_gross2_horizontal")
+            ForbiddenMagic.id("block/taint_log_horizontal"),
+            ForbiddenMagic.id("block/taint_log_gross_horizontal"),
+            ForbiddenMagic.id("block/taint_log_gross2_horizontal")
         }
     };
 
@@ -116,7 +116,7 @@ public record TaintLogFaceModel(BlockStateModelPart[][] models) implements Dynam
 
     public record Unbaked() implements CustomUnbakedBlockStateModel {
         public static final MapCodec<Unbaked> CODEC = MapCodec.unit(new Unbaked());
-        public static final Identifier ID = FmIds.id("taint_log_faces");
+        public static final Identifier ID = ForbiddenMagic.id("taint_log_faces");
 
         private static final ModelState VERTICAL = BlockModelRotation.IDENTITY;
         private static final ModelState HORIZONTAL_X = BlockModelRotation.get(Quadrant.fromXYAngles(Quadrant.R90, Quadrant.R90));

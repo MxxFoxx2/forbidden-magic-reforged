@@ -1,6 +1,6 @@
 # Forbidden Magic: Reforged
 
-Порт **Forbidden Magic 0.574** (Minecraft 1.7.10, автор SpitefulFox) на **Thaumcraft 4: Reforged** для **Minecraft 26.3** / **NeoForge 26.3.0.57-beta**.
+Порт **Forbidden Magic 0.574** (Minecraft 1.7.10, автор SpitefulFox) на **Thaumcraft 4: Reforged** для **Minecraft 26.1.2** / **NeoForge 26.1.2.122**.
 
 | Minecraft | NeoForge | Thaumcraft 4: Reforged | Версия мода | Релиз |
 | --- | --- | --- | --- | --- |
@@ -15,7 +15,7 @@
 
 ## Установка
 
-1. Установите **Minecraft 26.3** с **NeoForge 26.3.0.57-beta**
+1. Установите **Minecraft 26.1.2** с **NeoForge 26.1.2.122**
 2. Установите **Thaumcraft 4: Reforged 1.1.2** (обязательно)
 3. Для 1.21.1: также установите **Curios 9.5.1+** (включён в runtime для GameTest)
 4. Положите `forbidden-magic-<version>-<mc>.jar` в папку `mods/`
@@ -63,7 +63,6 @@ python tools/prepare_host.py --verify # только верификация
 # Валидация
 python tools/check_host_agnostic_api.py  # проверить границы host-agnostic
 python tools/check_provenance.py         # проверить происхождение JAR
-python tools/check_host_pin.py           # проверить пин хоста и применимость патчей
 python tools/gen_resources.py            # сгенерировать ресурсы (2 раза, чистый diff)
 ```
 
@@ -102,15 +101,16 @@ src/main/java/dev/visfox/forbiddenreforged/
 │   ├── wand/        # Поведения жезлов (Hellfire, Blink Focus)
 │   └── warp/        # Абстракция доступа к варпу
 ├── integration/
-│   ├── api/         # HostAdapter, HostProfile, HostServices, HostAdapterRegistry
+│   ├── api/         # HostAdapter, HostProfile, HostAdapterRegistry
 │   ├── runtime/     # 15 capability интерфейсов (HostXxxServices)
-│   └── tc4/         # Реализация Thaumcraft 4: Reforged (Tc4Services + узкие адаптеры)
-├── common/          # Общие блоки, предметы, Fm*-регистрации, конфиг, синхронизация
+│   └── tc4/         # Реализация Thaumcraft 4: Reforged
 ├── client/          # Клиентский код (рендереры, креативные вкладки)
+├── test/            # GameTest реализации (компилируются в основной jar)
+├── FmBlocks.java    # Регистрация блоков
+├── FmItems.java     # Регистрация предметов
+├── FmResearch.java  # Регистрация исследований
+├── FmRecipes.java   # Регистрация рецептов
 └── ForbiddenMagic.java  # Главный класс мода (composition root)
-
-src/gameTest/java/dev/visfox/forbiddenreforged/
-└── test/            # GameTest реализации (отдельный source set, не попадают в JAR)
 ```
 
 ---

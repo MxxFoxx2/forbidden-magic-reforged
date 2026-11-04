@@ -22,9 +22,7 @@
 
 - **Паритет исследований:** восстановлены исходные аспекты NETHER у рецепта инфузии и исследования FORK; аспекты, цепочка зависимостей и статус concealed для `ROD_tainted`; аспекты и зависимость `ETHEREALBLOOM` для `TAINTSHOVEL`; зависимость `FORK` для `WRATHCAGE`; круглая иконка исследования `ROD_profane`. GameTest фиксируют эти исходные значения.
 - **Слоты Кольца насыщения:** бонус еды срабатывает только при экипировке кольца в слотах колец 1 или 2, но не в слоте амулета 0 или пояса 3. GameTest проверяет все четыре слота.
-- **Иконки улучшений Blink Focus:** Hellfire и Pandemonium используют исходные текстуры 32×32, включённые в namespace аддона, а не отсутствующие текстуры хоста; GameTest проверяют идентификаторы текстур и наличие ресурсов.
-- **Blink Focus:** сверено с `ItemFocusBlink` 1.7.10. Фокус делает собственный рейкаст на 128 блоков (`player.pick(128, …)`) вместо reach жезла, поэтому телепортирует далеко, а не на 4.5 блока. Точка выхода повторяет оригинал по точке попадания: сбоку ±0.5 от грани, нижняя грань −2, верхняя без смещения. Возвращены звук телепорта до и после броска, дым на выходе и огонь на прилёте (и по каждой задетой сущности). Hellfire наносит `3 + 3·potency` как fireball с игроком-причиной и поджигает на `3 + 3·potency` секунд; Pandemonium телепортирует только `Enemy`. Кулдаун — 0, как дефолт `ItemFocusBasic` (раньше стояло наше 500 мс), орнамент фокуса снова рисуется (`blink_focus_ornament`). Урон fireball в современном API масштабируется ванильной сложностью (easy/normal/hard); исходный `EntityDamageSource` не масштабировался — на normal значения совпадают.
-- **Стоимость каста Blink Focus при улучшении — исходная особенность, не баг порта:** оригинал передаёт в `getVisCost` стек жезла, а `ItemFocusBasic` читает NBT улучшений только со стека фокуса, поэтому каст всегда стоил базовые 300 Perditio, хотя тултип показывал повышенную цену. Порт сохраняет это поведение (сверено с исходником FM и байткодом `ItemFocusBasic`); «исправлять» его нельзя без отхода от 1:1.
+- **Иконки улучшений Blinky Focus:** Hellfire и Pandemonium используют исходные текстуры 32×32, включённые в namespace аддона, а не отсутствующие текстуры хоста; GameTest проверяют идентификаторы текстур и наличие ресурсов.
 
 - **Infernal Wand:** восстановлена отмена входящего огненного и Wither-урона при удержании жезла с инфернальным стержнем. Очистка эффектов горения и Wither при обновлении жезла остаётся отдельным поведением.
 - **Tainted Wand:** восстановлена реакция на damage type `thaumcraft:taint`: три раза выбирается случайный примальный аспект и добавляется 1 vis. Это отдельная механика от пассивного пополнения в скверном биоме.
@@ -47,23 +45,6 @@
 - **Раскладка исследований:** координаты `ROD_tainted`, `ROD_witchwood`, `ROD_witchwood_staff`, `TAINTSHOVEL` и `WRATHCAGE` приведены к оригиналу. Сложности 4 в исходнике TC4 и хост одинаково зажимают до 3, поэтому в порте хранится 3 — это не расхождение.
 - **Урон мечей:** морф-меч получает полный элементальный урон (7, как скелетный топор и вилка): раньше базовое значение было на единицу меньше. Все четыре мечеподобных предмета добавлены в тег `minecraft:swords`.
 - **Локализация:** исправлена структура TOML-таблиц для item names и исследовательских текстов; сгенерированные JSON-ключи выровнены с ключами, используемыми кодом.
-
-## Wrath Cage: сверка spawn/essentia с оригиналом
-
-Сверено с исходными [`TileEntityWrathCage`](https://github.com/SpitefulFox/ForbiddenMagic/blob/master/src/main/java/fox/spiteful/forbidden/tiles/TileEntityWrathCage.java), [`WrathSpawnerLogic`](https://github.com/SpitefulFox/ForbiddenMagic/blob/master/src/main/java/fox/spiteful/forbidden/tiles/WrathSpawnerLogic.java) и [`BlockWrathCage`](https://github.com/SpitefulFox/ForbiddenMagic/blob/master/src/main/java/fox/spiteful/forbidden/blocks/BlockWrathCage.java). Подтверждённые отличия исправлены в production commit [`e45e191`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/e45e191703e11715aedcf010fbefa6eebafd2537) и последующем bridge commit [`582285d`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/582285d046af2c4d9f94d9b267625253f6cf22b3):
-
-- **Essentia draw gate:** пополнение отключается, если любой из каналов `Special`, `Wrath` или `Sloth` достиг 64; для возобновления все три канала должны иметь свободное место.
-- **Mob-specific reserve:** при смене отпечатанного моба запас `Special` сбрасывается только когда меняется его аспект, а не при любом отличии entity ID.
-- **Порядок тика:** сначала выполняется серверная логика спавнера (если клетка включена и не запитана редстоуном), затем выполняется одна попытка втянуть эссенцию. Само втягивание не блокируется сигналом редстоуна или выключенной конфигурацией клетки, как и в исходнике.
-- **Suction:** сила входящего запроса — 256; `getMinimumSuction()` возвращает исходное значение 9000. Последнее значение сохранено для API-паритета, хотя сама клетка остаётся input-only (`canOutputTo=false`).
-- **Соседние трубы:** перед `takeEssentia` проверяются `isConnectable`, `canOutputTo`, совпадение типа эссенции и положительное количество у источника.
-- **Spawn activation/cap:** близость игрока не является условием активации (поле `activatingRangeFromPlayer=16` в оригинале не использовалось). Ограничение шести мобов проверяется по runtime-классу сущности в AABB исходного спавнера: диапазон 8 блоков по X/Z и 4 по Y от блока.
-- **Spawn positions/delay:** X/Z смещения не добавляют `+0.5`; задержка обновляется после каждого успешного появления, а сохранённое значение `-1` приводит к генерации нового delay перед спавном.
-- **Spawn event:** при успешном появлении вызывается стандартное событие spawner level event `2004`. Расход топлива и приоритет каналов `Special → Wrath → Sloth` сохранены.
-
-GameTests покрывают capacity gate, приоритет топлива, spawn AABB, силы suction, смену мобов с одинаковым/разным аспектом и TC4 transport bridge. На commit `582285d` CI #661 и release #73 успешно прошли обе конфигурации по **114/114** required GameTests.
-
-**Оставшаяся визуальная проверка:** старый клиентский sparkle `Thaumcraft.proxy.sparkle(0x870404)` и `EntityLiving.spawnExplosionParticle()` пока отдельно не восстановлены/не подтверждены в современном клиентском renderer. Headless GameTests не подтверждают визуальный паритет этих эффектов; для закрытия пункта нужен `runClient`.
 
 ## Визуальная проверка ещё нужна
 
@@ -95,7 +76,7 @@ GameTests покрывают capacity gate, приоритет топлива, s
 
 ## Host API: registered block scan targets and taint review
 
-- **Nether Portal aspect target — восстановлено в коде и проверено CI:** локальный host patch `patches/0001-block-aspect-targets.patch` добавляет registry/sync block targets. `Tc4AspectTagAdapter` назначает NETHER 4 современному `minecraft:nether_portal`, а GameTest `addon_item_aspects_match_original_assignments` проверяет фактический результат `ScanManager.resolveBlock`. Удалён прежний прокси через обсидиан. Патч повторно применён к upstream `6047676` (`main` после `1.1.2`): реестр и хук аспектов теперь в апстриме, block targets — только локально.
+- **Nether Portal aspect target — восстановлено в коде и проверено CI:** локальный host patch `patches/0001-block-aspect-targets.patch` добавляет registry/sync block targets. `FmAspectTags` назначает NETHER 4 современному `minecraft:nether_portal`, а GameTest `addon_item_aspects_match_original_assignments` проверяет фактический результат `ScanManager.resolveBlock`. Удалён прежний прокси через обсидиан. Патч повторно применён к upstream `6047676` (`main` после `1.1.2`): реестр и хук аспектов теперь в апстриме, block targets — только локально.
 - **Taint recognition остаётся вопросом сверки, а не подтверждённым разрывом:** исходный [`BlockLogTainted`](https://github.com/SpitefulFox/ForbiddenMagic/blob/master/src/main/java/fox/spiteful/forbidden/blocks/BlockLogTainted.java) использует `Config.taintMaterial`, а [`BlockLeavesTainted`](https://github.com/SpitefulFox/ForbiddenMagic/blob/master/src/main/java/fox/spiteful/forbidden/blocks/BlockLeavesTainted.java) сам обрабатывает decay и использует `taintLog` как опору. В исходнике не найдено явной регистрации FM-блоков как taint sources. Поэтому не следует расширять host `TaintSpread.isTaintBlock` только на основании фиксированного списка: сначала нужно доказать, что конкретное исходное поведение действительно потеряно. `taint_materials_resist_fibrous_taint` покрывает более узкий критерий невытеснения материалов при проверенных вызовах host spread.
 
 ## Не перенесено: внешние моды

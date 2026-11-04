@@ -9,9 +9,6 @@ import java.util.List;
 public interface HostAdapter {
     HostProfile profile();
 
-    /** Typed composition of this host's runtime capability ports. */
-    HostServices services();
-
     /** Registers host-native aspect scan targets after custom aspects exist. */
     void registerAspectTags();
 

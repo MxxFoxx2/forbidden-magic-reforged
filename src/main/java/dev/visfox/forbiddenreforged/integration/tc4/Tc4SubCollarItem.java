@@ -1,6 +1,6 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
-import dev.visfox.forbiddenreforged.common.FmComponents;
+import dev.visfox.forbiddenreforged.FmComponents;
 
 import java.util.function.Consumer;
 import net.minecraft.network.chat.Component;
