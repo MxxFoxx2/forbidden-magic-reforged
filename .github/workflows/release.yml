@@ -107,56 +107,19 @@ jobs:
             exit 1
           fi
 
-          build_version="$GITHUB_RUN_NUMBER.$GITHUB_RUN_ATTEMPT"
           base_version="$(tr -d '[:space:]' < "$repo_dir/release-version.txt")"
           previous_version=""
           if gh release view "release/$channel" --repo "$REPO" >/dev/null 2>&1; then
             previous_version="$(gh release view "release/$channel" --repo "$REPO" --json name,body               | python3 -c 'import json,re,sys; d=json.load(sys.stdin); m=re.search(r"<!-- release-version: ([0-9]+\.[0-9]+\.[0-9]+) -->", d.get("body") or ""); print(m.group(1) if m else (re.match(r"([0-9]+\.[0-9]+\.[0-9]+)", d.get("name") or "") or [None,""])[1])')"
           fi
-          release_version="$(python3 - "$base_version" "$previous_version" <<'PY'
-          import sys
-          base, previous = sys.argv[1], sys.argv[2]
-
-          def parse(value):
-              try:
-                  return tuple(int(part) for part in value.split("."))
-              except ValueError:
-                  return None
-
-          base_parts = parse(base) or (1, 0, 0)
-          previous_parts = parse(previous)
-          if previous_parts is None:
-              chosen = base_parts
-          elif base_parts > previous_parts:
-              chosen = base_parts
-          else:
-              chosen = (previous_parts[0], previous_parts[1], previous_parts[2] + 1)
-          print(".".join(str(part) for part in chosen))
-          PY
-          )"
+          release_version="$(python3 "$repo_dir/tools/prepare_release_version.py" "$base_version" "$previous_version" "$repo_dir/gradle.properties" "$channel")"
           mod_version="$release_version-$channel"
-          python3 - "$repo_dir/gradle.properties" "$mod_version" <<'PY'
-          import re
-          import sys
-          from pathlib import Path
-          path = Path(sys.argv[1])
-          content, count = re.subn(
-              r"(?m)^mod_version=.*$",
-              f"mod_version={sys.argv[2]}",
-              path.read_text(encoding="utf-8"),
-          )
-          if count != 1:
-              raise SystemExit(f"Expected one mod_version entry; found {count}")
-          path.write_text(content, encoding="utf-8")
-          PY
-
           {
             echo "channel=$channel"
             echo "repo_dir=$repo_dir"
             echo "expected_mc=$expected_mc"
             echo "java_version=$java_version"
             echo "source_sha=$source_sha"
-            echo "build_version=$build_version"
             echo "release_version=$release_version"
             echo "mod_version=$mod_version"
           } >> "$GITHUB_OUTPUT"
@@ -254,9 +217,7 @@ jobs:
           REPO: ${{ github.repository }}
           CHANNEL: ${{ steps.meta.outputs.channel }}
           SOURCE_SHA: ${{ steps.meta.outputs.source_sha }}
-          BUILD_VERSION: ${{ steps.meta.outputs.build_version }}
           RELEASE_VERSION: ${{ steps.meta.outputs.release_version }}
-          JAVA_VERSION: ${{ steps.meta.outputs.java_version }}
           MC_VERSION: ${{ steps.meta.outputs.expected_mc }}
           REPO_DIR: ${{ steps.meta.outputs.repo_dir }}
           JAR_PATH: ${{ steps.asset.outputs.jar_path }}
@@ -313,105 +274,7 @@ jobs:
           export PREVIOUS_BODY
 
           NOTES_FILE="$RUNNER_TEMP/release-notes-$CHANNEL.md"
-          python3 - "$NOTES_FILE" <<'PY'
-          import json
-          import os
-          import re
-          import subprocess
-          import sys
-
-          repo = os.environ["REPO"]
-          channel = os.environ["CHANNEL"]
-          source_sha = os.environ["SOURCE_SHA"]
-          build_version = os.environ["BUILD_VERSION"]
-          release_version = os.environ["RELEASE_VERSION"]
-          mc_version = os.environ["MC_VERSION"]
-          java_version = os.environ["JAVA_VERSION"]
-          repo_dir = os.environ["REPO_DIR"]
-          previous_body = os.environ.get("PREVIOUS_BODY", "")
-          marker = re.search(r"<!-- release-source-sha: ([0-9a-f]{40}) -->", previous_body)
-          previous_sha = marker.group(1) if marker else ""
-          source_url = f"https://github.com/{repo}/commit/{source_sha}"
-          compare_url = f"https://github.com/{repo}/compare/{previous_sha}...{source_sha}" if previous_sha and previous_sha != source_sha else ""
-
-          def gh_json(endpoint):
-              result = subprocess.run(["gh", "api", endpoint], check=True, capture_output=True, text=True)
-              return json.loads(result.stdout)
-
-          if compare_url:
-              try:
-                  commits = gh_json(f"repos/{repo}/compare/{previous_sha}...{source_sha}").get("commits", [])
-              except Exception:
-                  commits = []
-          else:
-              log = subprocess.run(
-                  ["git", "-C", repo_dir, "log", "-n", "12", "--format=%H%x1f%s"],
-                  check=True, capture_output=True, text=True,
-              ).stdout.splitlines()
-              commits = []
-              for line in log:
-                  parts = line.split("\x1f", 1)
-                  if len(parts) == 2:
-                      commits.append({"sha": parts[0], "commit": {"message": parts[1]}})
-
-          commit_lines = []
-          pr_map = {}
-          for item in commits:
-              sha = item.get("sha", "")
-              message = item.get("commit", {}).get("message", "").splitlines()[0]
-              if not sha:
-                  continue
-              commit_lines.append(f"- [{sha[:7]}](https://github.com/{repo}/commit/{sha}) — {message}")
-              try:
-                  for pr in gh_json(f"repos/{repo}/commits/{sha}/pulls"):
-                      if pr.get("html_url") and pr.get("number"):
-                          pr_map[pr["number"]] = (pr["html_url"], pr.get("title", f"PR #{pr['number']}"))
-              except Exception:
-                  pass
-              for number in re.findall(r"\(#(\d+)\)", message):
-                  pr_map.setdefault(int(number), (f"https://github.com/{repo}/pull/{number}", f"PR #{number}"))
-
-          if channel == "26.3":
-              bullets = [
-                  "Minecraft 26.3 / NeoForge 26.3 build; Java 25.",
-                  "Includes the core content: seven sin aspects, shards, taint content, morph tools, Mob Crystal and Wrath Cage, wand items, Blink Focus, enchantments, recipes, and research.",
-                  "Builds the host and add-on, checks artifact provenance, and runs GameTests with no_lust=false and no_lust=true.",
-                  f"Known parity gaps and client-visual checks are tracked in the [fidelity ledger](https://github.com/{repo}/blob/{source_sha}/docs/fidelity.md).",
-              ]
-          elif channel == "26.1.2":
-              bullets = [
-                  "Minecraft 26.1.2 / NeoForge 26.1.2 build; Java 25.",
-                  "Includes the core content: seven sin aspects, shards, taint content, morph tools, Mob Crystal and Wrath Cage, wand items, Blink Focus, enchantments, recipes, and research.",
-                  "Builds the pinned Thaumcraft host and add-on, verifies host preparation and artifact provenance, and runs GameTests with no_lust=false and no_lust=true.",
-                  f"Known parity gaps and client-visual checks are tracked in the [fidelity ledger](https://github.com/{repo}/blob/{source_sha}/docs/fidelity.md).",
-              ]
-          else:
-              bullets = [
-                  "Minecraft 1.21.1 / NeoForge 21.1.x build; Java 21.",
-                  "Includes the core content port: aspects and shards, taint materials and tree, morph tools, Mob Crystal and Wrath Cage, wand rods, Blink Focus upgrades, enchantments, recipes, and research.",
-                  "Builds the pinned Thaumcraft host and add-on, verifies host preparation and artifact provenance, and runs GameTests.",
-                  "Automated validation covers the test server; graphical client verification remains a separate manual check.",
-              ]
-
-          commit_subject = subprocess.run(
-              ["git", "-C", repo_dir, "show", "-s", "--format=%s", source_sha],
-              check=True, capture_output=True, text=True,
-          ).stdout.strip()
-
-          lines = [
-              f"Version {release_version} for Minecraft {mc_version}",
-              "",
-              f"`{source_sha[:7]}`: {commit_subject}",
-          ]
-          if compare_url:
-              lines += ["", f"[Changes since previous build]({compare_url})"]
-          lines += ["", f"<!-- release-source-sha: {source_sha} -->"]
-          lines += [f"<!-- release-version: {release_version} -->"]
-
-          with open(sys.argv[1], "w", encoding="utf-8", newline="\n") as output:
-              output.write("\n".join(lines) + "\n")
-          PY
-
+          python3 "$REPO_DIR/tools/generate_release_notes.py" "$NOTES_FILE"
           git -C "$REPO_DIR" tag -f -a "$CHANNEL_TAG" "$TAG_TARGET" -m "Latest tested Minecraft $CHANNEL build from source $SOURCE_SHA"
           git -C "$REPO_DIR" push --force origin "refs/tags/$CHANNEL_TAG"
 
