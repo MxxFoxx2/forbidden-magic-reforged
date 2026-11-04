@@ -552,7 +552,9 @@ public final class FmGameTests {
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.TAINT_BLOCK_SERVICES).level(),
             HostProfile.SupportLevel.ADAPTED, "taint block services use the host adapter");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.TAINT_ORIGINS).level(),
-            HostProfile.SupportLevel.UNSUPPORTED, "taint origins are explicitly declared unsupported");
+            HostProfile.SupportLevel.ADAPTED, "registered taint origins participate in the host taint engine");
+        helper.assertTrue(HostAdapterRegistry.requireTaintOrigins() != null,
+            "taint origin registration and spread are exposed through a typed host capability");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.WAND_CAPS).level(),
             HostProfile.SupportLevel.ADAPTED, "semantic cap definitions are materialized by the TC4 adapter");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.WAND_RODS).level(),
@@ -574,9 +576,9 @@ public final class FmGameTests {
         helper.assertTrue(HostAdapterRegistry.requireFocus() != null,
             "focus upgrade inspection and Vis payment are routed through a typed host capability");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.RESEARCH_STAGES).level(),
-            HostProfile.SupportLevel.PARTIAL, "multi-stage research remains explicitly unsupported by this adapter");
+            HostProfile.SupportLevel.ADAPTED, "multi-stage research is lowered into sequential native TC4 entries");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.OPTIONAL_ENCHANTMENT_INTEGRATION).level(),
-            HostProfile.SupportLevel.PARTIAL, "the optional Thaumic Tinkerer bridge remains reflective and best-effort");
+            HostProfile.SupportLevel.ADAPTED, "the optional Thaumic Tinkerer bridge uses its pinned typed compileOnly API");
         helper.assertValueEqual(profile.supportOf(HostProfile.Feature.CREATIVE_CONTENT).level(),
             HostProfile.SupportLevel.ADAPTED, "native wand samples are contributed through the creative-content capability");
         helper.assertTrue(HostAdapterRegistry.requireWandRegistration() != null,
