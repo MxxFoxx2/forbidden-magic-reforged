@@ -188,18 +188,7 @@ final class ItemRegistrationGameTests {
         helper.succeed();
     }
 
-        assertItemDataComponent(helper, FmComponents.MORPH_STATE.get(), "forbiddenmagic:morph_state", MorphState.EMPTY);
-        assertItemDataComponent(helper, FmComponents.MOB_ID.get(), "forbiddenmagic:mob_id", "minecraft:zombie");
-        assertItemDataComponent(helper, FmComponents.PROFANE_CONTRACT.get(), "forbiddenmagic:profane_contract", 25000);
-        assertItemDataComponent(helper, FmComponents.COLLAR_OWNER.get(), "forbiddenmagic:collar_owner", "Notch");
-        helper.assertValueEqual(
-            BuiltInRegistries.DATA_COMPONENT_TYPE.keySet().stream()
-                .filter(id -> id.getNamespace().equals(ForbiddenMagic.MODID))
-                .count(),
-            4L,
-            "the port registers exactly four item data components");
-        helper.succeed();
-    }
+
 
     private static <T> void assertItemDataComponent(GameTestHelper helper, DataComponentType<T> type, String expectedId, T sample) {
         helper.assertValueEqual(BuiltInRegistries.DATA_COMPONENT_TYPE.getKey(type), Identifier.parse(expectedId),

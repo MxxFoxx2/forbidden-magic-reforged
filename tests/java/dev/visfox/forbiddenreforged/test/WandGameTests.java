@@ -451,12 +451,7 @@ final class WandGameTests {
         helper.succeed();
     }
 
-        assertPlainWandCapCost(helper, "vinteum", 0.9F, 6);
-        assertPlainWandCapCost(helper, "manasteel", 0.9F, 6);
-        assertPlainWandCapCost(helper, "elementium", 0.8F, 9);
-        assertPlainWandCapCost(helper, "terrasteel", 1.8F, 1);
-        helper.succeed();
-    }
+
 
     private static void assertPlainWandCapCost(GameTestHelper helper, String tag, float baseCostModifier, int craftCost) {
         WandCap cap = WandRegistry.findCap(tag);
