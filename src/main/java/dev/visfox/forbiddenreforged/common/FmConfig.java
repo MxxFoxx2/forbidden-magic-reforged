@@ -9,6 +9,14 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
+/**
+ * Mod configuration. STARTUP type is intentional: content-gating flags
+ * (no_lust, emerald_transmutation, enchanting, greedy_ench, wrath_cage) decide
+ * what gets registered, and STARTUP is read before registration. Because NeoForge
+ * does not sync STARTUP configs, {@link FmSync} sends the server's values to
+ * clients on login and disconnects on mismatch, so client/server registries
+ * cannot diverge. Display-only flags (tag_research, spork) stay local.
+ */
 public final class FmConfig {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
     public static final ModConfigSpec SPEC;
