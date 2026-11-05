@@ -130,7 +130,7 @@ GameTests покрывают capacity gate, приоритет топлива, s
 - Emerald conversions (b): 9 fragments <-> 1 emerald recipes.
 - Tainted blood shard (c): new item + drop rule (TaintedMob + player attack + Weakness amp>=2 -> 50%).
 - itemBacon tag (d): aspects on forbiddenmagic:item_bacon tag (empty by default).
-- Smelting bonus (e): inert in original (no emerald smelting recipe, size-0 stack); not ported.
+- Smelting bonus (e): **dormant, ожидает API хоста.** Оригинал вызывал `ThaumcraftApi.addSmeltingBonus(emerald → resource[0])`. В TC4 1.1.2/1.1.3 таблица бонусов внутренняя (`thaumcraft.device.SmeltingBonuses` не имеет публичного метода регистрации), поэтому бонус не переносится и не имитируется: единственная конверсия изумруд↔фрагмент — портированные crafting-рецепты. Аддон содержит готовую capability (`HostSmeltingBonusServices` + `Tc4SmeltingBonusAdapter`), которая рефлективно связывается с публичным API хоста, как только тот появится, и остаётся неактивной до этого момента. Профиль хоста объявляет `SMELTING_BONUSES` как `UNSUPPORTED`; GameTest `smelting_bonus_stays_dormant_until_host_exposes_an_api` проверяет инвариант «бонус активен iff хост предоставляет API».
 - Wand caps (f): 6 subtypes + 4 cap registrations + textures.
 - Silverfish aspect (g): config-dependent (GREED iff silverfishEmeralds).
 - Garbage blocks config (h): general.garbage_blocks.

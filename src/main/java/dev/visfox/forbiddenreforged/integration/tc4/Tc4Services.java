@@ -15,6 +15,7 @@ import dev.visfox.forbiddenreforged.integration.runtime.HostItemFactoryServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostItemPropertyServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostMorphToolServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostScribingServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostSmeltingBonusServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostTaintBlockServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandInspectionServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandVisServices;
@@ -58,7 +59,8 @@ public final class Tc4Services {
         new WarpPort(),
         new ItemPropertyPort(),
         new ItemFactoryPort(),
-        new BootstrapPort()
+        new BootstrapPort(),
+        new SmeltingBonusPort()
     );
 
     private Tc4Services() {
@@ -342,6 +344,18 @@ public final class Tc4Services {
         @Override
         public void addCreativeWands(List<ItemStack> stacks) {
             Tc4WandAdapter.addCreativeWands(stacks);
+        }
+    }
+
+    private static final class SmeltingBonusPort implements HostSmeltingBonusServices {
+        @Override
+        public boolean registerBonus(Item input, Item bonus) {
+            return Tc4SmeltingBonusAdapter.INSTANCE.registerBonus(input, bonus);
+        }
+
+        @Override
+        public boolean supportsBonuses() {
+            return Tc4SmeltingBonusAdapter.INSTANCE.supportsBonuses();
         }
     }
 }

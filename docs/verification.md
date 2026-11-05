@@ -1,5 +1,23 @@
 # Verification status
 
+## Локальная проверка «спящего» smelting-бонуса — 5 ноября 2026
+
+Локальный прогон на рабочем дереве поверх `main` (`06a950ae`), до коммита:
+
+- `runGameTestServer` с `no_lust=false` — **118/118** required GameTests passed (новый тест `smelting_bonus_stays_dormant_until_host_exposes_an_api`).
+- `runGameTestServer` с `no_lust=true` — **118/118** required GameTests passed.
+- В логе сервера: `Host exposes no smelting-bonus API; the emerald bonus stays inactive` — на реальном хосте TC4 1.1.2 бонус спит, как и объявлено в профиле (`SMELTING_BONUSES = UNSUPPORTED`).
+- Тест на синтетическом API-хоте подтверждает обратный случай: при появлении публичного метода регистрации адаптер просыпается и передаёт хосту `emerald → emerald_fragment` ровно один раз.
+- `gradlew build` — успешно; в production JAR 190 класса, ни одного тестового.
+- `tools/check_host_agnostic_api.py` — Host API boundaries passed (72 Java files checked).
+- `tools/check_provenance.py` — provenance ok: 2 jar(s).
+- `tools/check_host_pin.py` — host pin check passed; upstream `origin/main` опережает пин на 25 коммитов.
+
+Два дефекта, найденных и исправленных в ходе этой работы:
+
+1. Локальный `host/` был пересобран под старый набор патчей и содержал удалённый патч `0002`, из-за чего probe находил несуществующий в реальном хосте метод `register`. `host/` пересобран скриптом `tools/prepare_host.py` (1 патч).
+2. `new ItemStack(...)` во время common setup падал с `Components not bound yet`: компоненты предметов привязываются позже. Регистрация перенесена на `DefaultDataComponentsBoundEvent`, а порт принимает `Item`, а не `ItemStack`.
+
 ## Локальная проверка ветки `refactor/simplify-architecture` — 4 ноября 2026
 
 Локальный прогон на коммите `e30b6e48` (ветка `refactor/simplify-architecture`, ещё не смержена в `main`; CI для неё не запускался):

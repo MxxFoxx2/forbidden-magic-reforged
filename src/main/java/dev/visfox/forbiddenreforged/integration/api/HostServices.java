@@ -11,6 +11,7 @@ import dev.visfox.forbiddenreforged.integration.runtime.HostItemFactoryServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostItemPropertyServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostMorphToolServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostScribingServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostSmeltingBonusServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostTaintBlockServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandInspectionServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandVisServices;
@@ -39,7 +40,8 @@ public record HostServices(
     HostWarpServices warp,
     HostItemPropertyServices itemProperties,
     HostItemFactoryServices itemFactories,
-    HostBootstrapServices bootstrap
+    HostBootstrapServices bootstrap,
+    HostSmeltingBonusServices smeltingBonuses
 ) {
     public HostServices {
         Objects.requireNonNull(aspects, "aspects");
@@ -57,5 +59,6 @@ public record HostServices(
         Objects.requireNonNull(itemProperties, "itemProperties");
         Objects.requireNonNull(itemFactories, "itemFactories");
         Objects.requireNonNull(bootstrap, "bootstrap");
+        Objects.requireNonNull(smeltingBonuses, "smeltingBonuses");
     }
 }

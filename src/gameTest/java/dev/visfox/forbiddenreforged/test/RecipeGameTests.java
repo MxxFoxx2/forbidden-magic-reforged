@@ -44,7 +44,8 @@ public final class RecipeGameTests {
         "tc4_warp_adapter_preserves_semantic_types_and_item_costs",
         "host_content_identifiers_are_resolved_by_the_tc4_adapter",
         "host_adapter_registry_exposes_tc4_profile",
-        "profane_wand_behavior_uses_core_ports"
+        "profane_wand_behavior_uses_core_ports",
+        "smelting_bonus_stays_dormant_until_host_exposes_an_api"
     };
 
     public static void registerFunctions(net.minecraft.core.Registry<java.util.function.Consumer<net.minecraft.gametest.framework.GameTestHelper>> registry) {
@@ -69,6 +70,7 @@ public final class RecipeGameTests {
         FmGameTestBootstrap.register(registry, "host_content_identifiers_are_resolved_by_the_tc4_adapter", HostIntegrationGameTests::hostContentIdentifiersAreResolvedByTc4Adapter);
         FmGameTestBootstrap.register(registry, "host_adapter_registry_exposes_tc4_profile", HostIntegrationGameTests::hostAdapterRegistryExposesTc4Profile);
         FmGameTestBootstrap.register(registry, "profane_wand_behavior_uses_core_ports", HostIntegrationGameTests::profaneWandBehaviorUsesCorePorts);
+        FmGameTestBootstrap.register(registry, "smelting_bonus_stays_dormant_until_host_exposes_an_api", SmeltingBonusGameTests::smeltingBonusStaysDormantUntilHostExposesAnApi);
     }
 
     private RecipeGameTests() {}

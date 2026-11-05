@@ -123,6 +123,18 @@ Tc4AspectTagAdapter намеренно ловит NoSuchMethodError для block
 
 [Tc4ScribingAdapter](../../src/main/java/dev/visfox/forbiddenreforged/integration/tc4/Tc4ScribingAdapter.java) читает настройку сложности через Config.researchDifficulty(), получает primal aspects через Aspect.getPrimalAspects() и изменяет pool игрока через ResearchManager.addAspectPool(...).
 
+## Smelting-бонусы
+
+Оригинал FM регистрировал бонус «изумруд → осколок изумруда» через `ThaumcraftApi.addSmeltingBonus`. В TC4 1.1.2 и 1.1.3 таблица бонусов внутренняя: у `thaumcraft.device.SmeltingBonuses` есть только внутренние `item(...)`/`tag(...)` и публичный `get(ItemStack)` — метода регистрации для аддонов нет.
+
+[Tc4SmeltingBonusAdapter](../../src/main/java/dev/visfox/forbiddenreforged/integration/tc4/Tc4SmeltingBonusAdapter.java) рефлективно ищет в классе хоста публичный статический метод регистрации (`addSmeltingBonus` или `register`, с аргументами `ItemStack`/`Item`) и вызывает его, когда такой метод появляется. Пока метода нет, capability остаётся неактивной, а профиль хоста объявляет `SMELTING_BONUSES` как `UNSUPPORTED`.
+
+Регистрация выполняется в `common/FmSmeltingBonusSetup` по событию `DefaultDataComponentsBoundEvent`: host-API, принимающий `ItemStack`, читает компоненты предметов, а они привязываются только после загрузки данных сервера. Создавать `ItemStack` на этапе common setup нельзя — компоненты ещё не привязаны (`Components not bound yet`).
+
+Что делать при обновлении хоста: если хост опубликует метод регистрации, адаптер подхватит его без изменения кода аддона; если появится метод с другой сигнатурой, её нужно добавить в список кандидатов `Tc4SmeltingBonusAdapter.CANDIDATES` и подтвердить GameTest `smelting_bonus_stays_dormant_until_host_exposes_an_api`.
+
+Не подменяй бонус другим механизмом: пока API отсутствует, конверсия изумруд↔осколок остаётся только crafting-рецептами, как в текущем порте.
+
 ## Процедура обновления хоста
 
 При изменении host pin для main:

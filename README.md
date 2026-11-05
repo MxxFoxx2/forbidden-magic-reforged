@@ -103,7 +103,7 @@ src/main/java/dev/visfox/forbiddenreforged/
 │   └── warp/        # Абстракция доступа к варпу
 ├── integration/
 │   ├── api/         # HostAdapter, HostProfile, HostServices, HostAdapterRegistry
-│   ├── runtime/     # 15 capability интерфейсов (HostXxxServices)
+│   ├── runtime/     # 16 capability портов (HostXxxServices)
 │   └── tc4/         # Реализация Thaumcraft 4: Reforged (Tc4Services + узкие адаптеры)
 ├── common/          # Общие блоки, предметы, Fm*-регистрации, конфиг, синхронизация
 ├── client/          # Клиентский код (рендереры, креативные вкладки)

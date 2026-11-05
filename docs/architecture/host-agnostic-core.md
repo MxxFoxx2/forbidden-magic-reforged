@@ -87,6 +87,15 @@ The old aggregate contracts were removed. Consumers request the narrow capabilit
 through the typed accessors of `HostAdapterRegistry` (`warp()`, `wandVis()`, `itemFactories()`, ...),
 which read the adapter's immutable `HostServices` composition.
 
+### 3b. Dormant host capabilities
+
+A capability may exist before the host can serve it. `HostSmeltingBonusServices` is the
+example: the original add-on registered an emerald smelting bonus through the host, but TC4
+1.1.2/1.1.3 keep the bonus table internal. The port exists, the TC4 adapter probes the host
+reflectively, and the bonus stays inactive until the host publishes a registration method. The
+host profile declares the capability as `UNSUPPORTED` until then, and no substitute mechanic is
+introduced.
+
 ### 4. Concrete host integration — `integration/tc4/`
 
 TC4-specific registry values, entity classes, wand APIs, Essentia types, research/recipe APIs, Baubles, and host item subclasses live in this layer. `Tc4HostAdapter` implements only the registration/lifecycle `HostAdapter` contract and exposes `services()`; `Tc4Services` composes every runtime port from the focused TC4 adapters in one place.

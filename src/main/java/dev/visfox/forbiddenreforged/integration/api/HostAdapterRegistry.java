@@ -11,6 +11,7 @@ import dev.visfox.forbiddenreforged.integration.runtime.HostItemFactoryServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostItemPropertyServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostMorphToolServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostScribingServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostSmeltingBonusServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostTaintBlockServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandInspectionServices;
 import dev.visfox.forbiddenreforged.integration.runtime.HostWandVisServices;
@@ -114,5 +115,9 @@ public final class HostAdapterRegistry {
 
     public static HostBootstrapServices bootstrap() {
         return services().bootstrap();
+    }
+
+    public static HostSmeltingBonusServices smeltingBonuses() {
+        return services().smeltingBonuses();
     }
 }
