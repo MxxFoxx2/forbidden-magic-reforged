@@ -5,8 +5,8 @@
 ## Зафиксированная версия
 
 - Хост: [notlikethiss/thaumcraft-4-reforged](https://github.com/notlikethiss/thaumcraft-4-reforged).
-- Версия, закреплённая в host.sha: commit [6047676](https://github.com/notlikethiss/thaumcraft-4-reforged/commit/604767636dc318a6d81f1abb8a8a2d3e5ec3298a), Thaumcraft 4: Reforged 1.1.2.
-- Зависимость аддона: thaumcraft_version=1.1.2 в gradle.properties.
+- Версия, закреплённая в host.sha: commit [99499a8](https://github.com/notlikethiss/thaumcraft-4-reforged/commit/99499a8ef6cf9af0efa6a93a058ea56a42a0e7b2), Thaumcraft 4: Reforged 1.1.3.
+- Зависимость аддона: thaumcraft_version=1.1.3 в gradle.properties.
 - Host-specific реализация находится в [integration/tc4/](../../src/main/java/dev/visfox/forbiddenreforged/integration/tc4/); композиция выполняется через [Tc4HostAdapter](../../src/main/java/dev/visfox/forbiddenreforged/integration/tc4/Tc4HostAdapter.java).
 
 При обновлении хоста сверяй этот документ с новым pin и исходниками. Сигнатура, которая присутствует в текущем адаптере, не считается гарантированной для будущей версии.
@@ -17,7 +17,7 @@
 
 ### Аспекты, добавленные аддоном
 
-[Tc4AspectAdapter](../../src/main/java/dev/visfox/forbiddenreforged/integration/tc4/Tc4AspectAdapter.java) использует [AddonAspects](https://github.com/notlikethiss/thaumcraft-4-reforged/blob/604767636dc318a6d81f1abb8a8a2d3e5ec3298a/src/main/java/thaumcraft/aspect/AddonAspects.java):
+[Tc4AspectAdapter](../../src/main/java/dev/visfox/forbiddenreforged/integration/tc4/Tc4AspectAdapter.java) использует [AddonAspects](https://github.com/notlikethiss/thaumcraft-4-reforged/blob/99499a8ef6cf9af0efa6a93a058ea56a42a0e7b2/src/main/java/thaumcraft/aspect/AddonAspects.java):
 
 - Регистрирует callback через AddonAspects.addRegistrar(...).
 - Преобразует определения core/aspect/AspectDefinition в объекты Aspect.
@@ -30,7 +30,7 @@
 
 ### Аспекты предметов и сущностей
 
-[Tc4AspectTagAdapter](../../src/main/java/dev/visfox/forbiddenreforged/integration/tc4/Tc4AspectTagAdapter.java) использует [AspectSync](https://github.com/notlikethiss/thaumcraft-4-reforged/blob/604767636dc318a6d81f1abb8a8a2d3e5ec3298a/src/main/java/thaumcraft/aspect/AspectSync.java) и [AspectRegistrar](https://github.com/notlikethiss/thaumcraft-4-reforged/blob/604767636dc318a6d81f1abb8a8a2d3e5ec3298a/src/main/java/thaumcraft/aspect/AspectRegistrar.java):
+[Tc4AspectTagAdapter](../../src/main/java/dev/visfox/forbiddenreforged/integration/tc4/Tc4AspectTagAdapter.java) использует [AspectSync](https://github.com/notlikethiss/thaumcraft-4-reforged/blob/99499a8ef6cf9af0efa6a93a058ea56a42a0e7b2/src/main/java/thaumcraft/aspect/AspectSync.java) и [AspectRegistrar](https://github.com/notlikethiss/thaumcraft-4-reforged/blob/99499a8ef6cf9af0efa6a93a058ea56a42a0e7b2/src/main/java/thaumcraft/aspect/AspectRegistrar.java):
 
 - AspectSync.addRegistrar(...) подключает нашу таблицу к пересборке реестра.
 - AspectRegistrar предоставляет регистрацию, заполнение и объединение аспектов предметов.
@@ -43,7 +43,7 @@
 
 Блоковые цели — отдельное локальное расширение, а не следствие API регистрации аспектов аддонов.
 
-Патч [0001-block-aspect-targets.patch](../../patches/0001-block-aspect-targets.patch) добавляет в host AspectRegistrar.block(...) и поддержку чтения/синхронизации block targets в сканере. Сейчас адаптер использует этот путь для minecraft:nether_portal.
+Патч [0001-feat-support-block-aspect-scan-targets.patch](../../patches/0001-feat-support-block-aspect-scan-targets.patch) добавляет в host AspectRegistrar.block(...) и поддержку чтения/синхронизации block targets в сканере. Сейчас адаптер использует этот путь для minecraft:nether_portal.
 
 Tc4AspectTagAdapter намеренно ловит NoSuchMethodError для block-target метода и сообщает, что прямые block aspects недоступны. Не удаляй эту проверку, пока локальный patch не стал обязательным и гарантированным для всех поддерживаемых host pins. GameTest портала проверяет именно прямую цель block:minecraft:nether_portal, а не прокси через обсидиан.
 
@@ -51,7 +51,7 @@ Tc4AspectTagAdapter намеренно ловит NoSuchMethodError для block
 
 ### Регистрация частей жезлов
 
-[Tc4WandAdapter](../../src/main/java/dev/visfox/forbiddenreforged/integration/tc4/Tc4WandAdapter.java) использует [WandRegistry](https://github.com/notlikethiss/thaumcraft-4-reforged/blob/604767636dc318a6d81f1abb8a8a2d3e5ec3298a/src/main/java/thaumcraft/wand/WandRegistry.java):
+[Tc4WandAdapter](../../src/main/java/dev/visfox/forbiddenreforged/integration/tc4/Tc4WandAdapter.java) использует [WandRegistry](https://github.com/notlikethiss/thaumcraft-4-reforged/blob/99499a8ef6cf9af0efa6a93a058ea56a42a0e7b2/src/main/java/thaumcraft/wand/WandRegistry.java):
 
 - registerCap(...) регистрирует колпачок: discount, специальные аспекты/скидку, item ID, craft cost, material и texture.
 - registerRod(...) регистрирует стержень: базовый tag, вместимость, item ID, craft cost, RodUpdate, glowing/staff/runes и texture.
@@ -60,7 +60,7 @@ Tc4AspectTagAdapter намеренно ловит NoSuchMethodError для block
 
 ### Хранилище vis
 
-[Tc4WandVisAdapter](../../src/main/java/dev/visfox/forbiddenreforged/integration/tc4/Tc4WandVisAdapter.java) использует [Wands](https://github.com/notlikethiss/thaumcraft-4-reforged/blob/604767636dc318a6d81f1abb8a8a2d3e5ec3298a/src/main/java/thaumcraft/wand/Wands.java):
+[Tc4WandVisAdapter](../../src/main/java/dev/visfox/forbiddenreforged/integration/tc4/Tc4WandVisAdapter.java) использует [Wands](https://github.com/notlikethiss/thaumcraft-4-reforged/blob/99499a8ef6cf9af0efa6a93a058ea56a42a0e7b2/src/main/java/thaumcraft/wand/Wands.java):
 
 | Метод | Использование |
 |---|---|
@@ -83,7 +83,7 @@ Tc4AspectTagAdapter намеренно ловит NoSuchMethodError для block
 
 ## Warp
 
-[Tc4WarpAdapter](../../src/main/java/dev/visfox/forbiddenreforged/integration/tc4/Tc4WarpAdapter.java) использует [Warp](https://github.com/notlikethiss/thaumcraft-4-reforged/blob/604767636dc318a6d81f1abb8a8a2d3e5ec3298a/src/main/java/thaumcraft/research/Warp.java):
+[Tc4WarpAdapter](../../src/main/java/dev/visfox/forbiddenreforged/integration/tc4/Tc4WarpAdapter.java) использует [Warp](https://github.com/notlikethiss/thaumcraft-4-reforged/blob/99499a8ef6cf9af0efa6a93a058ea56a42a0e7b2/src/main/java/thaumcraft/research/Warp.java):
 
 - Warp.registerItem(Identifier, int) регистрирует количество warp для предмета.
 - Warp.add(ServerPlayer, amount, WarpType) изменяет warp игрока.

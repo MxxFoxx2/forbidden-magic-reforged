@@ -1,7 +1,7 @@
 # Host-agnostic core architecture
 
 **Track:** `architecture/host-agnostic-core`  
-**Current runtime target:** Minecraft 26.3 / NeoForge / Thaumcraft 4: Reforged 1.1.2
+**Current runtime target:** Minecraft 26.3 / NeoForge / Thaumcraft 4: Reforged 1.1.3
 **Status:** Implemented and CI-verified on this branch within the scope described below. This is not a claim of a second host adapter or cross-Minecraft-version compatibility.
 
 ## Purpose and non-goals

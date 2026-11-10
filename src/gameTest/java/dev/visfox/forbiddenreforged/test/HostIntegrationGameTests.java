@@ -64,7 +64,7 @@ final class HostIntegrationGameTests {
     static void hostAdapterRegistryExposesTc4Profile(GameTestHelper helper) {
         HostProfile profile = HostAdapterRegistry.require().profile();
         helper.assertValueEqual(profile.id(), ContentId.parse("host:tc4-reforged"), "selected host profile id");
-        helper.assertValueEqual(profile.hostVersion(), "1.1.2", "selected host dependency version");
+        helper.assertValueEqual(profile.hostVersion(), "1.1.3", "selected host dependency version");
         helper.assertValueEqual(profile.minecraftVersion(), "26.3", "selected Minecraft version");
         helper.assertTrue(
             profile.supportOf(HostProfile.Feature.RESEARCH_STAGES).level() == HostProfile.SupportLevel.PARTIAL,

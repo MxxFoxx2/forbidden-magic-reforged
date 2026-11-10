@@ -22,7 +22,7 @@ public final class Tc4HostAdapter implements HostAdapter {
 
     private static final HostProfile PROFILE = new HostProfile(
         ContentId.parse("host:tc4-reforged"),
-        "1.1.2",
+        "1.1.3",
         "26.3",
         Map.ofEntries(
             Map.entry(HostProfile.Feature.ASPECT_REGISTRATION,
@@ -136,7 +136,7 @@ public final class Tc4HostAdapter implements HostAdapter {
             Tc4AspectAdapter.registerAspects(aspects);
         } catch (NoSuchMethodError | NoClassDefFoundError absent) {
             throw new IllegalStateException(
-                "Forbidden Magic requires Thaumcraft 4: Reforged 1.1.2 or newer with the add-on aspect API",
+                "Forbidden Magic requires Thaumcraft 4: Reforged 1.1.3 or newer with the add-on aspect API",
                 absent
             );
         }

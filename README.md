@@ -4,7 +4,7 @@
 
 | Minecraft | NeoForge | Thaumcraft 4: Reforged | Версия мода | Релиз |
 | --- | --- | --- | --- | --- |
-| **26.3** | 26.3.0.57-beta | 1.1.2 | `0.574-26.3-port.0.1.0` | [`release/26.3`](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/release/26.3) |
+| **26.3** | 26.3.0.57-beta | 1.1.3 | `0.574-26.3-port.0.1.0` | [`release/26.3`](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/release/26.3) |
 | **26.1.2** | 26.1.2.122 | 1.1.2 | `0.574-26.1.2-port.0.1.0` | [`mc/26.1.2`](https://github.com/MxxFoxx2/forbidden-magic-reforged/tree/mc/26.1.2) |
 | **1.21.1** | 21.1.256 | 1.1.2 | `0.574-1.21.1-port.0.1.0` | [`1.21.1`](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/1.21.1) |
 
@@ -16,7 +16,7 @@
 ## Установка
 
 1. Установите **Minecraft 26.3** с **NeoForge 26.3.0.57-beta**
-2. Установите **Thaumcraft 4: Reforged 1.1.2** (обязательно)
+2. Установите **Thaumcraft 4: Reforged 1.1.3** (обязательно)
 3. Для 1.21.1: также установите **Curios 9.5.1+** (включён в runtime для GameTest)
 4. Положите `forbidden-magic-<version>-<mc>.jar` в папку `mods/`
 5. Вкладка **FORBIDDEN** появится в Тауманомиконе (нажмите **Shift**, чтобы раскрыть скрытые записи)

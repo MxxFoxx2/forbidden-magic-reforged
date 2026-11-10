@@ -50,7 +50,7 @@ public final class WrathCageEssentiaGameTests {
                 Identifier.fromNamespaceAndPath(FmIds.MODID, name),
                 new FunctionGameTestInstance(
                     function,
-                    new TestData<>(environment, Identifier.parse("thaumcraft:test/platform"), 100, 0, true)
+                    new TestData<>(environment, Identifier.parse("forbiddenmagic:test/platform"), 100, 0, true)
                 )
             );
         }

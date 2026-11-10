@@ -118,7 +118,7 @@ public final class AspectGameTests {
                 ResourceKey.create(Registries.TEST_FUNCTION, Identifier.fromNamespaceAndPath(FmIds.MODID, name));
             event.registerTest(
                 Identifier.fromNamespaceAndPath(FmIds.MODID, name),
-                new FunctionGameTestInstance(function, new TestData<>(environment, Identifier.parse("thaumcraft:test/platform"), 100, 0, true))
+                new FunctionGameTestInstance(function, new TestData<>(environment, Identifier.parse("forbiddenmagic:test/platform"), 100, 0, true))
             );
         }
     }

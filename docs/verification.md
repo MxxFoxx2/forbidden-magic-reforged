@@ -1,5 +1,22 @@
 # Verification status
 
+## Локальная проверка bump хоста 1.1.3 — 10 ноября 2026
+
+Локальный прогон на рабочем дереве поверх `main` (`1b676737`), до коммита:
+
+- Пин передвинут `6047676` → `99499a8` (вершина upstream `main`, `mod_version=1.1.3`); `tools/check_host_pin.py` — патч `0001` применяется, дрейф upstream — 0 коммитов.
+- `tools/prepare_host.py` + `--verify` — `host matches sha + 1 patch commit(s)`. Локальный `main` соседнего upstream-репозитория отстаёт от GitHub, и пин существовал там только в detached HEAD: объект догружен в `host/` разовым `git fetch origin HEAD` (соседний репозиторий не изменялся).
+- Сборка патченного хоста — BUILD SUCCESSFUL (4m 15s); сборка аддона — BUILD SUCCESSFUL (3m 48s).
+- `tools/check_provenance.py` — provenance ok: 2 jar(s).
+- `tools/gen_resources.py` + `git diff --exit-code -- src/generated` — чисто.
+- `tools/check_host_agnostic_api.py` — Host API boundaries passed (72 Java files checked); `python -m unittest discover -s tests/python` — 15 tests OK.
+- `runGameTestServer` с `no_lust=false` — **118/118** required GameTests passed; с `no_lust=true` — **118/118** (`luxuria=disabled-by-config`); конфигурация возвращена в `false`.
+- Smelting-capability остаётся спящей на 1.1.3: в логе `Host exposes no smelting-bonus API; the emerald bonus stays inactive`; синтетический API-хот подтверждает пробуждение адаптера при появлении метода регистрации.
+
+Найдено и исправлено по ходу bump:
+
+1. Upstream-коммит `d72680e` («fix: remove gametests», вошёл в 1.1.3) удалил тестовые структуры хоста, включая `thaumcraft:test/platform` — все 118 GameTests падали на размещении структуры, ещё до проверки поведения. Тесты переведены на собственную фикстуру `forbiddenmagic:test/platform` (`src/gameTest/resources/data/forbiddenmagic/structure/test/platform.nbt`: 7×7×7, каменный пол y=0, 49 блоков; сгенерирована нами по снятым размерам, не скопирована из хоста). Фикстура живёт в gameTest source set и в релизный JAR не попадает.
+
 ## Локальная проверка «спящего» smelting-бонуса — 5 ноября 2026
 
 Локальный прогон на рабочем дереве поверх `main` (`06a950ae`), до коммита:
