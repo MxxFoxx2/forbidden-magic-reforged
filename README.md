@@ -68,14 +68,7 @@ python tools/check_host_pin.py           # проверить пин хоста 
 python tools/gen_resources.py            # сгенерировать ресурсы (2 раза, чистый diff)
 ```
 
-### Definition of Done (для контрибьюторов)
-1. `python tools/prepare_host.py --verify` → `host matches sha + 1 patch commit(s)`
-2. `./gradlew build` успешно
-3. `./gradlew runGameTestServer` зелёный с `no_lust=false` И `no_lust=true` (потом вернуть `false`)
-4. `python tools/check_host_agnostic_api.py` и `python tools/check_provenance.py` зелёные
-5. Если трогали `data/` или `tools/` генераторы → `gen_resources.py` 2 раза, чистый diff `src/generated/`
-6. Любое реальное отклонение от оригинала → задокументировано в `docs/fidelity.md` (не фикс теста)
-7. Коммит по Conventional Commits (`feat:`, `fix:`, `docs:` и т.д.), без co-author строк
+Полный гейт проверки и правила вкладов — в [AGENTS.md](AGENTS.md).
 
 ---
 
