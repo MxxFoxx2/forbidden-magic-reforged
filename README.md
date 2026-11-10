@@ -36,7 +36,7 @@
 | `emerald_transmutation` | `true` | Включить рецепты изумруд ⇄ фрагмент |
 | `wrath_cage` | `true` | Включить блок Клетка гнева и Кристалл моба |
 
-> Опция `lust_disabled` — это **гейт** — она полностью удаляет контент, связанный с Похотью. Переключение через `python tools/set_startup_config.py no_lust=true|false`. Финальное состояние **обязательно `false`** для релиза.
+> Опция `lust_disabled` — это **гейт**: она полностью удаляет контент, связанный с Похотью. Переключение через `python tools/set_startup_config.py no_lust=true|false`.
 
 ---
 
@@ -86,8 +86,6 @@ python tools/gen_resources.py            # сгенерировать ресур
 - **Fidelity Ledger**: [docs/fidelity.md](docs/fidelity.md) — каждое известное отклонение, компромисс и пробел в парности
 - **Verification Report**: [docs/verification.md](docs/verification.md) — результаты GameTest, статус CI
 - **Roadmap**: [docs/roadmap.md](docs/roadmap.md) — текущие приоритеты и блокеры
-
-> **Визуальная и геймплейная парность подтверждается только через `runClient` и реальную игру.** Зелёная компиляция и GameTest — необходимо, но не достаточно.
 
 ---
 
