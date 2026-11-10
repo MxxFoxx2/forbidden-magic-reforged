@@ -48,21 +48,20 @@
 - `pytest tests/python` — 15 passed, 7 subtests passed.
 - Новый GameTest-бюстрап: `src/gameTest/java/dev/visfox/forbiddenreforged/test/FmGameTestBootstrap.java`. В Minecraft 26.3 `minecraft:test_function` — статический built-in реестр: `DeferredRegister` по нему не срабатывал, и все 117 функций отсутствовали в рантайме (`Trying to access missing test function`). Рабочее окно — `RegisterEvent` реестра `minecraft:test_function`, который `GameData.postRegisterEvents()` рассылает на mod bus, пока реестр разморожен; `RegisterGameTestsEvent` стреляется уже после заморозки и даёт только реестры окружений и инстансов тестов.
 
-## Последний успешный CI — 4 ноября 2026
+## Последний успешный CI — 10 ноября 2026
 
-- Проверенный production/runtime commit: [`582285d`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/582285d046af2c4d9f94d9b267625253f6cf22b3).
-- [Java CI with Gradle #661](https://github.com/MxxFoxx2/forbidden-magic-reforged/actions/runs/41739354310) завершился успешно: host-agnostic boundary check, подготовка и сборка закреплённого Thaumcraft, сборка аддона, artifact provenance, generated-resource freshness и обе конфигурации GameTests.
-- С `no_lust=false`: **114/114** required GameTests passed.
-- С `no_lust=true`: **114/114** required GameTests passed.
-- Три дополнительных теста проверяют исходное правило заполнения каналов, приоритет расходования эссенции и AABB ограничения количества мобов.
-- [Release workflow #73](https://github.com/MxxFoxx2/forbidden-magic-reforged/actions/runs/41739354306) завершился успешно на том же source SHA: обе конфигурации GameTests, provenance, подготовка assets и публикация rolling release.
-- В [2.0.4 (NeoForge 26.3)](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/release/26.3) опубликован [`forbidden-magic-2.0.4-26.3.jar`](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/download/release/26.3/forbidden-magic-2.0.4-26.3.jar). Release metadata подтверждает source SHA `582285d046af2c4d9f94d9b267625253f6cf22b3`.
+- Проверенный production/runtime commit: [`a7a4f05`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/a7a4f051702bbc227998017f3f118d33c1f4cc91) (bump пина хоста до Thaumcraft 1.1.3).
+- [Java CI with Gradle #677](https://github.com/MxxFoxx2/forbidden-magic-reforged/actions/runs/42726269063) завершился успешно: host-agnostic boundary check, подготовка и сборка закреплённого Thaumcraft 1.1.3, сборка аддона, artifact provenance, generated-resource freshness и обе конфигурации GameTests.
+- С `no_lust=false`: **118/118** required GameTests passed; `luxuria=luxuria`.
+- С `no_lust=true`: **118/118** required GameTests passed; `luxuria=null`.
+- [Release workflow #81](https://github.com/MxxFoxx2/forbidden-magic-reforged/actions/runs/42726269083) завершился успешно на том же source SHA: обе конфигурации GameTests, provenance, подготовка assets и публикация rolling release.
+- В [2.0.8 (NeoForge 26.3)](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/release/26.3) опубликован [`forbidden-magic-2.0.8-26.3.jar`](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/download/release/26.3/forbidden-magic-2.0.8-26.3.jar). Release metadata подтверждает source SHA `a7a4f051702bbc227998017f3f118d33c1f4cc91`.
 - CI остаётся headless: клиентские sparkle/spawn-particle эффекты оригинальной Wrath Cage требуют отдельной визуальной проверки в `runClient`.
 
 ## Состояние rolling release
 
-- Текущий rolling release — **2.0.4 (NeoForge 26.3)**, source commit [`582285d`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/582285d046af2c4d9f94d9b267625253f6cf22b3).
-- Предыдущая версия **2.0.3** была опубликована из [`64fabaaf`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/64fabaaf5bba2c6adbfeb65c4c2887a07dd964c7).
+- Текущий rolling release — **2.0.8 (NeoForge 26.3)**, source commit [`a7a4f05`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/a7a4f051702bbc227998017f3f118d33c1f4cc91).
+- Версия **2.0.4** была опубликована из [`582285d`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/582285d046af2c4d9f94d9b267625253f6cf22b3) 4 ноября 2026 (CI #661, release #73); **2.0.3** — из [`64fabaaf`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/64fabaaf5bba2c6adbfeb65c4c2887a07dd964c7).
 - Первый rolling release после перехода на 26.3 — **2.0.1**, собранный из [`50a91ed`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/50a91edc39c0ad0edeaf14cf3b50f53c28e0e557); test/tooling-only commit `d540ec7` ранее ошибочно обновил его до 2.0.2.
 - Фильтр release workflow исправлен в [`b7ae154`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/b7ae154e93b413816df0865c60e9c43c4a67162a): test/docs/tooling-only changes не инициируют публикацию JAR, production Java changes проходят release workflow.
 - Release workflow #71 для промежуточного commit `e45e191` завершился неуспешно, потому что новый test DeferredRegister не был подключён к mod event bus. Исправление в [`6b32d33`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/6b32d3387ee06f05326a12d81701ae8cebcccfa6) подключило новые функции к уже зарегистрированному `EntityGameTests.FUNCTIONS`; итоговые CI #660/#661 и release #73 подтвердили выполнение всех 114 тестов. Неуспешный промежуточный run не является результатом опубликованного 2.0.4.
