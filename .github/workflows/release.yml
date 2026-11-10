@@ -42,7 +42,7 @@ concurrency:
 jobs:
   publish:
     name: Build, test, and update the matching Minecraft release
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 120
     steps:
       - name: Checkout Minecraft 26.3 source
