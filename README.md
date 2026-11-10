@@ -79,16 +79,6 @@ python tools/gen_resources.py            # сгенерировать ресур
 
 ---
 
-## Файдлити и верификация
-
-Порт нацелен на **1:1 парность логики, чисел, рецептов и текстов** с оригинальным Forbidden Magic 0.574, в рамках возможностей современного API.
-
-- **Fidelity Ledger**: [docs/fidelity.md](docs/fidelity.md) — каждое известное отклонение, компромисс и пробел в парности
-- **Verification Report**: [docs/verification.md](docs/verification.md) — результаты GameTest, статус CI
-- **Roadmap**: [docs/roadmap.md](docs/roadmap.md) — текущие приоритеты и блокеры
-
----
-
 ## Структура проекта
 
 ```
@@ -135,3 +125,4 @@ src/gameTest/java/dev/visfox/forbiddenreforged/
 - **Issues**: [GitHub Issues](https://github.com/MxxFoxx2/forbidden-magic-reforged/issues)
 - **Thaumcraft 4: Reforged**: [GitHub](https://github.com/notlikethiss/thaumcraft-4-reforged)
 - **Оригинальный Forbidden Magic**: [GitHub](https://github.com/SpitefulFox/ForbiddenMagic)
+- **Документация**: [отклонения](docs/fidelity.md), [верификация](docs/verification.md), [дорожная карта](docs/roadmap.md)
