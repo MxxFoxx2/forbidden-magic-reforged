@@ -2,12 +2,13 @@
 
 Порт **Forbidden Magic 0.574** (Minecraft 1.7.10, автор SpitefulFox) на **Thaumcraft 4: Reforged** для **Minecraft 26.3** / **NeoForge 26.3.0.57-beta**.
 
-| Minecraft | NeoForge | Thaumcraft 4: Reforged | Версия мода | Релиз |
-| --- | --- | --- | --- | --- |
-| **26.3** | 26.3.0.57-beta | 1.1.3 | `0.574-26.3-port.0.1.0` | [`release/26.3`](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/release/26.3) |
-| **26.1.2** | 26.1.2.122 | 1.1.2 | `0.574-26.1.2-port.0.1.0` | [`mc/26.1.2`](https://github.com/MxxFoxx2/forbidden-magic-reforged/tree/mc/26.1.2) |
-| **1.21.1** | 21.1.256 | 1.1.2 | `0.574-1.21.1-port.0.1.0` | [`1.21.1`](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/1.21.1) |
+| Minecraft | NeoForge | Thaumcraft 4: Reforged | Релиз |
+| --- | --- | --- | --- |
+| **26.3** | 26.3.0.57-beta | 1.1.3 | [`release/26.3`](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/release/26.3) |
+| **26.1.2** | 26.1.2.122 | 1.1.2 | [`release/26.1.2`](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/release/26.1.2) |
+| **1.21.1** | 21.1.256 | 1.1.2 | [`release/1.21.1`](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/release/1.21.1) |
 
+> Актуальная версия мода — на странице rolling-релиза канала: номера авто-инкрементируются при публикации. Локальная dev-сборка использует `mod_version` из `gradle.properties` и не совпадает с номером релиза.
 > Для Minecraft **1.21.1** требуется [Curios 9.5.1+1.21.1](https://www.curseforge.com/minecraft/mc-mods/curios) (включён в runtime classpath для GameTest).
 > Общего бинарника между версиями Minecraft нет — каждая ветка собирается и выпускается отдельно.
 
