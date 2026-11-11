@@ -59,32 +59,7 @@ python tools/check_host_pin.py           # check the host pin and patch applicab
 python tools/gen_resources.py            # regenerate resources (must leave a clean diff)
 ```
 
-The full verification gate and contribution rules are in [AGENTS.md](AGENTS.md).
-
----
-
-## Project structure
-
-```
-src/main/java/dev/visfox/forbiddenreforged/
-├── core/
-│   ├── aspect/      # Aspect definitions (host-neutral)
-│   ├── model/       # ContentId, HostContent (host-neutral)
-│   ├── recipe/      # Recipe definitions (host-neutral)
-│   ├── research/    # Research definitions (host-neutral)
-│   ├── wand/        # Wand behaviours (Hellfire, Blink Focus)
-│   └── warp/        # Warp access abstraction
-├── integration/
-│   ├── api/         # HostAdapter, HostProfile, HostServices, HostAdapterRegistry
-│   ├── runtime/     # 16 capability ports (HostXxxServices)
-│   └── tc4/         # Thaumcraft 4: Reforged implementation (Tc4Services + narrow adapters)
-├── common/          # Shared blocks, items, Fm* registrations, config, sync
-├── client/          # Client code (renderers, creative tabs)
-└── ForbiddenMagic.java  # Main mod class (composition root)
-
-src/gameTest/java/dev/visfox/forbiddenreforged/
-└── test/            # GameTest implementations (separate source set, not included in the JAR)
-```
+The full verification gate and contribution rules are in [AGENTS.md](AGENTS.md). The package layout and layer boundaries are described in [docs/architecture/host-agnostic-core.md](docs/architecture/host-agnostic-core.md).
 
 ---
 
