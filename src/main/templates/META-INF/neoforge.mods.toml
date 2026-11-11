@@ -29,6 +29,6 @@ ${mod_description}
 [[dependencies.${mod_id}]]
     modId="thaumcraft"
     type="required"
-    versionRange="[${thaumcraft_version}]"
+    versionRange="[${thaumcraft_version},)"
     ordering="AFTER"
     side="BOTH"

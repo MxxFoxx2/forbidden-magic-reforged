@@ -14,7 +14,7 @@ An unofficial port of **Forbidden Magic 0.574** (Minecraft 1.7.10) to **Thaumcra
 
 - Target environment: Minecraft 1.21.1, NeoForge 21.1.x, Java 21
 - Full parity with original not confirmed. Current progress and remaining tasks in [roadmap](docs/roadmap.md)
-- Requires Thaumcraft 4: Reforged 1.1.2. This branch uses upstream addon aspect API.
+- Requires Thaumcraft 4: Reforged 1.1.2 or newer. This branch uses upstream addon aspect API.
 
 ---
 
@@ -22,7 +22,7 @@ An unofficial port of **Forbidden Magic 0.574** (Minecraft 1.7.10) to **Thaumcra
 
 Verify the downloaded file is for **Minecraft 1.21.1 and NeoForge 21.1.x** — the 26.3 build is incompatible. Release files available at [Releases](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases). If no suitable release exists, build from this branch.
 
-Required for play: NeoForge, Thaumcraft 4: Reforged 1.1.2, and host dependencies including Curios. Place mod JAR in `mods/` folder.
+Required for play: NeoForge, Thaumcraft 4: Reforged 1.1.2 or newer, and host dependencies including Curios. Place mod JAR in `mods/` folder.
 
 ---
 
