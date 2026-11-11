@@ -89,6 +89,28 @@
 - **CoFH:** интеграция из `compat/`.
 - Внутренние meta-варианты `ItemResource`, `ItemWandCaps`, `ItemWandCores`, зависящие от перечисленных модов.
 
+## Совместимость с Ars Magica: Legacy
+
+Оригинальная AM2-интеграция (witchwood rod/staff, vinteum cap, conversion wand updates) перенесена на
+[Ars Magica: Legacy](https://github.com/MinecraftschurliMods/Ars-Magica-Legacy) 1.7.1 для MC 26.1.2
+(`arsmagicalegacy`). Гейт регистрации расширен с `arsmagica2` до обоих ID (`FmArsMagica`), так что
+предметы и исследования не дублируются при наличии обоих модов и остаются выключенными без них.
+
+- **Род-апдейты:** `ManaWandBehavior.wand` и `.staff` воспроизводят `ManaWandUpdate`/`ManaStaffUpdate`. Итерация по каждому примальному аспекту: дефицит зажат до 100, +1 vis только если игрок может оплатить `cost * deficit`. Интервалы и цены оригинала: жезл — 100 тиков, 1.4 на очко (vinteum 0.8); посох — 40 тиков, 1.0 (vinteum 0.5). Доступ к vis идёт через `WandVisAccess`, а не через host-специфичный мёп.
+- **Проверка колпачка:** `Wands.getParts(stack).cap()` сравнивается с `"vinteum"`, как оригинальный `getCap(itemstack).getTag()`.
+- **Регистрация жезлов:** witchwood rod (100 vis, craft 12) и witchwood staff (50 vis, craft 24, sceptre) регистрируются только при загруженном мод; их `RodUpdate` привязан к конфигу `compatibility.cross_wand`, как оригинальный `Config.crossWand`. Без конверсии жезлы остаются, но не пополняются.
+- **Порт к мане:** `Tc4ArsMagicaManaSource` вызывает `ArsMagicaApi.manaHelper()` reflectively (`getMana`/`decreaseMana`), как оригинал через `ArsMagicaApi.instance.getExtendedProperties`. Reflection сохраняет сборку аддона герметичной: AML не входит ни в compile, ни в runtime classpath. Сбой резолва трактуется как «источник недоступен», без исключений и без регистрации при отсутствии мода. Сигнатуры API берутся из classloader'а AML: методы принимают `LivingEntity`, а не `Player`; тест проверяет, что мост реально резолвится, а не молча падает.
+- **Creative wands:** добавляются witchwood wand/staff с vinteum cap, как оригинальный `ItemWandCores` при `Compat.am2`.
+- **Ингредиенты рецептов — осознанная замена.** AML не имеет AM2-мета-вариантов `essence` (arcane/earth/air/fire/water + pure/high core) и `itemOre` (vinteum dust 0, arcane compound 1, arcane ash 2, purified vinteum 3, chimerite 4, blue topaz 5, sunstone 6, moonstone 7), поэтому рецепты восстановлены с подстановкой AML-предметов, а не 1:1:
+  - `essence` → `arsmagicalegacy:affinity_essence` (в AML эссенции существуют по аффинити, а не как мета-предмет);
+  - `itemOre:0/3` → `arsmagicalegacy:vinteum_dust`;
+  - `itemOre:2` → `arsmagicalegacy:arcane_ash`;
+  - `itemOre:4/5/6/7` → `chimerite` / `topaz` / `sunstone` / `moonstone`.
+  Мета-раскладка взята из исходника AM2 (`ItemEssence`, `ItemOre`), а не угадана. Виско-стоимость, нестабильность (5/5), размер сетки (3×3) и число компонентов (9/3) сохранены точно от оригинала. Это **отклонение**, зафиксированное здесь, а не паритет: слоты заполнены ближайшим смысловым аналогом, и игровой баланс рецепта отличается от оригинала.
+- **`CAP_thaumium` — родитель research с сохранённым регистром хоста:** оригинал ссылался на `CAP_thaumium` (смешанный регистр, как в TC4 1.7.10); современный хост регистрирует то же имя `CAP_thaumium`, поэтому добавлен алиас в `Tc4ResearchAdapter.LEGACY_RESEARCH_KEYS` — без него авто-uppercase ломал связь.
+
+Прогрессия `ROD_witchwood` (`parents("nethershards")`, warp 2, HIDDEN) и `ROD_witchwood_staff` сохранена без изменений; координаты, аспектные ценники и тексты страниц берутся из оригинальных ResearchItem. `CAP_vinteum` добавлен как вторичное скрытое исследование с родителями `ROD_witchwood`/`CAP_thaumium`.
+
 ## Пункты, которые не являются расхождением сами по себе
 
 - **Profaned Wand Rod использует bedrock как item reference** — исходный `ForbiddenItems.java` тоже регистрирует `WAND_ROD_PROFANED` с `Blocks.bedrock` и отдельной текстурой.

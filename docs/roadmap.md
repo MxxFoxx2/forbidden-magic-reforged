@@ -23,14 +23,14 @@
 - `runClient`: Tainted Log во всех трёх ориентациях; Taint Sapling обеих стадий, форма кроны и decay support листьев; Wrath Cage render и обновление моба после смены кристалла.
 - Реальная игровая проверка hooks урона жезлов, дропов осколков, Collar of Pain и Riding Crop.
 - Проверить в клиенте Alchemical Cap / Equivalent Rod: предметные и wand-модели, подсказки и Equivalent creative wand.
+- При загруженном Ars Magica: Legacy проверить конверсию witchwood wand/staff: целевой тик (100/40), цену 1.4/1.0 на очко vis, скидку vinteum cap до 0.8/0.5 и уход маны из HUD AML. Это новая механика, а не регрессия.
 
 Headless CI не заменяет визуальный и игровой гейт.
 
 ## Ограничения, не выдаваемые за баги
 
-- Старый Extreme Hills сопоставлен с `minecraft:windswept_hills`; точного аналога нет.
-- Mob Crystal хранит современный namespaced entity ID; миграция миров 1.7.10 не заявлена.
-- Blood Magic, Botania, Ars Magica 2 и CoFH не поддерживаются на 26.3 из-за отсутствия согласованных совместимых зависимостей. Без них нельзя заявлять полный паритет интеграций оригинала; это отдельный scope вне core parity.
+- **Ars Magica 2 заменён на Ars Magica: Legacy** (`arsmagicalegacy`, MC 26.1.2): регистрируются witchwood rod/staff, witchwood/staff creative wands и conversion-механика (мана → примальный vis). Рецепты восстановлены с подстановкой AML-ингредиентов вместо снятых AM2-мета-вариантов `essence`/`itemOre` — это зафиксированное отклонение, не паритет: числа стоимости и структура сетки оригинальные, состав слотов — ближайший смысловой аналог. Подробности и границы — в [fidelity ledger](fidelity.md).
+- Blood Magic, Botania и CoFH не поддерживаются на 26.3 из-за отсутствия согласованных совместимых зависимостей. Без них нельзя заявлять полный паритет интеграций оригинала; это отдельный scope вне core parity.
 - Ветка 1.21.1 уже переведена на upstream aspect API и composite build в PR #44; полный content parity 1.21.1 остаётся отдельной задачей.
 
 ## Гейт завершения core parity 26.3

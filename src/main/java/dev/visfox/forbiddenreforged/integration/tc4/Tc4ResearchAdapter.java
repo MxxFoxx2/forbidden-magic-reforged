@@ -23,6 +23,8 @@ public final class Tc4ResearchAdapter {
         "rod_silverwood", "ROD_silverwood",
         "rod_witchwood", "ROD_witchwood",
         "rod_witchwood_staff", "ROD_witchwood_staff",
+        "cap_vinteum", "CAP_vinteum",
+        "cap_thaumium", "CAP_thaumium",
         "rod_profane", "ROD_profane"
     );
 

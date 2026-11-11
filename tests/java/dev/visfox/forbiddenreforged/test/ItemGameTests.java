@@ -4,6 +4,8 @@ import com.mojang.authlib.GameProfile;
 import com.google.gson.JsonArray;
 import dev.visfox.forbiddenreforged.core.wand.BlinkFocusBehavior;
 import dev.visfox.forbiddenreforged.core.wand.HellfireWandBehavior;
+import dev.visfox.forbiddenreforged.core.wand.ManaSource;
+import dev.visfox.forbiddenreforged.core.wand.ManaWandBehavior;
 import dev.visfox.forbiddenreforged.core.wand.WandTriggerAccess;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4BlinkFocusItem;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4CrystalwellItem;
@@ -75,9 +77,11 @@ import dev.visfox.forbiddenreforged.core.wand.WandVisAccess;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4WandPartsAdapter;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4WandVisAdapter;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4WandRuntimeAdapter;
+import dev.visfox.forbiddenreforged.integration.tc4.Tc4ArsMagicaManaSource;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectAdapter;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4ScribingAdapter;
 import dev.visfox.forbiddenreforged.FmAspects;
+import dev.visfox.forbiddenreforged.FmArsMagica;
 import dev.visfox.forbiddenreforged.FmComponents;
 import dev.visfox.forbiddenreforged.FmDrops;
 import dev.visfox.forbiddenreforged.FmItems;
@@ -158,7 +162,8 @@ public final class ItemGameTests {
         "blink_focus_reaches_beyond_wand_reach_and_lands_like_original",
         "wand_vis_and_parts_use_neutral_access_ports",
         "hellfire_behavior_uses_host_neutral_access",
-        "scribe_well_aspect_ids_stay_semantic"
+        "scribe_well_aspect_ids_stay_semantic",
+        "witchwood_converts_mana_into_primal_vis_at_original_cost"
     };
 
     static {
@@ -202,6 +207,7 @@ public final class ItemGameTests {
         FUNCTIONS.register(TESTS[37], () -> ItemGameTests::wandVisAndPartsUseNeutralAccessPorts);
         FUNCTIONS.register(TESTS[38], () -> ItemGameTests::hellfireBehaviorUsesHostNeutralAccess);
         FUNCTIONS.register(TESTS[39], () -> ItemGameTests::scribeWellAspectIdsStaySemantic);
+        FUNCTIONS.register(TESTS[40], () -> ItemGameTests::witchwoodConvertsManaIntoPrimalVisAtOriginalCost);
     }
 
     private ItemGameTests() {}
@@ -1070,11 +1076,55 @@ public final class ItemGameTests {
     }
 
     private static void witchwoodRequiresArsMagica(GameTestHelper helper) {
-        boolean am2 = ModList.get().isLoaded("arsmagica2");
-        helper.assertValueEqual(BuiltInRegistries.ITEM.getOptional(ForbiddenMagic.id("witchwood_rod")).isPresent(), am2, "the witchwood rod exists only with Ars Magica 2");
-        helper.assertValueEqual(BuiltInRegistries.ITEM.getOptional(ForbiddenMagic.id("witchwood_staff_rod")).isPresent(), am2, "the witchwood staff rod exists only with Ars Magica 2");
-        helper.assertValueEqual(ResearchCategories.getResearch("ROD_witchwood") != null, am2, "the witchwood research exists only with Ars Magica 2");
-        helper.assertValueEqual(ResearchCategories.getResearch("ROD_witchwood_staff") != null, am2, "the witchwood staff research exists only with Ars Magica 2");
+        boolean am2 = FmArsMagica.loaded();
+        helper.assertValueEqual(BuiltInRegistries.ITEM.getOptional(ForbiddenMagic.id("witchwood_rod")).isPresent(), am2, "the witchwood rod exists only with Ars Magica 2 or Ars Magica: Legacy");
+        helper.assertValueEqual(BuiltInRegistries.ITEM.getOptional(ForbiddenMagic.id("witchwood_staff_rod")).isPresent(), am2, "the witchwood staff rod exists only with Ars Magica 2 or Ars Magica: Legacy");
+        helper.assertValueEqual(ResearchCategories.getResearch("ROD_witchwood") != null, am2, "the witchwood research exists only with Ars Magica 2 or Ars Magica: Legacy");
+        helper.assertValueEqual(ResearchCategories.getResearch("ROD_witchwood_staff") != null, am2, "the witchwood staff research exists only with Ars Magica 2 or Ars Magica: Legacy");
+        helper.succeed();
+    }
+
+    /**
+     * The conversion itself, priced as the original {@code ManaWandUpdate} and
+     * {@code ManaStaffUpdate}: one vis per paid point, a deficit clamped to 100, the
+     * per-rod intervals and the Vinteum cap discount.
+     */
+    private static void witchwoodConvertsManaIntoPrimalVisAtOriginalCost(GameTestHelper helper) {
+        helper.assertValueEqual(ManaWandBehavior.interval(false), 100, "the wand converts every 100 ticks");
+        helper.assertValueEqual(ManaWandBehavior.interval(true), 40, "the staff converts every 40 ticks");
+
+        helper.assertValueEqual(ManaWandBehavior.pointCost(false, false), 1.4, "the wand defaults to 140% mana per vis");
+        helper.assertValueEqual(ManaWandBehavior.pointCost(true, false), 1.0, "the staff charges half as much per vis");
+        helper.assertValueEqual(ManaWandBehavior.pointCost(false, true), 0.8, "a Vinteum cap halves the wand cost");
+        helper.assertValueEqual(ManaWandBehavior.pointCost(true, true), 0.5, "a Vinteum cap halves the staff cost");
+
+        helper.assertValueEqual(ManaWandBehavior.price(false, false, 1), 1.4, "one empty point costs the full unit");
+        helper.assertValueEqual(ManaWandBehavior.price(false, false, 50), 70.0, "a half-full aspect costs half the unit");
+        helper.assertValueEqual(ManaWandBehavior.price(false, false, 100), 140.0, "an empty aspect costs the whole 140");
+        helper.assertValueEqual(ManaWandBehavior.price(false, false, 1000), 140.0, "the deficit clamps at 100");
+        helper.assertValueEqual(ManaWandBehavior.price(false, false, 0), 0.0, "a full aspect is free to leave alone");
+        helper.assertValueEqual(ManaWandBehavior.price(true, true, 100), 50.0, "the staff with a Vinteum cap tops out at half");
+
+        // The rods, their capacities and the mana bridge only exist with a mana mod.
+        WandRod rod = WandRegistry.findRod("witchwood");
+        helper.assertValueEqual(rod != null, FmArsMagica.loaded(), "the witchwood rod follows the Ars Magica gate");
+        if (rod == null || !FmArsMagica.loaded()) {
+            helper.succeed();
+            return;
+        }
+        helper.assertValueEqual(rod.capacity(), 100, "witchwood rod stores 100 vis");
+        helper.assertValueEqual(WandRegistry.findRod("witchwood_staff").capacity(), 50, "witchwood staff stores 50 vis");
+
+        ManaSource mana = Tc4ArsMagicaManaSource.INSTANCE;
+        helper.assertTrue(mana.available(), "the mana bridge resolves against the loaded mana mod");
+        Player player = helper.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+        ItemStack wand = Wands.create(WandRegistry.CAP_IRON, rod, false);
+        double before = mana.mana(player);
+        ManaWandBehavior.wand(wand, player, new Tc4WandVisAdapter(), mana, false);
+        helper.assertValueEqual(Wands.getAllVisData(wand).air(), 0, "an empty wand with no mana gains no vis");
+        helper.assertValueEqual(mana.mana(player), before, "an inert conversion spends nothing");
+        helper.assertTrue(!mana.spend(player, Double.MAX_VALUE) || mana.mana(player) >= 0, "overspending cannot push mana below zero");
+
         helper.succeed();
     }
 

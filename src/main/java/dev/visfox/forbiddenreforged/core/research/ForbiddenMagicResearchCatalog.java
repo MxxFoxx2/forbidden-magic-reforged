@@ -232,7 +232,14 @@ public final class ForbiddenMagicResearchCatalog {
             entries.add(entry("rod_witchwood", item("witchwood_rod"),
                 cost(a("tree", 3), a("magic", 2)),
                 -3, 1, 3, parents("nethershards"), noParents(), flags(HIDDEN), List.of(), 2,
-                text("forbiddenmagic.research_page.ROD_witchwood.1")));
+                text("forbiddenmagic.research_page.ROD_witchwood.1"),
+                recipe(ResearchDefinition.PageKind.INFUSION_RECIPE, "ROD_WITCHWOOD")));
+            entries.add(entry("cap_vinteum", item("vinteum_cap"),
+                cost(a("magic", 4), a("tool", 1), a("energy", 2)),
+                -4, -1, 1, parents("rod_witchwood", "cap_thaumium"), noParents(),
+                flags(SECONDARY, HIDDEN), List.of(), 0,
+                text("forbiddenmagic.research_page.CAP_vinteum.1"),
+                recipe(ResearchDefinition.PageKind.INFUSION_RECIPE, "CAP_VINTEUM")));
         }
 
         entries.add(entry("rod_profane", item("profane_rod"), AspectDefinition.Cost.EMPTY,
@@ -243,7 +250,8 @@ public final class ForbiddenMagicResearchCatalog {
             entries.add(entry("rod_witchwood_staff", item("witchwood_staff_rod"),
                 cost(a("tree", 4), a("magic", 3)),
                 -3, -1, 2, parents("rod_witchwood"), noParents(), flags(HIDDEN), List.of(), 0,
-                text("forbiddenmagic.research_page.ROD_witchwood_staff.1")));
+                text("forbiddenmagic.research_page.ROD_witchwood_staff.1"),
+                recipe(ResearchDefinition.PageKind.ARCANE_RECIPE, "ROD_WITCHWOOD_STAFF")));
         }
 
         if (options.emeraldTransmutationEnabled()) {

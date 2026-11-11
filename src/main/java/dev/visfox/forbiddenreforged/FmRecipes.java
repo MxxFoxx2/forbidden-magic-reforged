@@ -6,11 +6,14 @@ import java.util.Set;
 
 public final class FmRecipes {
     public static final Set<String> OWN_KEYS = Set.of(
-        "SKULLAXE", "FORK", "WRATH", "GREEDY", "CONSUMING", "EDUCATIONAL", "CORRUPTING",
+        "SKULLAXE", "FORK", "WRATH", "GREEDY", "CONSUMING", "EDUCATIONAL",
         "MORPHPICK", "MORPHSWORD", "MORPHSHOVEL", "MORPHAXE", "CLUSTER", "IMPACT", "VOIDTOUCHED",
-        "TAINTTREE", "BLACKFLOWER", "ARCANECAKE", "WRATHCAGE", "MOBCRYSTAL", "ROD_TAINTED",
-        "ROD_INFERNAL", "TAINTSHOVEL", "TAINTPICK", "CRYSTALWELL", "PRIMEWELL", "TRANSEMERALD",
-        "FOCUSBLINK", "RINGFOOD", "TaintStone", "TaintBrick", "BlackInk", "SUBCOLLAR", "RidingCrop"
+        "CORRUPTING",
+        "TAINTTREE", "BLACKFLOWER", "ARCANECAKE", "WRATHCAGE", "MOBCRYSTAL",
+        "ROD_WITCHWOOD", "CAP_VINTEUM", "ROD_WITCHWOOD_STAFF",
+        "ROD_TAINTED", "ROD_INFERNAL", "TAINTSHOVEL", "TAINTPICK",
+        "CRYSTALWELL", "PRIMEWELL", "TRANSEMERALD", "FOCUSBLINK", "RINGFOOD",
+        "TaintStone", "TaintBrick", "BlackInk", "SUBCOLLAR", "RidingCrop"
     );
 
     private FmRecipes() {
@@ -23,6 +26,7 @@ public final class FmRecipes {
             FmConfig.emeraldTrans(),
             FmConfig.gluttonyMode(),
             FmConfig.lustDisabled(),
+            FmArsMagica.loaded(),
             HostAdapterRegistry.require().crystalwellUsesShardTag()
         );
         HostAdapterRegistry.require().registerRecipes(ForbiddenMagicRecipeCatalog.definitions(options));

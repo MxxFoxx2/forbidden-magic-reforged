@@ -24,6 +24,7 @@ public final class FmConfig {
     public static ModConfigSpec.BooleanValue spork;
     public static ModConfigSpec.BooleanValue silverfishEmeralds;
     public static ModConfigSpec.BooleanValue emeraldTrans;
+    public static ModConfigSpec.BooleanValue crossWand;
     public static ModConfigSpec.ConfigValue<String> garbageBlocks;
 
     static {
@@ -39,6 +40,7 @@ public final class FmConfig {
         spork = BUILDER.comment("Rename the Diabolist Fork to 'Diabolist Spork' and use the spork texture.").define("general.spork", false);
         silverfishEmeralds = BUILDER.comment("Allow silverfish to drop emerald nuggets.").define("general.silverfish_emeralds", true);
         emeraldTrans = BUILDER.comment("Enable Emerald Transmutation research and recipe.").define("general.emerald_transmutation", true);
+        crossWand = BUILDER.comment("Enable wands that convert mana from other magic mods into vis.").define("compatibility.cross_wand", true);
         garbageBlocks = BUILDER.comment("Ore-dict names (modern: item ids) of garbage blocks for the Consuming enchantment to eat.").define("general.garbage_blocks", "minecraft:dirt;minecraft:sand;minecraft:gravel;minecraft:cobblestone;minecraft:netherrack");
         SPEC = BUILDER.build();
     }
@@ -96,6 +98,10 @@ public final class FmConfig {
 
     public static boolean emeraldTrans() {
         return SPEC.isLoaded() ? emeraldTrans.get() : emeraldTrans.getDefault();
+    }
+
+    public static boolean crossWandEnabled() {
+        return SPEC.isLoaded() ? crossWand.get() : crossWand.getDefault();
     }
 
     public static Set<Item> garbageBlocks() {

@@ -36,6 +36,7 @@ import net.neoforged.neoforge.event.RegisterGameTestsEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import dev.visfox.forbiddenreforged.ForbiddenMagic;
 import dev.visfox.forbiddenreforged.FmAspects;
+import dev.visfox.forbiddenreforged.FmArsMagica;
 import dev.visfox.forbiddenreforged.FmBlocks;
 import dev.visfox.forbiddenreforged.FmConfig;
 import dev.visfox.forbiddenreforged.FmDrops;
@@ -107,7 +108,8 @@ public final class RecipeGameTests {
         "tc4_warp_adapter_preserves_semantic_types_and_item_costs",
         "host_content_identifiers_are_resolved_by_the_tc4_adapter",
         "host_adapter_registry_exposes_tc4_profile",
-        "profane_wand_behavior_uses_core_ports"
+        "profane_wand_behavior_uses_core_ports",
+        "ars_magica_witchwood_recipes_match_original_costs"
     };
 
     static {
@@ -132,6 +134,7 @@ public final class RecipeGameTests {
         FUNCTIONS.register(TESTS[18], () -> RecipeGameTests::hostContentIdentifiersAreResolvedByTc4Adapter);
         FUNCTIONS.register(TESTS[19], () -> RecipeGameTests::hostAdapterRegistryExposesTc4Profile);
         FUNCTIONS.register(TESTS[20], () -> RecipeGameTests::profaneWandBehaviorUsesCorePorts);
+        FUNCTIONS.register(TESTS[21], () -> RecipeGameTests::arsMagicaWitchwoodRecipesMatchOriginalCosts);
     }
 
     private RecipeGameTests() {}
@@ -588,6 +591,7 @@ public final class RecipeGameTests {
             FmConfig.emeraldTrans(),
             FmConfig.gluttonyMode(),
             FmConfig.lustDisabled(),
+            FmArsMagica.loaded(),
             Tc4RecipeAdapter.crystalwellUsesShardTag()
         );
         List<RecipeDefinition> definitions = ForbiddenMagicRecipeCatalog.definitions(options);
@@ -908,6 +912,66 @@ public final class RecipeGameTests {
         TcRecipe brick = TcRecipes.get("TaintBrick");
         helper.assertTrue(brick instanceof CraftingRecipeRef ref, "brick recipe is registered as a reference");
         helper.assertValueEqual(((CraftingRecipeRef) brick).recipe(), ForbiddenMagic.id("taint_stone_brick"), "brick recipe id");
+        helper.succeed();
+    }
+
+    /**
+     * The Ars Magica recipes, ported with substituted AML ingredients.
+     *
+     * <p>Costs, instability and component arity come from the original {@code Compat}
+     * registration (MAGIC 16 plus four primals for the rod, ENERGY 12 / MAGIC 6 for the
+     * cap, 26 of each primal plus ORDER for the staff). AML has no AM2 meta items, so the
+     * essence and ore slots map onto AML affinity essence and gem items; the arity and the
+     * vis-costing numbers stay original.
+     */
+    private static void arsMagicaWitchwoodRecipesMatchOriginalCosts(GameTestHelper helper) {
+        if (!FmArsMagica.loaded()) {
+            helper.assertTrue(TcRecipes.get("ROD_WITCHWOOD") == null, "no witchwood rod recipe without a mana mod");
+            helper.assertTrue(TcRecipes.get("CAP_VINTEUM") == null, "no vinteum cap recipe without a mana mod");
+            helper.assertTrue(TcRecipes.get("ROD_WITCHWOOD_STAFF") == null, "no witchwood staff recipe without a mana mod");
+            helper.succeed();
+            return;
+        }
+
+        InfusionRecipe rod = (InfusionRecipe) TcRecipes.get("ROD_WITCHWOOD");
+        helper.assertTrue(rod != null, "witchwood rod infusion recipe exists");
+        helper.assertValueEqual(rod.instability(), 5, "witchwood rod keeps the original instability");
+        helper.assertValueEqual(rod.aspects().getAmount(Aspect.MAGIC), 16, "witchwood rod costs sixteen magic");
+        for (Aspect primal : List.of(Aspect.AIR, Aspect.EARTH, Aspect.FIRE, Aspect.WATER)) {
+            helper.assertValueEqual(rod.aspects().getAmount(primal), 9, primal + " costs nine for the witchwood rod");
+        }
+        ItemStack witchwoodLog = new ItemStack(BuiltInRegistries.ITEM.get(Identifier.parse("arsmagicalegacy:witchwood_log")).get().value());
+        helper.assertTrue(rod.central().test(witchwoodLog),
+            "the witchwood log is the central ingredient of the rod infusion");
+        helper.assertValueEqual(rod.components().size(), 9, "the rod keeps its nine essence and ore components");
+
+        InfusionRecipe cap = (InfusionRecipe) TcRecipes.get("CAP_VINTEUM");
+        helper.assertTrue(cap != null, "vinteum cap infusion recipe exists");
+        helper.assertValueEqual(cap.instability(), 5, "vinteum cap keeps the original instability");
+        helper.assertValueEqual(cap.aspects().getAmount(Aspect.ENERGY), 12, "vinteum cap costs twelve energy");
+        helper.assertValueEqual(cap.aspects().getAmount(Aspect.MAGIC), 6, "vinteum cap costs six magic");
+        helper.assertValueEqual(cap.components().size(), 3, "vinteum cap keeps its three vinteum components");
+        ItemStack vinteumDust = new ItemStack(BuiltInRegistries.ITEM.get(Identifier.parse("arsmagicalegacy:vinteum_dust")).get().value());
+        helper.assertTrue(cap.components().stream().allMatch(ingredient -> ingredient.test(vinteumDust)),
+            "vinteum cap takes AML vinteum dust");
+
+        ShapedArcaneRecipe staff = (ShapedArcaneRecipe) TcRecipes.get("ROD_WITCHWOOD_STAFF");
+        helper.assertTrue(staff != null, "witchwood staff arcane recipe exists");
+        helper.assertValueEqual(staff.width(), 3, "staff recipe is three wide");
+        helper.assertValueEqual(staff.height(), 3, "staff recipe is three tall");
+        for (Aspect primal : List.of(Aspect.AIR, Aspect.EARTH, Aspect.FIRE, Aspect.WATER)) {
+            helper.assertValueEqual(staff.aspects().getAmount(primal), 26, primal + " costs twenty-six for the staff");
+        }
+        helper.assertValueEqual(staff.aspects().getAmount(Aspect.ORDER), 26, "the staff costs twenty-six order");
+        helper.assertValueEqual(staff.aspects().getAmount(Aspect.ENTROPY), 26, "the staff costs twenty-six entropy");
+
+        ResearchItem rodResearch = ResearchCategories.getResearch("ROD_witchwood");
+        helper.assertTrue(rodResearch != null, "witchwood rod research exists");
+        helper.assertTrue(rodResearch.pages().size() >= 2, "witchwood rod research carries its recipe page");
+        ResearchItem capResearch = ResearchCategories.getResearch("CAP_vinteum");
+        helper.assertTrue(capResearch != null, "vinteum cap research exists");
+        helper.assertTrue(capResearch.isSecondary(), "vinteum cap research stays secondary as in the original");
+        helper.assertValueEqual(capResearch.parents(), List.of("ROD_witchwood", "CAP_thaumium"), "vinteum cap keeps the original parents");
         helper.succeed();
     }
 

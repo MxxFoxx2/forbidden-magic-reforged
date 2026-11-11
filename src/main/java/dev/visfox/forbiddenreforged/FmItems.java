@@ -8,7 +8,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.ToolMaterial;
-import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
@@ -96,7 +95,7 @@ public final class FmItems {
         EQUIVALENT_ROD = ITEMS.registerSimpleItem("equivalent_rod");
         TAINTED_ROD = ITEMS.registerSimpleItem("tainted_rod");
         INFERNAL_ROD = ITEMS.registerSimpleItem("infernal_rod");
-        if (ModList.get().isLoaded("arsmagica2")) {
+        if (FmArsMagica.loaded()) {
             WITCHWOOD_ROD = ITEMS.registerSimpleItem("witchwood_rod");
             WITCHWOOD_STAFF_ROD = ITEMS.registerSimpleItem("witchwood_staff_rod");
         } else {

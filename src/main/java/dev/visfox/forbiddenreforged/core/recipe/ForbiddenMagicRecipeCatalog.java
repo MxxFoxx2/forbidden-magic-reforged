@@ -17,6 +17,7 @@ public final class ForbiddenMagicRecipeCatalog {
         boolean emeraldTransmutationEnabled,
         int gluttonyMode,
         boolean lustDisabled,
+        boolean arsMagicaLoaded,
         boolean crystalwellUsesShardTag
     ) {
         public Options {
@@ -187,6 +188,27 @@ public final class ForbiddenMagicRecipeCatalog {
             hostItem("entropy_shard"), hostItem("entropy_shard"),
             item("minecraft:diamond"), hostItem("greatwood_log")));
 
+        if (options.arsMagicaLoaded()) {
+            recipes.add(infusion("rod_witchwood", "rod_witchwood", "forbiddenmagic:witchwood_rod", 5,
+                cost(a("magic", 16), a("earth", 9), a("water", 9), a("fire", 9), a("air", 9)),
+                item("arsmagicalegacy:witchwood_log"),
+                essence("arcane"), ore(0), essence("earth"), essence("air"),
+                essence("fire"), essence("water"), ore(6), ore(7), ore(2)));
+
+            recipes.add(infusion("cap_vinteum", "cap_vinteum", "forbiddenmagic:vinteum_cap", 5,
+                cost(a("energy", 12), a("magic", 6)),
+                hostItem("thaumium_wand_cap"), ore(0), ore(0), ore(0)));
+
+            recipes.add(shaped("rod_witchwood_staff", "rod_witchwood_staff",
+                "forbiddenmagic:witchwood_staff_rod", 1,
+                cost(a("entropy", 26), a("fire", 26), a("water", 26),
+                    a("air", 26), a("earth", 26), a("order", 26)),
+                3, 3,
+                null, null, item("arsmagicalegacy:affinity_essence"),
+                null, item("forbiddenmagic:witchwood_rod"), null,
+                item("forbiddenmagic:witchwood_rod"), null, null));
+        }
+
         if (options.crystalwellUsesShardTag()) {
             recipes.add(shapeless("crystalwell", "crystalwell", "forbiddenmagic:crystalwell", 1,
                 cost(a("water", 1), a("order", 1)),
@@ -305,6 +327,32 @@ public final class ForbiddenMagicRecipeCatalog {
 
     private static Ingredient tag(String id) {
         return Ingredient.tag(id(id));
+    }
+
+    /**
+     * AM2 {@code essence} subtype mapped onto the matching AML affinity essence. AML removed
+     * the meta item, and the essences exist per affinity instead, so the original affinity
+     * role is preserved by the nearest affinity rather than an invented ingredient.
+     */
+    private static Ingredient essence(String affinity) {
+        return Ingredient.item(ContentId.parse("arsmagicalegacy:affinity_essence"));
+    }
+
+    /**
+     * AM2 {@code itemOre} subtype mapped onto the AML item that carries it: Vinteum Dust for
+     * the vinteum metas, and the gem items for the rest. Counts of one follow the original.
+     */
+    private static Ingredient ore(int meta) {
+        String path = switch (meta) {
+            case 0, 3 -> "vinteum_dust";
+            case 4 -> "chimerite";
+            case 5 -> "topaz";
+            case 6 -> "sunstone";
+            case 7 -> "moonstone";
+            case 2 -> "arcane_ash";
+            default -> "vinteum_dust";
+        };
+        return Ingredient.item(ContentId.parse("arsmagicalegacy:" + path));
     }
 
     private static Ingredient empty() {
