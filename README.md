@@ -43,6 +43,8 @@ python tools/prepare_host.py
 
 On Linux/macOS use `python3` and `./gradlew`. The `tools/prepare_host.py` script prepares the pinned host version from `host.sha` into `host/`. Gradle uses `host/` via composite build; no separate `publish` needed. Do not edit `host/` manually.
 
+Localization is generated: edit `data/lang/en_us.toml` / `data/lang/ru_ru.toml` and run `python tools/gen_resources.py` to refresh `src/generated/resources/assets/forbiddenmagic/lang/*.json`. Do not edit the generated JSON by hand.
+
 On successful build, JAR is created at `build/libs/forbidden-magic-0.574-1.21.1-port.0.1.0.jar`.
 
 ---

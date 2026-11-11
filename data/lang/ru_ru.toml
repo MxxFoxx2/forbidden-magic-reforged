@@ -41,12 +41,14 @@ taint_pickaxe = "Кирка искажения"
 crystalwell = "Кристальная чернильница с пером"
 primewell = "Первобытные письменные инструменты"
 blink_focus = "Набалдашник: Телепортация"
+alchemical_cap = "Алхимический набалдашник"
 vinteum_cap = "Колпачок жезла из винтеума"
 terrasteel_cap = "Колпачок жезла из террастали"
 manasteel_cap = "Колпачок жезла из манастали"
 manasteel_inert_cap = "Инертный колпачок жезла из манастали"
 elementium_cap = "Колпачок жезла из элементия"
 elementium_inert_cap = "Инертный колпачок жезла из элементия"
+equivalent_rod = "Эквивалентный стержень"
 
 sub_collar = "Ошейник боли"
 [item.Wand.tainted]
@@ -66,6 +68,12 @@ cap = "Обитый орихалком"
 
 [item.Wand.neutronium]
 rod = "космически нейтронный"
+
+[item.Wand.alchemical]
+cap = "Алхимически коронованный"
+
+[item.Wand.equivalent]
+rod = "§kAlchemical§r"
 
 [item.forbiddenmagic.mob_crystal]
 empty = "Пустой кристалл импринтинга"

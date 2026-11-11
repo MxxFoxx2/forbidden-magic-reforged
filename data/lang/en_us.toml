@@ -325,10 +325,10 @@ mobcrystal = "Mob Crystals"
 creativeonly = "Creative Only"
 profane_contract = "Contract: %s"
 [item.Wand.alchemical]
-cap = "Alchemical"
+cap = "Alchemically Crowned"
 
 [item.Wand.equivalent]
-rod = "Equivalent"
+rod = "§kAlchemical§r"
 
 [forbiddenmagic.research_page.SUBCOLLAR]
 1 = "Sometimes, people just want to get hurt. Especially if there's a benefit...<BR><BR>The Collar of Pain has all the capabilities of an Amulet of Vis Storage with the added bonus that it will generate vis whenever you take damage. The more you get hurt, the more vis it generates."

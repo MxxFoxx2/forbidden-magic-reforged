@@ -12,3 +12,6 @@ forbidden-magic-reforged/
 logs/
 *.hprof
 *.log
+
+__pycache__/
+*.pyc

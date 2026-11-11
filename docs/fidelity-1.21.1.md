@@ -22,6 +22,12 @@ This file tracks the 1.21.1 backport-specific checks separately from the 26.3 fi
 
 Still deferred on this target: (e) smelting bonus (inert in the original).
 
+## Localization source of truth
+
+`data/lang/en_us.toml` and `data/lang/ru_ru.toml` are the canonical localization sources; `src/generated/resources/assets/forbiddenmagic/lang/*.json` are generated from them by `python tools/gen_resources.py` and must not be edited by hand. The generator also fails when the two TOML files diverge in key set, so English and Russian always expose the same keys.
+
+The earlier hand-maintained JSON had drifted from its TOML source: it was missing `item.forbiddenmagic.alchemical_cap`, `item.forbiddenmagic.equivalent_rod`, `item.Wand.alchemical.cap`, `item.Wand.equivalent.rod`, the `message.collar.*` and `tooltip.collar.owner` keys, and it carried shortened research-page text plus non-original item names (`item.forbiddenmagic.taint_coal` was "Tainted Coal" instead of "Hexcoal", and several wand rods were named "... Wand Rod" instead of the original labels). Regenerating from the TOML source restores the canonical values that match the 26.3 line, byte for byte for English.
+
 ## Automated coverage
 
-GameTests check Witchwood updater registration, its tick intervals and mana-cost rules, the Ring of Nutrition ring-slot predicate, the `item_bacon` tag plus its aspect mapping for every tagged member, and Tainted Blood Shard drop conditions, item registration, creative-tab inclusion, and model texture binding. These tests do not replace a client run to visually verify item models, focus-upgrade icons, and research-browser pages.
+GameTests check Witchwood updater registration, its tick intervals and mana-cost rules, the Ring of Nutrition ring-slot predicate, the `item_bacon` tag plus its aspect mapping for every tagged member, Tainted Blood Shard drop conditions, item registration, creative-tab inclusion, and model texture binding, and the completeness of the English/Russian translation keys. These tests do not replace a client run to visually verify item models, focus-upgrade icons, and research-browser pages.
