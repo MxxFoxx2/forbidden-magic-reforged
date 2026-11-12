@@ -71,6 +71,9 @@ jobs:
           chmod +x gradlew
           ./gradlew build
 
+      - name: Run unit tests
+        run: ./gradlew test
+
       - name: Build mod
         run: ./gradlew build
 

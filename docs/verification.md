@@ -1,5 +1,16 @@
 # Verification status
 
+## Minecraft 26.3 — быстрый unit-test гейт (локально, 12 ноября 2026)
+
+- Перенос JUnit-гейта с `mc/26.1.2` вертикальным срезом: `gradlew test` проверяет host-neutral каталоги без запуска сервера.
+- `build.gradle`: добавлены `mavenCentral()`, JUnit 5 (`junit-bom:5.11.4`) и задача `test` (`useJUnitPlatform`).
+- 4 класса в `src/test/java` — **23 теста**: `RecipeCatalogTest` (7, адаптирован под 6-параметровый `Options` без `arsMagicaLoaded`), `ResearchCatalogTest` (6), `AspectCatalogTest` (6), `ContentIdTest` (4).
+- Дублирующий GameTest `core_aspect_catalog_is_host_neutral_and_complete` удалён из `src/gameTest/.../AspectGameTests.java`: его host-neutral покрытие перенесено в `AspectCatalogTest`. Из-за этого число required GameTests уменьшилось со 118 до 117.
+- CI: шаг «Run unit tests» (`./gradlew test`) добавлен в `.github/workflows/gradle.yml` между сборкой хоста и сборкой аддона.
+- Локальные результаты (offline, JDK 25): `gradlew test` — **23/23** passed, 0 failures, 0 errors; `tools/check_host_agnostic_api.py` — Host API boundaries passed (72 Java files).
+- `runGameTestServer` с `no_lust=false` — **117/117** required GameTests passed (`luxuria=luxuria`); с `no_lust=true` — **117/117** (`luxuria=null`, `registeredAddon=6`).
+- Проверка локальная и headless; CI на этом коммите ещё не запускался. Клиентские визуальные и игровые проверки из разделов ниже остаются в силе.
+
 ## Последний успешный CI — 10 ноября 2026
 
 - Проверенный production/runtime commit: [`a7a4f05`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/a7a4f051702bbc227998017f3f118d33c1f4cc91) (bump пина хоста до Thaumcraft 1.1.3).
