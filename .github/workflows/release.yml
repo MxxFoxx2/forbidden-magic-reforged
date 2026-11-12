@@ -239,21 +239,27 @@ jobs:
           if [[ "$CHANNEL" == "26.3" ]]; then
             TAG_TARGET="$SOURCE_SHA"
 
-            # GITHUB_TOKEN cannot create a tag on a commit that changes workflow
-            # files unless it has the separate workflows permission. Keep the
-            # tested source tree intact, but inherit the previous workflow tree
-            # for the rolling-release tag target.
-            if git -C "$REPO_DIR" diff-tree --no-commit-id --name-only -r "$SOURCE_SHA" -- .github/workflows | grep -q .; then
-              SOURCE_PARENT="$(git -C "$REPO_DIR" rev-parse "$SOURCE_SHA^")"
+            # GITHUB_TOKEN cannot create or update a tag whose .github/workflows tree
+            # differs from the existing tag (it lacks the `workflows` permission).
+            # Workflow-only commits do not trigger this workflow, so main's workflows
+            # can drift ahead of the rolling tag. Freeze the tag's workflow tree at the
+            # existing tag's version and parent the snapshot to it, so the ref update
+            # never presents a workflow delta. The tested source tree stays intact.
+            if git -C "$REPO_DIR" fetch --force origin "refs/tags/$CHANNEL_TAG:refs/tags/$CHANNEL_TAG" 2>/dev/null; then
+              WORKFLOW_BASE="$(git -C "$REPO_DIR" rev-parse "refs/tags/$CHANNEL_TAG^{commit}")"
+            else
+              WORKFLOW_BASE="$(git -C "$REPO_DIR" rev-parse "$SOURCE_SHA^")"
+            fi
+            if ! git -C "$REPO_DIR" diff --quiet "$WORKFLOW_BASE" "$SOURCE_SHA" -- .github/workflows; then
               TREE_WORKDIR="$RUNNER_TEMP/release-source-tree-main"
-              git -C "$REPO_DIR" worktree add --detach "$TREE_WORKDIR" "$SOURCE_PARENT"
+              git -C "$REPO_DIR" worktree add --detach "$TREE_WORKDIR" "$WORKFLOW_BASE"
               git -C "$TREE_WORKDIR" rm -r --cached -f .
               git -C "$TREE_WORKDIR" clean -fdx
               git -C "$REPO_DIR" archive "$SOURCE_SHA" | tar -xf - -C "$TREE_WORKDIR"
-              git -C "$TREE_WORKDIR" checkout --force "$SOURCE_PARENT" -- .github/workflows
+              git -C "$TREE_WORKDIR" checkout --force "$WORKFLOW_BASE" -- .github/workflows
               git -C "$TREE_WORKDIR" add -A
               TREE_SHA="$(git -C "$TREE_WORKDIR" write-tree)"
-              TAG_TARGET="$(printf 'Release snapshot for Minecraft %s; source %s\n' "$CHANNEL" "$SOURCE_SHA" | git -C "$TREE_WORKDIR" commit-tree "$TREE_SHA" -p "$SOURCE_PARENT")"
+              TAG_TARGET="$(printf 'Release snapshot for Minecraft %s; source %s\n' "$CHANNEL" "$SOURCE_SHA" | git -C "$TREE_WORKDIR" commit-tree "$TREE_SHA" -p "$WORKFLOW_BASE")"
               git -C "$REPO_DIR" worktree remove "$TREE_WORKDIR" --force
               echo "Created rolling-release tag target without workflow-file changes: $TAG_TARGET"
             fi
