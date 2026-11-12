@@ -75,6 +75,12 @@ cap = "Обитый орихалком"
 [item.Wand.neutronium]
 rod = "космически нейтронный"
 
+[item.Wand.witchwood]
+rod = "ведьмино-древесный"
+
+[item.Wand.vinteum]
+cap = "обитый винтеумом"
+
 [item.forbiddenmagic.mob_crystal]
 empty = "Пустой кристалл импринтинга"
 filled = "Отпечатанный кристалл (%s)"

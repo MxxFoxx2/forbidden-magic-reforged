@@ -75,6 +75,12 @@ cap = "Orichalcum Studded"
 [item.Wand.neutronium]
 rod = "Cosmic Neutronium"
 
+[item.Wand.witchwood]
+rod = "Witchwood"
+
+[item.Wand.vinteum]
+cap = "Vinteum Studded"
+
 [item.forbiddenmagic.mob_crystal]
 empty = "Blank Imprinting Crystal"
 filled = "%s Imprinted Crystal"

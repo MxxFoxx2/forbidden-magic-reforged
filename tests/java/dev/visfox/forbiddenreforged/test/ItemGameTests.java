@@ -680,6 +680,8 @@ public final class ItemGameTests {
                 "item.Wand.profaned.rod",
                 "item.Wand.orichalcum.cap",
                 "item.Wand.neutronium.rod",
+                "item.Wand.witchwood.rod",
+                "item.Wand.vinteum.cap",
                 "item.forbiddenmagic.taint_shovel",
                 "item.forbiddenmagic.taint_pickaxe",
                 "item.forbiddenmagic.crystalwell",
