@@ -67,6 +67,8 @@ neoForge {
 }
 
 repositories {
+    maven { url = uri("maven") }
+    mavenCentral()
     maven {
         name = "Curios"
         url = uri("https://maven.theillusivec4.top/")
@@ -169,10 +171,22 @@ dependencies {
     compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
     compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
     clientRuntimeOnly "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
+
+    testImplementation platform("org.junit:junit-bom:5.11.4")
+    testImplementation "org.junit.jupiter:junit-jupiter"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
 
 tasks.named('compileJava') {
     dependsOn(downloadTinkererCompileApi)
+}
+
+tasks.named('test', Test) {
+    useJUnitPlatform()
+    testLogging {
+        events "failed", "skipped"
+        exceptionFormat "full"
+    }
 }
 
 tasks.named('jar', Jar) {
