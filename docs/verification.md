@@ -1,5 +1,14 @@
 # Verification status
 
+## Minecraft 26.1.2 — fast unit-test gate (local, 12 November 2026)
+
+- Added a host-neutral JUnit 5 suite under `src/test/java`, run by `./gradlew test` (part of `check`/`build`, plus a dedicated CI step). It verifies catalog data and option gating in seconds, without booting a server.
+- **23 unit tests passed** across 4 suites: `AspectCatalogTest` (6), `ContentIdTest` (4), `RecipeCatalogTest` (7), `ResearchCatalogTest` (6); 0 failures, 0 skipped.
+- Removed the pure-logic GameTest `core_aspect_catalog_is_host_neutral_and_complete` from `AspectGameTests`; its assertions now live in `AspectCatalogTest`. All runtime GameTests are retained.
+- Local `runGameTestServer`: with `no_lust=false` **112/112** required GameTests passed; with `no_lust=true` **112/112** passed.
+- Host-agnostic API boundary check passed (28 Java files).
+- Local headless verification only; the change is not yet pushed to CI. Client launch, rendering/tooltips, and manual in-world gameplay checks are still required before treating the port as release-ready.
+
 ## Minecraft 26.1.2 — host-agnostic architecture port
 
 - Verified implementation commit: [`62a3e5e`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/62a3e5ee89fba12ba7e902501725d1bc5b1eea9f).
