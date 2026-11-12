@@ -295,21 +295,26 @@ jobs:
           git -C "$REPO_DIR" tag -f -a "$CHANNEL_TAG" "$TAG_TARGET" -m "Latest tested Minecraft $CHANNEL build from source $SOURCE_SHA"
           git -C "$REPO_DIR" push --force origin "refs/tags/$CHANNEL_TAG"
 
-          # Recreate the rolling release instead of editing it: GitHub derives the
-          # "released ..." date from the release, not from the asset, so an edit would
-          # keep showing the first build date. The channel tag remains the moving
-          # pointer to the latest tested source.
-          if gh release view "$CHANNEL_TAG" --repo "$REPO" >/dev/null 2>&1; then
-            gh release delete "$CHANNEL_TAG" --repo "$REPO" --yes --cleanup-tag=false
-          fi
+          # Update the rolling release in place instead of delete-then-create:
+          # deleting first left the channel with no release object whenever the
+          # subsequent create failed. The channel tag is already force-pushed above
+          # and remains the moving pointer to the latest tested source.
+          # Neither edit nor create passes --target: the tag already exists, and a
+          # detached snapshot target whose .github/workflows tree differs from main
+          # is rejected for GITHUB_TOKEN (it lacks the workflows permission), which
+          # surfaced as HTTP 403 on POST /releases.
           # 26.3 is the primary channel and keeps the GitHub "Latest" mark; the
-          # secondary channel is created without it so the two rolling releases
+          # secondary channel is published without it so the two rolling releases
           # do not steal the badge from each other on every build.
           LATEST_FLAG="--latest=false"
           if [[ "$CHANNEL" == "26.3" ]]; then
             LATEST_FLAG="--latest"
           fi
-          gh release create "$CHANNEL_TAG" --repo "$REPO" --target "$TAG_TARGET" --title "$TITLE" --notes-file "$NOTES_FILE" $LATEST_FLAG
+          if gh release view "$CHANNEL_TAG" --repo "$REPO" >/dev/null 2>&1; then
+            gh release edit "$CHANNEL_TAG" --repo "$REPO" --title "$TITLE" --notes-file "$NOTES_FILE" "$LATEST_FLAG"
+          else
+            gh release create "$CHANNEL_TAG" --repo "$REPO" --title "$TITLE" --notes-file "$NOTES_FILE" "$LATEST_FLAG"
+          fi
 
           # This is a rolling release, not a build archive: remove only assets managed
           # by this workflow before uploading the current, predictable filenames.
@@ -322,5 +327,5 @@ jobs:
             fi
           done < <(gh api "repos/$REPO/releases/$RELEASE_ID/assets?per_page=100" --jq '.[] | [.id, .name] | @tsv')
 
-          gh release upload "$CHANNEL_TAG" "$JAR_PATH" --repo "$REPO"
+          gh release upload "$CHANNEL_TAG" "$JAR_PATH" --repo "$REPO" --clobber
           echo "Updated release $CHANNEL_TAG from $SOURCE_SHA. The other Minecraft channel was not touched."
