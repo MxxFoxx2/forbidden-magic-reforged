@@ -81,7 +81,7 @@ public final class BlinkFocusBehavior {
                 if (entity == player) {
                     continue;
                 }
-                entity.hurtServer(serverLevel, serverLevel.damageSources().source(DamageTypes.FIREBALL, player), damage);
+                entity.hurt(serverLevel.damageSources().source(DamageTypes.FIREBALL, player), damage);
                 entity.setRemainingFireTicks((3 + 3 * potency) * 20);
                 puff(serverLevel, ParticleTypes.FLAME, entity);
             }

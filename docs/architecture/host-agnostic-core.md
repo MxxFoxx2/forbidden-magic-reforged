@@ -1,135 +1,93 @@
-# Host-agnostic core architecture
+# Host-agnostic core architecture — Minecraft 1.21.1
 
-**Runtime target:** Minecraft 26.3 / NeoForge / Thaumcraft 4: Reforged 1.1.3
-**Status:** Implemented in `main` and CI-verified within the scope described below. This is not a claim of a second host adapter or cross-Minecraft-version compatibility.
+**Track:** `architecture/1.21.1-host-agnostic`  
+**Runtime target:** Minecraft 1.21.1 / NeoForge 21.1.256 / Thaumcraft 4: Reforged 1.1.2 / Java 21  
+**Status:** The 1.21.1 host-agnostic architecture migration is complete for the implemented feature set. Direct Thaumcraft API usage is isolated in `integration/tc4/`; remaining limitations are explicitly recorded in the capability table and test suite.
 
 ## Purpose and non-goals
 
-The goal is to keep Forbidden Magic's content definitions and shared gameplay rules independent of a particular magic-host API. Host-specific registration, runtime behavior, entity semantics, item implementations, and lifecycle hooks belong behind explicit adapter contracts.
+The portability boundary is the **magic host**, not Minecraft. Shared definitions and behavior contracts should not depend on Thaumcraft's registry, wand, aspect, research, recipe, Baubles, or Essentia classes. Minecraft and NeoForge remain first-class runtime dependencies.
 
-This work does **not** claim that the current JAR supports multiple magic hosts or multiple Minecraft versions. The production composition root selects `Tc4HostAdapter`, and the current build targets the 26.3 TC4 track. Support for another magic host is outside the project's current scope.
+The 1.21.1 runtime is a separate track. Its adapter uses the 1.21.1 `ResourceLocation`, damage, particle, item-property, block-entity, and Thaumcraft APIs. It is not source- or binary-compatible with the newer 26.x tracks merely by changing version constants.
+
+This branch does not produce a universal JAR across Minecraft versions, does not alter `main` or `mc/26.1.2`, and does not claim a second production magic-host adapter.
 
 ## Layers
 
-### 0. Shared gameplay and registries — `common/`
+### Shared semantic model — `core/`
 
-All shared mod classes (blocks, items, `Fm*` registries, config, event handlers) live in
-`dev.visfox.forbiddenreforged.common`. The root package holds only the composition root
-`ForbiddenMagic`; `common/FmIds` owns `MODID`/`LOGGER`/`id()` so no shared class imports the
-composition root. `tools/check_host_agnostic_api.py` rejects any import of the root package
-outside `ForbiddenMagic.java` and any `integration/tc4` dependency on the root package, which
-keeps the package graph acyclic: `integration/tc4 → common → integration/api → core`.
+The shared core owns:
 
-### 0b. GameTests — `src/gameTest`
+- `ContentId` and symbolic host content references.
+- Aspect, recipe, and research definitions/catalogs.
+  `FmRecipes` and `FmResearch` are thin registration facades; their full definitions live in `ForbiddenMagicRecipeCatalog` and `ForbiddenMagicResearchCatalog`.
+- Shared wand behavior rules and narrow access contracts, including Blink Focus targeting, teleport effects, upgrade progression/cost profiles, and Witchwood mana conversion rates.
+- Shared Wrath Cage logical state (attunement, storage, fuel, spawn delay, and Sloth mode), spawn eligibility and fuel selection/application, spawn-delay countdown rules, complete spawn-round orchestration, player-range gating, vanilla entity resolution/creation, per-round attempt limits, nearby-entity caps, placement and collision checks, bounded three-channel Essentia storage, semantic aspect-to-channel routing, extraction eligibility, display-mode selection, and immutable state snapshot/restore.
+- Semantic warp kinds and access contracts.
 
-GameTest classes live in a dedicated `gameTest` source set (`src/gameTest/java`), wired only
-into the `gameTestServer` run and the mod's test namespace. They are not compiled into the
-production JAR, and `ForbiddenMagic` no longer references them.
+The core may use Minecraft runtime types where behavior necessarily operates on Minecraft objects, such as `ItemStack`, entities, and levels. It must not import Thaumcraft or NeoForge implementation APIs, or refer to the concrete TC4 adapter.
 
-### 0c. Content-gating config sync — `common/FmSync`
+### Adapter contract — `integration/api/`
 
-`FmConfig` stays `STARTUP` (read before registration), but the flags that change registered
-content (`no_lust`, `emerald_transmutation`, `enchanting`, `greedy_ench`, `wrath_cage`) are
-sent to clients in a play-to-client payload on login; a mismatch disconnects the client with
-an explanatory message because registries cannot be reconciled after the fact. Display-only
-flags (`tag_research`, `spork`) remain local. `tools/check_host_pin.py` (scheduled CI) verifies
-the pinned host sha and patch applicability without ever updating `host.sha`.
+- `HostAdapter` describes the selected host's catalog registration, diagnostics, bootstrap, and profile; shared commands and tests retrieve registry diagnostics through this neutral contract. `HostBlockEntityServices` exposes only the Minecraft `BlockEntity` base type and typed lifecycle/interaction operations; the concrete `Tc4WrathCageBlockEntity` implementation stays inside `integration/tc4/`.
+- `HostProfile` declares every capability as `NATIVE`, `ADAPTED`, `PARTIAL`, or `UNSUPPORTED`.
+- `HostAdapterRegistry` installs the selected adapter once and exposes typed capability lookups.
 
-### 1. Shared model and catalogs — `core/`
+`ForbiddenMagic` is the composition root. It installs `Tc4HostAdapter.INSTANCE` before shared aspect catalog registration and before item registration causes host item properties/factories to be resolved.
 
-The shared layer owns semantic values and definitions:
+### Runtime capabilities — `integration/runtime/`
 
-- `ContentId` identifies content without resolving it to a host registry object.
-- `HostContent` describes selected-host item/tag references symbolically using the internal `host:item/...` and `host:tag/...` keys; no concrete host namespace is embedded in the model.
-- Aspect, recipe, and research catalogs describe Forbidden Magic content as data.
-- Shared wand behaviors use narrow access contracts rather than importing TC4 wand classes.
+The narrow interfaces currently cover aspect services, item properties and factories, entity aspects and classification, morph tools, block-entity construction, wand inspection, full typed wand Vis reads/writes plus separate item-backed real-Vis storage, focus upgrade/Vis operations, typed wand-parts mutation, Essentia source extraction, accessory slots, taint block and taint-origin services, enchantment effects, scribing operations, warp, wand/trigger registration, optional enchantment integration, and creative-content contribution.
 
-The architecture checker rejects Minecraft/NeoForge/host API imports from the pure model/catalog/API boundaries and rejects hard-coded host namespaces in core catalogs.
+These contracts may expose Minecraft/NeoForge runtime types required by the 1.21.1 implementation. They must not expose Thaumcraft types or concrete adapter classes.
 
-### 2. Host contract — `integration/api/`
+### TC4 implementation — `integration/tc4/`
 
-`HostAdapter` is the registration/lifecycle contract. It exposes the selected host profile, aspect-tag registration, aspect/recipe/research registration, Crystalwell mode, diagnostics, and runtime bootstrap.
+The concrete layer owns conversions between semantic identifiers and TC4 values, TC4 aspect definitions and aspect-tag/scan-target registration, recipe/research registration, wand and Vis calls, Baubles, taint materials/origins and taint spread, taint damage, special mining, Thaumcraft entity classification, TC4 item properties/factories, and warp-pool mapping.
 
-`HostProfile` advertises feature support with `NATIVE`, `ADAPTED`, `PARTIAL`, or `UNSUPPORTED` levels. It is descriptive compatibility metadata, not a runtime feature switch. An omitted entry is treated as `UNSUPPORTED` by `supportOf()`. Keep the declarations accurate; test material `PARTIAL`/`UNSUPPORTED` limitations and actual behavior rather than copying the entire metadata table into GameTests.
+Core Minecraft gameplay consumers remain in the mod's regular source packages; direct Thaumcraft API references are confined to `integration/tc4/`, with `ForbiddenMagic` retaining the single composition-root import that installs the selected adapter. `WandMaterialCatalog` owns semantic rod/cap registration data, while `WandTriggerCatalog` owns Hellfire trigger blocks, research, aspect, and Vis cost. `Tc4WandAdapter` now only maps material definitions into TC4 registries; `Tc4WandUpdateAdapter` isolates `RodUpdate` callback construction, and `Tc4ArsMagicaManaUpdate` isolates reflective access to optional Ars Magica mana APIs. Shared rod behaviors consume the typed `HostWandVisServices` and wand-parts contracts. Native creative wand assembly and rod-part mutation are provided through the focused `HostCreativeContentServices` and `HostWandPartsServices` capabilities. `Tc4BlinkFocusItem` is the TC4 `FocusItem` integration wrapper. Targeting, destination calculation and teleport/combat behavior live in `core/wand/BlinkFocusBehavior`; upgrade progression and semantic Vis-cost definitions live in `core/wand/BlinkFocusRules`. Focus upgrade inspection and Vis payment use `HostFocusServices`; `Tc4FocusAdapter` converts semantic upgrades and Vis costs to TC4 `FocusUpgradeType` and `AspectList` values, while `FocusItem` and `WandItem` lifecycle calls stay in `integration/tc4/`. `Tc4WrathCageBlockEntity` in `integration/tc4/` remains the TC4 block-entity/EssentiaSource/EssentiaTransport callback wrapper. The complete logical cage state (attunement, storage, fuel, spawn delay, and Sloth mode) lives in `core/block/WrathCageState`, which also owns spawn eligibility, fuel-channel consumption, and spawn-delay advancement; channel capacities, routing, extraction planning, and storage snapshots live in `core/block/WrathCageStorage`. The TC4 callback wrapper converts incoming `Aspect` values to `ContentId` and delegates channel selection and storage mutations to the core. The tick wrapper delegates the spawn gate, fuel-channel selection/application, and spawn-delay advancement to `WrathCageState`. Complete spawn-round orchestration lives in `core/block/WrathCageSpawnBehavior` and uses Minecraft `ServerLevel`, entity registry, entity creation, placement, and collision APIs directly; this is intentional because Minecraft remains the runtime target rather than an abstracted host. Physical pulls from neighboring sources are performed through `HostEssentiaTransportServices` by `Tc4EssentiaTransportAdapter`, which alone checks `EssentiaTransport` and output direction. The block entity maps the complete core snapshot to the unchanged legacy `MobId`, `Special`, `Wrath`, `Sloth`, `Fuel`, `Delay`, `Slothful`, and `Mode` keys and still owns `ValueInput`/`ValueOutput`, callback interfaces, and entity spawning. Compatibility facades such as `FmWands` delegate Witchwood mana rules to the shared core rather than duplicating formulas. The former broad `HostBootstrapServices` contract is split into independent wand-registration, optional-enchantment, and creative-content capabilities.
 
-`HostAdapterRegistry` is the capability lookup. `ForbiddenMagic` is the composition root: it installs the selected adapter before registering shared catalogs and content. Shared feature classes must not select or import a concrete adapter.
+## Current capability status
 
-### 3. Runtime capability ports — `integration/runtime/`
+The 1.21.1 `Tc4HostAdapter` declares every `HostProfile.Feature`. The currently adapted capabilities include:
 
-Runtime contracts are separated by responsibility rather than combined in one service:
+- Aspect registration, diagnostics, presentation, and scan targets.
+- Semantic recipe and research catalog registration, including multi-stage definitions lowered to sequential native research entries, stage-specific prerequisites/pages/warp, sibling links, and item, entity, and aspect unlock triggers.
+- Warp pools and sticky warp mapping.
+- Morph-tool area mining and cycle sound.
+- Wand inspection and typed wand Vis reads/writes, with item-backed real-Vis writes kept as a distinct operation.
+- Semantic wand rods/caps, update behavior, trigger rules, typed part mutation, Blink Focus progression and cost profiles, all materialized through native TC4 registration/lifecycle adapters.
+- Bounded Essentia storage and extraction policy, with native persistence and physical transport calls isolated in the TC4 block-entity/transport adapters.
+- Host-native creative-tab contributions through the dedicated creative-content capability (currently catalogued wand samples).
+- Baubles accessory lookup and slot assignment.
+- Taint material classification, taint-shovel behavior, opt-in taint-origin registration/adjacent fibre propagation, and special-mining/taint-damage hooks.
+- Optional Thaumic Tinkerer enchantment-cost integration through a typed, isolated adapter compiled against the pinned public 1.21.1 API as `compileOnly`.
+- Scribing research difficulty, primal-aspect selection, aspect-pool updates, and spent scribing-tool creation.
+- Wrath Cage block-entity construction.
+- Entity-to-aspect catalog and host entity classification; Wrath Cage aspect lookup and mob-imprint boss checks consume semantic IDs from these services instead of duplicating TC4 Aspect and boss registries.
+- Host-specific item properties and factories. TC4 item shells that implement `ScribingToolsItem`, `Bauble`, `RunicArmor`, `VisAmuletItem`, or `WarpingGear` live in `integration/tc4`; the shared registration API receives only Minecraft `Item` instances.
 
-| Contract | Responsibility |
-|---|---|
-| `HostEntityAspectServices` | Typed entity-to-aspect catalog; declared by `ENTITY_ASPECTS` |
-| `HostEntityClassificationServices` | Tainted-mob/boss/golem predicates and boss IDs; declared by `ENTITY_CLASSIFICATION` |
-| `HostAspectServices` | Host-provided aspect display components |
-| TC4 aspect registration | Declares `ASPECT_RECIPE_DERIVATION` because semantic component lists are passed into the host AddonAspects registrar |
-| `Tc4WarpAdapter` | Maps `PERMANENT`, `STICKY`, and `TEMPORARY` to distinct TC4 pools; declared by `WARP_POOLS` and `STICKY_WARP` |
-| `HostMorphToolServices` | Morph-tool cycle sound and area mining |
-| `HostBlockEntityServices` | Host-backed Wrath Cage block-entity factory |
-| TC4 Wrath Cage bridge | Declares `ESSENTIA_STORAGE` and `ESSENTIA_TRANSPORT` because its host subclass implements `AspectSource` and `EssentiaTransport` |
-| `HostWandInspectionServices` | Read-only wand and focus queries; declared by `WAND_INSPECTION` |
-| `HostWandVisServices` | Writes semantic aspects to wand and real Vis stores; declared by `WAND_VIS_STORAGE` |
-| `Tc4WandPartsAdapter` | Implements rod replacement through the TC4 `WandParts` component; declared by `WAND_PARTS` |
-| `HostAccessoryServices` | Host accessory slot lookup; declared by `ACCESSORY_INTEGRATION` |
-| `HostTaintBlockServices` | Taint block classification and taint-shovel behavior; declared by `TAINT_BLOCK_SERVICES` |
-| `HostEnchantmentEffectServices` | Host-specific special-mining drops and taint damage classification; declared by `ENCHANTMENT_EFFECTS` |
-| `HostScribingServices` | Research difficulty, primal aspect IDs, and player aspect-pool operations |
-| `HostItemPropertyServices` | Host-specific `Item.Properties` customization; declared by `ITEM_PROPERTIES` |
-| `HostItemFactoryServices` | Host-backed item implementations and remainder items; declared by `ITEM_FACTORIES` |
-| `HostBootstrapServices` | Wand/trigger/optional-enchantment registration and creative-tab entries |
-| `HostWarpServices` | Applies semantic permanent/sticky/temporary warp changes through `WarpAccess`; host mapping remains in `Tc4WarpAdapter` |
+The three previously recorded TC4 gaps now have explicit implementations:
 
-These ports may use Minecraft runtime types such as `ItemStack`, `LivingEntity`, `BlockState`, and `ServerPlayer`: this is a host-agnostic boundary within the current Minecraft/NeoForge target, not a cross-Minecraft-version abstraction. They must not expose TC4 or another magic-host's API types.
+- **Research stages:** the adapter lowers each semantic stage to a native TC4 `ResearchItem`. Intermediate stages receive deterministic adapter-owned keys, each requires the previous stage plus its own prerequisites, and the final stage retains the definition's canonical key. Definition note cost is charged on the first stage only. Later zero-cost entries auto-complete only after their previous stage and stage-specific prerequisites are complete, revealing their own pages and applying their warp without charging a second note. Intermediate entries are placed before the canonical entry while avoiding occupied category coordinates.
+- **Thaumic Tinkerer:** the add-on remains optional, but the bridge is now linked against the pinned 1.21.1 public API at compile time. Gradle downloads the published `1.1.3-1.21.1` API JAR into `build/`, verifies SHA-256 `8af77b4bd9ade42b1867389c7d74a48837e0a436ee9ba0ffef6c90963b26b9e8`, and adds it as `compileOnly`; the runtime JAR is not bundled. All eight `Data` records are materialized before the public map is changed, and writes are rolled back if the map rejects a mutation. The TT-linked adapter is isolated in its own class and is invoked only when `thaumictinkerer` is loaded; no TT classes need to resolve for installations without the mod. Disabled enchantments and an absent mod are no-ops.
+- **Taint origins:** `HostTaintOriginServices` exposes origin block registration, unregistration, classification, and an adjacent propagation operation. A local patch to the pinned TC4 host makes registered origins participate in taint adjacency and delegates fibre placement to the host's `TaintSpread`; the target biome is marked tainted only after fibre placement succeeds. The caller owns the origin's tick cadence.
 
-The old aggregate contracts were removed. Consumers request the narrow capability they need
-through the typed accessors of `HostAdapterRegistry` (`warp()`, `wandVis()`, `itemFactories()`, ...),
-which read the adapter's immutable `HostServices` composition.
-
-### 3b. Dormant host capabilities
-
-A capability may exist before the host can serve it. `HostSmeltingBonusServices` is the
-example: the original add-on registered an emerald smelting bonus through the host, but TC4
-1.1.2/1.1.3 keep the bonus table internal. The port exists, the TC4 adapter probes the host
-reflectively, and the bonus stays inactive until the host publishes a registration method. The
-host profile declares the capability as `UNSUPPORTED` until then, and no substitute mechanic is
-introduced.
-
-### 4. Concrete host integration — `integration/tc4/`
-
-TC4-specific registry values, entity classes, wand APIs, Essentia types, research/recipe APIs, Baubles, and host item subclasses live in this layer. `Tc4HostAdapter` implements only the registration/lifecycle `HostAdapter` contract and exposes `services()`; `Tc4Services` composes every runtime port from the focused TC4 adapters in one place.
-
-The one intended production composition-root reference to a concrete adapter is the selection of `Tc4HostAdapter.INSTANCE` in `ForbiddenMagic`. Other shared production classes should use the neutral contracts.
-
-## Entity aspect catalog
-
-The Mob Crystal/spawner lookup is now split:
-
-- `FmSpawnerMobs` owns the common query surface and Wrath Cage imprint rules.
-- `HostEntityAspectServices` supplies the `Map<ContentId, ContentId>` from entity IDs to aspect IDs.
-- `HostEntityClassificationServices` supplies host-specific boss/taint/golem predicates and boss IDs.
-- `Tc4EntityAdapter` owns the TC4 entity taxonomy and translates both entity and aspect identifiers to semantic `ContentId` values.
-- `Tc4WarpAdapter` maps all three semantic warp kinds directly to TC4 `WarpType` values, including distinct `STICKY`; the profile declares `WARP_POOLS` and `STICKY_WARP`. GameTests exercise all three mappings and a sticky-warp change through `HostWarpServices`.
-- Core wand progression uses `WandContractAccess` for the Profane Contract component and `WarpAccess` for sticky-warp mutations. The concrete data-component adapter lives outside `core`; the host warp operation is exposed through `HostWarpServices`. No core warp class extends NeoForge `Event` or posts to the NeoForge event bus.
-- Host taint-origin registration is not implemented; `TAINT_ORIGINS` is explicitly declared `UNSUPPORTED` by the TC4 adapter. Every `HostProfile.Feature` has one explicit support declaration.
-
-The silverfish configuration is passed to the host capability as an explicit option. The common mob catalog no longer hard-codes `thaumcraft:` entity or aspect identifiers.
+The port does not automatically register an existing Forbidden Magic block as a source: the legacy source audit did not establish that any FM block acted as an independent taint origin. The new API is opt-in so that future content can register an origin without silently changing existing gameplay. Native Thaumcraft objects and callbacks remain inside the TC4 adapter or the pinned host patch by design; their presence there is not a portability gap.
 
 ## Validation
 
-Use checks that match the change:
+The 1.21.1 workflow builds the pinned Thaumcraft host and addon, verifies artifact provenance, runs GameTests, and uploads the resulting JAR. The build fetches the pinned Thaumic Tinkerer API artifact and verifies its SHA-256 before compiling the optional typed adapter; the `verifyTinkererCompileOnly` task also fails if any `thaumictinkerer/` classes appear in the produced Forbidden Magic JAR. The architecture boundary checker rejects Thaumcraft dependencies in `core/`, `integration/api/`, and `integration/runtime/`, and checks all production sources outside `integration/tc4/` for direct host imports. The only production exception is the single `Tc4HostAdapter` import in the `ForbiddenMagic` composition root.
 
-1. Use `tools/check_host_agnostic_api.py` to guard package and import boundaries; extend it only when a real boundary changes.
-2. Add GameTests for changed runtime behavior, compatibility-sensitive paths, and meaningful host limitations. Do not mirror the full `HostProfile` metadata table in tests.
-3. For integration changes, run the pinned host preparation/build and the relevant GameTests. The full release CI gate remains responsible for provenance, generated-resource freshness, and both `no_lust` configurations.
+`ArchitectureCapabilityGameTests` checks the three former gaps at runtime: stage lowering, delayed continuation-stage advancement until prerequisites are satisfied, the adapted capability declarations, and origin registration plus a real adjacent fibre spread through the TC4 host engine. `EnchantmentGameTests.tinkererIntegrationIsOptional` verifies no-op behavior without Thaumic Tinkerer, eight registrations when it is present, and idempotent repeated registration. The host-profile test and existing profile audit continue to require a non-empty explanation for every declared feature. Catalog registration, scan-target registration, diagnostics, and runtime bootstrap are intentionally provided by the base `HostAdapter`; the event-time services are exposed through the narrow `Host*Services` interfaces. The test also checks the mapping between those typed services and the corresponding profile features.
 
-Static boundary checks catch unwanted dependencies; GameTests verify the current TC4 adapter. They do not imply compatibility with other magic hosts or Minecraft versions.
+A green headless CI run verifies compilation and GameTest behavior; it does not replace manual client checks for rendering, tooltips, wand/focus interactions, and in-world visuals before release.
 
 ## Rules for future changes
 
-- Keep semantic IDs and content definitions in `core/`; resolve them to host objects only in the concrete adapter.
-- Do not add host API imports to shared gameplay, common facades, or capability contracts.
-- Prefer a new narrow capability over adding unrelated methods to an existing contract.
-- Update `HostProfile` when host support materially changes. Test the important `PARTIAL`/`UNSUPPORTED` limitations and affected behavior instead of adding a test for every metadata entry.
-- Keep Minecraft/NeoForge version tracks separate. Do not combine incompatible host versions in one source set or binary.
-- Record partial or non-equivalent host behavior as `PARTIAL` and document the gap rather than silently approximating it.
+1. Put shared definitions and semantics in `core/`; resolve them to host objects only inside `integration/tc4/`.
+2. Prefer a narrow runtime capability over a growing aggregate host interface.
+3. Keep host-specific registrations and callbacks inside `integration/tc4/`, and expose only the operations actually consumed through narrow runtime capabilities.
+4. Update the profile and its GameTest whenever support changes.
+5. Keep MC/NeoForge version tracks and binaries separate.
+6. Preserve legacy gameplay behavior while moving implementation behind the adapter; do not silently replace mechanics with approximations.

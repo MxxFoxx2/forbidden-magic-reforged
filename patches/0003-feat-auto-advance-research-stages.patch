@@ -1,0 +1,98 @@
+From 16a19d257d658fbf3e2ba6f2c6ab55c8f1b2f851 Mon Sep 17 00:00:00 2001
+From: Forbidden Magic Port Build <port-build@example.invalid>
+Date: Tue, 3 Nov 2026 17:45:00 +0300
+Subject: [PATCH] feat: add automatic progression for addon research stages
+
+---
+ .../thaumcraft/research/ResearchStageRegistry.java | 59 +++++++++++++++++++++++++
+ .../java/thaumcraft/research/ResearchManager.java   |  2 +
+ 2 files changed, 61 insertions(+)
+ create mode 100644 src/main/java/thaumcraft/research/ResearchStageRegistry.java
+
+diff --git a/src/main/java/thaumcraft/research/ResearchStageRegistry.java b/src/main/java/thaumcraft/research/ResearchStageRegistry.java
+new file mode 100644
+index 0000000..a72db0f
+--- /dev/null
++++ b/src/main/java/thaumcraft/research/ResearchStageRegistry.java
+@@ -0,0 +1,59 @@
++package thaumcraft.research;
++
++import java.util.List;
++import java.util.Objects;
++import java.util.Set;
++import java.util.concurrent.ConcurrentHashMap;
++import net.minecraft.server.level.ServerPlayer;
++
++/**
++ * Unlocks zero-cost continuation entries registered by add-ons after their
++ * native research prerequisites have been completed.
++ */
++public final class ResearchStageRegistry {
++    private static final Set<String> AUTOMATIC_STAGES = ConcurrentHashMap.newKeySet();
++    private static final ThreadLocal<Boolean> ADVANCING = ThreadLocal.withInitial(() -> false);
++
++    private ResearchStageRegistry() {
++    }
++
++    public static void registerAutomaticStages(List<String> keys) {
++        Objects.requireNonNull(keys, "keys");
++        for (String key : keys) {
++            if (key == null || key.isBlank()) {
++                throw new IllegalArgumentException("Research stage key cannot be blank");
++            }
++            AUTOMATIC_STAGES.add(key);
++        }
++    }
++
++    public static void advance(ServerPlayer player) {
++        Objects.requireNonNull(player, "player");
++        if (ADVANCING.get()) {
++            return;
++        }
++
++        ADVANCING.set(true);
++        try {
++            boolean progressed;
++            do {
++                progressed = false;
++                for (String key : AUTOMATIC_STAGES) {
++                    if (ResearchManager.isComplete(player, key)) {
++                        continue;
++                    }
++                    ResearchItem stage = ResearchCategories.getResearch(key);
++                    if (stage == null || stage.tags().size() != 0
++                        || !ResearchManager.hasRequisites(player, key)) {
++                        continue;
++                    }
++                    if (ResearchManager.complete(player, key)) {
++                        progressed = true;
++                    }
++                }
++            } while (progressed);
++        } finally {
++            ADVANCING.remove();
++        }
++    }
++}
+diff --git a/src/main/java/thaumcraft/research/ResearchManager.java b/src/main/java/thaumcraft/research/ResearchManager.java
+index bdafecf..fb6348c 100644
+--- a/src/main/java/thaumcraft/research/ResearchManager.java
++++ b/src/main/java/thaumcraft/research/ResearchManager.java
+@@ -60,6 +60,7 @@ public final class ResearchManager {
+         if (notify) {
+             ModNetwork.sendToPlayer(player, new ResearchCompletePayload(key));
+         }
++        ResearchStageRegistry.advance(player);
+         return true;
+     }
+ 
+@@ -113,6 +114,7 @@ public final class ResearchManager {
+                 complete(player, item.key(), false);
+             }
+         }
++        ResearchStageRegistry.advance(player);
+     }
+ 
+     public static void grantStartingPool(ServerPlayer player) {
+-- 
+2.43.0

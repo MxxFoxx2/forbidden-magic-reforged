@@ -63,7 +63,8 @@ public record HostProfile(
         TAINT_ORIGINS,
         ENTITY_ASPECTS,
         ENTITY_CLASSIFICATION,
-        SMELTING_BONUSES
+        VILLAGER_TRADES,
+        CREATIVE_CONTENT
     }
 
     public enum SupportLevel {

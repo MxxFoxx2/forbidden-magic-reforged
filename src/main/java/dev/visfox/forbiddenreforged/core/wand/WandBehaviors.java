@@ -18,7 +18,7 @@ public final class WandBehaviors {
     private static final ContentId WATER = aspect("water");
     private static final ContentId ORDER = aspect("order");
     private static final ContentId ENTROPY = aspect("entropy");
-    private static final ContentId PROFANED_ROD = new ContentId("forbiddenmagic", "profaned");
+    private static final ContentId PROFANED_ROD = WandMaterialCatalog.rodId("profaned");
     private static final List<ContentId> NON_FIRE = List.of(ORDER, ENTROPY, AIR, EARTH, WATER);
 
     private WandBehaviors() {
@@ -97,7 +97,7 @@ public final class WandBehaviors {
             parts.setRod(wand, PROFANED_ROD);
             contractAccess.clear(wand);
             warpAccess.changeWarp(player, 1, WarpKind.STICKY);
-            player.level().sendParticles(
+            player.serverLevel().sendParticles(
                 ParticleTypes.EXPLOSION,
                 player.getX(),
                 player.getY() + player.getBbHeight() / 2.0,

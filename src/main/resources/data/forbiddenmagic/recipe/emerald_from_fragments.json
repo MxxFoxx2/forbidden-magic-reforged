@@ -2,7 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "#": "forbiddenmagic:emerald_fragment"
+    "#": {
+      "item": "forbiddenmagic:emerald_fragment"
+    }
   },
   "pattern": [
     "###",

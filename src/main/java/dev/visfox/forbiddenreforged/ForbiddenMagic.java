@@ -1,45 +1,42 @@
 package dev.visfox.forbiddenreforged;
 
-import dev.visfox.forbiddenreforged.common.FmAspects;
-import dev.visfox.forbiddenreforged.common.FmBlockEntities;
-import dev.visfox.forbiddenreforged.common.FmBlocks;
-import dev.visfox.forbiddenreforged.common.FmCommands;
-import dev.visfox.forbiddenreforged.common.FmComponents;
-import dev.visfox.forbiddenreforged.common.FmConfig;
-import dev.visfox.forbiddenreforged.common.FmCreativeTab;
-import dev.visfox.forbiddenreforged.common.FmDrops;
-import dev.visfox.forbiddenreforged.common.FmEnchantmentEffects;
-import dev.visfox.forbiddenreforged.common.FmIds;
-import dev.visfox.forbiddenreforged.common.FmItems;
-import dev.visfox.forbiddenreforged.common.FmVillagers;
-import dev.visfox.forbiddenreforged.common.ScribeWellEvents;
-import dev.visfox.forbiddenreforged.common.FmToolEvents;
+import com.mojang.logging.LogUtils;
 import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
 import dev.visfox.forbiddenreforged.integration.tc4.Tc4HostAdapter;
+import dev.visfox.forbiddenreforged.core.aspect.ForbiddenMagicAspectCatalog;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.common.NeoForge;
+import org.slf4j.Logger;
 
-/**
- * Composition root: the only place that selects the concrete host adapter.
- * All shared content lives in {@code common}; GameTests live in their own source set.
- */
-@Mod(FmIds.MODID)
+@Mod(ForbiddenMagic.MODID)
 public final class ForbiddenMagic {
+    public static final String MODID = "forbiddenmagic";
+    public static final Logger LOGGER = LogUtils.getLogger();
+
     public ForbiddenMagic(IEventBus modEventBus, ModContainer modContainer) {
         FmConfig.register(modContainer);
         HostAdapterRegistry.install(Tc4HostAdapter.INSTANCE);
-        FmAspects.init();
+        HostAdapterRegistry.require().registerAspects(
+            ForbiddenMagicAspectCatalog.definitions(!FmConfig.lustDisabled())
+        );
         HostAdapterRegistry.require().registerAspectTags();
         FmComponents.register(modEventBus);
-        FmBlocks.BLOCKS.register(modEventBus);
-        FmBlockEntities.register(modEventBus);
+        FmBlocks.register(modEventBus);
         FmItems.ITEMS.register(modEventBus);
+        FmBlockEntities.register(modEventBus);
         FmCreativeTab.register(modEventBus);
         FmVillagers.register(modEventBus);
         FmDrops.register();
         FmEnchantmentEffects.register();
         FmToolEvents.register();
         ScribeWellEvents.register();
+        NeoForge.EVENT_BUS.addListener(FmItemEvents::onFuel);
+    }
+
+    public static ResourceLocation id(String path) {
+        return ResourceLocation.fromNamespaceAndPath(MODID, path);
     }
 }

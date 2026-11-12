@@ -3,7 +3,7 @@ package dev.visfox.forbiddenreforged.integration.tc4;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
 import dev.visfox.forbiddenreforged.core.warp.WarpKind;
 import java.util.Objects;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import thaumcraft.research.Warp;
 import thaumcraft.research.WarpType;
@@ -18,7 +18,7 @@ public final class Tc4WarpAdapter {
             throw new IllegalArgumentException("Registered item warp cannot be negative");
         }
         Warp.registerItem(
-            Identifier.fromNamespaceAndPath(item.namespace(), item.path()),
+            ResourceLocation.fromNamespaceAndPath(item.namespace(), item.path()),
             amount
         );
     }

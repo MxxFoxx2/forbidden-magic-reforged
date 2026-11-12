@@ -4,7 +4,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 LANG_SOURCE = ROOT / "data" / "lang"
 ASSETS = ROOT / "src" / "generated" / "resources" / "assets" / "forbiddenmagic"
-TEXTURES = ROOT / "src" / "main" / "resources" / "assets" / "forbiddenmagic" / "textures" / "item"
 
 
 def flatten(value: object, prefix: str = "") -> dict[str, str]:

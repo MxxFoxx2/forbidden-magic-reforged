@@ -5,7 +5,7 @@ import dev.visfox.forbiddenreforged.core.recipe.RecipeDefinition;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import thaumcraft.crafting.CraftingRecipeRef;
 import thaumcraft.crafting.CrucibleRecipe;
 import thaumcraft.crafting.InfusionEnchantmentRecipe;
@@ -16,6 +16,7 @@ import thaumcraft.crafting.TcIngredient;
 import thaumcraft.crafting.TcRecipe;
 import thaumcraft.crafting.TcRecipes;
 import thaumcraft.crafting.TcStack;
+import thaumcraft.research.ResearchConfig;
 
 public final class Tc4RecipeAdapter {
     private static final Map<String, String> LEGACY_RECIPE_KEYS = Map.of(
@@ -36,7 +37,7 @@ public final class Tc4RecipeAdapter {
 
     
     public static boolean crystalwellUsesShardTag() {
-        return thaumcraft.Config.researchDifficulty() == -1;
+        return ResearchConfig.RESEARCH_DIFFICULTY == -1;
     }
 
     public static void registerRecipes(List<RecipeDefinition> definitions) {
@@ -132,7 +133,7 @@ public final class Tc4RecipeAdapter {
         return TcStack.of(Tc4ContentAdapter.resolveItem(output.item()).toString(), output.count());
     }
 
-    private static Identifier identifier(ContentId id) {
+    private static ResourceLocation identifier(ContentId id) {
         return Tc4ContentAdapter.resolveItem(id);
     }
 

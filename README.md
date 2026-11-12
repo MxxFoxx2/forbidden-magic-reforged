@@ -1,69 +1,93 @@
-# Forbidden Magic: Reforged
+# Forbidden Magic: Reforged — Minecraft 1.21.1
 
-A port of **Forbidden Magic 0.574** (Minecraft 1.7.10, by SpitefulFox) to **Thaumcraft 4: Reforged** for **Minecraft 26.3** / **NeoForge 26.3.0.57-beta**.
+An unofficial port of **Forbidden Magic 0.574** (Minecraft 1.7.10) to **Thaumcraft 4: Reforged** on **Minecraft 1.21.1**. This branch is developed separately from the Minecraft 26.3 port.
 
-| Minecraft | NeoForge | Thaumcraft 4: Reforged | Release |
-| --- | --- | --- | --- |
-| **26.3** | 26.3.0.57-beta | 1.1.3 | [`release/26.3`](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/release/26.3) |
-| **26.1.2** | 26.1.2.122 | 1.1.2 | [`release/26.1.2`](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/release/26.1.2) |
-| **1.21.1** | 21.1.256 | 1.1.2 | [`release/1.21.1`](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/release/1.21.1) |
+| Minecraft | NeoForge | Thaumcraft 4: Reforged | Mod Version | Release Tag |
+| --- | --- | --- | --- | --- |
+| **1.21.1** | 21.1.256 | 1.1.2 | `0.574-1.21.1-port.0.1.0` | [`1.21.1`](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/1.21.1) |
 
-> The current mod version lives on the channel's rolling release page: the numbers auto-increment on each publish. A local dev build uses `mod_version` from `gradle.properties` and does not match the release number.
-> Minecraft **1.21.1** requires [Curios 9.5.1+1.21.1](https://www.curseforge.com/minecraft/mc-mods/curios).
-> There is no shared binary between Minecraft versions — each branch is built and released separately.
+> **Requires** [Curios 9.5.1+1.21.1](https://www.curseforge.com/minecraft/mc-mods/curios) (bundled in runtime classpath for GameTest).
+
+---
+
+## Status
+
+- Target environment: Minecraft 1.21.1, NeoForge 21.1.x, Java 21
+- Full parity with original not confirmed. Current progress and remaining tasks in [roadmap](docs/roadmap.md)
+- Requires Thaumcraft 4: Reforged 1.1.2 or newer. This branch uses upstream addon aspect API.
 
 ---
 
 ## Installation
 
-1. Install **Minecraft 26.3** with **NeoForge 26.3.0.57-beta**
-2. Install **Thaumcraft 4: Reforged 1.1.3** (required)
-3. For 1.21.1: also install **Curios 9.5.1+**
-4. Drop `forbidden-magic-<version>-<mc>.jar` into the `mods/` folder
-5. The **Apocrypha** tab appears in the Thaumonomicon
+Verify the downloaded file is for **Minecraft 1.21.1 and NeoForge 21.1.x** — the 26.3 build is incompatible. Release files available at [Releases](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases). If no suitable release exists, build from this branch.
+
+Required for play: NeoForge, Thaumcraft 4: Reforged 1.1.2 or newer, and host dependencies including Curios. Place mod JAR in `mods/` folder.
 
 ---
 
-## Configuration
+## Building & Testing
 
-Config file: `config/forbiddenmagic-startup.toml` (created on first launch). Each option carries its own description and default in the file.
+Requires Git, Python 3, and JDK 21.
 
-> `no_lust`, `enchanting`, `greedy_ench`, `emerald_transmutation`, and `wrath_cage` are **gates**: they decide what gets registered, so they are read at startup and synced to the client. A mismatch disconnects the client instead of diverging registries.
+Clone the branch and host repository side by side:
 
----
-
-## Building and development
-
-### Requirements
-- **Java 25** (Java 21 for the 1.21.1 branch)
-- **Python 3** (for host preparation, resource generation, validation)
-- Gradle wrapper included (`./gradlew`)
-
-### Commands
-```bash
-# Host preparation (Thaumcraft 4: Reforged sources + patches)
-python tools/prepare_host.py          # build host/
-python tools/prepare_host.py --verify # verification only
-
-# Build
-./gradlew build                       # builds both the host and the addon (composite build)
-
-# Run
-./gradlew runClient                   # dev client
-./gradlew runGameTestServer           # automated GameTests (headless)
-
-# Validation
-python tools/check_host_agnostic_api.py  # check host-agnostic boundaries
-python tools/check_provenance.py         # check JAR provenance
-python tools/check_host_pin.py           # check the host pin and patch applicability
-python tools/gen_resources.py            # regenerate resources (must leave a clean diff)
+```powershell
+git clone --branch 1.21.1 https://github.com/MxxFoxx2/forbidden-magic-reforged.git forbidden-magic-reforged-1.21.1
+cd forbidden-magic-reforged-1.21.1
+git clone https://github.com/notlikethiss/thaumcraft-4-reforged.git ../thaumcraft-4-reforged
+python tools/prepare_host.py
+.\gradlew.bat build --no-daemon
+.\gradlew.bat runGameTestServer --no-daemon
 ```
 
-The full verification gate and contribution rules are in [AGENTS.md](AGENTS.md). The package layout and layer boundaries are described in [docs/architecture/host-agnostic-core.md](docs/architecture/host-agnostic-core.md).
+On Linux/macOS use `python3` and `./gradlew`. The `tools/prepare_host.py` script prepares the pinned host version from `host.sha` into `host/`. Gradle uses `host/` via composite build; no separate `publish` needed. Do not edit `host/` manually.
+
+Localization is generated: edit `data/lang/en_us.toml` / `data/lang/ru_ru.toml` and run `python tools/gen_resources.py` to refresh `src/generated/resources/assets/forbiddenmagic/lang/*.json`. Do not edit the generated JSON by hand.
+
+On successful build, JAR is created at `build/libs/forbidden-magic-0.574-1.21.1-port.0.1.0.jar`.
 
 ---
 
-## Authors and license
+## Fidelity & Verification
+
+This port aims for **1:1 logic, numbers, recipes, and text parity** with the original Forbidden Magic 0.574, within modern API limits.
+
+- **Fidelity Ledger**: [docs/fidelity.md](docs/fidelity.md) — every known deviation, compromise, and parity gap
+- **Verification Report**: [docs/verification.md](docs/verification.md) — GameTest results, CI status
+- **Roadmap**: [docs/roadmap.md](docs/roadmap.md) — current priorities and blockers
+
+> **Visual and gameplay parity is only confirmed via `runClient` and actual play.** Green compilation and GameTests are necessary but not sufficient.
+
+---
+
+## Project Structure
+
+```
+src/main/java/dev/visfox/forbiddenreforged/
+├── core/
+│   ├── aspect/      # Aspect definitions (host-neutral)
+│   ├── model/       # ContentId, HostContent (host-neutral)
+│   ├── recipe/      # Recipe definitions (host-neutral)
+│   ├── research/    # Research definitions (host-neutral)
+│   ├── wand/        # Wand behaviors (Hellfire, Blink Focus)
+│   └── warp/        # Warp access abstraction
+├── integration/
+│   ├── api/         # HostAdapter, HostProfile, HostAdapterRegistry
+│   ├── runtime/     # 15 capability interfaces (HostXxxServices)
+│   └── tc4/         # Thaumcraft 4: Reforged implementation
+├── client/          # Client-only code (renderers, creative tabs)
+├── test/            # GameTest implementations (compile into main jar)
+├── FmBlocks.java    # Block registration
+├── FmItems.java     # Item registration
+├── FmResearch.java  # Research registration
+├── FmRecipes.java   # Recipe registration
+└── ForbiddenMagic.java  # Main mod class (composition root)
+```
+
+---
+
+## Credits & License
 
 | Role | Author |
 | --- | --- |
@@ -72,9 +96,9 @@ The full verification gate and contribution rules are in [AGENTS.md](AGENTS.md).
 | **Thaumcraft 4: Reforged** | [notlikethiss](https://github.com/notlikethiss/thaumcraft-4-reforged) |
 | **Forbidden Magic: Reforged** | [MxxFoxx2](https://github.com/MxxFoxx2/forbidden-magic-reforged) (MIT) |
 
-- The original's logic, numbers, recipes, texts, and assets are ported 1:1 wherever the modern API allows.
-- Thaumcraft assets belong to Azanor. This repository contains ported logic and assets and is **not intended for redistribution** beyond personal use.
-- See [LICENSE](LICENSE) and [NOTICE](NOTICE) for the full terms.
+- The original mod's logic, numbers, recipes, texts, and assets are ported 1:1 where the modern API permits.
+- Thaumcraft assets belong to Azanor. This repository contains ported logic and assets and is **not intended for redistribution** outside personal use.
+- See [LICENSE](LICENSE) and [NOTICE](NOTICE) for full terms.
 
 ---
 
@@ -84,4 +108,3 @@ The full verification gate and contribution rules are in [AGENTS.md](AGENTS.md).
 - **Issues**: [GitHub Issues](https://github.com/MxxFoxx2/forbidden-magic-reforged/issues)
 - **Thaumcraft 4: Reforged**: [GitHub](https://github.com/notlikethiss/thaumcraft-4-reforged)
 - **Original Forbidden Magic**: [GitHub](https://github.com/SpitefulFox/ForbiddenMagic)
-- **Documentation**: [deviations](docs/fidelity.md), [verification](docs/verification.md), [roadmap](docs/roadmap.md)

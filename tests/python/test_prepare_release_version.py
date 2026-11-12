@@ -36,6 +36,19 @@ class ReleaseVersionTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "previous release version"):
             select_release_version("2.0.0", "2.0")
 
+    def test_1_21_1_channel_is_accepted(self):
+        with tempfile.TemporaryDirectory() as directory:
+            properties = Path(directory) / "gradle.properties"
+            properties.write_text("mod_version=0.0.0-dev\n", encoding="utf-8")
+
+            result = prepare_release_version("1.0.0", "", properties, "1.21.1")
+
+            self.assertEqual(result, "1.0.0")
+            self.assertEqual(
+                properties.read_text(encoding="utf-8"),
+                "mod_version=1.0.0-1.21.1\n",
+            )
+
     def test_prepare_updates_exact_mod_version_entry(self):
         with tempfile.TemporaryDirectory() as directory:
             properties = Path(directory) / "gradle.properties"

@@ -1,13 +1,11 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
-import dev.visfox.forbiddenreforged.integration.tc4.Tc4AspectDiagnostics;
-import dev.visfox.forbiddenreforged.common.FmConfig;
-import dev.visfox.forbiddenreforged.common.FmRecipes;
-import dev.visfox.forbiddenreforged.common.FmResearch;
-import dev.visfox.forbiddenreforged.common.FmWandTriggers;
-import dev.visfox.forbiddenreforged.common.FmWands;
-import dev.visfox.forbiddenreforged.common.FmIds;
+import dev.visfox.forbiddenreforged.FmConfig;
+import dev.visfox.forbiddenreforged.ForbiddenMagic;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
+import dev.visfox.forbiddenreforged.core.recipe.ForbiddenMagicRecipeCatalog;
+import dev.visfox.forbiddenreforged.core.research.ForbiddenMagicResearchCatalog;
+import java.util.List;
 import thaumcraft.aspect.Aspect;
 
 public final class Tc4BootstrapAdapter {
@@ -18,10 +16,38 @@ public final class Tc4BootstrapAdapter {
         logAspectRegistry();
         Tc4WarpAdapter.registerWarpItem(ContentId.parse("forbiddenmagic:wrath_cage"), 5);
         Tc4WarpAdapter.registerWarpItem(ContentId.parse("forbiddenmagic:taint_sapling"), 1);
-        FmWands.register();
-        FmWandTriggers.register();
-        FmRecipes.register();
-        FmResearch.register();
+
+        Tc4WandAdapter.registerWands();
+        Tc4WandTriggerAdapter.register();
+
+        var host = Tc4HostAdapter.INSTANCE;
+        boolean crystalwellUsesShardTag = host.crystalwellUsesShardTag();
+        host.registerRecipes(ForbiddenMagicRecipeCatalog.definitions(
+            new ForbiddenMagicRecipeCatalog.Options(
+                FmConfig.enchantmentsEnabled(),
+                FmConfig.greedyEnchantmentEnabled(),
+                FmConfig.emeraldTrans(),
+                FmConfig.gluttonyMode(),
+                FmConfig.lustDisabled(),
+                crystalwellUsesShardTag
+            )
+        ));
+        host.registerResearch(
+            List.of(ForbiddenMagicResearchCatalog.category()),
+            ForbiddenMagicResearchCatalog.definitions(
+                new ForbiddenMagicResearchCatalog.Options(
+                    FmConfig.enchantmentsEnabled(),
+                    FmConfig.greedyEnchantmentEnabled(),
+                    FmConfig.lustDisabled(),
+                    FmConfig.emeraldTrans(),
+                    Tc4HostAdapter.INSTANCE.isArsMagicaLoaded(),
+                    crystalwellUsesShardTag
+                )
+            )
+        );
+
+        // Optional integration remains on its original supported 1.21.1 API,
+        // but registration is owned by the selected host adapter.
         Tc4TinkererAdapter.register();
     }
 
@@ -36,7 +62,7 @@ public final class Tc4BootstrapAdapter {
         } else {
             luxuriaStatus = "registered";
         }
-        FmIds.LOGGER.info(
+        ForbiddenMagic.LOGGER.info(
             "Aspect registry summary: total={} builtin={} registeredAddon={} fmAddon={} expectedFmAddon={} luxuria={}",
             Tc4AspectDiagnostics.totalCount(),
             Tc4AspectDiagnostics.BUILTIN_ASPECT_COUNT,
@@ -46,7 +72,7 @@ public final class Tc4BootstrapAdapter {
             luxuriaStatus
         );
         for (String line : Tc4AspectDiagnostics.registryLines()) {
-            FmIds.LOGGER.info("Aspect registry: {}", line);
+            ForbiddenMagic.LOGGER.info("Aspect registry: {}", line);
         }
     }
 }

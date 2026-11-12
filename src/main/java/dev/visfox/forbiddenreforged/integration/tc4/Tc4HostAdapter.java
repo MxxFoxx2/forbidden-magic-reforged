@@ -2,107 +2,173 @@ package dev.visfox.forbiddenreforged.integration.tc4;
 
 import dev.visfox.forbiddenreforged.core.aspect.AspectDefinition;
 import dev.visfox.forbiddenreforged.core.model.ContentId;
+import dev.visfox.forbiddenreforged.core.wand.BlinkFocusRules;
 import dev.visfox.forbiddenreforged.core.recipe.RecipeDefinition;
 import dev.visfox.forbiddenreforged.core.research.ResearchCategoryDefinition;
 import dev.visfox.forbiddenreforged.core.research.ResearchDefinition;
+import dev.visfox.forbiddenreforged.core.warp.WarpKind;
 import dev.visfox.forbiddenreforged.integration.api.HostAdapter;
 import dev.visfox.forbiddenreforged.integration.api.HostProfile;
-import dev.visfox.forbiddenreforged.integration.api.HostServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostAspectServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostWandRegistrationServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostOptionalEnchantmentServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostCreativeContentServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostAccessoryServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostBlockEntityServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostEnchantmentEffectServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostEntityAspectServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostEntityClassificationServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostMorphToolServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostItemFactoryServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostItemPropertyServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostScribingServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostTaintBlockServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostTaintOriginServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostWandInspectionServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostWandVisServices;
+import dev.visfox.forbiddenreforged.core.wand.WandVisAccess;
+import dev.visfox.forbiddenreforged.core.wand.WandPartsAccess;
+import dev.visfox.forbiddenreforged.core.wand.WandRodKind;
+import dev.visfox.forbiddenreforged.integration.runtime.HostWandPartsServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostFocusServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostEssentiaTransportServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostWarpServices;
+import dev.visfox.forbiddenreforged.integration.runtime.HostVillagerTradeServices;
+import java.util.EnumMap;
 import java.util.List;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.entity.npc.VillagerTrades;
 import java.util.Map;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Rarity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import java.util.Set;
+import java.util.function.Predicate;
+import thaumcraft.item.gear.TcMaterials;
+import thaumcraft.platform.Registration;
+import net.neoforged.fml.ModList;
+import thaumcraft.wand.focus.FocusItem;
 
 /**
- * Thaumcraft 4: Reforged implementation of the host-neutral content contract.
+ * Thaumcraft 4: Reforged adapter for the Minecraft 1.21.1 release track.
  *
- * Registration/lifecycle methods stay here; every runtime capability port is
- * composed once in {@link Tc4Services} and exposed through {@link #services()}.
+ * Shared semantic catalogs are registered through this boundary. Existing
+ * 1.21.1 gameplay integrations remain intact while their extraction into
+ * focused host capabilities proceeds incrementally.
  */
-public final class Tc4HostAdapter implements HostAdapter {
+public final class Tc4HostAdapter implements HostAdapter, HostAspectServices, HostWarpServices, HostMorphToolServices, HostBlockEntityServices, HostWandInspectionServices, HostWandVisServices, HostWandPartsServices, HostFocusServices, HostEssentiaTransportServices, HostAccessoryServices, HostTaintBlockServices, HostTaintOriginServices, HostEnchantmentEffectServices, HostScribingServices, HostEntityAspectServices, HostEntityClassificationServices, HostItemFactoryServices, HostItemPropertyServices, HostWandRegistrationServices, HostOptionalEnchantmentServices, HostCreativeContentServices, HostVillagerTradeServices {
+    private static final WandVisAccess WAND_VIS = new Tc4WandVisAdapter();
+    private static final WandPartsAccess WAND_PARTS = new Tc4WandPartsAdapter();
+
     public static final Tc4HostAdapter INSTANCE = new Tc4HostAdapter();
 
-    private static final HostProfile PROFILE = new HostProfile(
-        ContentId.parse("host:tc4-reforged"),
-        "1.1.3",
-        "26.3",
-        Map.ofEntries(
-            Map.entry(HostProfile.Feature.ASPECT_REGISTRATION,
-                HostProfile.FeatureSupport.adapted("Uses the AddonAspects registration API")),
-            Map.entry(HostProfile.Feature.ASPECT_RECIPE_DERIVATION,
-                HostProfile.FeatureSupport.adapted("Passes semantic aspect component lists to the TC4 AddonAspects registrar")),
-            Map.entry(HostProfile.Feature.ASPECT_SCAN_TARGETS,
-                HostProfile.FeatureSupport.adapted("Registers item, block and entity scan targets through the TC4 AspectSync API")),
-            Map.entry(HostProfile.Feature.ASPECT_DIAGNOSTICS,
-                HostProfile.FeatureSupport.adapted("Reports native and add-on aspects from the TC4 registry")),
-            Map.entry(HostProfile.Feature.ASPECT_PRESENTATION,
-                HostProfile.FeatureSupport.adapted("Resolves display components for host aspects")),
-            Map.entry(HostProfile.Feature.RUNTIME_BOOTSTRAP,
-                HostProfile.FeatureSupport.adapted("Initializes TC4 warp, wand, recipe, research and add-on integrations")),
-            Map.entry(HostProfile.Feature.MORPH_TOOL_RUNTIME,
-                HostProfile.FeatureSupport.adapted("Provides morph-tool cycle sounds and area-mining behavior")),
-            Map.entry(HostProfile.Feature.WAND_INSPECTION,
-                HostProfile.FeatureSupport.adapted("Provides wand detection, rod tags, and focus-upgrade queries")),
-            Map.entry(HostProfile.Feature.WAND_VIS_STORAGE,
-                HostProfile.FeatureSupport.adapted("Adds semantic aspects to wand and real Vis stores")),
-            Map.entry(HostProfile.Feature.ACCESSORY_INTEGRATION,
-                HostProfile.FeatureSupport.adapted("Reads host accessory slots through the accessory provider API")),
-            Map.entry(HostProfile.Feature.TAINT_BLOCK_SERVICES,
-                HostProfile.FeatureSupport.adapted("Provides taint block classification and taint-shovel behavior")),
-            Map.entry(HostProfile.Feature.ENCHANTMENT_EFFECTS,
-                HostProfile.FeatureSupport.adapted("Provides host special-mining drops and taint damage-source classification")),
-            Map.entry(HostProfile.Feature.TAINT_ORIGINS,
-                HostProfile.FeatureSupport.unsupported("No host taint-origin registration or propagation adapter is implemented")),
-            Map.entry(HostProfile.Feature.SMELTING_BONUSES,
-                HostProfile.FeatureSupport.unsupported("TC4 keeps the smelting-bonus table internal; the add-on wakes up once the host publishes a registration API")),
-            Map.entry(HostProfile.Feature.SCRIBING_RUNTIME,
-                HostProfile.FeatureSupport.adapted("Provides research difficulty and player aspect-pool access")),
-            Map.entry(HostProfile.Feature.WARP_POOLS,
-                HostProfile.FeatureSupport.adapted("Routes semantic permanent, sticky, and temporary warp changes into TC4 Warp")),
-            Map.entry(HostProfile.Feature.STICKY_WARP,
-                HostProfile.FeatureSupport.adapted("Preserves sticky warp as the distinct TC4 WarpType.STICKY pool")),
-            Map.entry(HostProfile.Feature.WAND_RODS,
-                HostProfile.FeatureSupport.adapted("Registers TC4 wand rods and their update behaviors")),
-            Map.entry(HostProfile.Feature.WAND_CAPS,
-                HostProfile.FeatureSupport.adapted("Registers TC4 wand caps and material properties")),
-            Map.entry(HostProfile.Feature.WAND_PARTS,
-                HostProfile.FeatureSupport.adapted("Replaces wand rod parts through the TC4 WandParts component while preserving the installed cap")),
-            Map.entry(HostProfile.Feature.WAND_TRIGGERS,
-                HostProfile.FeatureSupport.adapted("Registers TC4 wand block triggers")),
-            Map.entry(HostProfile.Feature.FOCI_OR_SPELLS,
-                HostProfile.FeatureSupport.adapted("Integrates the Blink Focus with the TC4 wand/focus API")),
-            Map.entry(HostProfile.Feature.OPTIONAL_ENCHANTMENT_INTEGRATION,
-                HostProfile.FeatureSupport.partial("Thaumic Tinkerer enchantment costs are registered only when the optional mod is installed")),
-            Map.entry(HostProfile.Feature.ITEM_PROPERTIES,
-                HostProfile.FeatureSupport.adapted("Applies TC4 tool-material, food, focus, and repair Item.Properties")),
-            Map.entry(HostProfile.Feature.ITEM_FACTORIES,
-                HostProfile.FeatureSupport.adapted("Creates TC4-backed morph tools, baubles, wells, focus, collar, and primordial pearl items")),
-            Map.entry(HostProfile.Feature.BLOCK_ENTITY_IMPLEMENTATION,
-                HostProfile.FeatureSupport.adapted("Provides the TC4 EssentiaSource/EssentiaTransport Wrath Cage bridge implementation")),
-            Map.entry(HostProfile.Feature.ESSENTIA_STORAGE,
-                HostProfile.FeatureSupport.adapted("Wrath Cage stores aspect quantities through the TC4 AspectSource container contract")),
-            Map.entry(HostProfile.Feature.ESSENTIA_TRANSPORT,
-                HostProfile.FeatureSupport.adapted("Wrath Cage accepts and exposes aspect transport through the TC4 EssentiaTransport contract")),
-            Map.entry(HostProfile.Feature.ENTITY_ASPECTS,
-                HostProfile.FeatureSupport.adapted("Provides vanilla and TC4 entity-to-aspect mappings as semantic ContentId values")),
-            Map.entry(HostProfile.Feature.ENTITY_CLASSIFICATION,
-                HostProfile.FeatureSupport.adapted("Provides TC4 tainted-mob, boss, and golem predicates")),
-            Map.entry(HostProfile.Feature.RESEARCH_ENTRIES,
-                HostProfile.FeatureSupport.adapted("Translates common research definitions to ResearchItem")),
-            Map.entry(HostProfile.Feature.RESEARCH_STAGES,
-                HostProfile.FeatureSupport.partial("Only one page group is supported; multi-stage definitions are rejected")),
-            Map.entry(HostProfile.Feature.ARCANE_RECIPES,
-                HostProfile.FeatureSupport.adapted("Translates common arcane recipe definitions")),
-            Map.entry(HostProfile.Feature.CRAFTING_RECIPE_REFERENCES,
-                HostProfile.FeatureSupport.adapted("Translates common crafting recipe references")),
-            Map.entry(HostProfile.Feature.CRUCIBLE_RECIPES,
-                HostProfile.FeatureSupport.adapted("Translates common crucible recipe definitions")),
-            Map.entry(HostProfile.Feature.INFUSION_RECIPES,
-                HostProfile.FeatureSupport.adapted("Translates common infusion recipe definitions")),
-            Map.entry(HostProfile.Feature.INFUSION_ENCHANTMENTS,
-                HostProfile.FeatureSupport.adapted("Translates common infusion enchantment definitions"))
-        )
-    );
+    private static final HostProfile PROFILE = createProfile();
 
     private Tc4HostAdapter() {
+    }
+
+    private static HostProfile createProfile() {
+        Map<HostProfile.Feature, HostProfile.FeatureSupport> support =
+            new EnumMap<>(HostProfile.Feature.class);
+        adapted(support, HostProfile.Feature.ASPECT_REGISTRATION,
+            "Registers shared semantic aspect definitions through AddonAspects");
+        adapted(support, HostProfile.Feature.ASPECT_DIAGNOSTICS,
+            "Reads the TC4 aspect registry for startup diagnostics");
+        adapted(support, HostProfile.Feature.ASPECT_PRESENTATION,
+            "Resolves semantic aspect identifiers to TC4 display components");
+        adapted(support, HostProfile.Feature.RUNTIME_BOOTSTRAP,
+            "Registers TC4 wand rods, caps, triggers, optional enchantment costs, creative host wands, and shared catalogs");
+        adapted(support, HostProfile.Feature.ASPECT_RECIPE_DERIVATION,
+            "Uses semantic aspect definitions and component identifiers");
+        adapted(support, HostProfile.Feature.ASPECT_SCAN_TARGETS,
+            "Registers scan targets through the existing 1.21.1 AspectSync implementation");
+        adapted(support, HostProfile.Feature.RESEARCH_ENTRIES,
+            "Translates shared research definitions, including sibling links and item/entity/aspect unlock triggers, to TC4 ResearchItem entries");
+        adapted(support, HostProfile.Feature.RESEARCH_STAGES,
+            "Lowers each semantic stage into a sequential native ResearchItem; intermediate keys are adapter-owned and the final stage keeps the canonical key");
+        adapted(support, HostProfile.Feature.ARCANE_RECIPES, "Translates shared arcane recipe definitions");
+        adapted(support, HostProfile.Feature.CRAFTING_RECIPE_REFERENCES,
+            "Translates shared crafting recipe references");
+        adapted(support, HostProfile.Feature.CRUCIBLE_RECIPES, "Translates shared crucible recipe definitions");
+        adapted(support, HostProfile.Feature.INFUSION_RECIPES, "Translates shared infusion recipe definitions");
+        adapted(support, HostProfile.Feature.INFUSION_ENCHANTMENTS,
+            "Translates shared infusion enchantment definitions");
+        adapted(support, HostProfile.Feature.WARP_POOLS,
+            "Maps semantic warp kinds to the three TC4 warp pools");
+        adapted(support, HostProfile.Feature.STICKY_WARP, "Preserves sticky warp as WarpType.STICKY");
+        adapted(support, HostProfile.Feature.VILLAGER_TRADES,
+            "Contributes TC4-backed Profane Wand and Fire Focus novice trade offers");
+        adapted(support, HostProfile.Feature.MORPH_TOOL_RUNTIME,
+            "Uses the TC4 ToolHarvest API for morph-tool area harvesting and cycle sounds");
+        adapted(support, HostProfile.Feature.WAND_INSPECTION,
+            "Maps native TC4 rod tags to semantic WandRodKind values; wand/focus item inspection and numeric focus modifiers remain host-backed");
+        adapted(support, HostProfile.Feature.WAND_RODS,
+            "Shared rod definitions and update behavior are translated to TC4 RodRegistry entries and RodUpdate callbacks");
+        adapted(support, HostProfile.Feature.WAND_CAPS,
+            "Shared cap definitions and aspect costs are translated to native TC4 WandCap registry entries");
+        adapted(support, HostProfile.Feature.WAND_PARTS,
+            "The semantic rod mutation contract maps to TC4 WandParts while preserving native cap and sceptre data");
+        adapted(support, HostProfile.Feature.WAND_TRIGGERS,
+            "Shared Hellfire trigger rules and costs are wired to the TC4 WandTriggers registry and callback API");
+        adapted(support, HostProfile.Feature.FOCI_OR_SPELLS,
+            "Shared Blink Focus behavior, progression, costs and presentation are materialized through the native TC4 FocusItem lifecycle");
+        adapted(support, HostProfile.Feature.OPTIONAL_ENCHANTMENT_INTEGRATION,
+            "Links the pinned Thaumic Tinkerer 1.21.1 public Data record through an isolated optional compileOnly adapter; missing mod is a no-op");
+        adapted(support, HostProfile.Feature.CREATIVE_CONTENT,
+            "Contributes catalogued TC4 wand stacks through a dedicated creative-content capability");
+        adapted(support, HostProfile.Feature.ACCESSORY_INTEGRATION,
+            "Reads accessory slots through the TC4 Baubles bridge");
+        adapted(support, HostProfile.Feature.TAINT_BLOCK_SERVICES,
+            "Uses TC4 taint material and flux purification APIs");
+        adapted(support, HostProfile.Feature.ENCHANTMENT_EFFECTS,
+            "Delegates special mining drops and taint damage classification to TC4");
+        adapted(support, HostProfile.Feature.SCRIBING_RUNTIME,
+            "Reads TC4 research difficulty, primal aspects and player aspect pools");
+        adapted(support, HostProfile.Feature.BLOCK_ENTITY_IMPLEMENTATION,
+            "Creates the 1.21.1 TC4 EssentiaSource/EssentiaTransport Wrath Cage");
+        adapted(support, HostProfile.Feature.ESSENTIA_STORAGE,
+            "Three-channel storage, capacity, routing and extraction policy are shared; the TC4 block entity maps persistence and native callbacks");
+        adapted(support, HostProfile.Feature.ESSENTIA_TRANSPORT,
+            "Shared extraction order is executed through a typed capability backed by the TC4 EssentiaTransport API");
+        adapted(support, HostProfile.Feature.WAND_VIS_STORAGE,
+            "Exposes semantic wand Vis reads/writes and separate item-backed real-Vis storage writes");
+        adapted(support, HostProfile.Feature.ENTITY_ASPECTS,
+            "Provides entity-to-aspect mappings using semantic identifiers");
+        adapted(support, HostProfile.Feature.ENTITY_CLASSIFICATION,
+            "Delegates tainted-mob, TC4 boss and golem classification to TC4");
+        adapted(support, HostProfile.Feature.ITEM_PROPERTIES,
+            "Provides TC4 tool stats, rarity, food and focus properties");
+        adapted(support, HostProfile.Feature.ITEM_FACTORIES,
+            "Creates TC4-bound morph, ring, scribing and accessory items behind the host factory");
+        adapted(support, HostProfile.Feature.TAINT_ORIGINS,
+            "Exposes opt-in origin block registration and adjacent fibre propagation through the pinned TC4 taint engine");
+
+        return new HostProfile(
+            ContentId.parse("host:tc4-reforged"),
+            "1.1.2",
+            "1.21.1",
+            support
+        );
+    }
+
+    private static void adapted(
+        Map<HostProfile.Feature, HostProfile.FeatureSupport> support,
+        HostProfile.Feature feature,
+        String notes
+    ) {
+        support.put(feature, HostProfile.FeatureSupport.adapted(notes));
     }
 
     @Override
@@ -111,8 +177,13 @@ public final class Tc4HostAdapter implements HostAdapter {
     }
 
     @Override
-    public HostServices services() {
-        return Tc4Services.INSTANCE;
+    public void registerAspectTags() {
+        Tc4AspectTagAdapter.register();
+    }
+
+    @Override
+    public boolean crystalwellUsesShardTag() {
+        return Tc4RecipeAdapter.crystalwellUsesShardTag();
     }
 
     @Override
@@ -126,25 +197,8 @@ public final class Tc4HostAdapter implements HostAdapter {
     }
 
     @Override
-    public void registerAspectTags() {
-        Tc4AspectTagAdapter.register();
-    }
-
-    @Override
     public void registerAspects(List<AspectDefinition> aspects) {
-        try {
-            Tc4AspectAdapter.registerAspects(aspects);
-        } catch (NoSuchMethodError | NoClassDefFoundError absent) {
-            throw new IllegalStateException(
-                "Forbidden Magic requires Thaumcraft 4: Reforged 1.1.3 or newer with the add-on aspect API",
-                absent
-            );
-        }
-    }
-
-    @Override
-    public boolean crystalwellUsesShardTag() {
-        return Tc4RecipeAdapter.crystalwellUsesShardTag();
+        Tc4AspectAdapter.registerAspects(aspects);
     }
 
     @Override
@@ -158,5 +212,376 @@ public final class Tc4HostAdapter implements HostAdapter {
         List<ResearchDefinition> research
     ) {
         Tc4ResearchAdapter.register(categories, research);
+    }
+
+    @Override
+    public Component aspectDescription(ContentId aspect) {
+        return Tc4AspectAdapter.description(aspect);
+    }
+
+    @Override
+    public void changeWarp(ServerPlayer player, int amount, WarpKind kind) {
+        Tc4WarpAdapter.changeWarp(player, amount, kind);
+    }
+
+    @Override
+    public void playMorphCycleSound(Level level, BlockPos pos, RandomSource random) {
+        Tc4MorphToolAdapter.playCycleSound(level, pos, random);
+    }
+
+    @Override
+    public boolean isAreaHarvesting() {
+        return Tc4MorphToolAdapter.isAreaHarvesting();
+    }
+
+    @Override
+    public void breakArea(ItemStack tool, ServerLevel level, ServerPlayer player, BlockPos origin,
+                          Predicate<BlockState> correctTool) {
+        Tc4MorphToolAdapter.breakArea(tool, level, player, origin, correctTool);
+    }
+
+    @Override
+    public BlockEntity createWrathCageBlockEntity(BlockPos pos, BlockState state) {
+        return new Tc4WrathCageBlockEntity(pos, state);
+    }
+
+    @Override
+    public String wrathCageMobId(BlockEntity cage) {
+        return requireWrathCage(cage).getMobId();
+    }
+
+    @Override
+    public void setWrathCageMobId(BlockEntity cage, String mobId) {
+        requireWrathCage(cage).setMobId(mobId);
+    }
+
+    @Override
+    public void cycleWrathCageMode(BlockEntity cage) {
+        requireWrathCage(cage).cycleMode();
+    }
+
+    @Override
+    public void tickWrathCage(Level level, BlockPos pos, BlockState state, BlockEntity cage) {
+        Tc4WrathCageBlockEntity.tick(level, pos, state, requireWrathCage(cage));
+    }
+
+    private static Tc4WrathCageBlockEntity requireWrathCage(BlockEntity cage) {
+        if (cage instanceof Tc4WrathCageBlockEntity tc4Cage) {
+            return tc4Cage;
+        }
+        throw new IllegalArgumentException(
+            "Expected a Thaumcraft-backed Wrath Cage block entity, got " + cage.getClass().getName()
+        );
+    }
+
+    @Override
+    public void beforeRemoveWrathCage(BlockState state, Level level, BlockPos pos, BlockState newState) {
+        Tc4BlockEntityAdapter.beforeRemoveWrathCage(state, level, pos, newState);
+    }
+
+    @Override
+    public boolean takeOneFromOutput(net.minecraft.world.level.block.entity.BlockEntity source,
+                                     net.minecraft.core.Direction outputSide, ContentId aspect) {
+        return Tc4EssentiaTransportAdapter.takeOneFromOutput(source, outputSide, aspect);
+    }
+
+    @Override
+    public WandRodKind wandRodKind(ItemStack stack) {
+        return Tc4WandRuntimeAdapter.rodKind(stack);
+    }
+
+    @Override
+    public int wandFocusTreasure(ItemStack stack) {
+        return Tc4WandRuntimeAdapter.focusTreasure(stack);
+    }
+
+    @Override
+    public int wandFocusPotency(ItemStack stack) {
+        return Tc4WandRuntimeAdapter.focusPotency(stack);
+    }
+
+    @Override
+    public ItemStack wandFocusItem(ItemStack stack) {
+        return Tc4WandRuntimeAdapter.focusItem(stack);
+    }
+
+    @Override
+    public int wandFocusEnlarge(ItemStack stack) {
+        return Tc4WandRuntimeAdapter.focusEnlarge(stack);
+    }
+
+    @Override
+    public boolean hasFocusUpgrade(ItemStack focus, BlinkFocusRules.Upgrade upgrade) {
+        return Tc4FocusAdapter.hasUpgrade(focus, upgrade);
+    }
+
+    @Override
+    public boolean consumeFocusVis(ItemStack wand, Player player, List<BlinkFocusRules.VisCost> costs, boolean apply) {
+        return Tc4FocusAdapter.consumeVis(wand, player, costs, apply);
+    }
+
+    @Override
+    public List<ContentId> primalAspects() {
+        return WAND_VIS.primalAspects();
+    }
+
+    @Override
+    public int maximumVis(ItemStack wand) {
+        return WAND_VIS.maximumVis(wand);
+    }
+
+    @Override
+    public int vis(ItemStack wand, ContentId aspect) {
+        return WAND_VIS.vis(wand, aspect);
+    }
+
+    @Override
+    public void addVis(ItemStack wand, ContentId aspect, int amount, boolean apply) {
+        WAND_VIS.addVis(wand, aspect, amount, apply);
+    }
+
+    @Override
+    public void addRealVis(ItemStack wand, ContentId aspect, int amount, boolean apply) {
+        WAND_VIS.addRealVis(wand, aspect, amount, apply);
+    }
+
+    @Override
+    public void fill(ItemStack wand) {
+        WAND_VIS.fill(wand);
+    }
+
+    @Override
+    public void addItemRealVis(ItemStack stack, ContentId aspect, int amount, boolean apply) {
+        Tc4VisAdapter.addRealVis(stack, aspect, amount, apply);
+    }
+
+    @Override
+    public void setRod(ItemStack wand, ContentId rod) {
+        WAND_PARTS.setRod(wand, rod);
+    }
+
+    @Override
+    public ItemStack accessory(Player player, int slot) {
+        return Tc4AccessoryAdapter.getBauble(player, slot);
+    }
+
+    @Override
+    public void setAccessory(Player player, int slot, ItemStack stack) {
+        Tc4AccessoryAdapter.setBauble(player, slot, stack);
+    }
+
+    @Override
+    public boolean isTaintMaterial(BlockState state) {
+        return Tc4TaintAdapter.isHostTaintMaterial(state);
+    }
+
+    @Override
+    public boolean isTaintShovelPurificationTarget(BlockState state) {
+        return Tc4TaintAdapter.isTaintShovelPurificationTarget(state);
+    }
+
+    @Override
+    public float taintShovelMiningSpeed() {
+        return Tc4TaintAdapter.taintShovelMiningSpeed();
+    }
+
+    @Override
+    public void playTaintShovelSound(Level level, BlockPos pos) {
+        Tc4TaintAdapter.playTaintShovelSound(level, pos);
+    }
+
+    @Override
+    public void registerOrigin(net.minecraft.world.level.block.Block originBlock) {
+        Tc4TaintOriginAdapter.register(originBlock);
+    }
+
+    @Override
+    public void unregisterOrigin(net.minecraft.world.level.block.Block originBlock) {
+        Tc4TaintOriginAdapter.unregister(originBlock);
+    }
+
+    @Override
+    public boolean isOrigin(BlockState state) {
+        return Tc4TaintOriginAdapter.isOrigin(state);
+    }
+
+    @Override
+    public boolean spreadFromOrigin(ServerLevel level, BlockPos origin, BlockPos target) {
+        return Tc4TaintOriginAdapter.spread(level, origin, target);
+    }
+
+    @Override
+    public ItemStack specialMiningDrop(BlockState state, ItemStack drop, float chance, RandomSource random) {
+        return Tc4EnchantmentAdapter.specialMiningDrop(state, drop, chance, random);
+    }
+
+    @Override
+    public boolean isTaintDamage(DamageSource source) {
+        return Tc4EnchantmentAdapter.isTaintDamage(source);
+    }
+
+    @Override
+    public boolean isNoResearchDifficulty() {
+        return Tc4ScribingAdapter.isNoResearchDifficulty();
+    }
+
+    @Override
+    public List<ContentId> primalAspectIds() {
+        return Tc4ScribingAdapter.primalAspectIds();
+    }
+
+    @Override
+    public boolean addAspectPool(ServerPlayer player, ContentId aspect, int amount) {
+        return Tc4ScribingAdapter.addAspectPool(player, aspect, amount);
+    }
+
+    @Override
+    public ItemStack createSpentScribingToolsStack() {
+        return Tc4ScribingAdapter.spentScribingToolsStack();
+    }
+
+    @Override
+    public Map<ContentId, ContentId> aspectCatalog(boolean silverfishEmeralds) {
+        return Tc4EntityAdapter.aspectCatalog(silverfishEmeralds);
+    }
+
+    @Override
+    public boolean isTaintedMob(LivingEntity entity) {
+        return Tc4EntityAdapter.isTaintedMob(entity);
+    }
+
+    @Override
+    public boolean isHostBoss(LivingEntity entity) {
+        return Tc4EntityAdapter.isHostBoss(entity);
+    }
+
+    @Override
+    public boolean isHostGolem(LivingEntity entity) {
+        return Tc4EntityAdapter.isHostGolem(entity);
+    }
+
+    @Override
+    public Set<ContentId> bossEntityIds() {
+        return Tc4EntityAdapter.bossEntityIds();
+    }
+
+    @Override
+    public Item.Properties gluttonyFoodProperties(Item.Properties properties) {
+        return Registration.food(properties, 2, 0.1F);
+    }
+
+    @Override
+    public Item.Properties skullAxeProperties(Item.Properties properties) {
+        return Registration.sword(properties.rarity(Rarity.UNCOMMON), TcMaterials.ELEMENTAL_TOOL, 3.0F, -2.4F);
+    }
+
+    @Override
+    public Item.Properties morphPickaxeProperties(Item.Properties properties) {
+        return Registration.pickaxe(properties.rarity(Rarity.EPIC), TcMaterials.ELEMENTAL_TOOL, 2.0F, -2.8F);
+    }
+
+    @Override
+    public Item.Properties morphSwordProperties(Item.Properties properties) {
+        return Registration.sword(properties.rarity(Rarity.EPIC), TcMaterials.ELEMENTAL_TOOL, 3.0F, -2.4F);
+    }
+
+    @Override
+    public Item.Properties morphShovelProperties(Item.Properties properties) {
+        return Registration.shovel(properties.rarity(Rarity.EPIC), TcMaterials.ELEMENTAL_TOOL, 1.0F, -3.0F);
+    }
+
+    @Override
+    public Item.Properties morphAxeProperties(Item.Properties properties) {
+        return Registration.axe(properties.rarity(Rarity.EPIC), TcMaterials.ELEMENTAL_TOOL, 3.0F, -3.0F);
+    }
+
+    @Override
+    public Item.Properties diabolistForkProperties(Item.Properties properties) {
+        return Registration.sword(properties.rarity(Rarity.UNCOMMON), TcMaterials.THAUMIUM_TOOL, 3.0F, -2.4F);
+    }
+
+    @Override
+    public Item.Properties taintShovelProperties(Item.Properties properties) {
+        return Registration.shovel(properties.rarity(Rarity.UNCOMMON), TcMaterials.ELEMENTAL_TOOL, 1.0F, -3.0F);
+    }
+
+    @Override
+    public Item.Properties taintPickaxeProperties(Item.Properties properties) {
+        return Registration.pickaxe(properties.rarity(Rarity.UNCOMMON), TcMaterials.ELEMENTAL_TOOL, 1.0F, -2.8F);
+    }
+
+    @Override
+    public Item.Properties blinkFocusProperties(Item.Properties properties) {
+        return FocusItem.properties(properties);
+    }
+
+    @Override
+    public Item createMorphTool(Item.Properties properties) {
+        return new Tc4MorphToolItem(properties);
+    }
+
+    @Override
+    public Item createRingNutrition(Item.Properties properties) {
+        return new Tc4RingNutritionItem(properties);
+    }
+
+    @Override
+    public Item createCrystalwell(Item.Properties properties) {
+        return new Tc4CrystalwellItem(properties);
+    }
+
+    @Override
+    public Item createPrimewell(Item.Properties properties) {
+        return new Tc4PrimewellItem(properties);
+    }
+
+    @Override
+    public Item createBlinkFocus(Item.Properties properties) {
+        return new Tc4BlinkFocusItem(properties);
+    }
+
+    @Override
+    public Item primordialPearlItem() {
+        return BuiltInRegistries.ITEM.get(ResourceLocation.parse("thaumcraft:primordial_pearl"));
+    }
+
+    @Override
+    public Item createSubCollar(Item.Properties properties) {
+        return new Tc4SubCollarItem(properties);
+    }
+
+    @Override
+    public void registerWands() {
+        Tc4WandAdapter.registerWands();
+    }
+
+    @Override
+    public void registerWandTriggers() {
+        Tc4WandTriggerAdapter.register();
+    }
+
+    @Override
+    public void registerOptionalEnchantments() {
+        Tc4TinkererAdapter.register();
+    }
+
+    @Override
+    public int registeredOptionalEnchantments() {
+        return Tc4TinkererAdapter.registeredCount();
+    }
+
+    @Override
+    public boolean isArsMagicaLoaded() {
+        return ModList.get().isLoaded("arsmagicalegacy") || ModList.get().isLoaded("arsmagica2");
+    }
+
+    @Override
+    public void addCreativeContent(List<ItemStack> stacks) {
+        Tc4WandAdapter.addCreativeWands(stacks);
+    }
+
+    @Override
+    public void addNoviceTrades(List<VillagerTrades.ItemListing> trades) {
+        Tc4VillagerTradeAdapter.addNoviceTrades(trades);
     }
 }

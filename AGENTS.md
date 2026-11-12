@@ -6,6 +6,15 @@
 
 Этот файл — защитные правила проекта, а не ритуал для каждого изменения. Объём анализа, абстракций и проверок выбирай по реальному риску. Запреты ниже — жёсткие границы проекта; остальное — ориентиры для самостоятельных решений. Трековые ветки носят этот же текст плюс таргет-блок, который уточняет команды и документы своего трека.
 
+## Таргет этой ветки: Minecraft 1.21.1
+
+- Работай и коммить в 1.21.1; перенос в main — только по запросу.
+- Версии: Minecraft 1.21.1, NeoForge 21.1.256, Java 21; пин хоста — host.sha, хост-зависимость — gradle.properties (thaumcraft_version; принимается любой хост 1.1.2+).
+- CI: .github/workflows/build-1.21.1.yml; релизы: release.yml, канал release/1.21.1. Релизный гейт этого трека проходит без no_lust-прогона GameTests; CI прогоняет оба режима.
+- Границу host-agnostic API проверяй скриптом `python3 tools/check_host_agnostic_boundary.py` (вместо check_host_agnostic_api.py); клиентские ассеты дополнительно проверяет `python3 tools/check_client_assets.py`.
+- Документы трека: вместо docs/fidelity.md — docs/fidelity-1.21.1.md; вместо docs/verification.md — docs/porting/1.21.1-adaptation-status.md; вместо docs/upstream.md — каталог docs/upstream/; docs/host-compatibility/ нет. Спека и план — docs/superpowers/.
+- reference/tc4r/fm-1.21.1.jar — чужой порт только для сверки поведения; код и ассеты оттуда не заимствуй.
+
 ## Источники истины
 
 - Поведение и данные оригинала: ../ForbiddenMagic.
