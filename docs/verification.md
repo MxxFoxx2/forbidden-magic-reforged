@@ -1,35 +1,44 @@
 # Verification status
 
-## Последний успешный CI — 10 ноября 2026
+## Minecraft 26.1.2 — fast unit-test gate (local, 12 November 2026)
 
-- Проверенный production/runtime commit: [`a7a4f05`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/a7a4f051702bbc227998017f3f118d33c1f4cc91) (bump пина хоста до Thaumcraft 1.1.3).
-- [Java CI with Gradle #677](https://github.com/MxxFoxx2/forbidden-magic-reforged/actions/runs/42726269063) завершился успешно: host-agnostic boundary check, подготовка и сборка закреплённого Thaumcraft 1.1.3, сборка аддона, artifact provenance, generated-resource freshness и обе конфигурации GameTests.
-- С `no_lust=false`: **118/118** required GameTests passed; `luxuria=luxuria`.
-- С `no_lust=true`: **118/118** required GameTests passed; `luxuria=null`.
-- [Release workflow #81](https://github.com/MxxFoxx2/forbidden-magic-reforged/actions/runs/42726269083) завершился успешно на том же source SHA: обе конфигурации GameTests, provenance, подготовка assets и публикация rolling release.
-- CI остаётся headless: клиентские sparkle/spawn-particle эффекты оригинальной Wrath Cage требуют отдельной визуальной проверки в `runClient`.
+- Added a host-neutral JUnit 5 suite under `src/test/java`, run by `./gradlew test` (part of `check`/`build`, plus a dedicated CI step). It verifies catalog data and option gating in seconds, without booting a server.
+- **23 unit tests passed** across 4 suites: `AspectCatalogTest` (6), `ContentIdTest` (4), `RecipeCatalogTest` (7), `ResearchCatalogTest` (6); 0 failures, 0 skipped.
+- Removed the pure-logic GameTest `core_aspect_catalog_is_host_neutral_and_complete` from `AspectGameTests`; its assertions now live in `AspectCatalogTest`. All runtime GameTests are retained.
+- Local `runGameTestServer`: with `no_lust=false` **112/112** required GameTests passed; with `no_lust=true` **112/112** passed.
+- Host-agnostic API boundary check passed (28 Java files).
+- Local headless verification only; the change is not yet pushed to CI. Client launch, rendering/tooltips, and manual in-world gameplay checks are still required before treating the port as release-ready.
 
-## Состояние rolling release
+## Minecraft 26.1.2 — host-agnostic architecture port
 
-- Текущий rolling release — **2.0.8 (NeoForge 26.3)**, source commit [`a7a4f05`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/a7a4f051702bbc227998017f3f118d33c1f4cc91), JAR [`forbidden-magic-2.0.8-26.3.jar`](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/download/release/26.3/forbidden-magic-2.0.8-26.3.jar). Release metadata подтверждает source SHA `a7a4f051702bbc227998017f3f118d33c1f4cc91`.
+- Verified implementation commit: [`62a3e5e`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/62a3e5ee89fba12ba7e902501725d1bc5b1eea9f).
+- [Java CI with Gradle #472](https://github.com/MxxFoxx2/forbidden-magic-reforged/actions/runs/41375528543) completed successfully on 2 November 2026.
+- Host-agnostic API boundary check passed.
+- Pinned Thaumcraft 4: Reforged 1.1.2 preparation and build passed.
+- Forbidden Magic compilation, artifact provenance, and generated-resource freshness checks passed.
+- With `no_lust=false`: **111/111 GameTests passed** (`luxuria=luxuria`).
+- With `no_lust=true`: **111/111 GameTests passed** (`luxuria=null`).
+- The selected TC4 adapter profile reports Minecraft 26.1.2 and the support-level GameTest matrix matches all 36 declared feature flags.
+- This CI is headless. Client launch, rendering/tooltips, and manual in-world gameplay checks are still required before treating the port as release-ready.
 
-## Локальная проверка bump хоста 1.1.3 — 10 ноября 2026
 
-Локальный прогон на рабочем дереве поверх `main` (`1b676737`), до коммита:
+## Последний успешный runtime CI
 
-- Пин передвинут `6047676` → `99499a8` (вершина upstream `main`, `mod_version=1.1.3`); `tools/check_host_pin.py` — патч `0001` применяется, дрейф upstream — 0 коммитов.
-- `tools/prepare_host.py` + `--verify` — `host matches sha + 1 patch commit(s)`. Локальный `main` соседнего upstream-репозитория отстаёт от GitHub, и пин существовал там только в detached HEAD: объект догружен в `host/` разовым `git fetch origin HEAD` (соседний репозиторий не изменялся).
-- Сборка патченного хоста — BUILD SUCCESSFUL (4m 15s); сборка аддона — BUILD SUCCESSFUL (3m 48s).
-- `tools/check_provenance.py` — provenance ok: 2 jar(s).
-- `tools/gen_resources.py` + `git diff --exit-code -- src/generated` — чисто.
-- `tools/check_host_agnostic_api.py` — Host API boundaries passed (72 Java files checked); `python -m unittest discover -s tests/python` — 15 tests OK.
-- `runGameTestServer` с `no_lust=false` — **118/118** required GameTests passed; с `no_lust=true` — **118/118** (`luxuria=disabled-by-config`); конфигурация возвращена в `false`.
-- Smelting-capability остаётся спящей на 1.1.3: в логе `Host exposes no smelting-bonus API; the emerald bonus stays inactive`; синтетический API-хот подтверждает пробуждение адаптера при появлении метода регистрации.
+- Проверенный коммит: [`74a6dcd`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/74a6dcd0e31d7c222ce2198475658e997d295e6e).
+- [Java CI with Gradle #40566141998](https://github.com/MxxFoxx2/forbidden-magic-reforged/actions/runs/40566141998) завершился успешно 27 октября 2026 года.
+- Хост закреплён на upstream `604767636dc318a6d81f1abb8a8a2d3e5ec3298a` (1.1.2); host patch подготовлен через `tools/prepare_host.py`, сборка использует Gradle composite build вместо локального Maven publish.
+- Сборка хоста, сборка аддона и проверка provenance завершились успешно.
+- С `no_lust=false`: **97/97** required GameTests passed; `luxuria=luxuria`.
+- С `no_lust=true`: **97/97** required GameTests passed; `luxuria=null`.
+- Опубликованный релиз: rolling [`26.3`](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/26.3). Сборка и тесты headless не заменяют ручные проверки клиента и реального геймплея.
 
-Найдено и исправлено по ходу bump:
+## Проверки вне CI
 
-1. Upstream-коммит `d72680e` («fix: remove gametests», вошёл в 1.1.3) удалил тестовые структуры хоста, включая `thaumcraft:test/platform` — все 118 GameTests падали на размещении структуры, ещё до проверки поведения. Тесты переведены на собственную фикстуру `forbiddenmagic:test/platform` (`src/gameTest/resources/data/forbiddenmagic/structure/test/platform.nbt`: 7×7×7, каменный пол y=0, 49 блоков; сгенерирована нами по снятым размерам, не скопирована из хоста). Фикстура живёт в gameTest source set и в релизный JAR не попадает.
+- `tools/gen_resources.py` запускался дважды с чистым diff после генерации в pre-release проверке.
+- `runClient` ещё должен подтвердить Morph Tools tint, Creative Wand family, Tainted Log во всех ориентациях, Taint Sapling stages/canopy/leaf support, Wrath Cage render и исследования/рецепты.
+- Полноценная игровая проверка всё ещё нужна для боевых hooks жезлов, дропов осколков, Collar of Pain и Riding Crop.
+- Alchemical Cap и Equivalent Rod прошли headless-проверку, но визуальные модели и подсказки в клиенте не подтверждены.
 
 ## Статус паритета
 
-Core parity 26.3 **не объявлен завершённым**: остаются ручные визуальные и игровые проверки (список — в [roadmap](roadmap.md)). Вопрос о распознавании FM-taint blocks остаётся предметом сверки оригинального поведения, а не подтверждённым API-блокером. Отклонения и приближения перечислены в [fidelity ledger](fidelity.md); полный parity интеграций Blood Magic/Botania/Ars Magica 2/CoFH не заявляется.
+Core parity 26.3 **не объявлен завершённым**: остаются ручные визуальные и игровые проверки. Вопрос о распознавании FM-taint blocks остаётся предметом сверки оригинального поведения, а не подтверждённым API-блокером. Отклонения и приближения перечислены в [fidelity ledger](fidelity.md); полный parity интеграций Blood Magic/Botania/CoFH не заявляется, а AM2 заменён на Ars Magica: Legacy с ограниченным набором механик (см. [roadmap](roadmap.md)).

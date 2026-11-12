@@ -15,7 +15,6 @@
 - Стоимость зачарований и их совместимость задаются JSON-реестрами в современном API.
 - Пассивное пополнение Tainted Wand проверяет `TaintBiomes.isTainted`, а не числовой biome ID.
 - При `no_lust` регистрируется альтернативный аспект/предметный вид для соответствующего осколка; это сохраняет исходный режим без Lust, хотя внутренние ID и отдельные предметы отличаются.
-- Счётчик аспектов использует `Aspect.values().length` и константу 48 (`Tc4AspectDiagnostics.BUILTIN_ASPECT_COUNT`): `Aspect.count()`/`builtinCount()` удалены из upstream API.
 
 ## Перенесённые и проверенные механики
 
@@ -23,9 +22,7 @@
 
 - **Паритет исследований:** восстановлены исходные аспекты NETHER у рецепта инфузии и исследования FORK; аспекты, цепочка зависимостей и статус concealed для `ROD_tainted`; аспекты и зависимость `ETHEREALBLOOM` для `TAINTSHOVEL`; зависимость `FORK` для `WRATHCAGE`; круглая иконка исследования `ROD_profane`. GameTest фиксируют эти исходные значения.
 - **Слоты Кольца насыщения:** бонус еды срабатывает только при экипировке кольца в слотах колец 1 или 2, но не в слоте амулета 0 или пояса 3. GameTest проверяет все четыре слота.
-- **Иконки улучшений Blink Focus:** Hellfire и Pandemonium используют исходные текстуры 32×32, включённые в namespace аддона, а не отсутствующие текстуры хоста; GameTest проверяют идентификаторы текстур и наличие ресурсов.
-- **Blink Focus:** сверено с `ItemFocusBlink` 1.7.10. Фокус делает собственный рейкаст на 128 блоков (`player.pick(128, …)`) вместо reach жезла, поэтому телепортирует далеко, а не на 4.5 блока. Точка выхода повторяет оригинал по точке попадания: сбоку ±0.5 от грани, нижняя грань −2, верхняя без смещения. Возвращены звук телепорта до и после броска, дым на выходе и огонь на прилёте (и по каждой задетой сущности). Hellfire наносит `3 + 3·potency` как fireball с игроком-причиной и поджигает на `3 + 3·potency` секунд; Pandemonium телепортирует только `Enemy`. Кулдаун — 0, как дефолт `ItemFocusBasic` (раньше стояло наше 500 мс), орнамент фокуса снова рисуется (`blink_focus_ornament`). Урон fireball в современном API масштабируется ванильной сложностью (easy/normal/hard); исходный `EntityDamageSource` не масштабировался — на normal значения совпадают.
-- **Стоимость каста Blink Focus при улучшении — исходная особенность, не баг порта:** оригинал передаёт в `getVisCost` стек жезла, а `ItemFocusBasic` читает NBT улучшений только со стека фокуса, поэтому каст всегда стоил базовые 300 Perditio, хотя тултип показывал повышенную цену. Порт сохраняет это поведение (сверено с исходником FM и байткодом `ItemFocusBasic`); «исправлять» его нельзя без отхода от 1:1.
+- **Иконки улучшений Blinky Focus:** Hellfire и Pandemonium используют исходные текстуры 32×32, включённые в namespace аддона, а не отсутствующие текстуры хоста; GameTest проверяют идентификаторы текстур и наличие ресурсов.
 
 - **Infernal Wand:** восстановлена отмена входящего огненного и Wither-урона при удержании жезла с инфернальным стержнем. Очистка эффектов горения и Wither при обновлении жезла остаётся отдельным поведением.
 - **Tainted Wand:** восстановлена реакция на damage type `thaumcraft:taint`: три раза выбирается случайный примальный аспект и добавляется 1 vis. Это отдельная механика от пассивного пополнения в скверном биоме.
@@ -48,23 +45,6 @@
 - **Раскладка исследований:** координаты `ROD_tainted`, `ROD_witchwood`, `ROD_witchwood_staff`, `TAINTSHOVEL` и `WRATHCAGE` приведены к оригиналу. Сложности 4 в исходнике TC4 и хост одинаково зажимают до 3, поэтому в порте хранится 3 — это не расхождение.
 - **Урон мечей:** морф-меч получает полный элементальный урон (7, как скелетный топор и вилка): раньше базовое значение было на единицу меньше. Все четыре мечеподобных предмета добавлены в тег `minecraft:swords`.
 - **Локализация:** исправлена структура TOML-таблиц для item names и исследовательских текстов; сгенерированные JSON-ключи выровнены с ключами, используемыми кодом.
-
-## Wrath Cage: сверка spawn/essentia с оригиналом
-
-Сверено с исходными [`TileEntityWrathCage`](https://github.com/SpitefulFox/ForbiddenMagic/blob/master/src/main/java/fox/spiteful/forbidden/tiles/TileEntityWrathCage.java), [`WrathSpawnerLogic`](https://github.com/SpitefulFox/ForbiddenMagic/blob/master/src/main/java/fox/spiteful/forbidden/tiles/WrathSpawnerLogic.java) и [`BlockWrathCage`](https://github.com/SpitefulFox/ForbiddenMagic/blob/master/src/main/java/fox/spiteful/forbidden/blocks/BlockWrathCage.java). Подтверждённые отличия исправлены в production commit [`e45e191`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/e45e191703e11715aedcf010fbefa6eebafd2537) и последующем bridge commit [`582285d`](https://github.com/MxxFoxx2/forbidden-magic-reforged/commit/582285d046af2c4d9f94d9b267625253f6cf22b3):
-
-- **Essentia draw gate:** пополнение отключается, если любой из каналов `Special`, `Wrath` или `Sloth` достиг 64; для возобновления все три канала должны иметь свободное место.
-- **Mob-specific reserve:** при смене отпечатанного моба запас `Special` сбрасывается только когда меняется его аспект, а не при любом отличии entity ID.
-- **Порядок тика:** сначала выполняется серверная логика спавнера (если клетка включена и не запитана редстоуном), затем выполняется одна попытка втянуть эссенцию. Само втягивание не блокируется сигналом редстоуна или выключенной конфигурацией клетки, как и в исходнике.
-- **Suction:** сила входящего запроса — 256; `getMinimumSuction()` возвращает исходное значение 9000. Последнее значение сохранено для API-паритета, хотя сама клетка остаётся input-only (`canOutputTo=false`).
-- **Соседние трубы:** перед `takeEssentia` проверяются `isConnectable`, `canOutputTo`, совпадение типа эссенции и положительное количество у источника.
-- **Spawn activation/cap:** близость игрока не является условием активации (поле `activatingRangeFromPlayer=16` в оригинале не использовалось). Ограничение шести мобов проверяется по runtime-классу сущности в AABB исходного спавнера: диапазон 8 блоков по X/Z и 4 по Y от блока.
-- **Spawn positions/delay:** X/Z смещения не добавляют `+0.5`; задержка обновляется после каждого успешного появления, а сохранённое значение `-1` приводит к генерации нового delay перед спавном.
-- **Spawn event:** при успешном появлении вызывается стандартное событие spawner level event `2004`. Расход топлива и приоритет каналов `Special → Wrath → Sloth` сохранены.
-
-GameTests покрывают capacity gate, приоритет топлива, spawn AABB, силы suction, смену мобов с одинаковым/разным аспектом и TC4 transport bridge. На commit `582285d` CI #661 и release #73 успешно прошли обе конфигурации по **114/114** required GameTests.
-
-**Оставшаяся визуальная проверка:** старый клиентский sparkle `Thaumcraft.proxy.sparkle(0x870404)` и `EntityLiving.spawnExplosionParticle()` пока отдельно не восстановлены/не подтверждены в современном клиентском renderer. Headless GameTests не подтверждают визуальный паритет этих эффектов; для закрытия пункта нужен `runClient`.
 
 ## Визуальная проверка ещё нужна
 
@@ -96,7 +76,7 @@ GameTests покрывают capacity gate, приоритет топлива, s
 
 ## Host API: registered block scan targets and taint review
 
-- **Nether Portal aspect target — восстановлено в коде и проверено CI:** локальный host patch `patches/0001-feat-support-block-aspect-scan-targets.patch` добавляет registry/sync block targets. `Tc4AspectTagAdapter` назначает NETHER 4 современному `minecraft:nether_portal`, а GameTest `addon_item_aspects_match_original_assignments` проверяет фактический результат `ScanManager.resolveBlock`. Удалён прежний прокси через обсидиан. Патч повторно применён к upstream `6047676` (`main` после `1.1.2`): реестр и хук аспектов теперь в апстриме, block targets — только локально.
+- **Nether Portal aspect target — восстановлено в коде и проверено CI:** локальный host patch `patches/0001-block-aspect-targets.patch` добавляет registry/sync block targets. `FmAspectTags` назначает NETHER 4 современному `minecraft:nether_portal`, а GameTest `addon_item_aspects_match_original_assignments` проверяет фактический результат `ScanManager.resolveBlock`. Удалён прежний прокси через обсидиан. Патч повторно применён к upstream `6047676` (`main` после `1.1.2`): реестр и хук аспектов теперь в апстриме, block targets — только локально.
 - **Taint recognition остаётся вопросом сверки, а не подтверждённым разрывом:** исходный [`BlockLogTainted`](https://github.com/SpitefulFox/ForbiddenMagic/blob/master/src/main/java/fox/spiteful/forbidden/blocks/BlockLogTainted.java) использует `Config.taintMaterial`, а [`BlockLeavesTainted`](https://github.com/SpitefulFox/ForbiddenMagic/blob/master/src/main/java/fox/spiteful/forbidden/blocks/BlockLeavesTainted.java) сам обрабатывает decay и использует `taintLog` как опору. В исходнике не найдено явной регистрации FM-блоков как taint sources. Поэтому не следует расширять host `TaintSpread.isTaintBlock` только на основании фиксированного списка: сначала нужно доказать, что конкретное исходное поведение действительно потеряно. `taint_materials_resist_fibrous_taint` покрывает более узкий критерий невытеснения материалов при проверенных вызовах host spread.
 
 ## Не перенесено: внешние моды
@@ -108,6 +88,28 @@ GameTests покрывают capacity gate, приоритет топлива, s
 - **Ars Magica 2:** vinteum focus, witchwood recipes и AM2 rod update.
 - **CoFH:** интеграция из `compat/`.
 - Внутренние meta-варианты `ItemResource`, `ItemWandCaps`, `ItemWandCores`, зависящие от перечисленных модов.
+
+## Совместимость с Ars Magica: Legacy
+
+Оригинальная AM2-интеграция (witchwood rod/staff, vinteum cap, conversion wand updates) перенесена на
+[Ars Magica: Legacy](https://github.com/MinecraftschurliMods/Ars-Magica-Legacy) 1.7.1 для MC 26.1.2
+(`arsmagicalegacy`). Гейт регистрации расширен с `arsmagica2` до обоих ID (`FmArsMagica`), так что
+предметы и исследования не дублируются при наличии обоих модов и остаются выключенными без них.
+
+- **Род-апдейты:** `ManaWandBehavior.wand` и `.staff` воспроизводят `ManaWandUpdate`/`ManaStaffUpdate`. Итерация по каждому примальному аспекту: дефицит зажат до 100, +1 vis только если игрок может оплатить `cost * deficit`. Интервалы и цены оригинала: жезл — 100 тиков, 1.4 на очко (vinteum 0.8); посох — 40 тиков, 1.0 (vinteum 0.5). Доступ к vis идёт через `WandVisAccess`, а не через host-специфичный мёп.
+- **Проверка колпачка:** `Wands.getParts(stack).cap()` сравнивается с `"vinteum"`, как оригинальный `getCap(itemstack).getTag()`.
+- **Регистрация жезлов:** witchwood rod (100 vis, craft 12) и witchwood staff (50 vis, craft 24, sceptre) регистрируются только при загруженном мод; их `RodUpdate` привязан к конфигу `compatibility.cross_wand`, как оригинальный `Config.crossWand`. Без конверсии жезлы остаются, но не пополняются.
+- **Порт к мане:** `Tc4ArsMagicaManaSource` вызывает `ArsMagicaApi.manaHelper()` reflectively (`getMana`/`decreaseMana`), как оригинал через `ArsMagicaApi.instance.getExtendedProperties`. Reflection сохраняет сборку аддона герметичной: AML не входит ни в compile, ни в runtime classpath. Сбой резолва трактуется как «источник недоступен», без исключений и без регистрации при отсутствии мода. Сигнатуры API берутся из classloader'а AML: методы принимают `LivingEntity`, а не `Player`; тест проверяет, что мост реально резолвится, а не молча падает.
+- **Creative wands:** добавляются witchwood wand/staff с vinteum cap, как оригинальный `ItemWandCores` при `Compat.am2`.
+- **Ингредиенты рецептов — осознанная замена.** AML не имеет AM2-мета-вариантов `essence` (arcane/earth/air/fire/water + pure/high core) и `itemOre` (vinteum dust 0, arcane compound 1, arcane ash 2, purified vinteum 3, chimerite 4, blue topaz 5, sunstone 6, moonstone 7), поэтому рецепты восстановлены с подстановкой AML-предметов, а не 1:1:
+  - `essence` → `arsmagicalegacy:affinity_essence` (в AML эссенции существуют по аффинити, а не как мета-предмет);
+  - `itemOre:0/3` → `arsmagicalegacy:vinteum_dust`;
+  - `itemOre:2` → `arsmagicalegacy:arcane_ash`;
+  - `itemOre:4/5/6/7` → `chimerite` / `topaz` / `sunstone` / `moonstone`.
+  Мета-раскладка взята из исходника AM2 (`ItemEssence`, `ItemOre`), а не угадана. Виско-стоимость, нестабильность (5/5), размер сетки (3×3) и число компонентов (9/3) сохранены точно от оригинала. Это **отклонение**, зафиксированное здесь, а не паритет: слоты заполнены ближайшим смысловым аналогом, и игровой баланс рецепта отличается от оригинала.
+- **`CAP_thaumium` — родитель research с сохранённым регистром хоста:** оригинал ссылался на `CAP_thaumium` (смешанный регистр, как в TC4 1.7.10); современный хост регистрирует то же имя `CAP_thaumium`, поэтому добавлен алиас в `Tc4ResearchAdapter.LEGACY_RESEARCH_KEYS` — без него авто-uppercase ломал связь.
+
+Прогрессия `ROD_witchwood` (`parents("nethershards")`, warp 2, HIDDEN) и `ROD_witchwood_staff` сохранена без изменений; координаты, аспектные ценники и тексты страниц берутся из оригинальных ResearchItem. `CAP_vinteum` добавлен как вторичное скрытое исследование с родителями `ROD_witchwood`/`CAP_thaumium`.
 
 ## Пункты, которые не являются расхождением сами по себе
 
@@ -122,8 +124,6 @@ GameTests покрывают capacity gate, приоритет топлива, s
 - `/forbiddenmagic aspects` и стартовая INFO-сводка показывают ordinal, tag, имя, тип и компоненты
   зарегистрированных аспектов. Встроенные аспекты сохраняют ordinal `0-47`, аспекты Forbidden Magic
   начинаются с `48`; при `no_lust` отсутствие `luxuria` отмечено как отключённое конфигурацией.
-- Вывод идёт в каноническом порядке хоста (`Aspect.values()`): апстрим сортирует аддонные аспекты
-  по тегу, поэтому первым аддонным идёт `desidia`.
 - JEI `31.16.0.90` подключается только к classpath клиентского run для разработки. В опубликованный
   jar, общий runtime classpath и GameTest-сервер JEI не входит.
 
@@ -133,7 +133,7 @@ GameTests покрывают capacity gate, приоритет топлива, s
 - Emerald conversions (b): 9 fragments <-> 1 emerald recipes.
 - Tainted blood shard (c): new item + drop rule (TaintedMob + player attack + Weakness amp>=2 -> 50%).
 - itemBacon tag (d): aspects on forbiddenmagic:item_bacon tag (empty by default).
-- Smelting bonus (e): **dormant, ожидает API хоста.** Оригинал вызывал `ThaumcraftApi.addSmeltingBonus(emerald → resource[0])`. В TC4 1.1.2/1.1.3 таблица бонусов внутренняя (`thaumcraft.device.SmeltingBonuses` не имеет публичного метода регистрации), поэтому бонус не переносится и не имитируется: единственная конверсия изумруд↔фрагмент — портированные crafting-рецепты. Аддон содержит готовую capability (`HostSmeltingBonusServices` + `Tc4SmeltingBonusAdapter`), которая рефлективно связывается с публичным API хоста, как только тот появится, и остаётся неактивной до этого момента. Профиль хоста объявляет `SMELTING_BONUSES` как `UNSUPPORTED`; GameTest `smelting_bonus_stays_dormant_until_host_exposes_an_api` проверяет инвариант «бонус активен iff хост предоставляет API».
+- Smelting bonus (e): inert in original (no emerald smelting recipe, size-0 stack); not ported.
 - Wand caps (f): 6 subtypes + 4 cap registrations + textures.
 - Silverfish aspect (g): config-dependent (GREED iff silverfishEmeralds).
 - Garbage blocks config (h): general.garbage_blocks.

@@ -15,15 +15,15 @@ Versions therefore always increase without a manual step; the committed `gradle.
 
 ## When a release is published
 
-A push publishes a release only if it changes a path in the workflow allowlist: `src/`, `data/`, `tools/gen/`, `tools/gen_resources.py`, `tools/prepare_host.py`, `patches/`, the Gradle inputs (`build.gradle`, `settings.gradle`, `gradle.properties`, `gradle/`, `gradlew`, `gradlew.bat`), `host.sha` or `release-version.txt`. Pushes that touch only documentation, the README, licenses, `.github/` or other paths outside this list do not publish a new version; the regular CI workflow still builds and tests them. The workflow's `paths` filter is authoritative — add every new build input there when it is introduced.
+A push publishes a release only if it changes files that build into the mod or drive the release: `src/`, `tests/`, `data/`, `tools/`, `patches/`, the Gradle inputs (`build.gradle`, `settings.gradle`, `gradle.properties`, `gradle/`, `gradlew`, `gradlew.bat`), `host.sha` or `release-version.txt`. Pushes that touch only docs, the README, licenses, `.github/` or other repository service files are ignored, so documentation and CI tweaks do not create a new version; the regular CI workflow still builds and tests them. The allowlist lives in the workflow's `paths` filter — a new build input must be added there or its pushes will not release.
 
 Manual `workflow_dispatch` runs ignore this filter, which is how a workflow change itself can be published on purpose.
 
 ## Rolling channels
 
-There is one rolling GitHub release per Minecraft channel, tagged `release/26.3`, `release/26.1.2` and `release/1.21.1` (the `release/` prefix keeps the tags from colliding with branch names like `1.21.1`). Each successful build moves its channel tag to the tested source snapshot and **recreates** the corresponding release with the current jar, so the release date and asset match the newest build. Only the `release/26.3` release is created with the GitHub "Latest" mark — the primary channel — so the two channels do not steal the badge from each other on every build.
+There is one rolling GitHub release per Minecraft channel, tagged `release/26.3`, `release/26.1.2` and `release/1.21.1` (the `release/` prefix keeps the tags from colliding with branch names like `1.21.1`). Each successful build **recreates** its release with the current jar, so the release date and the asset always match the newest build. The tag is preserved across the recreation. Only the `release/26.3` release is created with the GitHub "Latest" mark — the primary channel — so the two channels do not steal the badge from each other on every build.
 
-The workflow does not create per-build backup or rollback tags. To rebuild an earlier version, run `workflow_dispatch` from the corresponding channel branch and set `source_ref` to the desired commit SHA or an existing tag. Leave it empty to build the selected branch's current head. The selected source must still be available in Git history and must target the selected Minecraft channel; no additional retention is provided.
+For rollback, every 26.3 build also pushes an `archive/releases/26.3/<source sha>` tag. A manual `workflow_dispatch` run accepts such a tag and rebuilds it; the workflow refuses to overwrite an existing numbered release.
 
 ## Older numbered releases
 

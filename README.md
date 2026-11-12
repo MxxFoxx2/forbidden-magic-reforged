@@ -1,6 +1,6 @@
 # Forbidden Magic: Reforged
 
-A port of **Forbidden Magic 0.574** (Minecraft 1.7.10, by SpitefulFox) to **Thaumcraft 4: Reforged** for **Minecraft 26.3** / **NeoForge 26.3.0.57-beta**.
+A port of **Forbidden Magic 0.574** (Minecraft 1.7.10, by SpitefulFox) to **Thaumcraft 4: Reforged** for **Minecraft 26.1.2** / **NeoForge 26.1.2.122**.
 
 | Minecraft | NeoForge | Thaumcraft 4: Reforged | Release |
 | --- | --- | --- | --- |
@@ -16,8 +16,8 @@ A port of **Forbidden Magic 0.574** (Minecraft 1.7.10, by SpitefulFox) to **Thau
 
 ## Installation
 
-1. Install **Minecraft 26.3** with **NeoForge 26.3.0.57-beta**
-2. Install **Thaumcraft 4: Reforged 1.1.3** (required)
+1. Install **Minecraft 26.1.2** with **NeoForge 26.1.2.122**
+2. Install **Thaumcraft 4: Reforged 1.1.2 or newer** (required)
 3. For 1.21.1: also install **Curios 9.5.1+**
 4. Drop `forbidden-magic-<version>-<mc>.jar` into the `mods/` folder
 5. The **Apocrypha** tab appears in the Thaumonomicon
@@ -28,7 +28,7 @@ A port of **Forbidden Magic 0.574** (Minecraft 1.7.10, by SpitefulFox) to **Thau
 
 Config file: `config/forbiddenmagic-startup.toml` (created on first launch). Each option carries its own description and default in the file.
 
-> `no_lust`, `enchanting`, `greedy_ench`, `emerald_transmutation`, and `wrath_cage` are **gates**: they decide what gets registered, so they are read at startup and synced to the client. A mismatch disconnects the client instead of diverging registries.
+> `no_lust`, `enchanting`, `greedy_ench`, `emerald_transmutation`, and `wrath_cage` are **gates**: they decide what gets registered, so they are read at startup. `python tools/set_startup_config.py no_lust=true|false` toggles them for testing.
 
 ---
 
@@ -55,7 +55,7 @@ python tools/prepare_host.py --verify # verification only
 # Validation
 python tools/check_host_agnostic_api.py  # check host-agnostic boundaries
 python tools/check_provenance.py         # check JAR provenance
-python tools/check_host_pin.py           # check the host pin and patch applicability
+python tools/check_host_clean.py         # ensure the pinned host checkout is unmodified
 python tools/gen_resources.py            # regenerate resources (must leave a clean diff)
 ```
 

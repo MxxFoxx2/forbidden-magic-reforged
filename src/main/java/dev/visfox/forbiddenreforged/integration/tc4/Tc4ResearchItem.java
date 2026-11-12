@@ -1,6 +1,6 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
-import dev.visfox.forbiddenreforged.common.FmConfig;
+import dev.visfox.forbiddenreforged.FmConfig;
 
 import net.minecraft.resources.Identifier;
 import thaumcraft.aspect.AspectList;

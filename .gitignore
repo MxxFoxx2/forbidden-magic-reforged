@@ -11,8 +11,6 @@ run/
 .worktrees/
 
 # Caches and temporary files
-__pycache__/
-*.py[cod]
 .cache/
 .codegraph/
 logs/

@@ -1,8 +1,12 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
-import dev.visfox.forbiddenreforged.common.FmIds;
-import dev.visfox.forbiddenreforged.common.FmWandContractAccess;
+import dev.visfox.forbiddenreforged.ForbiddenMagic;
+import dev.visfox.forbiddenreforged.FmArsMagica;
+import dev.visfox.forbiddenreforged.FmConfig;
+import dev.visfox.forbiddenreforged.FmWandContractAccess;
 import dev.visfox.forbiddenreforged.integration.api.HostAdapterRegistry;
+import dev.visfox.forbiddenreforged.core.wand.ManaSource;
+import dev.visfox.forbiddenreforged.core.wand.ManaWandBehavior;
 import dev.visfox.forbiddenreforged.core.wand.WandBehaviors;
 import dev.visfox.forbiddenreforged.core.wand.WandPartsAccess;
 import dev.visfox.forbiddenreforged.core.wand.WandVisAccess;
@@ -21,51 +25,62 @@ import thaumcraft.wand.Wands;
 public final class Tc4WandAdapter {
     private static final WandVisAccess VIS = new Tc4WandVisAdapter();
     private static final WandPartsAccess PARTS = new Tc4WandPartsAdapter();
+    private static final ManaSource MANA = FmArsMagica.modernApiAvailable()
+        ? Tc4ArsMagicaManaSource.INSTANCE
+        : Tc4NoManaSource.INSTANCE;
 
     private Tc4WandAdapter() {
     }
 
 
     public static void registerWands() {
-        WandRegistry.registerRod("tainted", 150, FmIds.id("tainted_rod"), 12,
+        WandRegistry.registerRod("tainted", 150, ForbiddenMagic.id("tainted_rod"), 12,
             new TaintedWandUpdate(), false, false, false,
-            FmIds.id("textures/model/wand_rod_tainted.png"));
-        WandRegistry.registerRod("infernal", 150, FmIds.id("infernal_rod"), 12,
+            ForbiddenMagic.id("textures/model/wand_rod_tainted.png"));
+        WandRegistry.registerRod("infernal", 150, ForbiddenMagic.id("infernal_rod"), 12,
             new InfernalWandUpdate(), false, false, false,
-            FmIds.id("textures/model/wand_rod_infernal.png"));
-        WandRegistry.registerRod("profane", 50, FmIds.id("profane_rod"), 12,
+            ForbiddenMagic.id("textures/model/wand_rod_infernal.png"));
+        WandRegistry.registerRod("profane", 50, ForbiddenMagic.id("profane_rod"), 12,
             new ProfaneWandUpdate(), false, false, false,
-            FmIds.id("textures/model/wand_rod_profane.png"));
+            ForbiddenMagic.id("textures/model/wand_rod_profane.png"));
         WandRegistry.registerRod("profaned", 50, Identifier.withDefaultNamespace("bedrock"), 1000,
             null, false, false, false,
-            FmIds.id("textures/model/wand_rod_profaned.png"));
+            ForbiddenMagic.id("textures/model/wand_rod_profaned.png"));
         WandRegistry.registerCap("orichalcum", 0.0F, List.of(), 0.0F,
             Identifier.withDefaultNamespace("command_block"), 1000, null,
-            FmIds.id("textures/model/wand_cap_orichalcum.png"));
+            ForbiddenMagic.id("textures/model/wand_cap_orichalcum.png"));
         WandRegistry.registerCap("alchemical", 0.9F, List.of(Aspect.WATER), 0.8F,
-            FmIds.id("alchemical_cap"), 7, null,
-            FmIds.id("textures/model/wand_cap_alchemical.png"));
+            ForbiddenMagic.id("alchemical_cap"), 7, null,
+            ForbiddenMagic.id("textures/model/wand_cap_alchemical.png"));
         WandRegistry.registerCap("vinteum", 0.9F, List.of(), 0.0F,
-            FmIds.id("vinteum_cap"), 6, null,
-            FmIds.id("textures/model/wand_cap_vinteum.png"));
+            ForbiddenMagic.id("vinteum_cap"), 6, null,
+            ForbiddenMagic.id("textures/model/wand_cap_vinteum.png"));
         WandRegistry.registerCap("manasteel", 0.9F, List.of(), 0.0F,
-            FmIds.id("manasteel_cap"), 6, null,
-            FmIds.id("textures/model/wand_cap_manasteel.png"));
+            ForbiddenMagic.id("manasteel_cap"), 6, null,
+            ForbiddenMagic.id("textures/model/wand_cap_manasteel.png"));
         WandRegistry.registerCap("elementium", 0.8F, List.of(), 0.0F,
-            FmIds.id("elementium_cap"), 9, null,
-            FmIds.id("textures/model/wand_cap_elementium.png"));
+            ForbiddenMagic.id("elementium_cap"), 9, null,
+            ForbiddenMagic.id("textures/model/wand_cap_elementium.png"));
         WandRegistry.registerCap("terrasteel", 1.8F, List.of(), 0.0F,
-            FmIds.id("terrasteel_cap"), 1, null,
-            FmIds.id("textures/model/wand_cap_terrasteel.png"));
-        WandRegistry.registerRod("equivalent", 100, FmIds.id("equivalent_rod"), 12,
+            ForbiddenMagic.id("terrasteel_cap"), 1, null,
+            ForbiddenMagic.id("textures/model/wand_cap_terrasteel.png"));
+        if (FmArsMagica.loaded()) {
+            WandRegistry.registerRod("witchwood", 100, ForbiddenMagic.id("witchwood_rod"), 12,
+                FmConfig.crossWandEnabled() ? new WitchwoodWandUpdate() : null, false, false, false,
+                ForbiddenMagic.id("textures/model/wand_rod_witchwood.png"));
+            WandRegistry.registerRod("witchwood", 50, ForbiddenMagic.id("witchwood_staff_rod"), 24,
+                FmConfig.crossWandEnabled() ? new WitchwoodStaffUpdate() : null, false, true, false,
+                ForbiddenMagic.id("textures/model/wand_rod_witchwood.png"));
+        }
+        WandRegistry.registerRod("equivalent", 100, ForbiddenMagic.id("equivalent_rod"), 12,
             null, false, false, false,
-            FmIds.id("textures/model/wand_rod_equivalent.png"));
+            ForbiddenMagic.id("textures/model/wand_rod_equivalent.png"));
         WandRegistry.registerRod("neutronium", 9001, Identifier.withDefaultNamespace("bedrock"), 1000,
             new CreativeWandUpdate(), true, false, false,
-            FmIds.id("textures/model/wand_rod_neutronium.png"));
+            ForbiddenMagic.id("textures/model/wand_rod_neutronium.png"));
         WandRegistry.registerRod("neutronium", 9002, Identifier.withDefaultNamespace("bedrock"), 1000,
             new CreativeWandUpdate(), true, true, false,
-            FmIds.id("textures/model/wand_rod_neutronium.png"));
+            ForbiddenMagic.id("textures/model/wand_rod_neutronium.png"));
     }
 
     public static void addCreativeWands(List<ItemStack> stacks) {
@@ -90,6 +105,11 @@ public final class Tc4WandAdapter {
                 VIS.addVis(filled, aspect, 5000, true);
             }
             stacks.add(filled);
+        }
+
+        if (FmArsMagica.loaded()) {
+            addWand(stacks, WandRegistry.findCap("vinteum"), "witchwood");
+            addWand(stacks, WandRegistry.findCap("vinteum"), "witchwood_staff");
         }
     }
 
@@ -125,7 +145,29 @@ public final class Tc4WandAdapter {
     private static final class ProfaneWandUpdate implements RodUpdate {
         @Override
         public void onUpdate(ItemStack stack, Player player) {
-            WandBehaviors.profane(stack, player, VIS, PARTS, FmWandContractAccess.INSTANCE, HostAdapterRegistry.warp());
+            WandBehaviors.profane(stack, player, VIS, PARTS, FmWandContractAccess.INSTANCE, HostAdapterRegistry.requireWarp());
+        }
+    }
+
+    private static final class WitchwoodWandUpdate implements RodUpdate {
+        @Override
+        public void onUpdate(ItemStack stack, Player player) {
+            if (!FmArsMagica.loaded() || !FmConfig.crossWandEnabled()) {
+                return;
+            }
+            boolean vinteum = "vinteum".equals(Wands.getParts(stack).cap());
+            ManaWandBehavior.wand(stack, player, VIS, MANA, vinteum);
+        }
+    }
+
+    private static final class WitchwoodStaffUpdate implements RodUpdate {
+        @Override
+        public void onUpdate(ItemStack stack, Player player) {
+            if (!FmArsMagica.loaded() || !FmConfig.crossWandEnabled()) {
+                return;
+            }
+            boolean vinteum = "vinteum".equals(Wands.getParts(stack).cap());
+            ManaWandBehavior.staff(stack, player, VIS, MANA, vinteum);
         }
     }
 }

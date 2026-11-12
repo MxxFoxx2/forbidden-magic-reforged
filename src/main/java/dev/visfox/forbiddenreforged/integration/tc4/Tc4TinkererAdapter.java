@@ -1,8 +1,8 @@
 package dev.visfox.forbiddenreforged.integration.tc4;
 
-import dev.visfox.forbiddenreforged.common.FmConfig;
-import dev.visfox.forbiddenreforged.common.FmEnchantments;
-import dev.visfox.forbiddenreforged.common.FmIds;
+import dev.visfox.forbiddenreforged.FmConfig;
+import dev.visfox.forbiddenreforged.FmEnchantments;
+import dev.visfox.forbiddenreforged.ForbiddenMagic;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -39,7 +39,7 @@ public final class Tc4TinkererAdapter {
             add(costs, constructor, FmEnchantments.VOIDTOUCHED, "textures/misc/voidtouched.png", new AspectList().add(Aspect.ENTROPY, 70), "VOIDTOUCHED");
             registered = 8;
         } catch (ReflectiveOperationException | LinkageError error) {
-            FmIds.LOGGER.warn("Thaumic Tinkerer is present but its enchantment API is missing", error);
+            ForbiddenMagic.LOGGER.warn("Thaumic Tinkerer is present but its enchantment API is missing", error);
         }
     }
 
@@ -48,7 +48,7 @@ public final class Tc4TinkererAdapter {
     }
 
     private static void add(Map<Object, Object> costs, Constructor<?> constructor, ResourceKey<Enchantment> key, String texture, AspectList aspects, String research) throws ReflectiveOperationException {
-        Object datum = constructor.newInstance(key, FmIds.id(texture), false, aspects, research);
+        Object datum = constructor.newInstance(key, ForbiddenMagic.id(texture), false, aspects, research);
         costs.put(key, datum);
     }
 }

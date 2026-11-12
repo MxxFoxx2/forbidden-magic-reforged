@@ -62,8 +62,7 @@ public record HostProfile(
         STICKY_WARP,
         TAINT_ORIGINS,
         ENTITY_ASPECTS,
-        ENTITY_CLASSIFICATION,
-        SMELTING_BONUSES
+        ENTITY_CLASSIFICATION
     }
 
     public enum SupportLevel {

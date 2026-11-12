@@ -75,6 +75,12 @@ cap = "Orichalcum Studded"
 [item.Wand.neutronium]
 rod = "Cosmic Neutronium"
 
+[item.Wand.witchwood]
+rod = "Witchwood"
+
+[item.Wand.vinteum]
+cap = "Vinteum Studded"
+
 [item.forbiddenmagic.mob_crystal]
 empty = "Blank Imprinting Crystal"
 filled = "%s Imprinted Crystal"
@@ -106,6 +112,7 @@ RINGFOOD = "Ring of Nutrition"
 ROD_tainted = "Tainted Wand Core"
 ROD_infernal = "Infernal Wand Core"
 ROD_witchwood = "Witchwood Wand Core"
+CAP_vinteum = "Vinteum Caps"
 ROD_profane = "Profane Wand"
 ROD_witchwood_staff = "Witchwood Staff Core"
 TRANSEMERALD = "Emerald Transmutation"
@@ -140,6 +147,7 @@ RINGFOOD = "Cheese puffs prevent scurvy, right?"
 ROD_tainted = "Squiggly vis storage"
 ROD_infernal = "Devilish vis storage"
 ROD_witchwood = "Mana converter"
+CAP_vinteum = "Magical wand caps"
 ROD_profane = "Sign on the dotted line"
 ROD_witchwood_staff = "Staff of the Arcanist"
 TRANSEMERALD = "Transformation of valuables into emerald"
@@ -182,6 +190,7 @@ RINGFOOD = "[FM] Cheese puffs prevent scurvy, right?"
 ROD_tainted = "[FM] Squiggly vis storage"
 ROD_infernal = "[FM] Devilish vis storage"
 ROD_witchwood = "[FM] Mana converter"
+CAP_vinteum = "[FM] Magical wand caps"
 ROD_profane = "[FM] Sign on the dotted line"
 ROD_witchwood_staff = "[FM] Staff of the Arcanist"
 TRANSEMERALD = "[FM] Transformation of valuables into emerald"
@@ -290,6 +299,9 @@ wrath_cage = "Wrath Cage"
 
 [forbiddenmagic.research_page.ROD_witchwood]
 1 = "By creating a wand core out of Witchwood, you've discovered a way to convert mana into Vis.  The Witchwood Wand Core holds up to 100 vis and will gradually charge itself at the cost of 140 mana per point of vis.<BR><BR>Further research may reveal ways to lower this price."
+
+[forbiddenmagic.research_page.CAP_vinteum]
+1 = "By infusing a Thaumium cap with Vinteum, you create a cap that, when combined with a Witchwood Wand Core, lowers its mana cost to only 80 per point of vis.<BR><BR>The Thaumium cap seems to meld well with Vinteum, offering the same 90% vis rate."
 
 [forbiddenmagic.research_page.ROD_profane]
 1 = "Strange villagers have been known to procure these wooden wands carved with blasphemous symbols. Profane Wands draw from a mediocre pool of vis, but they seem to be able to refill themselves very quickly from an unseen source.<BR><BR>The runes on the wand sometimes shift and bleed and the wand itself occasionally whispers of demonic contracts and vile deeds.<BR><BR>Prolonged use is not recommended."
