@@ -1,138 +1,87 @@
 # Forbidden Magic: Reforged
 
-Порт **Forbidden Magic 0.574** (Minecraft 1.7.10, автор SpitefulFox) на **Thaumcraft 4: Reforged** для **Minecraft 26.3** / **NeoForge 26.3.0.57-beta**.
+A port of **Forbidden Magic 0.574** (Minecraft 1.7.10, by SpitefulFox) to **Thaumcraft 4: Reforged** for **Minecraft 26.3** / **NeoForge 26.3.0.57-beta**.
 
-| Minecraft | NeoForge | Thaumcraft 4: Reforged | Версия мода | Релиз |
-| --- | --- | --- | --- | --- |
-| **26.3** | 26.3.0.57-beta | 1.1.3 | `0.574-26.3-port.0.1.0` | [`release/26.3`](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/release/26.3) |
-| **26.1.2** | 26.1.2.122 | 1.1.2 | `0.574-26.1.2-port.0.1.0` | [`mc/26.1.2`](https://github.com/MxxFoxx2/forbidden-magic-reforged/tree/mc/26.1.2) |
-| **1.21.1** | 21.1.256 | 1.1.2 | `0.574-1.21.1-port.0.1.0` | [`1.21.1`](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/1.21.1) |
+| Minecraft | NeoForge | Thaumcraft 4: Reforged | Release |
+| --- | --- | --- | --- |
+| **26.3** | 26.3.0.57-beta | 1.1.3 | [`release/26.3`](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/release/26.3) |
+| **26.1.2** | 26.1.2.122 | 1.1.2 | [`release/26.1.2`](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/release/26.1.2) |
+| **1.21.1** | 21.1.256 | 1.1.2 | [`release/1.21.1`](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases/tag/release/1.21.1) |
 
-> Для Minecraft **1.21.1** требуется [Curios 9.5.1+1.21.1](https://www.curseforge.com/minecraft/mc-mods/curios) (включён в runtime classpath для GameTest).
-> Общего бинарника между версиями Minecraft нет — каждая ветка собирается и выпускается отдельно.
-
----
-
-## Установка
-
-1. Установите **Minecraft 26.3** с **NeoForge 26.3.0.57-beta**
-2. Установите **Thaumcraft 4: Reforged 1.1.3** (обязательно)
-3. Для 1.21.1: также установите **Curios 9.5.1+** (включён в runtime для GameTest)
-4. Положите `forbidden-magic-<version>-<mc>.jar` в папку `mods/`
-5. Вкладка **FORBIDDEN** появится в Тауманомиконе (нажмите **Shift**, чтобы раскрыть скрытые записи)
+> The current mod version lives on the channel's rolling release page: the numbers auto-increment on each publish. A local dev build uses `mod_version` from `gradle.properties` and does not match the release number.
+> Minecraft **1.21.1** requires [Curios 9.5.1+1.21.1](https://www.curseforge.com/minecraft/mc-mods/curios).
+> There is no shared binary between Minecraft versions — each branch is built and released separately.
 
 ---
 
-## Конфигурация
+## Installation
 
-Файл конфига: `config/forbiddenmagic.toml` (создаётся при первом запуске)
-
-| Опция | По умолчанию | Описание |
-| --- | --- | --- |
-| `enchantments_enabled` | `true` | Включить зачарования Гнева/Зависти/Жадности |
-| `greedy_enchantment_enabled` | `true` | Включить зачарование Капиталист (Жадность) |
-| `lust_disabled` | `false` | Отключить контент Похоти (Ошейник боли, рецепт набольника, осколок похоти) |
-| `emerald_transmutation` | `true` | Включить рецепты изумруд ⇄ фрагмент |
-| `wrath_cage` | `true` | Включить блок Клетка гнева и Кристалл моба |
-
-> Опция `lust_disabled` — это **гейт** — она полностью удаляет контент, связанный с Похотью. Переключение через `python tools/set_startup_config.py no_lust=true|false`. Финальное состояние **обязательно `false`** для релиза.
+1. Install **Minecraft 26.3** with **NeoForge 26.3.0.57-beta**
+2. Install **Thaumcraft 4: Reforged 1.1.3** (required)
+3. For 1.21.1: also install **Curios 9.5.1+**
+4. Drop `forbidden-magic-<version>-<mc>.jar` into the `mods/` folder
+5. The **Apocrypha** tab appears in the Thaumonomicon
 
 ---
 
-## Сборка и разработка
+## Configuration
 
-### Требования
-- **Java 25** (Java 21 для ветки 1.21.1)
-- **Python 3** (для подготовки хоста, генерации ресурсов, валидации)
-- Gradle wrapper включён (`./gradlew`)
+Config file: `config/forbiddenmagic-startup.toml` (created on first launch). Each option carries its own description and default in the file.
 
-### Команды
+> `no_lust`, `enchanting`, `greedy_ench`, `emerald_transmutation`, and `wrath_cage` are **gates**: they decide what gets registered, so they are read at startup and synced to the client. A mismatch disconnects the client instead of diverging registries.
+
+---
+
+## Building and development
+
+### Requirements
+- **Java 25** (Java 21 for the 1.21.1 branch)
+- **Python 3** (for host preparation, resource generation, validation)
+- Gradle wrapper included (`./gradlew`)
+
+### Commands
 ```bash
-# Подготовка хоста (исходники Thaumcraft 4: Reforged + патчи)
-python tools/prepare_host.py          # собрать host/
-python tools/prepare_host.py --verify # только верификация
+# Host preparation (Thaumcraft 4: Reforged sources + patches)
+python tools/prepare_host.py          # build host/
+python tools/prepare_host.py --verify # verification only
 
-# Сборка
-./gradlew build                       # собирает и хост, и аддон (composite build)
+# Build
+./gradlew build                       # builds both the host and the addon (composite build)
 
-# Запуск
-./gradlew runClient                   # дев-клиент
-./gradlew runServer                   # дев-сервер
-./gradlew runGameTestServer           # автоматизированные GameTest (headless)
+# Run
+./gradlew runClient                   # dev client
+./gradlew runGameTestServer           # automated GameTests (headless)
 
-# Валидация
-python tools/check_host_agnostic_api.py  # проверить границы host-agnostic
-python tools/check_provenance.py         # проверить происхождение JAR
-python tools/check_host_pin.py           # проверить пин хоста и применимость патчей
-python tools/gen_resources.py            # сгенерировать ресурсы (2 раза, чистый diff)
+# Validation
+python tools/check_host_agnostic_api.py  # check host-agnostic boundaries
+python tools/check_provenance.py         # check JAR provenance
+python tools/check_host_pin.py           # check the host pin and patch applicability
+python tools/gen_resources.py            # regenerate resources (must leave a clean diff)
 ```
 
-### Definition of Done (для контрибьюторов)
-1. `python tools/prepare_host.py --verify` → `host matches sha + 1 patch commit(s)`
-2. `./gradlew build` успешно
-3. `./gradlew runGameTestServer` зелёный с `no_lust=false` И `no_lust=true` (потом вернуть `false`)
-4. `python tools/check_host_agnostic_api.py` и `python tools/check_provenance.py` зелёные
-5. Если трогали `data/` или `tools/` генераторы → `gen_resources.py` 2 раза, чистый diff `src/generated/`
-6. Любое реальное отклонение от оригинала → задокументировано в `docs/fidelity.md` (не фикс теста)
-7. Коммит по Conventional Commits (`feat:`, `fix:`, `docs:` и т.д.), без co-author строк
+The full verification gate and contribution rules are in [AGENTS.md](AGENTS.md). The package layout and layer boundaries are described in [docs/architecture/host-agnostic-core.md](docs/architecture/host-agnostic-core.md).
 
 ---
 
-## Файдлити и верификация
+## Authors and license
 
-Порт нацелен на **1:1 парность логики, чисел, рецептов и текстов** с оригинальным Forbidden Magic 0.574, в рамках возможностей современного API.
-
-- **Fidelity Ledger**: [docs/fidelity.md](docs/fidelity.md) — каждое известное отклонение, компромисс и пробел в парности
-- **Verification Report**: [docs/verification.md](docs/verification.md) — результаты GameTest, статус CI
-- **Roadmap**: [docs/roadmap.md](docs/roadmap.md) — текущие приоритеты и блокеры
-
-> **Визуальная и геймплейная парность подтверждается только через `runClient` и реальную игру.** Зелёная компиляция и GameTest — необходимо, но не достаточно.
-
----
-
-## Структура проекта
-
-```
-src/main/java/dev/visfox/forbiddenreforged/
-├── core/
-│   ├── aspect/      # Определения аспектов (host-neutral)
-│   ├── model/       # ContentId, HostContent (host-neutral)
-│   ├── recipe/      # Определения рецептов (host-neutral)
-│   ├── research/    # Определения исследований (host-neutral)
-│   ├── wand/        # Поведения жезлов (Hellfire, Blink Focus)
-│   └── warp/        # Абстракция доступа к варпу
-├── integration/
-│   ├── api/         # HostAdapter, HostProfile, HostServices, HostAdapterRegistry
-│   ├── runtime/     # 16 capability портов (HostXxxServices)
-│   └── tc4/         # Реализация Thaumcraft 4: Reforged (Tc4Services + узкие адаптеры)
-├── common/          # Общие блоки, предметы, Fm*-регистрации, конфиг, синхронизация
-├── client/          # Клиентский код (рендереры, креативные вкладки)
-└── ForbiddenMagic.java  # Главный класс мода (composition root)
-
-src/gameTest/java/dev/visfox/forbiddenreforged/
-└── test/            # GameTest реализации (отдельный source set, не попадают в JAR)
-```
-
----
-
-## Авторы и лицензия
-
-| Роль | Автор |
+| Role | Author |
 | --- | --- |
-| **Оригинальный Forbidden Magic 0.574** | [SpitefulFox](https://github.com/SpitefulFox/ForbiddenMagic) (WTFPL) |
+| **Original Forbidden Magic 0.574** | [SpitefulFox](https://github.com/SpitefulFox/ForbiddenMagic) (WTFPL) |
 | **Thaumcraft 4** | Azanor |
 | **Thaumcraft 4: Reforged** | [notlikethiss](https://github.com/notlikethiss/thaumcraft-4-reforged) |
 | **Forbidden Magic: Reforged** | [MxxFoxx2](https://github.com/MxxFoxx2/forbidden-magic-reforged) (MIT) |
 
-- Логика, числа, рецепты, тексты и ассеты оригинала портируются 1:1 там, где это позволяет современный API.
-- Ассеты Thaumcraft принадлежат Azanor. Этот репозиторий содержит портированную логику и ассеты и **не предназначен для перераспространения** за пределами личного использования.
-- См. [LICENSE](LICENSE) и [NOTICE](NOTICE) для полных условий.
+- The original's logic, numbers, recipes, texts, and assets are ported 1:1 wherever the modern API allows.
+- Thaumcraft assets belong to Azanor. This repository contains ported logic and assets and is **not intended for redistribution** beyond personal use.
+- See [LICENSE](LICENSE) and [NOTICE](NOTICE) for the full terms.
 
 ---
 
-## Ссылки
+## Links
 
-- **Релизы**: [GitHub Releases](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases)
+- **Releases**: [GitHub Releases](https://github.com/MxxFoxx2/forbidden-magic-reforged/releases)
 - **Issues**: [GitHub Issues](https://github.com/MxxFoxx2/forbidden-magic-reforged/issues)
 - **Thaumcraft 4: Reforged**: [GitHub](https://github.com/notlikethiss/thaumcraft-4-reforged)
-- **Оригинальный Forbidden Magic**: [GitHub](https://github.com/SpitefulFox/ForbiddenMagic)
+- **Original Forbidden Magic**: [GitHub](https://github.com/SpitefulFox/ForbiddenMagic)
+- **Documentation**: [deviations](docs/fidelity.md), [verification](docs/verification.md), [roadmap](docs/roadmap.md)

@@ -81,7 +81,6 @@ public final class AspectGameTests {
         "aspect_diagnostics_expose_stable_registry_table",
         "forbiddenmagic_aspects_command_is_registered",
         "addon_item_aspects_match_original_assignments",
-        "core_aspect_catalog_is_host_neutral_and_complete",
         "sin_aspect_colors_components_and_blend_match_original"
     };
 
@@ -103,7 +102,6 @@ public final class AspectGameTests {
         FmGameTestBootstrap.register(registry, "aspect_diagnostics_expose_stable_registry_table", AspectGameTests::aspectDiagnosticsExposeStableRegistryTable);
         FmGameTestBootstrap.register(registry, "forbiddenmagic_aspects_command_is_registered", AspectGameTests::forbiddenmagicAspectsCommandIsRegistered);
         FmGameTestBootstrap.register(registry, "addon_item_aspects_match_original_assignments", AspectGameTests::addonItemAspectsMatchOriginalAssignments);
-        FmGameTestBootstrap.register(registry, "core_aspect_catalog_is_host_neutral_and_complete", AspectGameTests::coreAspectCatalogIsHostNeutralAndComplete);
         FmGameTestBootstrap.register(registry, "sin_aspect_colors_components_and_blend_match_original", AspectGameTests::sinAspectColorsComponentsAndBlendMatchOriginal);
     }
 
@@ -121,40 +119,6 @@ public final class AspectGameTests {
                 new FunctionGameTestInstance(function, new TestData<>(environment, Identifier.parse("forbiddenmagic:test/platform"), 100, 0, true))
             );
         }
-    }
-
-    private static void coreAspectCatalogIsHostNeutralAndComplete(GameTestHelper helper) {
-        List<AspectDefinition> enabled = ForbiddenMagicAspectCatalog.definitions(true);
-        List<AspectDefinition> disabled = ForbiddenMagicAspectCatalog.definitions(false);
-        helper.assertValueEqual(enabled.size(), 7, "full catalog must define seven Forbidden Magic aspects");
-        helper.assertValueEqual(disabled.size(), 6, "no-lust catalog must define six aspects");
-        helper.assertTrue(enabled.stream().allMatch(definition ->
-            definition.id().namespace().equals(FmIds.MODID)
-                && definition.components().stream().allMatch(component ->
-                    component.namespace().equals(FmIds.MODID)
-                        && component.path().startsWith("concept/"))),
-            "catalog component references must use semantic IDs, not host aspect IDs");
-
-        AspectDefinition luxuria = enabled.get(0);
-        helper.assertValueEqual(luxuria.id(), ForbiddenMagicAspectCatalog.LUXURIA, "Luxuria must be the first enabled definition");
-        helper.assertValueEqual(luxuria.components(), List.of(
-            ContentId.parse("forbiddenmagic:concept/flesh"),
-            ContentId.parse("forbiddenmagic:concept/hunger")
-        ), "Luxuria must preserve its original semantic components");
-        helper.assertValueEqual(enabled.get(1).blendMode(), AspectDefinition.BlendMode.ONE_MINUS_SOURCE_COLOR,
-            "Infernus must retain its original blend mode");
-        helper.assertTrue(disabled.stream().noneMatch(definition ->
-            definition.id().equals(ForbiddenMagicAspectCatalog.LUXURIA)),
-            "no-lust catalog must omit Luxuria");
-
-        ContentId fire = ContentId.parse("forbiddenmagic:concept/fire");
-        AspectDefinition.Cost merged = new AspectDefinition.Cost(List.of(
-            new AspectDefinition.Amount(fire, 2),
-            new AspectDefinition.Amount(fire, 3)
-        ));
-        helper.assertValueEqual(merged.amountOf(fire), 5, "duplicate aspect costs must merge");
-        helper.assertValueEqual(merged.totalAmount(), 5, "merged cost total must remain stable");
-        helper.succeed();
     }
 
     private static void sinAspectColorsComponentsAndBlendMatchOriginal(GameTestHelper helper) {

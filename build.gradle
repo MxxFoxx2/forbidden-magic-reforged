@@ -56,6 +56,7 @@ neoForge {
 
 repositories {
     maven { url = uri("maven") }
+    mavenCentral()
     maven {
         name = "Minecraft Forge"
         url = "https://maven.minecraftforge.net/"
@@ -92,6 +93,10 @@ dependencies {
     compileOnly "thaumcraft:thaumcraft:${thaumcraft_version}"
     localRuntime "thaumcraft:thaumcraft:${thaumcraft_version}"
     clientRuntimeOnly "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
+
+    testImplementation platform("org.junit:junit-bom:5.11.4")
+    testImplementation "org.junit.jupiter:junit-jupiter"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
 
 // GameTests live in their own source set (not shipped in the jar) and need the
@@ -101,6 +106,14 @@ sourceSets.gameTest.runtimeClasspath += sourceSets.main.runtimeClasspath
 dependencies {
     gameTestCompileOnly "thaumcraft:thaumcraft:${thaumcraft_version}"
     gameTestImplementation "com.github.glitchfiend:TerraBlender-neoforge:${terrablender_version}"
+}
+
+tasks.named('test', Test) {
+    useJUnitPlatform()
+    testLogging {
+        events "failed", "skipped"
+        exceptionFormat "full"
+    }
 }
 
 tasks.named('jar', Jar) {
